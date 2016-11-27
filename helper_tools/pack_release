@@ -1,0 +1,25 @@
+failat 21
+echo "-> Deleting RAM:iGame.lha..."
+delete RAM:iGame.lha
+echo "-> Deleting RAM:iGame..."
+delete RAM:iGame ALL
+echo "-> Creating new dir RAM:iGame..."
+makedir RAM:iGame
+echo "-> Compiling iGame to RAM:"...
+failat 10
+vc -dontwarn=-1 -O2 -o RAM:iGame/iGame -IWork:Coding/MUI/Developer/C/Include -IWork:Coding/MCC_Guigfx/Developer/C/Include -IWork:Coding/MCC_Texteditor/Developer/C/Include -c99 -lamiga -lauto src/funcs.c src/iGameGUI.c src/iGameMain.c src/Hook_utility.o src/strdup.c
+echo "-> Copying required files to RAM:iGame..."
+copy required_files/genres to RAM:iGame/
+copy required_files/igame.iff to RAM:iGame/
+copy required_files/iGame.info to RAM:iGame/
+copy required_files/iGame_drawer.info to RAM:iGame.info
+copy guide/iGame.guide to RAM:iGame/
+copy guide/iGame.guide.info to RAM:iGame/
+makedir RAM:iGame/Icons
+copy alt_icons/iGame1.info to RAM:iGame/Icons
+copy alt_icons/iGame2.info to RAM:iGame/Icons
+copy alt_icons/iGame3.info to RAM:iGame/Icons
+copy alt_icons/iGame4.info to RAM:iGame/Icons
+lha -aezrx a RAM:iGame.lha RAM:iGame
+lha -aezrx a RAM:iGame.lha RAM:iGame.info
+echo "** DONE RELEASE **"

@@ -1,0 +1,298 @@
+@DATABASE iGame.guide
+@$VER: iGame.guide 1.8 (18.09.2014)
+@INDEX "Index"
+
+@NODE "Main" "iGame documentation"
+
+
+			   iGame
+	=============================================
+		© 2005-2015 Emmanuel Vasilakis
+
+
+     @{" Introduction     " LINK "INTR" 0} - About iGame
+     @{" Requirements     " LINK "REQS" 0} - System requirements
+
+     @{" Installation     " LINK "INST" 0} - Installing iGame
+     @{" Usage            " LINK "USAG" 0} - Using iGame
+
+     @{" Todo             " LINK "TODO" 0} - Todo stuff
+     @{" Known bugs       " LINK "BUGS" 0} - Known bugs
+     @{" Author           " LINK "INFO" 0} - Author contact info
+     @{" History          " LINK "HIST" 0} - Version history
+
+@ENDNODE
+@NODE "INTR" "Introduction"
+
+iGame is a program that provides a front-end to whdload'ed games installed
+on your machine.
+
+It can "discover" your games on pre-defined repositories and create a small
+database. You can then categorize each game according to it's genre, provide
+a small image to be displayed when the game is selected, and quickly find the
+one you're looking for using the Filter gadget.
+
+But not just whdload games. You can add and launch any type of executable, though
+it mostly makes sense if it's a game ;-)
+
+iGame was developed on an Amiga 3000 with a CSMKII 68060 with 128MB RAM.
+Tested on an Amiga 1200 68030/50 64MB RAM and WB3.1
+Developed on Cubic IDE (gcc).
+
+@ENDNODE
+@NODE "REQS" "Requirements"
+
+REQUIREMENTS
+
+Hardware
+
+ - Amiga Computer with at least 68020 processor
+ - 2 MB RAM min.
+
+To be perfectly honest, iGame requirements depend on the amount of installed games.
+I'd say a healthy ok would be an 68030 and 16MB of fast ram, but it is run okay on a 020
+system. (Havent tried on 00, let me know about it).
+
+On a 030 processor, it takes a while to scan and list the games. Typical
+numbers are about 2 mins for a complete scan of an SFS formated 5G partition
+with almost 2000 games (~3G data).
+
+On a 060 with ~200 games, scanning takes ~30 secs and listing/sorting <1 sec.
+
+A good amount of stack. Due to it's recursive scan, ~32000 is ok. If you find that iGame
+crashes, check the stack first, and then report a bug.
+
+Software
+
+ - Kickstart 2.04 or higher
+ - Workbench 2.1 or higher
+ - guigfx.library
+ - render.library
+ - guigfx.mcc
+ - Texteditor.mcc
+
+@ENDNODE
+@NODE "INST" "Installation"
+
+No supplied installer yet, so you must do the following by hand:
+
+  1. Unpack the archive.
+
+  2. Copy the iGame drawer anywhere on your hard disk.
+
+  3. Make sure the igame.iff file is in the same dir as the binary.
+
+  4. Install required libs and mccs suitable for your system.
+
+  5. Run iGame!
+
+iGame saves it's support files in the PROGDIR:, so it's best to use a separate
+directory. If you are upgrading from a previous release, then just copy the new
+executable over the old one. Make sure to keep the gameslist and repos.prefs files
+if you're upgrading!
+
+-- NOTE:
+
+Make sure that render.library and guigfx.library are ok for your system/processor.
+If iGame fails with guru 8000000B or similar at startup, double check the libraries.
+If it still persists, check http://igame.amigahellas.gr. On the files section you
+will find an archive of these 2 libraries for systems with 020/no fpu (thanks to
+Jools 'buzz' Smyth for providing them!). These might fix things even for 030/882 systems.
+Try those. If the problem is still there, add the NOGUIGFX tooltype to iGame.
+This will use MUI's internal dt loading routines (dtpic.mui) instead of guigfx.mcc's.
+In this case though, there will be no scaling of the screenshots you load, so each
+one you add must be of the same size as the others.
+
+@ENDNODE
+@NODE "USAG" "Using iGame"
+
+The first thing to do, when you start iGame for the first time, is to add
+one or more "repositories", i.e. paths on your system drives that you have
+games installed.
+
+For example, you might have a whole partition dedicated to games, or a
+folder inside a partition. So, add a repository ;-)
+
+Next step is to scan the repositories. iGame searches for slave files. After
+the search, the results are saved to disk, so you only need to do this once.
+(or whenever you add or remove a game to your repository so iGame can keep an
+up-to-date database).
+
+The list will be populated with the results, the game title that will appear will
+be the directory name where each slave was located, or the title from the slave
+file, if it containes one.
+
+Multiple slaves for the same game will be suffixed with the 'Alt' word.
+
+Then, just double-click on a game, and it will run! The list can be filtered
+by typing a part of the game name you're looking for, or by using the genres list
+on the right. If the slave file has an .info file associated with it, it will
+use whatever tooltypes there are in the .info file, else it will launch it with
+whdload default parameters.
+
+You can edit some game's properties from the "Game properties" menu. You can change
+the title, the genre so it will be filtered accordingly, whether it's one of your
+favorites, and the games tooltypes, as you would do in it's info file.
+
+You can also choose to hide the game from the list. It will not appear in any searching
+or genre filtering. Choose "Show/Hide hidden slaves" from the menu, to list those slaves.
+To go back to normal games listing, click on the same menu item again.
+
+To add a screenshot to appear when a game is selected, simply save an image in
+the game's folder with the name igame.iff. Note, the image can be of any type
+as long as you have the proper datatype installed. It should however still
+have .iff as it's extension, even though it may be a png file.
+
+Under some circumstances, newicons icons from games could be displayed on the screenshot box.
+This is still under testing.
+
+The genres list on the right side of the application is stored in a file called 'genres'.
+This file must be in the same directory as iGame itself. To add or remove genres
+just edit this file with your favorite editor.
+
+There are a few toolypes you can set to configure iGame. The SCREENSHOT tooltype
+will define the size of the screenshot part of the application. Use whatever
+size it fits your display. Any image will be scaled to fit that part. Use
+SCREENSHOT=WIDTHxHEIGHT to define it. Default is half the PAL low res screenmode (160x128).
+
+FILTERUSEENTER causes the filter to wait for an enter instead of searching as you
+type. This is useful for slower machines.
+
+SAVESTATSONEXIT: Use this tooltype to let iGame know you don't need saving your games
+statistics each time a game is launched. Instead it will save them when you quit iGame.
+Of course this implies that if a game crashes and the amiga is rebooted, statistics are
+lost.
+
+Since version 1.3, the 'update_titles' utility is included. It is intended for
+people who used iGame before 1.3. Update_titles will scan your slave files
+from the gameslist, extract titles from the slaves and update the gameslist
+file. To use, open a shell window, go to the dir where iGame is installed and
+run update_titles (no options). You may wish to keep a copy of gameslist file
+in case something goes wrong or you dont like the titles from the slaves. The
+gameslist file and update_lists must be in the same dir. Remember to use a good
+amount of stack before running (32000 should be ok).
+
+Most of the other parts of iGame should be easy to figure. ;-)
+
+@ENDNODE
+@NODE "TODO" "Todo"
+
+- Ability to edit global whdload settings.
+
+- Should be possible to retreive game info from a site or something
+  (title, genre, publisher, etc).
+
+- Way to display a readme file that comes with the game.
+
+- Fix bugs!
+
+Many people have contacted me with lots of suggestions and feature requests.
+These will be starting to be implemented in next releases.
+
+@ENDNODE
+@NODE "BUGS" "Known bugs/limitations"
+
+- Some Muforce hits have been reported, trying to fix those.
+
+- If you find anything, please let me know ;-)
+
+@ENDNODE
+@NODE "INFO" "Author info"
+
+If you wish to contact me:
+
+Emmanuel Vasilakis
+mrzammler\@gmail.com
+
+or, pop to #amigahellas channel in gr.net (nana.irc.gr).
+
+There is also a thread on eab that you could post suggestions/bugs:
+http://eab.abime.net/showthread.php?t=28771
+
+Icons and pics by Animagic and Emmanouela Panterh
+
+Many thanks to all those people who contacted me about iGame!
+
+@ENDNODE
+@NODE "HIST" "Version history"
+
+Here's a list of changes:
+
+  Work in progress builds (iGame-2015-11-07.lha):
+            
+        Fix a GR when selecting Game Properties without having selected a game. (Thanks @AllanU74)
+
+  Work in progress builds (iGame-2015-02-13.lha):
+            
+        Adjusts screenshot box according to workbench resolution.
+
+  Work in progress builds (iGame-2014-08-13.lha):
+            
+        Now compiled with vbcc. Should produce a slightly faster build.
+        Builds for 030 and 060.
+        Fixed OS4 crashes (mainly during search).
+        Added SAVESTATSONEXIT tooltype.
+        Faster initial loading.
+        Under some circumstances, iGame now loads games icons.
+        Some other small changes done during a few years of on/off coding.
+
+  1.5 (12/08/08):
+
+	Genres are now in an external file.
+	Added "--Never Played--".
+	Reworked "Show/Hide hidden slaves".
+	Filter will now work together with genres.
+	Added FILTERUSEENTER.
+	Added indication when writing to disk.
+
+  1.4 (08/12/07):
+
+	Editable tooltypes.
+	Speed increase while listing games.
+	Misc bug fixes.
+  
+  1.3 (28/04/07):
+
+	Added the NOGUIGFX tooltype.
+	Added keyboard shortcut to Game Properties (Right A + P).
+	Added option to hide a slave.
+	iGame will now launch a slave, even without an info file (with default tooltypes).
+	Reads titles from slave files.
+	Added the update_titles app.
+	'Alt' suffix is used for multiple slaves.
+
+  1.2 (06/04/2007):
+
+	Fixed screenshot size to be consistent when changing images.
+	Search .info files only when launching games.
+	Counters now work for genres filtering.
+
+  1.1 (27/03/2007):
+
+	Fixed a nasty bug that caused iGame to sometimes list wrong titles
+    (or no titles at all) after a scan.
+	Added MUI Settings.
+
+  1.0 (17/03/2007):
+
+	Too many things changed to list here.
+	Released ;-)
+
+  0.2 (30/07/2005):
+
+	iGame finds the tooltypes from the game's icon and uses them.
+
+  0.1-23052005 (23/05/2005):
+
+	Games that have their data stored in a sub-dir, now run.
+
+  0.1-05052005 (05/05/2005):
+
+	First test version.
+
+@ENDNODE
+
+
+@{BODY}
+
+

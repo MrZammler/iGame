@@ -1,0 +1,68 @@
+##########################################################################
+# Makefile for iGame on AmigaOS using VBCC.
+#-------------------------------------------------------------------------
+# To compile iGame using this makefile, run:
+#  make
+#
+# In progress makefile, not tested.
+#-------------------------------------------------------------------------
+# one line build:
+# vc -dontwarn=-1 -O2 -o RAM:iGame/iGame -IStuff:Development/MUI/Developer/C/Include -IStuff:Development/MCC_Guigfx/Developer/C/Include -IStuff:Development/MCC_Texteditor/Developer/C/Include -c99 -lamiga -lauto src/funcs.c src/iGameGUI.c src/iGameMain.c src/Hook_utility.o src/strdup.c
+##########################################################################
+
+##########################################################################
+# Default: Build iGame
+##########################################################################
+all: iGame
+
+##########################################################################
+# GLFW version
+##########################################################################
+VERMAJOR = 2
+VERMINOR = 4
+
+##########################################################################
+# Compiler settings
+##########################################################################
+CC	   = vc
+LINK       = vc
+#CFLAGS	   = -c -I. -I/ -c99 -cpu=68020 -fpu=68881 -O1
+CFLAGS     = -c -dontwarn=-1 -O2 -c99 -IStuff:Development/MUI/Developer/C/Include -IStuff:Development/MCC_Guigfx/Developer/C/Include -IStuff:Development/MCC_Texteditor/Developer/C/Include
+
+# Some modules should be optimized for speed (e.g. image decoding)
+CFLAGS_SPEED = -c -I. -I/ -c99 -cpu=68020 -fpu=68881 -O1
+
+##########################################################################
+# Library builder settings
+##########################################################################
+#MKLIB	 = join
+LIBFLAGS = -lamiga -lauto -o
+
+##########################################################################
+# Object files which are part of the GLFW library
+##########################################################################
+OBJS = src/funcs.o src/iGameGUI.o src/iGameMain.o src/Hook_utility.o src/strdup.o
+
+##########################################################################
+# Rule for building library
+##########################################################################
+iGame: $(OBJS)
+	$(LINK) $(OBJS) $(LIBFLAGS) $@
+
+##########################################################################
+# Rules for building library object files
+##########################################################################
+src/funcs.o: src/funcs.c
+	$(CC) $(CFLAGS) -o $@ src/funcs.c
+
+src/iGameGUI.o: src/iGameGUI.c src/iGameGUI.h
+	$(CC) $(CFLAGS) -o $@ src/iGameGUI.c
+
+src/iGameMain.o: src/iGameMain.c
+	$(CC) $(CFLAGS) -o $@ src/iGameMain.c
+
+src/strdup.o: src/strdup.c
+	$(CC) $(CFLAGS) -o $@ src/strdup.c
+
+clean:
+	delete iGame src/funcs.o src/iGameGui.o src/iGameMain.o src/strdup.o

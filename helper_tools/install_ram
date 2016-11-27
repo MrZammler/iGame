@@ -1,0 +1,15 @@
+failat 21
+;echo "-> Deleting RAM:iGame..."
+;delete RAM:iGame ALL
+echo "-> Creating new dir RAM:iGame..."
+makedir RAM:iGame
+;echo "-> Compiling iGame to RAM:"...
+failat 10
+;vc -dontwarn=-1 -O2 -o RAM:iGame/iGame -IStuff:Development/MUI/Developer/C/Include -IStuff:Development/MCC_Guigfx/Developer/C/Include -IStuff:Development/MCC_Texteditor/Developer/C/Include -c99 -lamiga -lauto src/funcs.c src/iGameGUI.c src/iGameMain.c src/Hook_utility.o src/strdup.c
+;make
+echo "-> Copying required files to RAM:iGame..."
+copy required_files/genres to RAM:iGame/
+copy required_files/igame.iff to RAM:iGame/
+copy required_files/iGame.info to RAM:iGame/
+copy iGame to RAM:iGame/
+echo "** DONE **"
