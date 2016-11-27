@@ -8,7 +8,7 @@ http://winterland.no-ip.org/igame/
 
 ## Builds and releases
 
-the iGame_rel folder should contain builds that are done at some point in time, following any major code changes.
+The iGame_rel folder should contain builds that are done at some point in time, following any major code changes.
 
 ## Installing
 
