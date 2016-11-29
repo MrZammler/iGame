@@ -70,7 +70,7 @@ struct ObjApp
 	char *  STR_TX_label_2;
 	char *  STR_TX_NumPlayed_0;
 	char *  STR_TX_Tooltypes_0;
-	char *	CY_Genre_0Content[256];
+	char *	CY_Genre_0Content[512];
 };
 
 

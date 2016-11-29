@@ -228,58 +228,57 @@ void AppStart()
 
 	fpgenres = fopen ("PROGDIR:genres", "r");
 	if (!fpgenres){
-        //stupid!
+	  //stupid!
+	}
+	else
+	  {
+	    do
+	      {
+		if (fgets(FileLine, sizeof(FileLine), fpgenres)==NULL) { break; }
 
-    }else{
-        do{
-			if (fgets(FileLine, sizeof(FileLine), fpgenres)==NULL) { break; }
+		FileLine[strlen(FileLine)-1]='\0';
 
-            FileLine[strlen(FileLine)-1]='\0';
+		if (strlen(FileLine)==0) continue;
 
-            if (strlen(FileLine)==0) continue;
+		item_genres = (Genres_list *)calloc(1, sizeof(Genres_list));
+		item_genres->next=NULL;
+		strcpy(item_genres->Genre, FileLine);
 
-			item_genres = (Genres_list *)calloc(1, sizeof(Genres_list));
-			item_genres->next=NULL;
-			strcpy(item_genres->Genre, FileLine);
-
-			if (Genres == NULL) {
-				Genres = item_genres;
-            }
-            else {
-				item_genres->next = Genres;
-				Genres = item_genres;
-            }
-
-			NoOfGenres++;
-			//App->CY_Genre_0Content[NoOfGenres] = item_genres->Genre;
-			DoMethod(App->LV_GenresList_1, MUIM_List_InsertSingle, item_genres->Genre, MUIV_List_Insert_Sorted);
-
-        }while(1);
-
-		for	(i=0;i<NoOfGenres;i++){
-			DoMethod(App->LV_GenresList_1, MUIM_List_GetEntry, i+5, &App->CY_Genre_0Content[i]);
+		if (Genres == NULL) {
+		  Genres = item_genres;
 		}
-		App->CY_Genre_0Content[i] = "Unknown";
-		App->CY_Genre_0Content[i+1] = NULL;
-		set (App->CY_Genre_0,MUIA_Cycle_Entries, App->CY_Genre_0Content);
-    }//end of else !fprepos
+		else {
+		  item_genres->next = Genres;
+		  Genres = item_genres;
+		}
 
-    //update the other list with genres
-	//DoMethod(App->LV_GenresList_1, MUIM_List_Insert, genres, -1, MUIV_List_Insert_Bottom);
+		NoOfGenres++;
+		
+		DoMethod(App->LV_GenresList_1, MUIM_List_InsertSingle, item_genres->Genre, MUIV_List_Insert_Sorted);
 
-    if (fpgames) fclose(fpgames);
-    if (fprepos) fclose(fprepos);
+	      }while(1);
+
+	   
+	    for (i=0;i<NoOfGenres;i++)
+	      {
+	    	DoMethod(App->LV_GenresList_1, MUIM_List_GetEntry, i+5, &App->CY_Genre_0Content[i]);
+	      }
+	   
+	    App->CY_Genre_0Content[i] = "Unknown";
+	    App->CY_Genre_0Content[i+1] = NULL;
+	   
+	    set (App->CY_Genre_0,MUIA_Cycle_Entries, App->CY_Genre_0Content);
+	   
+	   }//end of else !fpgenres
+
+	if (fpgames) fclose(fpgames);
+	if (fprepos) fclose(fprepos);
 	if (fpgenres) fclose(fpgenres);
 	IntroPic = 1;
-
-//	set(App->LV_GamesList_0, MUIA_List_Quiet, FALSE);
-//	set(App->LV_GenresList_1, MUIA_List_Quiet, FALSE);
 
 	set(App->WI_Main_0,
 		MUIA_Window_Open, TRUE
 		);
-
-
 }
 
 void FilterChange()
