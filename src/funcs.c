@@ -738,9 +738,7 @@ void GameClick()
     if (!NOSCREENSHOT && str) //for some reason, GameClick is called and str is null??
       {
 	GetPath((char *)str, path);
-	
-	//printf("Path: %s\n", path);
-	
+			
 	/* strip the path from the slave file and get the rest */
 	for (i=strlen(path)-1;i>=0;i--){
 	  if (path[i]=='/')
@@ -756,7 +754,6 @@ void GameClick()
 	  {
 	    sprintf(naked_path, "%s/igame.iff", naked_path);
 	    
-	    //printf("%s\n", naked_path);
 	    fp = fopen(naked_path, "r");
 	    if (!fp) //no igame.iff, try .info and newicons
 	      {
@@ -802,9 +799,15 @@ void GameClick()
 		    DoMethod(App->GR_grp_1,MUIM_Group_ExitChange);
 		    IntroPic = 0;
 		  }
+		else //in case it failed to load something, lets hope it gets picked up here and is forced to load the default igame.iff
+		  {
+		    goto loaddef;
+		  }
+		    
 	      } 
 	    else //no pic found
 	      {
+	      loaddef:
 		if (IntroPic == 0)
 		  {
 		  
