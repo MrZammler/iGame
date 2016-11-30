@@ -997,7 +997,7 @@ void MenuGameProperties()
 		set(App->TX_NumPlayed_0 , MUIA_Text_Contents, helperstr);
 
 		//set the genre
-		for (i=0; i<=21;i++)
+		for (i=0; i<NoOfGenres;i++)
 			if (!strcmp(App->CY_Genre_0Content[i],item_games->Genre)) break;
 		set(App->CY_Genre_0, MUIA_Cycle_Active, i);
 
