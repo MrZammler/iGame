@@ -27,8 +27,12 @@ If you still get gurus, try disabling the Screenshot pane with adding NOSCREENSH
 
 ## Compiling
 
-The early version of iGame were developed and compiled on a real Amiga using gcc at first and then vbcc.
-While you can still compile it on an Amiga, it is much faster to do so on a PC. These instruction assume the latter approach.
+The early versions of iGame were developed and compiled on a real Amiga using gcc at first and then vbcc.
+While you can still compile it on an Amiga, it is much faster to do so on a PC. (Side note: I don't really recall the time it took
+to compile on a 060, but it must have been close to 1 or 2 minutes. After a while I tried on an 030, and it took nearly 10!). Of course
+on a modern PC it takes less than a few seconds...)
+
+These instruction assume the latter approach.
 
 There is a pre-build vbcc enviroment that runs on x64 linux here: http://winterland.no-ip.org/2014/07/vbcc-cross-compiler/
 
