@@ -34,7 +34,7 @@ on a modern PC it takes less than a few seconds...)
 
 These instruction assume the latter approach.
 
-There is a pre-build vbcc enviroment that runs on x64 linux here: http://winterland.no-ip.org/2014/07/vbcc-cross-compiler/
+There is a pre-build vbcc enviroment that runs on x64 linux here: http://winterland.no-ip.org/2014/07/12/vbcc-cross-compiler/
 
 iGame requires the include files of the libraries used to be present when compiling it. The Makefile has these hardcoded paths in
 /opt/vbcc/includes_and_libs/ directories. You should provide the following includes for building:
