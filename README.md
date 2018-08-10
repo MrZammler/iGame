@@ -21,10 +21,6 @@ Just place the iGame folder anywhere you want on your drive. iGame also requires
 
 Make sure your installation contains MUI and the above libraries. You can find the latest versions in Aminet.
 
-If you're having problems with iGame starting (guru 8000000B) try these versions of render and guigfx instead (Thanks to Jools 'buzz' Smyth for providing them): [guigfx_render_nofpu.lha](guigfx_render_nofpu.lha)
-
-If you still get gurus, try disabling the Screenshot pane with adding NOSCREENSHOT in iGames info.
-
 ## Compiling
 
 Please check the [Wiki](https://github.com/MrZammler/iGame/wiki/Compiling-iGame)
