@@ -18,19 +18,14 @@ all: iGame
 ##########################################################################
 # Compiler settings
 ##########################################################################
-CC	   = vc
-LINK       = vc
-#CFLAGS	   = -c -I. -I/ -c99 -cpu=68020 -fpu=68881 -O1
-CFLAGS     = -c +aos68k -dontwarn=-1 -O2 -c99 -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
+CC		= vc
+LINK		= vc
 
-CFLAGS_030     = -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
-
-CFLAGS_060     = -c +aos68k -cpu=68060 -fpu=68882 -dontwarn=-1 -O2 -c99 -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
-
-CFLAGS_MOS     = -c +morphos -dontwarn=-1 -O2 -c99 I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
-
-# Some modules should be optimized for speed (e.g. image decoding)
-CFLAGS_SPEED = -c -I. -I/ -c99 -cpu=68020 -fpu=68881 -O1
+CFLAGS			= -c +aos68k -dontwarn=-1 -O2 -c99 -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
+CFLAGS_030		= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
+CFLAGS_040		= -c +aos68k -cpu=68040 -fpu=68040 -dontwarn=-1 -O2 -c99 -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
+CFLAGS_060		= -c +aos68k -cpu=68060 -fpu=68060 -dontwarn=-1 -O2 -c99 -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
+CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99 I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
 
 DATE = $(shell date --iso=date)
 
@@ -39,18 +34,15 @@ DATE = $(shell date --iso=date)
 ##########################################################################
 #MKLIB	 = join
 LIBFLAGS = +aos68k -lamiga -lauto -lmieee -o
-
 LIBFLAGS_MOS = +morphos -lamiga -lauto -o
 
 ##########################################################################
 # Object files which are part of the GLFW library
 ##########################################################################
 OBJS = src/funcs.o src/iGameGUI.o src/iGameMain.o src/Hook_utility.o src/strdup.o
-
 OBJS_030 = src/funcs_030.o src/iGameGUI_030.o src/iGameMain_030.o src/Hook_utility.o src/strdup_030.o
-
+OBJS_040 = src/funcs_040.o src/iGameGUI_040.o src/iGameMain_040.o src/Hook_utility.o src/strdup_040.o
 OBJS_060 = src/funcs_060.o src/iGameGUI_060.o src/iGameMain_060.o src/Hook_utility.o src/strdup_060.o
-
 OBJS_MOS = src/funcs_MOS.o src/iGameGUI_MOS.o src/iGameMain_MOS.o src/Hook_utility_MOS.o src/strdup_MOS.o
 
 ##########################################################################
@@ -62,6 +54,9 @@ iGame: $(OBJS)
 iGame.030: $(OBJS_030)
 	$(LINK) $(OBJS_030) $(LIBFLAGS) $@
 
+iGame.040: $(OBJS_040)
+	$(LINK) $(OBJS_040) $(LIBFLAGS) $@
+	
 iGame.060: $(OBJS_060)
 	$(LINK) $(OBJS_060) $(LIBFLAGS) $@
 
@@ -102,6 +97,22 @@ src/strdup_030.o: src/strdup.c
 	$(CC) $(CFLAGS_030) -o $@ src/strdup.c
 
 ##########################################################################
+# object files (040)
+##########################################################################
+
+src/funcs_040.o: src/funcs.c
+	$(CC) $(CFLAGS_040) -o $@ src/funcs.c
+
+src/iGameGUI_040.o: src/iGameGUI.c src/iGameGUI.h
+	$(CC) $(CFLAGS_040) -o $@ src/iGameGUI.c
+
+src/iGameMain_040.o: src/iGameMain.c
+	$(CC) $(CFLAGS_040) -o $@ src/iGameMain.c
+
+src/strdup_040.o: src/strdup.c
+	$(CC) $(CFLAGS_040) -o $@ src/strdup.c
+	
+##########################################################################
 # object files (060)
 ##########################################################################
 
@@ -134,26 +145,6 @@ src/strdup_MOS.o: src/strdup.c
 	$(CC) $(CFLAGS_MOS) -o $@ src/strdup.c
 
 clean:
-	del iGame iGame.030 iGame.060 src\funcs*.o src\iGameGUI*.o src\iGameMain*.o src\strdup*.o
+	del iGame iGame.* src\funcs*.o src\iGameGUI*.o src\iGameMain*.o src\strdup*.o
 
-# pack everything in a nice lha file
-release:
-	rm -rf iGame_rel/*
-	mkdir iGame_rel/iGame-$(DATE)
-	echo "#define VERSION \"\$$VER:version 1.6-testing ("$(DATE)")"\" > src/version.h
-	make iGame
-	make iGame.030
-	make iGame.060
-	cp iGame iGame_rel/iGame-$(DATE)/
-	cp iGame.030 iGame_rel/iGame-$(DATE)/
-	cp iGame.060 iGame_rel/iGame-$(DATE)/
-	cp required_files/genres iGame_rel/iGame-$(DATE)/
-	cp required_files/igame.iff iGame_rel/iGame-$(DATE)/
-	cp required_files/iGame.info iGame_rel/iGame-$(DATE)/
-	cp required_files/igame_drawer_3.0.info iGame_rel/iGame.info
-	cp guide/* iGame_rel/iGame-$(DATE)/
-	mkdir iGame_rel/iGame-$(DATE)/Icons/
-	cp alt_icons/* iGame_rel/iGame-$(DATE)/Icons/
-	cp required_files/igame_drawer.info iGame_rel/iGame-$(DATE)/Icons.info
-	cd iGame_rel && mv iGame-$(DATE) iGame && lha -a iGame-$(DATE).lha iGame/ && lha -a iGame-$(DATE).lha iGame.info
 
