@@ -118,7 +118,7 @@ struct ObjApp * CreateApp(void)
 	struct ObjApp * ObjectApp;
 
 	APTR	MNlabel1Actions, MNlabel1ScanRepository, MNlabel1Addslave, MNlabel1BarLabel1;
-	APTR	MNlabel1About, MNlabel1BarLabel2, MNlabel1BarLabel3, MNlabel1MUISettings, MNlabel1Quit, MNlabel1Settings,MNlabel1ShowHidden;
+	APTR	MNlabel1About, MNlabel1BarLabel2, MNlabel1BarLabel3, MNlabel1MUISettings, MNlabel1Quit, MNlabel1Settings, MNlabel1ShowHidden;
 	APTR	MNlabel1Gamespath, MNlabel1Game, MNlabel1GameProperties, GROUP_ROOT_0, IM_Pic;
 	APTR	GR_grp_Img, GR_grp_5, GR_grp_2, obj_aux0, obj_aux1, obj_aux2, obj_aux3, obj_aux4, GR_grp_0, GROUP_ROOT_1, GR_grp_4, GR_grp_6, GR_grp_7;
 	APTR	GROUP_ROOT_2, GR_grp_3, GROUP_ROOT_3, GROUP_ROOT_4, GROUP_ROOT_5, GROUP_ROOT_6;
@@ -139,12 +139,12 @@ struct ObjApp * CreateApp(void)
 	static struct Hook MenuMUISettingsHook;
 	static struct Hook MenuShowHiddenHook;
 
-	if (!(ObjectApp = AllocVec(sizeof(struct ObjApp),MEMF_CLEAR)))
+	if (!(ObjectApp = AllocVec(sizeof(struct ObjApp), MEMF_CLEAR)))
 		return(NULL);
 
 	ObjectApp->STR_TX_Status_0 = NULL;
 	ObjectApp->STR_TX_Path_2 = NULL;
-	ObjectApp->STR_TX_label_1 = "iGame version 1.6 testing - 'To be completed'\n\n(c) 2005-2015 Emmanuel Vasilakis\nmrzammler@gmail.gr";
+	ObjectApp->STR_TX_label_1 = "iGame version 1.7 beta\n\n(c) 2005-2018 Emmanuel Vasilakis\nmrzammler@gmail.com";
 	ObjectApp->STR_TX_label_2 = "Writing to disk, please wait...";
 
 	ObjectApp->CY_Genre_0Content[0] = "Unknown";
@@ -174,26 +174,26 @@ struct ObjApp * CreateApp(void)
 	ObjectApp->CY_Genre_0Content[22] = NULL;
 	*/
 
-	InstallHook(&FilterChangeHook,FilterChange,ObjectApp);
-	InstallHook(&GameDoubleClickHook,GameDoubleClick,ObjectApp);
-	InstallHook(&MenuScanHook,MenuScan,ObjectApp);
-	InstallHook(&AppStartHook,AppStart,ObjectApp);
-	InstallHook(&RepoAddHook,RepoAdd,ObjectApp);
-	InstallHook(&RepoRemoveHook,RepoRemove,ObjectApp);
-	InstallHook(&RepoStartHook,RepoStart,ObjectApp);
-	InstallHook(&RepoStopHook,RepoStop,ObjectApp);
-	InstallHook(&GameClickHook,GameClick,ObjectApp);
-	InstallHook(&MenuGamePropertiesHook,MenuGameProperties,ObjectApp);
-	InstallHook(&GamePropertiesOkHook,GamePropertiesOk,ObjectApp);
-	InstallHook(&GenresClickHook,GenresClick,ObjectApp);
-	InstallHook(&MenuAddNonWhdloadHook,MenuAddNonWhdload,ObjectApp);
-	InstallHook(&NonWhdloadOkHook,NonWhdloadOk,ObjectApp);
-	InstallHook(&MenuShowHiddenHook,MenuShowHidden,ObjectApp);
+	InstallHook(&FilterChangeHook, FilterChange, ObjectApp);
+	InstallHook(&GameDoubleClickHook, GameDoubleClick, ObjectApp);
+	InstallHook(&MenuScanHook, MenuScan, ObjectApp);
+	InstallHook(&AppStartHook, AppStart, ObjectApp);
+	InstallHook(&RepoAddHook, RepoAdd, ObjectApp);
+	InstallHook(&RepoRemoveHook, RepoRemove, ObjectApp);
+	InstallHook(&RepoStartHook, RepoStart, ObjectApp);
+	InstallHook(&RepoStopHook, RepoStop, ObjectApp);
+	InstallHook(&GameClickHook, GameClick, ObjectApp);
+	InstallHook(&MenuGamePropertiesHook, MenuGameProperties, ObjectApp);
+	InstallHook(&GamePropertiesOkHook, GamePropertiesOk, ObjectApp);
+	InstallHook(&GenresClickHook, GenresClick, ObjectApp);
+	InstallHook(&MenuAddNonWhdloadHook, MenuAddNonWhdload, ObjectApp);
+	InstallHook(&NonWhdloadOkHook, NonWhdloadOk, ObjectApp);
+	InstallHook(&MenuShowHiddenHook, MenuShowHidden, ObjectApp);
 
 	ObjectApp->STR_Filter_0 = StringObject,
 		MUIA_Frame, MUIV_Frame_String,
 		MUIA_HelpNode, "STR_Filter_0",
-	End;
+		End;
 
 	obj_aux1 = Label2("Filter:");
 
@@ -201,80 +201,82 @@ struct ObjApp * CreateApp(void)
 		MUIA_Group_Columns, 2,
 		Child, obj_aux1,
 		Child, ObjectApp->STR_Filter_0,
-	End;
+		End;
 
 	GR_grp_2 = GroupObject,
 		MUIA_HelpNode, "GR_grp_2",
 		MUIA_Group_Horiz, TRUE,
 		Child, obj_aux0,
-	End;
+		End;
 
-//	  ObjectApp->LV_GamesList_0 = NListObject,
-//		  MUIA_Frame, MUIV_Frame_InputList,
-//	  End;
+	//	  ObjectApp->LV_GamesList_0 = NListObject,
+	//		  MUIA_Frame, MUIV_Frame_InputList,
+	//	  End;
 
-//	  ObjectApp->LV_GamesList_0 = NListviewObject,
-//		  MUIA_HelpNode, "LV_GamesList_0",
-//		  MUIA_NList_DoubleClick, TRUE,
-//		  MUIA_NListview_Vert_ScrollBar, MUIV_NListview_VSB_Always,
-//		  MUIA_NListview_NList, ObjectApp->LV_GamesList_0,
+	//	  ObjectApp->LV_GamesList_0 = NListviewObject,
+	//		  MUIA_HelpNode, "LV_GamesList_0",
+	//		  MUIA_NList_DoubleClick, TRUE,
+	//		  MUIA_NListview_Vert_ScrollBar, MUIV_NListview_VSB_Always,
+	//		  MUIA_NListview_NList, ObjectApp->LV_GamesList_0,
 
-//	  End;
+	//	  End;
 
 	ObjectApp->LV_GamesList_0 = ListObject,
 		MUIA_Frame, MUIV_Frame_InputList,
-	End;
+		End;
 
 	ObjectApp->LV_GamesList_0 = ListviewObject,
 		MUIA_HelpNode, "LV_GamesList_0",
 		MUIA_Listview_DoubleClick, TRUE,
 		MUIA_Listview_List, ObjectApp->LV_GamesList_0,
-	End;
+		End;
 
-	if (!NOSCREENSHOT){
+	if (!NOSCREENSHOT) {
 
-	    if(NOGUIGFX){
-		    ObjectApp->IM_GameImage_0 = MUI_NewObject("Dtpic.mui",
-			    MUIA_Dtpic_Name, "PROGDIR:igame.iff",
-			    MUIA_Frame, MUIV_Frame_ImageButton,
-		    End;
-	    }else{
-		    ObjectApp->IM_GameImage_0 = GuigfxObject,
-			    MUIA_Guigfx_FileName, FILENAME_DEFAULT,
-			    MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
-			    MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
-			    MUIA_Frame, MUIV_Frame_ImageButton,
-			    MUIA_FixHeight, SS_HEIGHT,
-			    MUIA_FixWidth, SS_WIDTH,
-		    End;
-	    }
+		if (NOGUIGFX) {
+			ObjectApp->IM_GameImage_0 = MUI_NewObject("Dtpic.mui",
+				MUIA_Dtpic_Name, "PROGDIR:igame.iff",
+				MUIA_Frame, MUIV_Frame_ImageButton,
+				End;
+		}
+		else {
+			ObjectApp->IM_GameImage_0 = GuigfxObject,
+				MUIA_Guigfx_FileName, FILENAME_DEFAULT,
+				MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
+				MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
+				MUIA_Frame, MUIV_Frame_ImageButton,
+				MUIA_FixHeight, SS_HEIGHT,
+				MUIA_FixWidth, SS_WIDTH,
+				End;
+		}
 	}
 
 	ObjectApp->LV_GenresList_1 = ListObject,
 		MUIA_Frame, MUIV_Frame_InputList,
-	End;
+		End;
 
 	ObjectApp->LV_GenresList_1 = ListviewObject,
 		MUIA_HelpNode, "LV_GenresList_1",
 		MUIA_Listview_List, ObjectApp->LV_GenresList_1,
 		MUIA_MaxWidth, SS_WIDTH,	//keep the same width as if there was a screenshot area
-	End;
+		End;
 
-	if (!NOSCREENSHOT){
+	if (!NOSCREENSHOT) {
 
-	    ObjectApp->GR_grp_1 = GroupObject,
-		    MUIA_HelpNode, "GR_grp_1",
-		    MUIA_Group_Rows, 2,
-		    Child, ObjectApp->IM_GameImage_0,
-		    Child, ObjectApp->LV_GenresList_1,
-	    End;
-	}else {
+		ObjectApp->GR_grp_1 = GroupObject,
+			MUIA_HelpNode, "GR_grp_1",
+			MUIA_Group_Rows, 2,
+			Child, ObjectApp->IM_GameImage_0,
+			Child, ObjectApp->LV_GenresList_1,
+			End;
+	}
+	else {
 
-	    ObjectApp->GR_grp_1 = GroupObject,
-		    MUIA_HelpNode, "GR_grp_1",
-		    MUIA_Group_Rows, 1,
-		    Child, ObjectApp->LV_GenresList_1,
-	    End;
+		ObjectApp->GR_grp_1 = GroupObject,
+			MUIA_HelpNode, "GR_grp_1",
+			MUIA_Group_Rows, 1,
+			Child, ObjectApp->LV_GenresList_1,
+			End;
 
 	}
 
@@ -283,45 +285,45 @@ struct ObjApp * CreateApp(void)
 		MUIA_Group_Columns, 2,
 		Child, ObjectApp->LV_GamesList_0,
 		Child, ObjectApp->GR_grp_1,
-	End;
+		End;
 
 	ObjectApp->TX_Status_0 = TextObject,
 		MUIA_Background, MUII_TextBack,
 		MUIA_Frame, MUIV_Frame_Text,
 		MUIA_Text_Contents, ObjectApp->STR_TX_Status_0,
-	End;
+		End;
 
 	GROUP_ROOT_0 = GroupObject,
 		Child, GR_grp_2,
 		Child, GR_grp_0,
 		Child, ObjectApp->TX_Status_0,
-	End;
+		End;
 
 	MNlabel1ScanRepository = MenuitemObject,
 		MUIA_Menuitem_Title, "Scan Repositories",
 		MUIA_Menuitem_Shortcut, "S",
-	End;
+		End;
 
 	MNlabel1Addslave = MenuitemObject,
 		MUIA_Menuitem_Title, "Add non-whdload game...",
-	End;
+		End;
 
 	MNlabel1ShowHidden = MenuitemObject,
 		MUIA_Menuitem_Title, "Show/Hide hidden slaves",
-	End;
+		End;
 
 	MNlabel1BarLabel1 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
 
 	MNlabel1About = MenuitemObject,
 		MUIA_Menuitem_Title, "About...",
-	End;
+		End;
 
 	MNlabel1BarLabel2 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
 
 	MNlabel1Quit = MenuitemObject,
 		MUIA_Menuitem_Title, "Quit",
 		MUIA_Menuitem_Shortcut, "Q",
-	End;
+		End;
 
 	MNlabel1Actions = MenuitemObject,
 		MUIA_Menuitem_Title, "Actions",
@@ -332,45 +334,45 @@ struct ObjApp * CreateApp(void)
 		MUIA_Family_Child, MNlabel1About,
 		MUIA_Family_Child, MNlabel1BarLabel2,
 		MUIA_Family_Child, MNlabel1Quit,
-	End;
+		End;
 
 	MNlabel1Gamespath = MenuitemObject,
 		MUIA_Menuitem_Title, "Games Repositories...",
-	End;
+		End;
 
-    MNlabel1BarLabel3 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
+	MNlabel1BarLabel3 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
 
 	MNlabel1MUISettings = MenuitemObject,
 		MUIA_Menuitem_Title, "MUI Settings...",
-	End;
+		End;
 
-//	  MNlabel1ShowHidden = MenuitemObject,
-//		  MUIA_Menuitem_Title, "Show hidden slaves",
-//	  End;
+	//	  MNlabel1ShowHidden = MenuitemObject,
+	//		  MUIA_Menuitem_Title, "Show hidden slaves",
+	//	  End;
 
 	MNlabel1Settings = MenuitemObject,
 		MUIA_Menuitem_Title, "Settings",
 		MUIA_Family_Child, MNlabel1Gamespath,
-//		  MUIA_Family_Child, MNlabel1ShowHidden,
+		//		  MUIA_Family_Child, MNlabel1ShowHidden,
 		MUIA_Family_Child, MNlabel1BarLabel3,
 		MUIA_Family_Child, MNlabel1MUISettings,
-	End;
+		End;
 
 	MNlabel1GameProperties = MenuitemObject,
 		MUIA_Menuitem_Title, "Game properties...",
 		MUIA_Menuitem_Shortcut, "P",
-	End;
+		End;
 
 	MNlabel1Game = MenuitemObject,
 		MUIA_Menuitem_Title, "Game",
 		MUIA_Family_Child, MNlabel1GameProperties,
-	End;
+		End;
 
 	ObjectApp->MN_label_1 = MenustripObject,
 		MUIA_Family_Child, MNlabel1Actions,
 		MUIA_Family_Child, MNlabel1Settings,
 		MUIA_Family_Child, MNlabel1Game,
-	End;
+		End;
 
 	ObjectApp->WI_Main_0 = WindowObject,
 		MUIA_Window_Title, "iGame",
@@ -378,16 +380,16 @@ struct ObjApp * CreateApp(void)
 		MUIA_Window_ID, MAKE_ID('0', 'I', 'G', 'A'),
 		MUIA_Window_AppWindow, TRUE,
 		WindowContents, GROUP_ROOT_0,
-	End;
+		End;
 
 	ObjectApp->LV_RepoList_3 = ListObject,
 		MUIA_Frame, MUIV_Frame_InputList,
-	End;
+		End;
 
 	ObjectApp->LV_RepoList_3 = ListviewObject,
 		MUIA_HelpNode, "LV_RepoList_3",
 		MUIA_Listview_List, ObjectApp->LV_RepoList_3,
-	End;
+		End;
 
 	ObjectApp->STR_PA_label_0 = String("", 80);
 
@@ -399,9 +401,9 @@ struct ObjApp * CreateApp(void)
 		MUIA_Popstring_String, ObjectApp->STR_PA_label_0,
 		MUIA_Popstring_Button, ObjectApp->PA_label_0,
 		ASLFR_TitleText, "Select dir...",
-	End;
+		End;
 
-	ObjectApp->STR_PA_label_1 = String("",80);
+	ObjectApp->STR_PA_label_1 = String("", 80);
 
 	ObjectApp->PA_label_1 = PopButton(MUII_PopDrawer);
 
@@ -411,20 +413,20 @@ struct ObjApp * CreateApp(void)
 		MUIA_Popstring_String, ObjectApp->STR_PA_label_1,
 		MUIA_Popstring_Button, ObjectApp->PA_label_1,
 		ASLFR_TitleText, "Select game executable...",
-	End;
+		End;
 
 	ObjectApp->STR_Title_2 = StringObject,
 		MUIA_Frame, MUIV_Frame_String,
 		MUIA_FrameTitle, "Title",
 		MUIA_HelpNode, "STR_Title_2",
-	End;
+		End;
 
 	GR_grp_6 = GroupObject,
 		MUIA_HelpNode, "GR_grp_6",
 		//MUIA_Group_Vert, TRUE,
 		Child, ObjectApp->STR_Title_2,
 		Child, ObjectApp->PA_label_1,
-	End;
+		End;
 
 	ObjectApp->BT_NonWhdloadOk_0 = TextObject,
 		ButtonFrame,
@@ -434,7 +436,7 @@ struct ObjApp * CreateApp(void)
 		MUIA_Text_PreParse, "\033c",
 		MUIA_HelpNode, "BT_NonWhdloadOk_0",
 		MUIA_InputMode, MUIV_InputMode_RelVerify,
-	End;
+		End;
 
 	ObjectApp->BT_NonWhdloadCancel_0 = TextObject,
 		ButtonFrame,
@@ -444,25 +446,25 @@ struct ObjApp * CreateApp(void)
 		MUIA_Text_PreParse, "\033c",
 		MUIA_HelpNode, "BT_NonWhdloadCancel_0",
 		MUIA_InputMode, MUIV_InputMode_RelVerify,
-	End;
+		End;
 
 	GR_grp_7 = GroupObject,
 		MUIA_HelpNode, "GR_grp_7",
 		MUIA_Group_Horiz, TRUE,
 		Child, ObjectApp->BT_NonWhdloadOk_0,
 		Child, ObjectApp->BT_NonWhdloadCancel_0,
-	End;
+		End;
 
 	GROUP_ROOT_5 = GroupObject,
 		Child, GR_grp_6,
 		Child, GR_grp_7,
-	End;
+		End;
 
 	ObjectApp->WI_NonWhdload = WindowObject,
 		MUIA_Window_Title, "Adding a non whdload game",
 		MUIA_Window_ID, MAKE_ID('3', 'I', 'G', 'A'),
 		WindowContents, GROUP_ROOT_5,
-	End;
+		End;
 
 	ObjectApp->BT_RepoAdd_2 = TextObject,
 		ButtonFrame,
@@ -472,7 +474,7 @@ struct ObjApp * CreateApp(void)
 		MUIA_Text_PreParse, "\033c",
 		MUIA_HelpNode, "BT_RepoAdd_2",
 		MUIA_InputMode, MUIV_InputMode_RelVerify,
-	End;
+		End;
 
 	ObjectApp->BT_RepoRemove_3 = TextObject,
 		ButtonFrame,
@@ -482,7 +484,7 @@ struct ObjApp * CreateApp(void)
 		MUIA_Text_PreParse, "\033c",
 		MUIA_HelpNode, "BT_RepoRemove_3",
 		MUIA_InputMode, MUIV_InputMode_RelVerify,
-	End;
+		End;
 
 	ObjectApp->BT_RepoClose_1 = TextObject,
 		ButtonFrame,
@@ -492,44 +494,44 @@ struct ObjApp * CreateApp(void)
 		MUIA_Text_PreParse, "\033c",
 		MUIA_HelpNode, "BT_RepoClose_1",
 		MUIA_InputMode, MUIV_InputMode_RelVerify,
-	End;
+		End;
 
 	GR_grp_4 = GroupObject,
 		MUIA_HelpNode, "GR_grp_4",
 		MUIA_Group_Horiz, TRUE,
 		Child, ObjectApp->PA_label_0,
 		Child, ObjectApp->BT_RepoAdd_2,
-	End;
+		End;
 
 	GR_grp_5 = GroupObject,
 		MUIA_HelpNode, "GR_grp_5",
 		MUIA_Group_Horiz, TRUE,
 		Child, ObjectApp->BT_RepoRemove_3,
 		Child, ObjectApp->BT_RepoClose_1,
-	End;
+		End;
 
 	GROUP_ROOT_1 = GroupObject,
 		Child, GR_grp_4,
 		Child, ObjectApp->LV_RepoList_3,
 		Child, GR_grp_5,
-	End;
+		End;
 
 	ObjectApp->WI_GamesRepo_1 = WindowObject,
 		MUIA_Window_Title, "Games repositories",
 		MUIA_Window_ID, MAKE_ID('1', 'I', 'G', 'A'),
 		WindowContents, GROUP_ROOT_1,
-	End;
+		End;
 
 	ObjectApp->STR_Title_1 = StringObject,
 		MUIA_Frame, MUIV_Frame_String,
 		MUIA_FrameTitle, "Title",
 		MUIA_HelpNode, "STR_Title_1",
-	End;
+		End;
 
 	ObjectApp->CY_Genre_0 = CycleObject,
 		MUIA_HelpNode, "CY_Genre_0",
 		MUIA_Cycle_Entries, ObjectApp->CY_Genre_0Content,
-	End;
+		End;
 
 	/* For future tooltype editing */
 	ObjectApp->TX_Tooltypes_0 = TextEditorObject,
@@ -538,14 +540,14 @@ struct ObjApp * CreateApp(void)
 		//MUIA_Text_SetVMax, FALSE,
 		//MUIA_Text_SetMin, FALSE,
 		MUIA_FrameTitle, "ToolTypes",
-	End;
+		End;
 
 	ObjectApp->TX_Path_2 = TextObject,
 		MUIA_Background, MUII_TextBack,
 		MUIA_Frame, MUIV_Frame_Text,
 		MUIA_Text_Contents, ObjectApp->STR_TX_Path_2,
 		MUIA_Text_SetMin, TRUE,
-	End;
+		End;
 
 	ObjectApp->BT_GPOK_0 = SimpleButton("OK");
 
@@ -563,21 +565,21 @@ struct ObjApp * CreateApp(void)
 		Child, ObjectApp->CH_label_0,
 		Child, obj_aux4,
 		Child, ObjectApp->CH_label_1,
-	End;
+		End;
 
 	ObjectApp->TX_NumPlayed_0 = TextObject,
 		MUIA_Background, MUII_TextBack,
 		MUIA_Frame, MUIV_Frame_Text,
 		MUIA_Text_Contents, ObjectApp->STR_TX_NumPlayed_0,
 		MUIA_Text_SetMin, TRUE,
-	End;
+		End;
 
 	GR_grp_3 = GroupObject,
 		MUIA_HelpNode, "GR_grp_3",
 		MUIA_Group_Columns, 2,
 		Child, ObjectApp->BT_GPOK_0,
 		Child, ObjectApp->BT_GPCancel_1,
-	End;
+		End;
 
 	GROUP_ROOT_2 = GroupObject,
 		Child, ObjectApp->STR_Title_1,
@@ -586,36 +588,36 @@ struct ObjApp * CreateApp(void)
 		Child, ObjectApp->TX_NumPlayed_0,
 		Child, ObjectApp->TX_Path_2,
 		Child, GR_grp_3,
-	End;
+		End;
 
 	GROUP_ROOT_4 = GroupObject,
 		MUIA_Group_Columns, 2,
 		Child, GROUP_ROOT_2,
 		Child, ObjectApp->TX_Tooltypes_0,
-	End;
+		End;
 
 	ObjectApp->WI_GameProperties_2 = WindowObject,
 		MUIA_Window_Title, "Game Properties",
 		MUIA_Window_ID, MAKE_ID('2', 'I', 'G', 'A'),
 		WindowContents, GROUP_ROOT_4,
-	End;
+		End;
 
 	ObjectApp->TX_label_1 = TextObject,
 		MUIA_Background, MUII_TextBack,
 		MUIA_Frame, MUIV_Frame_Text,
 		MUIA_Text_Contents, ObjectApp->STR_TX_label_1,
 		MUIA_Text_SetMin, TRUE,
-	End;
+		End;
 
 	GROUP_ROOT_3 = GroupObject,
 		Child, ObjectApp->TX_label_1,
-	End;
+		End;
 
 	ObjectApp->WI_About_3 = WindowObject,
 		MUIA_Window_Title, "About iGame",
-	/*	  MUIA_Window_ID, MAKE_ID('4', 'I', 'G', 'A'), */
+		/*	  MUIA_Window_ID, MAKE_ID('4', 'I', 'G', 'A'), */
 		WindowContents, GROUP_ROOT_3,
-	End;
+		End;
 
 	/* ------ Wait window ------- */
 
@@ -624,14 +626,14 @@ struct ObjApp * CreateApp(void)
 		MUIA_Frame, MUIV_Frame_Text,
 		MUIA_Text_Contents, ObjectApp->STR_TX_label_2,
 		MUIA_Text_SetMin, TRUE,
-	End;
+		End;
 
 	GROUP_ROOT_6 = GroupObject,
 		Child, ObjectApp->TX_label_2,
-	End;
+		End;
 
 	ObjectApp->WI_Wait_0 = WindowObject,
-	/*	  MUIA_Window_Title, "iGame", */
+		/*	  MUIA_Window_Title, "iGame", */
 		/* MUIA_Window_ID, MAKE_ID('7', 'I', 'G', 'A'), */
 		WindowContents, GROUP_ROOT_6,
 		MUIA_Window_RefWindow, ObjectApp->WI_Main_0,
@@ -640,7 +642,7 @@ struct ObjApp * CreateApp(void)
 		MUIA_Window_DepthGadget, FALSE,
 		MUIA_Window_SizeGadget, FALSE,
 		MUIA_Window_DragBar, FALSE,
-	End;
+		End;
 
 	/* ------ End of Wait Window ------ */
 
@@ -658,7 +660,7 @@ struct ObjApp * CreateApp(void)
 		SubWindow, ObjectApp->WI_About_3,
 		SubWindow, ObjectApp->WI_NonWhdload,
 		SubWindow, ObjectApp->WI_Wait_0,
-	End;
+		End;
 
 	if (!ObjectApp->App)
 	{
@@ -671,87 +673,88 @@ struct ObjApp * CreateApp(void)
 		ObjectApp->App,
 		2,
 		MUIM_CallHook, &AppStartHook
-		);
+	);
 
 	DoMethod(MNlabel1ScanRepository,
 		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
 		ObjectApp->App,
 		2,
 		MUIM_CallHook, &MenuScanHook
-		);
+	);
 
 	DoMethod(MNlabel1About,
 		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
 		ObjectApp->WI_About_3,
 		3,
 		MUIM_Set, MUIA_Window_Open, TRUE
-		);
+	);
 
 	DoMethod(MNlabel1MUISettings,
 		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
 		ObjectApp->App,
 		3,
 		MUIM_Application_OpenConfigWindow, 0
-		);
+	);
 
 	DoMethod(MNlabel1Quit,
 		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
 		ObjectApp->App,
 		2,
 		MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit
-		);
+	);
 
 	DoMethod(MNlabel1Gamespath,
 		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
 		ObjectApp->WI_GamesRepo_1,
 		3,
 		MUIM_Set, MUIA_Window_Open, TRUE
-		);
+	);
 
 	DoMethod(MNlabel1GameProperties,
 		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
 		ObjectApp->App,
 		2,
 		MUIM_CallHook, &MenuGamePropertiesHook
-		);
+	);
 
 	DoMethod(MNlabel1ShowHidden,
 		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
 		ObjectApp->App,
 		2,
 		MUIM_CallHook, &MenuShowHiddenHook
-		);
+	);
 
 	DoMethod(MNlabel1Addslave,
-        MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
 		ObjectApp->App,
 		2,
 		MUIM_CallHook, &MenuAddNonWhdloadHook
-		);
+	);
 
 	DoMethod(ObjectApp->WI_Main_0,
 		MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
 		ObjectApp->App,
 		2,
 		MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit
-		);
+	);
 	//call whenever the string is changed
-	if (FILTERUSEENTER==0){
+	if (FILTERUSEENTER == 0) {
 
 		DoMethod(ObjectApp->STR_Filter_0,
 			MUIM_Notify, MUIA_String_Contents, MUIV_EveryTime,
 			ObjectApp->STR_Filter_0,
 			2,
 			MUIM_CallHook, &FilterChangeHook
-			);
-	}else{
+		);
+	}
+	else {
 		//call only after return key is pressed
 		DoMethod(ObjectApp->STR_Filter_0,
 			MUIM_Notify, MUIA_String_Acknowledge, MUIV_EveryTime,
 			ObjectApp->STR_Filter_0,
 			2,
 			MUIM_CallHook, &FilterChangeHook
-			);
+		);
 	}
 
 	DoMethod(ObjectApp->LV_GamesList_0,
@@ -759,38 +762,39 @@ struct ObjApp * CreateApp(void)
 		ObjectApp->LV_GamesList_0,
 		2,
 		MUIM_CallHook, &GameDoubleClickHook
-		);
+	);
 
 	DoMethod(ObjectApp->LV_GamesList_0,
 		MUIM_Notify, MUIA_List_Active, MUIV_EveryTime,
 		ObjectApp->LV_GamesList_0,
 		2,
 		MUIM_CallHook, &GameClickHook
-		);
+	);
 
- 	 DoMethod(ObjectApp->LV_GenresList_1,
+	DoMethod(ObjectApp->LV_GenresList_1,
 		MUIM_Notify, MUIA_List_Active, MUIV_EveryTime,
 		ObjectApp->LV_GenresList_1,
 		2,
 		MUIM_CallHook, &GenresClickHook
+	);
+
+	if (!NOSCREENSHOT) {
+
+		DoMethod(ObjectApp->WI_Main_0,
+			MUIM_Window_SetCycleChain, ObjectApp->STR_Filter_0,
+			ObjectApp->LV_GamesList_0,
+			ObjectApp->IM_GameImage_0,
+			ObjectApp->LV_GenresList_1,
+			0
 		);
+	}
+	else {
 
-	if (!NOSCREENSHOT){
-
-	    DoMethod(ObjectApp->WI_Main_0,
-		MUIM_Window_SetCycleChain, ObjectApp->STR_Filter_0,
-		ObjectApp->LV_GamesList_0,
-		ObjectApp->IM_GameImage_0,
-		ObjectApp->LV_GenresList_1,
-		0
-		);
-	}else{
-
-	    DoMethod(ObjectApp->WI_Main_0,
-		MUIM_Window_SetCycleChain, ObjectApp->STR_Filter_0,
-		ObjectApp->LV_GamesList_0,
-		ObjectApp->LV_GenresList_1,
-		0
+		DoMethod(ObjectApp->WI_Main_0,
+			MUIM_Window_SetCycleChain, ObjectApp->STR_Filter_0,
+			ObjectApp->LV_GamesList_0,
+			ObjectApp->LV_GenresList_1,
+			0
 		);
 	}
 
@@ -799,91 +803,91 @@ struct ObjApp * CreateApp(void)
 		ObjectApp->WI_GamesRepo_1,
 		3,
 		MUIM_Set, MUIA_Window_Open, FALSE
-		);
+	);
 
 	DoMethod(ObjectApp->BT_NonWhdloadOk_0,
 		MUIM_Notify, MUIA_Pressed, FALSE,
 		ObjectApp->BT_NonWhdloadOk_0,
 		2,
 		MUIM_CallHook, &NonWhdloadOkHook
-		);
+	);
 
 	DoMethod(ObjectApp->BT_NonWhdloadCancel_0,
 		MUIM_Notify, MUIA_Pressed, FALSE,
 		ObjectApp->WI_NonWhdload,
 		2,
 		MUIM_Set, MUIA_Window_Open, FALSE
-		);
+	);
 
 	DoMethod(ObjectApp->WI_NonWhdload,
 		MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
 		ObjectApp->WI_NonWhdload,
 		3,
 		MUIM_Set, MUIA_Window_Open, FALSE
-		);
+	);
 
 	DoMethod(ObjectApp->WI_GamesRepo_1,
 		MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
 		ObjectApp->WI_GamesRepo_1,
 		2,
 		MUIM_CallHook, &RepoStopHook
-		);
+	);
 
 	DoMethod(ObjectApp->LV_RepoList_3,
 		MUIM_Notify, MUIA_ShowMe, TRUE,
 		ObjectApp->LV_RepoList_3,
 		2,
 		MUIM_CallHook, &RepoStartHook
-		);
+	);
 
 	DoMethod(ObjectApp->LV_RepoList_3,
 		MUIM_Notify, MUIA_Disabled, FALSE,
 		ObjectApp->LV_RepoList_3,
 		2,
 		MUIM_CallHook, &RepoStartHook
-		);
+	);
 
 	DoMethod(ObjectApp->BT_RepoAdd_2,
 		MUIM_Notify, MUIA_Pressed, FALSE,
 		ObjectApp->BT_RepoAdd_2,
 		2,
 		MUIM_CallHook, &RepoAddHook
-		);
+	);
 
 	DoMethod(ObjectApp->BT_GPOK_0,
 		MUIM_Notify, MUIA_Pressed, FALSE,
 		ObjectApp->BT_GPOK_0,
 		2,
 		MUIM_CallHook, &GamePropertiesOkHook
-		);
+	);
 
 	DoMethod(ObjectApp->BT_RepoRemove_3,
 		MUIM_Notify, MUIA_Pressed, FALSE,
 		ObjectApp->BT_RepoRemove_3,
 		2,
 		MUIM_CallHook, &RepoRemoveHook
-		);
+	);
 
 	DoMethod(ObjectApp->BT_GPCancel_1,
 		MUIM_Notify, MUIA_Pressed, FALSE,
 		ObjectApp->WI_GameProperties_2,
 		2,
 		MUIM_Set, MUIA_Window_Open, FALSE
-		);
+	);
 
 	DoMethod(ObjectApp->BT_RepoClose_1,
 		MUIM_Notify, MUIA_Pressed, FALSE,
 		ObjectApp->BT_RepoClose_1,
 		2,
 		MUIM_CallHook, &RepoStopHook
-		);
+	);
 
 	DoMethod(ObjectApp->BT_RepoClose_1,
 		MUIM_Notify, MUIA_Pressed, FALSE,
 		ObjectApp->WI_GamesRepo_1,
 		2,
 		MUIM_Set, MUIA_Window_Open, FALSE
-		);
+	);
 
 	DoMethod(ObjectApp->WI_GamesRepo_1,
 		MUIM_Window_SetCycleChain, ObjectApp->LV_RepoList_3,
@@ -891,7 +895,7 @@ struct ObjApp * CreateApp(void)
 		ObjectApp->BT_RepoAdd_2,
 		ObjectApp->BT_RepoRemove_3,
 		0
-		);
+	);
 
 	DoMethod(ObjectApp->WI_GameProperties_2,
 		MUIM_Window_SetCycleChain, ObjectApp->STR_Title_1,
@@ -899,25 +903,25 @@ struct ObjApp * CreateApp(void)
 		ObjectApp->BT_GPOK_0,
 		ObjectApp->BT_GPCancel_1,
 		0
-		);
+	);
 
 	DoMethod(ObjectApp->WI_About_3,
 		MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
 		ObjectApp->WI_About_3,
 		3,
 		MUIM_Set, MUIA_Window_Open, FALSE
-		);
+	);
 
 	DoMethod(ObjectApp->WI_GameProperties_2,
 		MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
 		ObjectApp->WI_GameProperties_2,
 		3,
 		MUIM_Set, MUIA_Window_Open, FALSE
-		);
+	);
 
 	DoMethod(ObjectApp->WI_About_3,
 		MUIM_Window_SetCycleChain, 0
-		);
+	);
 
 	//set(ObjectApp->WI_Main_0,
 	//	  MUIA_Window_Open, TRUE
@@ -930,5 +934,4 @@ void DisposeApp(struct ObjApp * ObjectApp)
 {
 	MUI_DisposeObject(ObjectApp->App);
 	FreeVec(ObjectApp);
-
 }
