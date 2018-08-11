@@ -20,6 +20,7 @@
   along with iGame. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#pragma once
 #include <utility/hooks.h>
 
 APTR FilterChange(struct Hook* a0, APTR a2, APTR a1);

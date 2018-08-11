@@ -22,6 +22,7 @@
 
 /*  Prototypes for Hook_Utility */
 
+#pragma once
 #include <utility/hooks.h>
 
 /* prototype for C_Function
