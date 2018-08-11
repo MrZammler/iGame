@@ -19,12 +19,12 @@ all: iGame
 # Compiler settings
 ##########################################################################
 CC		= vc
-LINK		= vc
+LINK	= vc
 
-CFLAGS			= -c +aos68k -dontwarn=-1 -O2 -c99 -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
-CFLAGS_030		= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
-CFLAGS_040		= -c +aos68k -cpu=68040 -fpu=68040 -dontwarn=-1 -O2 -c99 -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
-CFLAGS_060		= -c +aos68k -cpu=68060 -fpu=68060 -dontwarn=-1 -O2 -c99 -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
+CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99 -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
+CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
+CFLAGS_040	= -c +aos68k -cpu=68040 -fpu=68040 -dontwarn=-1 -O2 -c99 -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
+CFLAGS_060	= -c +aos68k -cpu=68060 -fpu=68060 -dontwarn=-1 -O2 -c99 -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
 CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99 I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
 
 DATE = $(shell date --iso=date)

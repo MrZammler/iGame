@@ -23,17 +23,13 @@ VERMINOR = 4
 ##########################################################################
 # Compiler settings
 ##########################################################################
-CC       = vc
-LINK     = vc
-#CFLAGS       = -c -I. -I/ -c99 -cpu=68020 -fpu=68881 -O1
-CFLAGS   = -c +aos68k -dontwarn=-1 -O2 -c99 -IDevkits:sdk/classic/MUI/Developer/C/Include -IDevkits:sdk/classic/MCC_Guigfx/Developer/C/Include -IDevkits:sdk/classic/MCC_Texteditor/Developer/C/Include -IDevkits:sdk/classic/ndk_39/include/include_h
-CFLAGS_030     = -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -IDevkits:sdk/classic/MUI/Developer/C/Include -IDevkits:sdk/classic/MCC_Guigfx/Developer/C/Include -IDevkits:sdk/classic/MCC_Texteditor/Developer/C/Include -IDevkits:sdk/classic/ndk_39/include/include_h
-CFLAGS_040     = -c +aos68k -cpu=68040 -fpu=68040 -dontwarn=-1 -O2 -c99 -IDevkits:sdk/classic/MUI/Developer/C/Include -IDevkits:sdk/classic/MCC_Guigfx/Developer/C/Include -IDevkits:sdk/classic/MCC_Texteditor/Developer/C/Include -IDevkits:sdk/classic/ndk_39/include/include_h
-CFLAGS_060     = -c +aos68k -cpu=68060 -fpu=68060 -dontwarn=-1 -O2 -c99 -IDevkits:sdk/classic/MUI/Developer/C/Include -IDevkits:sdk/classic/MCC_Guigfx/Developer/C/Include -IDevkits:sdk/classic/MCC_Texteditor/Developer/C/Include -IDevkits:sdk/classic/ndk_39/include/include_h
-CFLAGS_MOS     = -c +morphos -dontwarn=-1 -O2 -c99 -IDevkits:sdk/classic/MUI/Developer/C/Include -IDevkits:sdk/classic/MCC_Guigfx/Developer/C/Include -IDevkits:sdk/classic/MCC_Texteditor/Developer/C/Include -IDevkits:sdk/classic/ndk_39/include/include_h
-
-# Some modules should be optimized for speed (e.g. image decoding)
-#CFLAGS_SPEED = -c -I. -I/ -c99 -cpu=68020 -fpu=68881 -O1
+CC       	= vc
+LINK     	= vc
+CFLAGS   	= -c +aos68k -dontwarn=-1 -O2 -c99 -IDevkits:sdk/classic/MUI/Developer/C/Include -IDevkits:sdk/classic/MCC_Guigfx/Developer/C/Include -IDevkits:sdk/classic/MCC_Texteditor/Developer/C/Include -IDevkits:sdk/classic/ndk_39/include/include_h
+CFLAGS_030  = -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -IDevkits:sdk/classic/MUI/Developer/C/Include -IDevkits:sdk/classic/MCC_Guigfx/Developer/C/Include -IDevkits:sdk/classic/MCC_Texteditor/Developer/C/Include -IDevkits:sdk/classic/ndk_39/include/include_h
+CFLAGS_040  = -c +aos68k -cpu=68040 -fpu=68040 -dontwarn=-1 -O2 -c99 -IDevkits:sdk/classic/MUI/Developer/C/Include -IDevkits:sdk/classic/MCC_Guigfx/Developer/C/Include -IDevkits:sdk/classic/MCC_Texteditor/Developer/C/Include -IDevkits:sdk/classic/ndk_39/include/include_h
+CFLAGS_060  = -c +aos68k -cpu=68060 -fpu=68060 -dontwarn=-1 -O2 -c99 -IDevkits:sdk/classic/MUI/Developer/C/Include -IDevkits:sdk/classic/MCC_Guigfx/Developer/C/Include -IDevkits:sdk/classic/MCC_Texteditor/Developer/C/Include -IDevkits:sdk/classic/ndk_39/include/include_h
+CFLAGS_MOS  = -c +morphos -dontwarn=-1 -O2 -c99 -IDevkits:sdk/classic/MUI/Developer/C/Include -IDevkits:sdk/classic/MCC_Guigfx/Developer/C/Include -IDevkits:sdk/classic/MCC_Texteditor/Developer/C/Include -IDevkits:sdk/classic/ndk_39/include/include_h
 
 ##########################################################################
 # Library builder settings
