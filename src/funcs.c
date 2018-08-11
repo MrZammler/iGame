@@ -70,6 +70,8 @@ int hex2dec(char* hexin);
 void MsgBox(char* msg);
 int GetTitleFromSlave(char* slave, char* title);
 int CheckDupTitle(char* title);
+int get_delimiter_position(const char* str);
+char* get_directory_name(char* str);
 
 /* structures */
 struct EasyStruct msgbox;
@@ -1736,7 +1738,10 @@ void followthread(BPTR lock, int tab_level)
 				temptitle[n] = '\0';
 				//printf("title: [%s]\n", temptitle);
 				//strcpy (item_games->Title, temptitle);
-				if (GetTitleFromSlave(fullpath, item_games->Title))
+				char* title = get_directory_name(fullpath);
+				if (title != NULL)
+					strcpy(item_games->Title, title);
+				else if (GetTitleFromSlave(fullpath, item_games->Title))
 				{
 					strcpy(item_games->Title, temptitle);
 				}
@@ -2207,7 +2212,6 @@ int GetTitleFromSlave(char* slave, char* title)
 
 	fread(&sl, 1, sizeof(sl), fp);
 
-
 	//sl.Version = (sl.Version>>8) | (sl.Version<<8);
 	//sl.name = (sl.name>>8) | (sl.name<<8);
 
@@ -2254,12 +2258,56 @@ int CheckDupTitle(char* title)
 	{
 		if (!strcmp(check_games->Title, title))
 		{
-			//			  printf("[%s] [%s]\n", check_games->Title, title);
+			//printf("[%s] [%s]\n", check_games->Title, title);
 			return 1;
 		}
 	}
 
 	return 0;
+}
+
+int get_delimiter_position(const char* str)
+{
+	char* delimiter = strrchr(str, '/');
+	if (!delimiter)
+		delimiter = strrchr(str, ':');
+
+	if (!delimiter)
+	{
+		//printf("Invalid path detected!\n");
+		return 0;
+	}
+
+	const int pos = delimiter - str;
+	return pos;
+}
+
+// Get the Directory part from a full path containing a file
+char* get_directory_name(char* str)
+{
+	int pos1 = get_delimiter_position(str);
+	if (!pos1)
+		return NULL;
+
+	char full_path[100];
+	strncpy(full_path, str, pos1);
+	full_path[pos1] = '\0';
+
+	const int pos2 = get_delimiter_position(full_path);
+	if (!pos2)
+		return NULL;
+
+	char* dir_name = malloc(sizeof full_path);
+	int c = 0;
+	for (unsigned int i = pos2 + 1; i <= sizeof full_path; i++)
+	{
+		dir_name[c] = full_path[i];
+		c++;
+	}
+	dir_name[c] = '\0';
+
+	//printf("%s -> %s\n", str, dirName);
+	return dir_name;
 }
 
 //void ReadToolTypes()
