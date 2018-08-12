@@ -932,6 +932,10 @@ struct ObjApp * CreateApp(void)
 
 void DisposeApp(struct ObjApp * ObjectApp)
 {
-	MUI_DisposeObject(ObjectApp->App);
-	FreeVec(ObjectApp);
+	if (ObjectApp)
+	{
+		MUI_DisposeObject(ObjectApp->App);
+		FreeVec(ObjectApp);
+		ObjectApp = NULL;
+	}
 }
