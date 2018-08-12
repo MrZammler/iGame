@@ -112,7 +112,7 @@ static APTR CreatePictureObject( STRPTR Name,
 */
 #include "iGameGUI.h"
 #include "iGameExtern.h"
-#include "Hook_utility.h"
+
 struct ObjApp * CreateApp(void)
 {
 	struct ObjApp * ObjectApp;
@@ -122,29 +122,29 @@ struct ObjApp * CreateApp(void)
 	APTR	MNlabel1Gamespath, MNlabel1Game, MNlabel1GameProperties, GROUP_ROOT_0, IM_Pic;
 	APTR	GR_grp_Img, GR_grp_5, GR_grp_2, obj_aux0, obj_aux1, obj_aux2, obj_aux3, obj_aux4, GR_grp_0, GROUP_ROOT_1, GR_grp_4, GR_grp_6, GR_grp_7;
 	APTR	GROUP_ROOT_2, GR_grp_3, GROUP_ROOT_3, GROUP_ROOT_4, GROUP_ROOT_5, GROUP_ROOT_6;
-	static struct Hook FilterChangeHook;
-	static struct Hook GameDoubleClickHook;
-	static struct Hook MenuScanHook;
-	static struct Hook AppStartHook;
-	static struct Hook RepoAddHook;
-	static struct Hook RepoRemoveHook;
-	static struct Hook RepoStartHook;
-	static struct Hook RepoStopHook;
-	static struct Hook GameClickHook;
-	static struct Hook MenuGamePropertiesHook;
-	static struct Hook GamePropertiesOkHook;
-	static struct Hook GenresClickHook;
-	static struct Hook MenuAddNonWhdloadHook;
-	static struct Hook NonWhdloadOkHook;
+	static struct Hook FilterChangeHook = {{NULL,NULL}, HookEntry, (HOOKFUNC)FilterChange, NULL };
+	static struct Hook GameDoubleClickHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)GameDoubleClick, NULL };
+	static struct Hook MenuScanHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)MenuScan, NULL };
+	static struct Hook AppStartHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)AppStart, NULL };
+	static struct Hook RepoAddHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)RepoAdd, NULL };
+	static struct Hook RepoRemoveHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)RepoRemove, NULL };
+	static struct Hook RepoStartHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)RepoStart, NULL };
+	static struct Hook RepoStopHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)RepoStop, NULL };
+	static struct Hook GameClickHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)GameClick, NULL };
+	static struct Hook MenuGamePropertiesHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)MenuGameProperties, NULL };
+	static struct Hook GamePropertiesOkHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)GamePropertiesOk, NULL };
+	static struct Hook GenresClickHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)GenresClick, NULL };
+	static struct Hook MenuAddNonWhdloadHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)MenuAddNonWhdload, NULL };
+	static struct Hook NonWhdloadOkHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)NonWhdloadOk, NULL };
 	static struct Hook MenuMUISettingsHook;
-	static struct Hook MenuShowHiddenHook;
+	static struct Hook MenuShowHiddenHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)MenuShowHidden, NULL };
 
 	if (!(ObjectApp = AllocVec(sizeof(struct ObjApp), MEMF_CLEAR)))
 		return(NULL);
 
 	ObjectApp->STR_TX_Status_0 = NULL;
 	ObjectApp->STR_TX_Path_2 = NULL;
-	ObjectApp->STR_TX_label_1 = "iGame version 1.7 beta\n\n(c) 2005-2018 Emmanuel Vasilakis\nmrzammler@gmail.com";
+	ObjectApp->STR_TX_label_1 = "iGame version 1.7 beta\n\n(c) 2005-2016 Emmanuel Vasilakis\nmrzammler@gmail.com\n\n(c) 2018 Dimitris Panokostas\nmidwan@gmail.com";
 	ObjectApp->STR_TX_label_2 = "Writing to disk, please wait...";
 
 	ObjectApp->CY_Genre_0Content[0] = "Unknown";
@@ -173,22 +173,6 @@ struct ObjApp * CreateApp(void)
 	ObjectApp->CY_Genre_0Content[21] = "Unknown";
 	ObjectApp->CY_Genre_0Content[22] = NULL;
 	*/
-
-	InstallHook(&FilterChangeHook, FilterChange, ObjectApp);
-	InstallHook(&GameDoubleClickHook, GameDoubleClick, ObjectApp);
-	InstallHook(&MenuScanHook, MenuScan, ObjectApp);
-	InstallHook(&AppStartHook, AppStart, ObjectApp);
-	InstallHook(&RepoAddHook, RepoAdd, ObjectApp);
-	InstallHook(&RepoRemoveHook, RepoRemove, ObjectApp);
-	InstallHook(&RepoStartHook, RepoStart, ObjectApp);
-	InstallHook(&RepoStopHook, RepoStop, ObjectApp);
-	InstallHook(&GameClickHook, GameClick, ObjectApp);
-	InstallHook(&MenuGamePropertiesHook, MenuGameProperties, ObjectApp);
-	InstallHook(&GamePropertiesOkHook, GamePropertiesOk, ObjectApp);
-	InstallHook(&GenresClickHook, GenresClick, ObjectApp);
-	InstallHook(&MenuAddNonWhdloadHook, MenuAddNonWhdload, ObjectApp);
-	InstallHook(&NonWhdloadOkHook, NonWhdloadOk, ObjectApp);
-	InstallHook(&MenuShowHiddenHook, MenuShowHidden, ObjectApp);
 
 	ObjectApp->STR_Filter_0 = StringObject,
 		MUIA_Frame, MUIV_Frame_String,
