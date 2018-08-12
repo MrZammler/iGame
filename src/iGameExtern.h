@@ -24,25 +24,25 @@
 #include <utility/hooks.h>
 
 APTR FilterChange(struct Hook* a0, APTR a2, APTR a1);
-APTR GameDoubleClick(struct Hook* a0, APTR a2, APTR a1);
-APTR MenuScan(struct Hook* a0, APTR a2, APTR a1);
-APTR GameClick(struct Hook* a0, APTR a2, APTR a1);
+APTR game_double_click(struct Hook* a0, APTR a2, APTR a1);
+APTR menu_scan(struct Hook* a0, APTR a2, APTR a1);
+APTR game_click(struct Hook* a0, APTR a2, APTR a1);
 
 
 APTR AppStart(struct Hook* a0, APTR a2, APTR a1);
-APTR RepoAdd(struct Hook* a0, APTR a2, APTR a1);
-APTR RepoRemove(struct Hook* a0, APTR a2, APTR a1);
-APTR RepoStart(struct Hook* a0, APTR a2, APTR a1);
-APTR RepoStop(struct Hook* a0, APTR a2, APTR a1);
+APTR repo_add(struct Hook* a0, APTR a2, APTR a1);
+APTR repo_remove(struct Hook* a0, APTR a2, APTR a1);
 
-APTR MenuGameProperties(struct Hook* a0, APTR a2, APTR a1);
-APTR GamePropertiesOk(struct Hook* a0, APTR a2, APTR a1);
+APTR repo_stop(struct Hook* a0, APTR a2, APTR a1);
 
-APTR MenuAddNonWhdload(struct Hook* a0, APTR a2, APTR a1);
-APTR NonWhdloadOk(struct Hook* a0, APTR a2, APTR a1);
+APTR menu_game_properties(struct Hook* a0, APTR a2, APTR a1);
+APTR game_properties_ok(struct Hook* a0, APTR a2, APTR a1);
 
-APTR GenresClick(struct Hook* a0, APTR a2, APTR a1);
+APTR menu_add_non_whdload(struct Hook* a0, APTR a2, APTR a1);
+APTR non_whdload_ok(struct Hook* a0, APTR a2, APTR a1);
 
-APTR MenuShowHidden(struct Hook* a0, APTR a2, APTR a1);
+APTR genres_click(struct Hook* a0, APTR a2, APTR a1);
+
+APTR menu_show_hidden(struct Hook* a0, APTR a2, APTR a1);
 
 //APTR MenuMUISettings( struct Hook *a0, APTR a2, APTR a1 );

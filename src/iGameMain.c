@@ -19,8 +19,8 @@ LONG __stack = 32000;
 
 struct ObjApp* app = NULL; /* Object */
 extern void AppStart();
-extern void AppStop();
-extern void ReadToolTypes();
+extern void app_stop();
+extern void read_tool_types();
 
 struct Library *MUIMasterBase;
 
@@ -30,7 +30,7 @@ void CleanExit(CONST_STRPTR s)
 	{
 		PutStr(s);
 	}
-	AppStop();
+	app_stop();
 	CloseLibrary(MUIMasterBase);
 }
 
@@ -46,7 +46,7 @@ BOOL InitApp(int argc, char **argv)
 	else
 	{
 		//read tooltypes here
-		ReadToolTypes();
+		read_tool_types();
 		AppStart();
 	}
 	
@@ -57,7 +57,6 @@ int main(int argc, char** argv)
 {
 	InitApp(argc, argv);
 	ULONG sigs = 0;
-	BOOL running = TRUE;
 
 	if (app)
 	{

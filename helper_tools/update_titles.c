@@ -7,25 +7,25 @@
 
 typedef struct games
 {
-	char Title[200];
-	char Genre[100];
-	int Index;
-	char Path[256];
-	int Favorite;
-	int TimesPlayed;
-	int LastPlayed; //indicates whether this one was the last game played
-	int Exists; //indicates whether this game still exists after a scan
-	int Hidden; //game is hidden from normal operation
+	char title[200];
+	char genre[100];
+	int index;
+	char path[256];
+	int favorite;
+	int times_played;
+	int last_played; //indicates whether this one was the last game played
+	int exists; //indicates whether this game still exists after a scan
+	int hidden; //game is hidden from normal operation
 	struct games* next;
-} Games_list;
+} games_list;
 
-Games_list *item_games = NULL, *Games = NULL;
+games_list *item_games = NULL, *games = NULL;
 
 /*
 * Gets title from a slave file
 * returns 0 on success, 1 on fail
 */
-int GetTitleFromSlave(char* slave, char* title)
+int get_title_from_slave(char* slave, char* title)
 {
 	FILE* fp;
 	char Title[100];
@@ -102,13 +102,13 @@ int GetTitleFromSlave(char* slave, char* title)
 * Checks if the title already exists
 * returns 1 if yes, 0 otherwise
 */
-int CheckDupTitle(char* title)
+int check_dup_title(char* title)
 {
-	Games_list* check_games = NULL;
+	games_list* check_games = NULL;
 
-	for (check_games = Games; check_games != NULL; check_games = check_games->next)
+	for (check_games = games; check_games != NULL; check_games = check_games->next)
 	{
-		if (!strcmp(check_games->Title, title))
+		if (!strcmp(check_games->title, title))
 		{
 			//			  printf("[%s] [%s]\n", check_games->Title, title);
 			return 1;
@@ -170,7 +170,7 @@ char** my_split(char* str, char* spl)
 /*
 * Saves the current Games struct to disk
 */
-void SaveList(int CheckExists)
+void save_list(int CheckExists)
 {
 	FILE* fpgames = NULL;
 
@@ -182,39 +182,39 @@ void SaveList(int CheckExists)
 	}
 	else
 	{
-		for (item_games = Games; item_games != NULL; item_games = item_games->next)
+		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
 			//printf("Saving: %s\n", item_games->Title);
 			if (CheckExists == 1)
 			{
-				if (item_games->Exists == 1)
+				if (item_games->exists == 1)
 				{
-					fprintf(fpgames, "index=%d\n", item_games->Index);
-					fprintf(fpgames, "title=%s\n", item_games->Title);
-					fprintf(fpgames, "genre=%s\n", item_games->Genre);
-					fprintf(fpgames, "path=%s\n", item_games->Path);
-					fprintf(fpgames, "favorite=%d\n", item_games->Favorite);
-					fprintf(fpgames, "timesplayed=%d\n", item_games->TimesPlayed);
-					fprintf(fpgames, "lastplayed=%d\n", item_games->LastPlayed);
-					fprintf(fpgames, "hidden=%d\n\n", item_games->Hidden);
+					fprintf(fpgames, "index=%d\n", item_games->index);
+					fprintf(fpgames, "title=%s\n", item_games->title);
+					fprintf(fpgames, "genre=%s\n", item_games->genre);
+					fprintf(fpgames, "path=%s\n", item_games->path);
+					fprintf(fpgames, "favorite=%d\n", item_games->favorite);
+					fprintf(fpgames, "timesplayed=%d\n", item_games->times_played);
+					fprintf(fpgames, "lastplayed=%d\n", item_games->last_played);
+					fprintf(fpgames, "hidden=%d\n\n", item_games->hidden);
 
 					fflush(fpgames);
 				}
 				else
 				{
-					strcpy(item_games->Path, "");
+					strcpy(item_games->path, "");
 				}
 			}
 			else
 			{
-				fprintf(fpgames, "index=%d\n", item_games->Index);
-				fprintf(fpgames, "title=%s\n", item_games->Title);
-				fprintf(fpgames, "genre=%s\n", item_games->Genre);
-				fprintf(fpgames, "path=%s\n", item_games->Path);
-				fprintf(fpgames, "favorite=%d\n", item_games->Favorite);
-				fprintf(fpgames, "timesplayed=%d\n", item_games->TimesPlayed);
-				fprintf(fpgames, "lastplayed=%d\n", item_games->LastPlayed);
-				fprintf(fpgames, "hidden=%d\n\n", item_games->Hidden);
+				fprintf(fpgames, "index=%d\n", item_games->index);
+				fprintf(fpgames, "title=%s\n", item_games->title);
+				fprintf(fpgames, "genre=%s\n", item_games->genre);
+				fprintf(fpgames, "path=%s\n", item_games->path);
+				fprintf(fpgames, "favorite=%d\n", item_games->favorite);
+				fprintf(fpgames, "timesplayed=%d\n", item_games->times_played);
+				fprintf(fpgames, "lastplayed=%d\n", item_games->last_played);
+				fprintf(fpgames, "hidden=%d\n\n", item_games->hidden);
 
 				fflush(fpgames);
 			}
@@ -264,13 +264,13 @@ int main()
 				continue;
 			}
 
-			item_games = (Games_list *)calloc(1, sizeof(Games_list));
+			item_games = (games_list *)calloc(1, sizeof(games_list));
 			item_games->next = NULL;
 
 			if (!strcmp(temp_tbl[0], "index"))
 			{
-				item_games->Index = atoi(temp_tbl[1]);
-				item_games->Exists = 0;
+				item_games->index = atoi(temp_tbl[1]);
+				item_games->exists = 0;
 				do
 				{
 					if (fgets(FileLine, sizeof(FileLine), fpgames) == NULL) { break; }
@@ -286,22 +286,22 @@ int main()
 					}
 
 					//this is to make sure that gameslist goes ok from 1.2 to 1.3
-					item_games->Hidden = 0;
+					item_games->hidden = 0;
 
 					if (!strcmp(temp_tbl[0], "title"))
-						strcpy(item_games->Title, temp_tbl[1]);
+						strcpy(item_games->title, temp_tbl[1]);
 					else if (!strcmp(temp_tbl[0], "genre"))
-						strcpy(item_games->Genre, temp_tbl[1]);
+						strcpy(item_games->genre, temp_tbl[1]);
 					else if (!strcmp(temp_tbl[0], "path"))
-						strcpy(item_games->Path, temp_tbl[1]);
+						strcpy(item_games->path, temp_tbl[1]);
 					else if (!strcmp(temp_tbl[0], "favorite"))
-						item_games->Favorite = atoi(temp_tbl[1]);
+						item_games->favorite = atoi(temp_tbl[1]);
 					else if (!strcmp(temp_tbl[0], "timesplayed"))
-						item_games->TimesPlayed = atoi(temp_tbl[1]);
+						item_games->times_played = atoi(temp_tbl[1]);
 					else if (!strcmp(temp_tbl[0], "lastplayed"))
-						item_games->LastPlayed = atoi(temp_tbl[1]);
+						item_games->last_played = atoi(temp_tbl[1]);
 					else if (!strcmp(temp_tbl[0], "hidden"))
-						item_games->Hidden = atoi(temp_tbl[1]);
+						item_games->hidden = atoi(temp_tbl[1]);
 
 					//	  break;
 
@@ -316,14 +316,14 @@ int main()
 				}
 				while (1);
 
-				if (Games == NULL)
+				if (games == NULL)
 				{
-					Games = item_games;
+					games = item_games;
 				}
 				else
 				{
-					item_games->next = Games;
-					Games = item_games;
+					item_games->next = games;
+					games = item_games;
 				}
 			}
 
@@ -339,7 +339,7 @@ int main()
 			//    printf("here\n");
 			//    if (str) strcpy(str,(char *)temp_tbl[1]);
 			//    printf("here2\n");
-			//    DoMethod(App->LV_GamesList_0, MUIM_List_Insert, &str, 1, MUIV_List_Insert_Bottom);
+			//    DoMethod(App->LV_GamesList, MUIM_List_Insert, &str, 1, MUIV_List_Insert_Bottom);
 			//    printf("here3\n");
 			//if (str) free(str);
 			//}
@@ -352,25 +352,25 @@ int main()
 
 	printf("Gameslist loaded, please wait...");
 
-	for (item_games = Games; item_games != NULL; item_games = item_games->next)
+	for (item_games = games; item_games != NULL; item_games = item_games->next)
 	{
 		//only if it is a slave file ;-)
-		if (strstr(item_games->Path, ".slave") || strstr(item_games->Path, ".Slave"))
+		if (strstr(item_games->path, ".slave") || strstr(item_games->path, ".Slave"))
 		{
-			if (!GetTitleFromSlave(item_games->Path, helperstr))
+			if (!get_title_from_slave(item_games->path, helperstr))
 			{
-				printf("Changing [%s] to [%s]\n", item_games->Title, helperstr);
-				item_games->Title[0] = '\0';
-				while (CheckDupTitle(helperstr))
+				printf("Changing [%s] to [%s]\n", item_games->title, helperstr);
+				item_games->title[0] = '\0';
+				while (check_dup_title(helperstr))
 				{
 					strcat(helperstr, " Alt");
 				}
-				strcpy(item_games->Title, helperstr);
+				strcpy(item_games->title, helperstr);
 			}
 		}
 	}
 
-	SaveList(0);
+	save_list(0);
 
 	printf("All done.!\n");
 }
