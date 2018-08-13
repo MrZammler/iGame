@@ -57,6 +57,7 @@ int NOGUIGFX;
 int FILTERUSEENTER;
 int NOSCREENSHOT;
 int SAVESTATSONEXIT;
+int SCANBYDIRS;
 int IntroPic = 0;
 
 /* function definitions */
@@ -1266,7 +1267,7 @@ void game_properties_ok()
 						unsigned char **new_tool_types = AllocVec(new_tool_type_count * sizeof(char *), MEMF_FAST | MEMF_CLEAR);
 						unsigned char **newptr = new_tool_types;
 
-						unsigned char **temp_tbl = my_split((char *)tools, "\n");
+						char **temp_tbl = my_split((char *)tools, "\n");
 						if (temp_tbl == NULL || temp_tbl[0] == NULL || !strcmp((char *)temp_tbl[0], " ") || !strcmp((
 							unsigned char *)temp_tbl[0], ""))
 						{
@@ -1275,7 +1276,7 @@ void game_properties_ok()
 
 						for (i = 0; i <= new_tool_type_count - 2; i++)
 						{
-							*newptr++ = temp_tbl[i];
+							*newptr++ = (unsigned char*)temp_tbl[i];
 						}
 
 						*newptr = NULL;
@@ -1619,12 +1620,18 @@ void followthread(BPTR lock, int tab_level)
 				temptitle[n] = '\0';
 				//printf("title: [%s]\n", temptitle);
 				//strcpy (item_games->Title, temptitle);
-				char* title = get_directory_name(fullpath);
-				if (title != NULL)
-					strcpy(item_games->title, title);
-				else if (get_title_from_slave(fullpath, item_games->title))
+				if (SCANBYDIRS)
 				{
-					strcpy(item_games->title, temptitle);
+					// If the SCANBYDIRS tooltype is enabled, set Titles from Directory names
+					char* title = get_directory_name(fullpath);
+					if (title != NULL)
+						strcpy(item_games->title, title);
+				}
+				else 
+				{
+					// Default behavior: set Titles by the .slave contents
+					if (get_title_from_slave(fullpath, item_games->title))
+						strcpy(item_games->title, temptitle);
 				}
 
 				while (check_dup_title(item_games->title))
@@ -1856,9 +1863,11 @@ void read_tool_types()
 	FILTERUSEENTER = 0;
 	NOSCREENSHOT = 0;
 	SAVESTATSONEXIT = 0;
+	SCANBYDIRS = 0;
 
 	if (icon_base = (struct Library *)OpenLibrary("icon.library", 0))
 	{
+		//TODO Is there a way to detect the executable name, instead of hard-coding it here?
 		if (disk_obj = (struct DiskObject *)GetDiskObject("PROGDIR:iGame"))
 		{
 			if (FindToolType(disk_obj->do_ToolTypes, "SCREENSHOT"))
@@ -1906,6 +1915,11 @@ void read_tool_types()
 			if (FindToolType(disk_obj->do_ToolTypes, "SAVESTATSONEXIT"))
 			{
 				SAVESTATSONEXIT = 1;
+			}
+
+			if (FindToolType(disk_obj->do_ToolTypes, "SCANBYDIRS"))
+			{
+				SCANBYDIRS = 1;
 			}
 		}
 
