@@ -108,7 +108,7 @@ struct ObjApp * CreateApp(void)
 
 	object_app->STR_TX_Status = NULL;
 	object_app->STR_TX_Path = NULL;
-	object_app->STR_TX_About = "iGame version 1.7 beta\n\n(c) 2005-2018 Emmanuel Vasilakis\nmrzammler@gmail.com\n\nUpdates by Dimitris Panokostas\nmidwan@gmail.com";
+	object_app->STR_TX_About = "iGame version 1.8 beta\n\n(c) 2005-2018 Emmanuel Vasilakis\nmrzammler@gmail.com\n\nUpdates by Dimitris Panokostas\nmidwan@gmail.com";
 	object_app->STR_TX_Wait = "Writing to disk, please wait...";
 
 	object_app->CY_Genre_Content[0] = "Unknown";
