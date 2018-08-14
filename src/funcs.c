@@ -33,488 +33,489 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <exec/memory.h>
-#include <libraries/dos.h>
-#include <libraries/dosextens.h>
 #include <workbench/workbench.h>
 #include <clib/graphics_protos.h>
+
 #include "iGameGUI.h"
 
 #define MUIA_Dtpic_Name 0x80423d72
 #define TEMPLATE 	"SCREENSHOT/K"
 
 extern char* strdup(const char* s);
+extern struct ObjApp* app;
 
 /* global variables */
 int global_filter_check = 0;
-int TotalHidden = 0;
-int Showing_hidden = 0;
+int total_hidden = 0;
+int showing_hidden = 0;
 char pathstr[512];
-int TotalGames;
-int NoOfGenres;
+int total_games;
+int no_of_genres;
 char gamestooltypes[1024];
 int SS_WIDTH, SS_HEIGHT;
 int NOGUIGFX;
 int FILTERUSEENTER;
 int NOSCREENSHOT;
 int SAVESTATSONEXIT;
+int SCANBYDIRS;
 int IntroPic = 0;
 
 /* function definitions */
 char** my_split(char* str, char* spl);
-int GetGenre(char* Title, char* Genre);
-void GetPath(char* Title, char* Path);
+int get_genre(char* title, char* genre);
+void get_path(char* title, char* path);
 void followthread(BPTR lock, int tab_level);
-void RefreshList(int CheckExists);
-void SaveList(int CheckExists);
+void refresh_list(int check_exists);
+void save_list(int check_exists);
 int hex2dec(char* hexin);
-void MsgBox(char* msg);
-int GetTitleFromSlave(char* slave, char* title);
-int CheckDupTitle(char* title);
+void msg_box(char* msg);
+int get_title_from_slave(char* slave, char* title);
+int check_dup_title(char* title);
+int get_delimiter_position(const char* str);
+char* get_directory_name(char* str);
 
 /* structures */
 struct EasyStruct msgbox;
 
 typedef struct games
 {
-	char Title[200];
-	char Genre[30];
-	int Index;
-	char Path[256];
-	int Favorite;
-	int TimesPlayed;
-	int LastPlayed; //indicates whether this one was the last game played
-	int Exists; //indicates whether this game still exists after a scan
-	int Hidden; //game is hidden from normal operation
+	char title[200];
+	char genre[30];
+	int index;
+	char path[256];
+	int favorite;
+	int times_played;
+	int last_played; //indicates whether this one was the last game played
+	int exists; //indicates whether this game still exists after a scan
+	int hidden; //game is hidden from normal operation
 	struct games* next;
-} Games_list;
+} games_list;
 
-Games_list *item_games = NULL, *Games = NULL;
+games_list *item_games = NULL, *games = NULL;
 
 typedef struct repos
 {
-	char Repo[256];
+	char repo[256];
 	struct repos* next;
-} Repos_list;
+} repos_list;
 
-Repos_list *item_repos = NULL, *Repos = NULL;
+repos_list *item_repos = NULL, *repos = NULL;
 
 typedef struct genres
 {
-	char Genre[256];
+	char genre[256];
 	struct genres* next;
-} Genres_list;
+} genres_list;
 
-Genres_list *item_genres = NULL, *Genres = NULL;
+genres_list *item_genres = NULL, *genres = NULL;
 
-void AppStart()
+void load_games_list()
 {
-	FILE* fpgames = NULL;
-	FILE* fprepos = NULL;
-	FILE* fpgenres = NULL;
-	char FileLine[500];
-	extern struct ObjApp* App;
-	char *str = NULL, helperstr[250];
-	//char **temp_tbl=NULL;
-	APTR pic;
-	int i;
+	char file_line[500];
+	char helperstr[250];
 
-	fpgames = fopen("PROGDIR:gameslist", "r");
-
+	FILE* fpgames = fopen("PROGDIR:gameslist", "r");
 	if (fpgames)
 	{
 		do
 		{
-			if (fgets(FileLine, sizeof(FileLine), fpgames) == NULL) { break; }
-			FileLine[strlen(FileLine) - 1] = '\0';
+			if (fgets(file_line, sizeof file_line, fpgames) == NULL) { break; }
 
-			if (strlen(FileLine) == 0) continue;
+			file_line[strlen(file_line) - 1] = '\0';
 
-			item_games = (Games_list *)calloc(1, sizeof(Games_list));
+			if (strlen(file_line) == 0) continue;
+
+			item_games = (games_list *)calloc(1, sizeof(games_list));
 			item_games->next = NULL;
 
-			if (!strcmp((char *)FileLine, "index=0"))
+			if (!strcmp((char *)file_line, "index=0"))
 			{
-				item_games->Index = 0;
-				item_games->Exists = 0;
+				item_games->index = 0;
+				item_games->exists = 0;
 
 				do
 				{
-					if (fgets(FileLine, sizeof(FileLine), fpgames) == NULL) { break; }
+					if (fgets(file_line, sizeof file_line, fpgames) == NULL) { break; }
 
-					FileLine[strlen(FileLine) - 1] = '\0';
+					file_line[strlen(file_line) - 1] = '\0';
 
-					if (strlen(FileLine) == 0) break;
+					if (strlen(file_line) == 0) break;
 
 					//this is to make sure that gameslist goes ok from 1.2 to 1.3
-					item_games->Hidden = 0;
+					item_games->hidden = 0;
 
-					if (!strncmp(FileLine, "title=", 6))
-						strcpy(item_games->Title, FileLine + 6);
-					else if (!strncmp(FileLine, "genre=", 6))
-						strcpy(item_games->Genre, FileLine + 6);
-					else if (!strncmp(FileLine, "path=", 5))
-						strcpy(item_games->Path, FileLine + 5);
-					else if (!strncmp(FileLine, "favorite=", 9))
-						item_games->Favorite = atoi(FileLine + 9);
-					else if (!strncmp(FileLine, "timesplayed=", 12))
-						item_games->TimesPlayed = atoi(FileLine + 12);
-					else if (!strncmp(FileLine, "lastplayed=", 11))
-						item_games->LastPlayed = atoi(FileLine + 11);
-					else if (!strncmp(FileLine, "hidden=", 7))
-						item_games->Hidden = atoi(FileLine + 7);
+					if (!strncmp(file_line, "title=", 6))
+						strcpy(item_games->title, file_line + 6);
+					else if (!strncmp(file_line, "genre=", 6))
+						strcpy(item_games->genre, file_line + 6);
+					else if (!strncmp(file_line, "path=", 5))
+						strcpy(item_games->path, file_line + 5);
+					else if (!strncmp(file_line, "favorite=", 9))
+						item_games->favorite = atoi(file_line + 9);
+					else if (!strncmp(file_line, "timesplayed=", 12))
+						item_games->times_played = atoi(file_line + 12);
+					else if (!strncmp(file_line, "lastplayed=", 11))
+						item_games->last_played = atoi(file_line + 11);
+					else if (!strncmp(file_line, "hidden=", 7))
+						item_games->hidden = atoi(file_line + 7);
 				}
 				while (1);
 
-				if (Games == NULL)
+				if (games == NULL)
 				{
-					Games = item_games;
+					games = item_games;
 				}
 				else
 				{
-					item_games->next = Games;
-					Games = item_games;
+					item_games->next = games;
+					games = item_games;
 				}
 			}
 		}
 		while (1); //read of gameslist ends here
 
 		//add the games to the list
-		TotalGames = 0;
-		for (item_games = Games; item_games != NULL; item_games = item_games->next)
+		total_games = 0;
+		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
-			if (item_games->Hidden != 1)
+			if (item_games->hidden != 1)
 			{
-				TotalGames++;
-				DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title, MUIV_List_Insert_Sorted);
+				total_games++;
+				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
 			}
 		}
-		sprintf(helperstr, "Total %d games.", TotalGames);
-		set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
-	} //end of if gamesfp
+		sprintf(helperstr, "Total %d games.", total_games);
+		set(app->TX_Status, MUIA_Text_Contents, helperstr);
 
-	fprepos = fopen("PROGDIR:repos.prefs", "r");
-	if (!fprepos)
-	{
-		//stupid!
+		fclose(fpgames);
 	}
-	else
+}
+
+void load_repos()
+{
+	char file_line[500];
+
+	FILE* fprepos = fopen("PROGDIR:repos.prefs", "r");
+	if (fprepos)
 	{
 		do
 		{
-			if (fgets(FileLine, sizeof(FileLine), fprepos) == NULL) { break; }
+			if (fgets(file_line, sizeof file_line, fprepos) == NULL) { break; }
 
-			FileLine[strlen(FileLine) - 1] = '\0';
+			file_line[strlen(file_line) - 1] = '\0';
 
-			if (strlen(FileLine) == 0) continue;
+			if (strlen(file_line) == 0) continue;
 
-			item_repos = (Repos_list *)calloc(1, sizeof(Repos_list));
+			item_repos = (repos_list *)calloc(1, sizeof(repos_list));
 			item_repos->next = NULL;
-			strcpy(item_repos->Repo, FileLine);
+			strcpy(item_repos->repo, file_line);
 
-			if (Repos == NULL)
+			if (repos == NULL)
 			{
-				Repos = item_repos;
+				repos = item_repos;
 			}
 			else
 			{
-				item_repos->next = Repos;
-				Repos = item_repos;
+				item_repos->next = repos;
+				repos = item_repos;
 			}
 
-			DoMethod(App->LV_RepoList_3, MUIM_List_InsertSingle, item_repos->Repo, 1, MUIV_List_Insert_Bottom);
+			DoMethod(app->LV_RepoList, MUIM_List_InsertSingle, item_repos->repo, 1, MUIV_List_Insert_Bottom);
 		}
 		while (1);
-	} //end of else !fprepos
 
-	DoMethod(App->LV_GenresList_1, MUIM_List_InsertSingle, "--Show All--", MUIV_List_Insert_Bottom);
-	DoMethod(App->LV_GenresList_1, MUIM_List_InsertSingle, "--Favorites--", MUIV_List_Insert_Bottom);
-	DoMethod(App->LV_GenresList_1, MUIM_List_InsertSingle, "--Last Played--", MUIV_List_Insert_Bottom);
-	DoMethod(App->LV_GenresList_1, MUIM_List_InsertSingle, "--Most Played--", MUIV_List_Insert_Bottom);
-	DoMethod(App->LV_GenresList_1, MUIM_List_InsertSingle, "--Never Played--", MUIV_List_Insert_Bottom);
-
-	NoOfGenres = 0;
-
-	fpgenres = fopen("PROGDIR:genres", "r");
-	if (!fpgenres)
-	{
-		//stupid!
+		fclose(fprepos);
 	}
-	else
+}
+
+void load_genres()
+{
+	char file_line[500];
+	int i;
+	FILE* fpgenres = fopen("PROGDIR:genres", "r");
+	if (fpgenres)
 	{
+		no_of_genres = 0;
 		do
 		{
-			if (fgets(FileLine, sizeof(FileLine), fpgenres) == NULL) { break; }
+			if (fgets(file_line, sizeof file_line, fpgenres) == NULL) { break; }
 
-			FileLine[strlen(FileLine) - 1] = '\0';
+			file_line[strlen(file_line) - 1] = '\0';
 
-			if (strlen(FileLine) == 0) continue;
+			if (strlen(file_line) == 0) continue;
 
-			item_genres = (Genres_list *)calloc(1, sizeof(Genres_list));
+			item_genres = (genres_list *)calloc(1, sizeof(genres_list));
 			item_genres->next = NULL;
-			strcpy(item_genres->Genre, FileLine);
+			strcpy(item_genres->genre, file_line);
 
-			if (Genres == NULL)
+			if (genres == NULL)
 			{
-				Genres = item_genres;
+				genres = item_genres;
 			}
 			else
 			{
-				item_genres->next = Genres;
-				Genres = item_genres;
+				item_genres->next = genres;
+				genres = item_genres;
 			}
 
-			NoOfGenres++;
+			no_of_genres++;
 
-			DoMethod(App->LV_GenresList_1, MUIM_List_InsertSingle, item_genres->Genre, MUIV_List_Insert_Sorted);
+			DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, item_genres->genre, MUIV_List_Insert_Sorted);
 		}
 		while (1);
 
-
-		for (i = 0; i < NoOfGenres; i++)
+		for (i = 0; i < no_of_genres; i++)
 		{
-			DoMethod(App->LV_GenresList_1, MUIM_List_GetEntry, i + 5, &App->CY_Genre_0Content[i]);
+			DoMethod(app->LV_GenresList, MUIM_List_GetEntry, i + 5, &app->CY_Genre_Content[i]);
 		}
 
-		App->CY_Genre_0Content[i] = "Unknown";
-		App->CY_Genre_0Content[i + 1] = NULL;
+		app->CY_Genre_Content[i] = "Unknown";
+		app->CY_Genre_Content[i + 1] = NULL;
 
-		set(App->CY_Genre_0, MUIA_Cycle_Entries, App->CY_Genre_0Content);
-	} //end of else !fpgenres
+		set(app->CY_Genre, MUIA_Cycle_Entries, app->CY_Genre_Content);
 
-	if (fpgames) fclose(fpgames);
-	if (fprepos) fclose(fprepos);
-	if (fpgenres) fclose(fpgenres);
+		fclose(fpgenres);
+	}
+}
+
+void AppStart()
+{
+	load_games_list();
+	load_repos();
+
+	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, "--Show All--", MUIV_List_Insert_Bottom);
+	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, "--Favorites--", MUIV_List_Insert_Bottom);
+	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, "--Last Played--", MUIV_List_Insert_Bottom);
+	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, "--Most Played--", MUIV_List_Insert_Bottom);
+	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, "--Never Played--", MUIV_List_Insert_Bottom);
+
+	load_genres();
+
 	IntroPic = 1;
 
-	set(App->WI_Main_0,
+	set(app->WI_MainWindow,
 		MUIA_Window_Open, TRUE
 	);
 }
 
 void FilterChange()
 {
-	extern struct ObjApp* App;
 	char *str = NULL, helper[210];
 	char *str_gen = NULL, helperstr[200];
 	int i, max = 0, _strlen;
 
-	get(App->STR_Filter_0, MUIA_String_Contents, &str);
+	get(app->STR_Filter, MUIA_String_Contents, &str);
 
-	DoMethod(App->LV_GenresList_1, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str_gen);
+	DoMethod(app->LV_GenresList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str_gen);
 	if (str && strlen(str) != 0) for (i = 0; i <= strlen((char *)str) - 1; i++) str[i] = tolower(str[i]);
 
 	if (str_gen == NULL || !strcmp(str_gen, "--Show All--"))
 	{
 		// Erase list
-		DoMethod(App->LV_GamesList_0, MUIM_List_Clear);
+		DoMethod(app->LV_GamesList, MUIM_List_Clear);
 
-		set(App->LV_GamesList_0, MUIA_List_Quiet, TRUE);
+		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
 
-		TotalGames = 0;
+		total_games = 0;
 		// Find the entries in Games and update the list
-		if (Games)
+		if (games)
 		{
-			for (item_games = Games; item_games != NULL; item_games = item_games->next)
+			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				strcpy(helper, item_games->Title);
+				strcpy(helper, item_games->title);
 				_strlen = strlen(helper);
 				for (i = 0; i <= _strlen - 1; i++) helper[i] = tolower(helper[i]);
 
 				if (strstr(helper, (char *)str))
 				{
-					if (item_games->Hidden != 1)
+					if (item_games->hidden != 1)
 					{
-						DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title,
+						DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title,
 						         MUIV_List_Insert_Sorted);
-						TotalGames++;
+						total_games++;
 					}
 				}
 			}
 		}
 
-		set(App->LV_GamesList_0, MUIA_List_Quiet, FALSE);
+		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
 
-		sprintf(helper, "Total %d games.", TotalGames);
-		set(App->TX_Status_0, MUIA_Text_Contents, helper);
+		sprintf(helper, "Total %d games.", total_games);
+		set(app->TX_Status, MUIA_Text_Contents, helper);
 	}
 
 	else if (!strcmp(str_gen, "--Favorites--"))
 	{
 		// Erase list
-		DoMethod(App->LV_GamesList_0, MUIM_List_Clear);
-		set(App->LV_GamesList_0, MUIA_List_Quiet, TRUE);
+		DoMethod(app->LV_GamesList, MUIM_List_Clear);
+		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
 
-		TotalGames = 0;
-		if (Games)
+		total_games = 0;
+		if (games)
 		{
-			for (item_games = Games; item_games != NULL; item_games = item_games->next)
+			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				strcpy(helper, item_games->Title);
+				strcpy(helper, item_games->title);
 				_strlen = strlen(helper);
 				for (i = 0; i <= _strlen - 1; i++) helper[i] = tolower(helper[i]);
 
-				if (item_games->Favorite == 1 && item_games->Hidden != 1 && strstr(helper, (char *)str))
+				if (item_games->favorite == 1 && item_games->hidden != 1 && strstr(helper, (char *)str))
 				{
-					DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title, MUIV_List_Insert_Sorted);
-					TotalGames++;
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+					total_games++;
 				}
 			}
 		}
 
-		set(App->LV_GamesList_0, MUIA_List_Quiet, FALSE);
+		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
 
-		sprintf(helperstr, "Total %d games.", TotalGames);
-		set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
+		sprintf(helperstr, "Total %d games.", total_games);
+		set(app->TX_Status, MUIA_Text_Contents, helperstr);
 	}
 	else if (!strcmp(str_gen, "--Last Played--"))
 	{
-		DoMethod(App->LV_GamesList_0, MUIM_List_Clear);
-		set(App->LV_GamesList_0, MUIA_List_Quiet, TRUE);
-		TotalGames = 0;
-		if (Games)
+		DoMethod(app->LV_GamesList, MUIM_List_Clear);
+		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
+		total_games = 0;
+		if (games)
 		{
-			for (item_games = Games; item_games != NULL; item_games = item_games->next)
+			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				strcpy(helper, item_games->Title);
+				strcpy(helper, item_games->title);
 				_strlen = strlen(helper);
 				for (i = 0; i <= _strlen - 1; i++) helper[i] = tolower(helper[i]);
 
-				if (item_games->LastPlayed == 1 && strstr(helper, (char *)str))
+				if (item_games->last_played == 1 && strstr(helper, (char *)str))
 				{
-					DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title, MUIV_List_Insert_Sorted);
-					TotalGames++;
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+					total_games++;
 				}
 			}
 		}
 
-		set(App->LV_GamesList_0, MUIA_List_Quiet, FALSE);
+		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
 
-		sprintf(helperstr, "Total %d games.", TotalGames);
-		set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
+		sprintf(helperstr, "Total %d games.", total_games);
+		set(app->TX_Status, MUIA_Text_Contents, helperstr);
 	}
 	else if (!strcmp(str_gen, "--Most Played--"))
 	{
-		DoMethod(App->LV_GamesList_0, MUIM_List_Clear);
-		set(App->LV_GamesList_0, MUIA_List_Quiet, TRUE);
-		TotalGames = 0;
-		if (Games)
+		DoMethod(app->LV_GamesList, MUIM_List_Clear);
+		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
+		total_games = 0;
+		if (games)
 		{
-			for (item_games = Games; item_games != NULL; item_games = item_games->next)
+			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				strcpy(helper, item_games->Title);
+				strcpy(helper, item_games->title);
 				_strlen = strlen(helper);
 				for (i = 0; i <= _strlen - 1; i++) helper[i] = tolower(helper[i]);
 
-				if (item_games->TimesPlayed && strstr(helper, (char *)str))
+				if (item_games->times_played && strstr(helper, (char *)str))
 				{
-					if (item_games->TimesPlayed >= max && item_games->Hidden != 1)
+					if (item_games->times_played >= max && item_games->hidden != 1)
 					{
-						max = item_games->TimesPlayed;
+						max = item_games->times_played;
 						//sprintf(helper, "%ld - %s", item_games->TimesPlayed, item_games->Title);
-						DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title, MUIV_List_Insert_Top);
-						TotalGames++;
+						DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Top);
+						total_games++;
 						//printf("%s - Top max:%d\n", item_games->Title, max);
 					}
 					else
 					{
 						//sprintf(helper, "%ld - %s", item_games->TimesPlayed, item_games->Title);
-						DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title,
+						DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title,
 						         MUIV_List_Insert_Bottom);
-						TotalGames++;
+						total_games++;
 						//printf("%s - Bottom max:%d\n", item_games->Title, max);
 					}
 				}
 			}
 		}
-		set(App->LV_GamesList_0, MUIA_List_Quiet, FALSE);
-		sprintf(helperstr, "Total %d games.", TotalGames);
-		set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
+		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
+		sprintf(helperstr, "Total %d games.", total_games);
+		set(app->TX_Status, MUIA_Text_Contents, helperstr);
 	}
 	else if (!strcmp(str_gen, "--Never Played--"))
 	{
-		DoMethod(App->LV_GamesList_0, MUIM_List_Clear);
-		set(App->LV_GamesList_0, MUIA_List_Quiet, TRUE);
-		TotalGames = 0;
-		if (Games)
+		DoMethod(app->LV_GamesList, MUIM_List_Clear);
+		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
+		total_games = 0;
+		if (games)
 		{
-			for (item_games = Games; item_games != NULL; item_games = item_games->next)
+			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				strcpy(helper, item_games->Title);
+				strcpy(helper, item_games->title);
 				_strlen = strlen(helper);
 				for (i = 0; i <= _strlen - 1; i++) helper[i] = tolower(helper[i]);
 
-				if (item_games->TimesPlayed == 0 && item_games->Hidden != 1 && strstr(helper, (char *)str))
+				if (item_games->times_played == 0 && item_games->hidden != 1 && strstr(helper, (char *)str))
 				{
-					DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title, MUIV_List_Insert_Sorted);
-					TotalGames++;
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+					total_games++;
 				}
 			}
 		}
 
-		set(App->LV_GamesList_0, MUIA_List_Quiet, FALSE);
+		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
 
-		sprintf(helperstr, "Total %d games.", TotalGames);
-		set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
+		sprintf(helperstr, "Total %d games.", total_games);
+		set(app->TX_Status, MUIA_Text_Contents, helperstr);
 	}
 		// the
 	else
 	{
 		// Erase list
-		DoMethod(App->LV_GamesList_0, MUIM_List_Clear);
+		DoMethod(app->LV_GamesList, MUIM_List_Clear);
 
-		set(App->LV_GamesList_0, MUIA_List_Quiet, TRUE);
+		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
 		//if (strlen(str)>0) for (i=0;i<=strlen((char *)str)-1;i++) str[i] = tolower(str[i]);
-		TotalGames = 0;
+		total_games = 0;
 		// Find the entries in Games and update the list
-		if (Games)
+		if (games)
 		{
-			for (item_games = Games; item_games != NULL; item_games = item_games->next)
+			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				strcpy(helper, item_games->Title);
+				strcpy(helper, item_games->title);
 				_strlen = strlen(helper);
 				for (i = 0; i <= _strlen - 1; i++) helper[i] = tolower(helper[i]);
 
-				if (!strcmp(item_games->Genre, str_gen) && item_games->Hidden != 1 && strstr(helper, (char *)str))
+				if (!strcmp(item_games->genre, str_gen) && item_games->hidden != 1 && strstr(helper, (char *)str))
 				{
-					DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title, MUIV_List_Insert_Sorted);
-					TotalGames++;
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+					total_games++;
 				}
 			}
 		}
 
-		set(App->LV_GamesList_0, MUIA_List_Quiet, FALSE);
+		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
 
-		sprintf(helper, "Total %d games.", TotalGames);
-		set(App->TX_Status_0, MUIA_Text_Contents, helper);
+		sprintf(helper, "Total %d games.", total_games);
+		set(app->TX_Status, MUIA_Text_Contents, helper);
 	}
 }
 
 /*
 *   Executes whdload with the slave
 */
-void GameDoubleClick()
+void game_double_click()
 {
-	extern struct ObjApp* App;
-	//struct FileLock *oldlock, *newlock, *origlock;
-	struct Library* IconBase;
-	struct DiskObject* diskObj;
-	char *str = NULL, genre[256], path[256], exec[256], naked_path[256], *tool_type, **tool_types, **temp_tbl = NULL;
+	struct Library* icon_base;
+	struct DiskObject* disk_obj;
+	char *game_title = NULL, path[256], exec[256], naked_path[256], *tool_type;
 	int success, i, k, whdload = 0;
-	struct FileInfoBlock* m;
-	//BPTR newlock, origlock;
-	BPTR lock, oldlock, newlock, origlock;
-	int exists = 0, j, n, z = 0, dec_rep = 0, _strlen;
-	char str2[512], fullpath[800], temptitle[256], slave[256], helperstr[250], to_check[256];
+	int z = 0;
+	char str2[512], fullpath[800], slave[256], helperstr[250], to_check[256];
 
 	//clear vars:
 	str2[0] = '\0';
 	fullpath[0] = '\0';
 
-	DoMethod(App->LV_GamesList_0, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str);
-	GetPath((char *)str, path);
+	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
+	get_path((char *)game_title, path);
 
-	sprintf(helperstr, "Running %s...", str);
-	set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
+	sprintf(helperstr, "Running %s...", game_title);
+	set(app->TX_Status, MUIA_Text_Contents, helperstr);
 
 	/* strip the path from the slave file and get the rest */
 	for (i = strlen(path) - 1; i >= 0; i--)
@@ -526,25 +527,24 @@ void GameDoubleClick()
 		naked_path[k] = path[k];
 	naked_path[k] = '\0';
 
-	_strlen = strlen(path);
-	for (k = i + 1; k <= _strlen - 1; k++)
+	int length = strlen(path);
+	for (k = i + 1; k <=  length - 1; k++)
 	{
 		slave[z] = path[k];
 		z++;
 	}
 
 	slave[z] = '\0';
-	_strlen = strlen(slave);
-	for (i = 0; i <= _strlen - 1; i++) slave[i] = tolower(slave[i]);
+	 length = strlen(slave);
+	for (i = 0; i <=  length - 1; i++) slave[i] = tolower(slave[i]);
 
 	if (strstr(slave, ".slave"))
 	{
 		whdload = 1;
 	}
 
-	oldlock = Lock("PROGDIR:", ACCESS_READ);
-
-	lock = Lock(naked_path, ACCESS_READ);
+	const BPTR oldlock = Lock("PROGDIR:", ACCESS_READ);
+	const BPTR lock = Lock(naked_path, ACCESS_READ);
 	CurrentDir(lock);
 
 	if (whdload == 1) sprintf(exec, "whdload ");
@@ -553,13 +553,13 @@ void GameDoubleClick()
 	//tooltypes only for whdload games
 	if (whdload == 1)
 	{
-		if (IconBase = (struct Library *)OpenLibrary("icon.library", 0))
+		if (icon_base = (struct Library *)OpenLibrary("icon.library", 0))
 		{
 			//scan the .info files in the current dir.
 			//one of them should be the game's project icon.
 
 			/*  allocate space for a FileInfoBlock */
-			m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
+			struct FileInfoBlock* m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
 
 			success = Examine(lock, m);
 			if (m->fib_DirEntryType <= 0)
@@ -583,19 +583,19 @@ void GameDoubleClick()
 					}
 					fullpath[i] = '\0';
 
-					if (diskObj = (struct DiskObject *)GetDiskObject(fullpath))
+					if (disk_obj = (struct DiskObject *)GetDiskObject(fullpath))
 					{
-						if (MatchToolValue(FindToolType(diskObj->do_ToolTypes, "SLAVE"), slave) || MatchToolValue(
-							FindToolType(diskObj->do_ToolTypes, "slave"), slave))
+						if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "SLAVE"), slave) || MatchToolValue(
+							FindToolType(disk_obj->do_ToolTypes, "slave"), slave))
 						{
 						}
 						else
 						{
-							FreeDiskObject(diskObj);
+							FreeDiskObject(disk_obj);
 							continue;
 						}
 
-						for (tool_types = (char **)diskObj->do_ToolTypes; tool_type = *tool_types; ++tool_types)
+						for (char **tool_types = (char **)disk_obj->do_ToolTypes; tool_type = *tool_types; ++tool_types)
 						{
 							if (!strncmp(tool_type, "IM", 2)) continue;
 							if (tool_type[0] == ' ') continue;
@@ -606,7 +606,7 @@ void GameDoubleClick()
 
 							/* Must check here for numerical values */
 							/* Those (starting with $ should be transformed to dec from hex) */
-							temp_tbl = my_split((char *)(tool_type), "=");
+							char **temp_tbl = my_split((char *)(tool_type), "=");
 							if (temp_tbl == NULL || temp_tbl[0] == NULL || !strcmp((char *)temp_tbl[0], " ") || !strcmp(
 								(char *)temp_tbl[0], ""))
 							{
@@ -618,7 +618,7 @@ void GameDoubleClick()
 								sprintf(to_check, "%s", temp_tbl[1]);
 								if (to_check[0] == '$')
 								{
-									dec_rep = hex2dec(to_check);
+									int dec_rep = hex2dec(to_check);
 									sprintf(tool_type, "%s=%d", temp_tbl[0], dec_rep);
 								}
 							}
@@ -629,14 +629,14 @@ void GameDoubleClick()
 							sprintf(exec, "%s %s", exec, tool_type);
 						}
 
-						FreeDiskObject(diskObj);
+						FreeDiskObject(disk_obj);
 
 						break;
 					}
 				}
 			}
 
-			CloseLibrary(IconBase);
+			CloseLibrary(icon_base);
 		}
 
 		//if we're still here, and exec contains just whdload, add the slave and execute
@@ -647,69 +647,66 @@ void GameDoubleClick()
 	}
 
 	//set the counters for this game
-	for (item_games = Games; item_games != NULL; item_games = item_games->next)
+	for (item_games = games; item_games != NULL; item_games = item_games->next)
 	{
-		if (!strcmp(item_games->Title, str))
+		if (!strcmp(item_games->title, game_title))
 		{
-			item_games->LastPlayed = 1;
-			item_games->TimesPlayed++;
+			item_games->last_played = 1;
+			item_games->times_played++;
 		}
 
-		if (item_games->LastPlayed == 1 && strcmp(item_games->Title, str))
+		if (item_games->last_played == 1 && strcmp(item_games->title, game_title))
 		{
-			item_games->LastPlayed = 0;
+			item_games->last_played = 0;
 		}
 	}
 
-	if (SAVESTATSONEXIT == 0) SaveList(0);
+	if (SAVESTATSONEXIT == 0) save_list(0);
 	success = Execute(exec, 0, 0);
 
-	if (success == 0) MsgBox("Error while executing whdload or game.\nPlease make sure whdload is in your path.");
+	if (success == 0) msg_box("Error while executing WHDLoad or Game.\nPlease make sure WHDLoad is in your path.");
 
 	CurrentDir(oldlock);
 
-	sprintf(helperstr, "Total %d games.", TotalGames);
-	set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
+	sprintf(helperstr, "Total %d games.", total_games);
+	set(app->TX_Status, MUIA_Text_Contents, helperstr);
 }
 
 /*
 * Scans the repos for games
 */
-void MenuScan()
+void menu_scan()
 {
-	extern struct ObjApp* App;
-	//struct FileLock *oldlock, *currentlock;
-	BPTR oldlock, currentlock;
 	char repotemp[256], helperstr[256];
 
-	if (!Repos)
+	if (!repos)
 	{
 		//printf("Nothing to scan!\n");
 	}
 	else
 	{
-		for (item_games = Games; item_games != NULL; item_games = item_games->next)
+		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
 			//only apply the not exists hack to slaves that are in the current repos, that will be scanned later
 			//Binaries (that are added through add-non-whdload, should be handled afterwards
-			if (strstr(item_games->Path, ".slave") || strlen(item_games->Path) == 0)
+			if (strstr(item_games->path, ".slave") || strlen(item_games->path) == 0)
 			{
-				item_games->Exists = 0;
+				item_games->exists = 0;
 			}
 			else
 			{
-				item_games->Exists = 1;
+				item_games->exists = 1;
 			}
 		}
 
-		currentlock = Lock("PROGDIR:", ACCESS_READ);
+		BPTR currentlock = Lock("PROGDIR:", ACCESS_READ);
 
-		for (item_repos = Repos; item_repos != NULL; item_repos = item_repos->next)
+		for (item_repos = repos; item_repos != NULL; item_repos = item_repos->next)
 		{
-			sprintf(repotemp, "%s", item_repos->Repo);
+			sprintf(repotemp, "%s", item_repos->repo);
 			sprintf(helperstr, "Scanning [%s]. Please wait...", repotemp);
-			set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
-			oldlock = Lock(repotemp, ACCESS_READ);
+			set(app->TX_Status, MUIA_Text_Contents, helperstr);
+			BPTR oldlock = Lock(repotemp, ACCESS_READ);
 
 			if (oldlock != 0)
 			{
@@ -723,24 +720,22 @@ void MenuScan()
 			}
 		}
 
-		SaveList(1);
-
-		RefreshList(1);
+		save_list(1);
+		refresh_list(1);
 	}
 }
 
-void GameClick()
+void game_click()
 {
-	extern struct ObjApp* App;
-	char *str = NULL, path[350], naked_path[400];
+	char *game_title = NULL, path[350], naked_path[400];
 	int i, k;
 	FILE* fp = NULL;
 
-	DoMethod(App->LV_GamesList_0, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str);
+	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
 
-	if (!NOSCREENSHOT && str) //for some reason, GameClick is called and str is null??
+	if (!NOSCREENSHOT && game_title) //for some reason, game_click is called and game_title is null??
 	{
-		GetPath((char *)str, path);
+		get_path((char *)game_title, path);
 
 		/* strip the path from the slave file and get the rest */
 		for (i = strlen(path) - 1; i >= 0; i--)
@@ -753,7 +748,7 @@ void GameClick()
 			naked_path[k] = path[k];
 		naked_path[k] = '\0';
 
-		//Check the string, when filter is populeted there is trouble
+		//Check the string, when filter is populated there is trouble
 		if (strlen(naked_path) != 0)
 		{
 			sprintf(naked_path, "%s/igame.iff", naked_path);
@@ -773,14 +768,14 @@ void GameClick()
 			{
 				if (NOGUIGFX)
 				{
-					App->IM_GameImage_1 = MUI_NewObject("Dtpic.mui",
+					app->IM_GameImage_1 = MUI_NewObject("Dtpic.mui",
 					                                    MUIA_Dtpic_Name, naked_path,
 					                                    MUIA_Frame, MUIV_Frame_ImageButton,
 					End;
 				}
 				else
 				{
-					App->IM_GameImage_1 = GuigfxObject,
+					app->IM_GameImage_1 = GuigfxObject,
 					                                  MUIA_Guigfx_FileName, naked_path,
 					                                  MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
 					                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
@@ -791,15 +786,15 @@ void GameClick()
 					End;
 				}
 
-				if (App->IM_GameImage_1)
+				if (app->IM_GameImage_1)
 				{
-					DoMethod(App->GR_grp_1, MUIM_Group_InitChange);
-					DoMethod(App->GR_grp_1, OM_REMMEMBER, App->IM_GameImage_0);
-					DoMethod(App->GR_grp_1, OM_REMMEMBER, App->LV_GenresList_1);
-					MUI_DisposeObject(App->IM_GameImage_0);
-					DoMethod(App->GR_grp_1, OM_ADDMEMBER, App->IM_GameImage_0 = App->IM_GameImage_1);
-					DoMethod(App->GR_grp_1, OM_ADDMEMBER, App->LV_GenresList_1);
-					DoMethod(App->GR_grp_1, MUIM_Group_ExitChange);
+					DoMethod(app->GR_grp_1, MUIM_Group_InitChange);
+					DoMethod(app->GR_grp_1, OM_REMMEMBER, app->IM_GameImage_0);
+					DoMethod(app->GR_grp_1, OM_REMMEMBER, app->LV_GenresList);
+					MUI_DisposeObject(app->IM_GameImage_0);
+					DoMethod(app->GR_grp_1, OM_ADDMEMBER, app->IM_GameImage_0 = app->IM_GameImage_1);
+					DoMethod(app->GR_grp_1, OM_ADDMEMBER, app->LV_GenresList);
+					DoMethod(app->GR_grp_1, MUIM_Group_ExitChange);
 					IntroPic = 0;
 				}
 				else
@@ -815,14 +810,14 @@ void GameClick()
 				{
 					if (NOGUIGFX)
 					{
-						App->IM_GameImage_1 = (Object *)MUI_NewObject("Dtpic.mui",
+						app->IM_GameImage_1 = (Object *)MUI_NewObject("Dtpic.mui",
 						                                              MUIA_Dtpic_Name, "PROGDIR:igame.iff",
 						                                              MUIA_Frame, MUIV_Frame_ImageButton,
 						End;
 					}
 					else
 					{
-						App->IM_GameImage_1 = GuigfxObject,
+						app->IM_GameImage_1 = GuigfxObject,
 						                                  MUIA_Guigfx_FileName, "PROGDIR:igame.iff",
 						                                  MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
 						                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
@@ -832,15 +827,15 @@ void GameClick()
 						                                  MUIA_FixWidth, SS_WIDTH,
 						End;
 					}
-					if (App->IM_GameImage_1)
+					if (app->IM_GameImage_1)
 					{
-						DoMethod(App->GR_grp_1, MUIM_Group_InitChange);
-						DoMethod(App->GR_grp_1, OM_REMMEMBER, App->IM_GameImage_0);
-						DoMethod(App->GR_grp_1, OM_REMMEMBER, App->LV_GenresList_1);
-						MUI_DisposeObject(App->IM_GameImage_0);
-						DoMethod(App->GR_grp_1, OM_ADDMEMBER, App->IM_GameImage_0 = App->IM_GameImage_1);
-						DoMethod(App->GR_grp_1, OM_ADDMEMBER, App->LV_GenresList_1);
-						DoMethod(App->GR_grp_1, MUIM_Group_ExitChange);
+						DoMethod(app->GR_grp_1, MUIM_Group_InitChange);
+						DoMethod(app->GR_grp_1, OM_REMMEMBER, app->IM_GameImage_0);
+						DoMethod(app->GR_grp_1, OM_REMMEMBER, app->LV_GenresList);
+						MUI_DisposeObject(app->IM_GameImage_0);
+						DoMethod(app->GR_grp_1, OM_ADDMEMBER, app->IM_GameImage_0 = app->IM_GameImage_1);
+						DoMethod(app->GR_grp_1, OM_ADDMEMBER, app->LV_GenresList);
+						DoMethod(app->GR_grp_1, MUIM_Group_ExitChange);
 						IntroPic = 1;
 					}
 				}
@@ -852,13 +847,13 @@ void GameClick()
 }
 
 /* Retrieves the Genre from the file, using the Title */
-int GetGenre(char* Title, char* Genre)
+int get_genre(char* title, char* genre)
 {
-	for (item_games = Games; item_games != NULL; item_games = item_games->next)
+	for (item_games = games; item_games != NULL; item_games = item_games->next)
 	{
-		if (!strcmp(Title, item_games->Title))
+		if (!strcmp(title, item_games->title))
 		{
-			strcpy(Genre, item_games->Genre);
+			strcpy(genre, item_games->genre);
 			break;
 		}
 	}
@@ -866,81 +861,70 @@ int GetGenre(char* Title, char* Genre)
 	return 0;
 }
 
-void GetPath(char* Title, char* Path)
+void get_path(char* title, char* path)
 {
-	for (item_games = Games; item_games != NULL; item_games = item_games->next)
+	for (item_games = games; item_games != NULL; item_games = item_games->next)
 	{
-		if (!strcmp(Title, item_games->Title))
+		if (!strcmp(title, item_games->title))
 		{
-			strcpy(Path, item_games->Path);
+			strcpy(path, item_games->path);
 			break;
 		}
 	}
-}
-
-void RepoStart()
-{
-	//printf("RepoStart??\n");
 }
 
 /*
 * Adds a repository (path on the disk)
 * to the list of repositories
 */
-void RepoAdd()
+void repo_add()
 {
-	extern struct ObjApp* App;
 	char* str = NULL;
 
-	get(App->PA_label_0, MUIA_String_Contents, &str);
+	get(app->PA_RepoPath, MUIA_String_Contents, &str);
 
 	if (str && strlen((char *)str) != 0)
 	{
-		item_repos = (Repos_list *)calloc(1, sizeof(Repos_list));
+		item_repos = (repos_list *)calloc(1, sizeof(repos_list));
 		item_repos->next = NULL;
 
-		strcpy(item_repos->Repo, (char *)str);
+		strcpy(item_repos->repo, (char *)str);
 
-		if (Repos == NULL)
+		if (repos == NULL)
 		{
-			Repos = item_repos;
+			repos = item_repos;
 		}
 		else
 		{
-			item_repos->next = Repos;
-			Repos = item_repos;
+			item_repos->next = repos;
+			repos = item_repos;
 		}
 
-		DoMethod(App->LV_RepoList_3, MUIM_List_InsertSingle, item_repos->Repo, 1, MUIV_List_Insert_Bottom);
+		DoMethod(app->LV_RepoList, MUIM_List_InsertSingle, item_repos->repo, 1, MUIV_List_Insert_Bottom);
 	}
 }
 
-void RepoRemove()
+void repo_remove()
 {
-	extern struct ObjApp* App;
-	DoMethod(App->LV_RepoList_3, MUIM_List_Remove, MUIV_List_Remove_Active);
+	DoMethod(app->LV_RepoList, MUIM_List_Remove, MUIV_List_Remove_Active);
 }
 
 /*
 * Writes the repositories to the repo.prefs file
 */
-void RepoStop()
+void repo_stop()
 {
-	extern struct ObjApp* App;
-	int i;
-	FILE* fprepos = NULL;
-
-	fprepos = fopen("PROGDIR:repos.prefs", "w");
+	FILE* fprepos = fopen("PROGDIR:repos.prefs", "w");
 	if (!fprepos)
 	{
-		MsgBox("Could not create repos.prefs file!");
+		msg_box("Could not create repos.prefs file!");
 	}
 	else
 	{
-		for (i = 0;; i++)
+		for (int i = 0;; i++)
 		{
 			char* str = NULL;
-			DoMethod(App->LV_RepoList_3, MUIM_List_GetEntry, i, &str);
+			DoMethod(app->LV_RepoList, MUIM_List_GetEntry, i, &str);
 			if (!str) break;
 			//printf("%d - %s\n", i, str);
 			fprintf(fprepos, "%s\n", (char *)str);
@@ -951,47 +935,37 @@ void RepoStop()
 }
 
 //shows and inits the GameProperties Window
-void MenuGameProperties()
+void menu_game_properties()
 {
-	extern struct ObjApp* App;
 	char* str = NULL;
 	char helperstr[512];
-	char path[512], genre[100];
+	char path[512];
 	int i, found = 0;
 
-	//struct FileLock *lock, *oldlock;
-	BPTR lock, oldlock;
-	struct Library* IconBase;
-	struct DiskObject* diskObj;
-	char naked_path[256], *tool_type, **tool_types;
-	int success, k, open;
-	struct FileInfoBlock* m;
-	BPTR newlock, origlock;
-	int exists = 0, j, n, z = 0, dec_rep = 0;
-	char str2[512], fullpath[800], temptitle[256], slave[256], to_check[256];
-
-	//printf("MenuGameProperties\n");
+	struct Library* icon_base;
+	struct DiskObject* disk_obj;
+	char naked_path[256], *tool_type;
+	int k, open;
+	int z = 0;
+	char str2[512], fullpath[800], slave[256];
 
 	//if window is already open
-	get(App->WI_GameProperties_2, MUIA_Window_Open, &open);
+	get(app->WI_GameProperties, MUIA_Window_Open, &open);
 	if (open) return;
 
-
 	//set the elements on the window
-	DoMethod(App->LV_GamesList_0, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str);
+	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str);
 
 	if (str == NULL || strlen(str) == 0)
 	{
-		MsgBox("Please select a game.");
+		msg_box("Please select a Game from the List.");
 		return;
 	}
 
-	for (item_games = Games; item_games != NULL; item_games = item_games->next)
+	for (item_games = games; item_games != NULL; item_games = item_games->next)
 	{
-		if (!strcmp(str, item_games->Title))
+		if (!strcmp(str, item_games->title))
 		{
-			//strcpy(path, item_games->Path);
-			//strcpy(genre, item_games->Genre);
 			found = 1;
 			break;
 		}
@@ -999,30 +973,30 @@ void MenuGameProperties()
 
 	if (found == 1)
 	{
-		set(App->STR_Title_1, MUIA_String_Contents, str);
-		set(App->TX_Path_2, MUIA_Text_Contents, item_games->Path);
+		set(app->STR_GameTitle, MUIA_String_Contents, str);
+		set(app->TX_GamePath, MUIA_Text_Contents, item_games->path);
 
-		sprintf(helperstr, "Times Played: %d", item_games->TimesPlayed);
-		set(App->TX_NumPlayed_0, MUIA_Text_Contents, helperstr);
+		sprintf(helperstr, "Times Played: %d", item_games->times_played);
+		set(app->TX_NumPlayed, MUIA_Text_Contents, helperstr);
 
 		//set the genre
-		for (i = 0; i < NoOfGenres; i++)
-			if (!strcmp(App->CY_Genre_0Content[i], item_games->Genre)) break;
-		set(App->CY_Genre_0, MUIA_Cycle_Active, i);
+		for (i = 0; i < no_of_genres; i++)
+			if (!strcmp(app->CY_Genre_Content[i], item_games->genre)) break;
+		set(app->CY_Genre, MUIA_Cycle_Active, i);
 
-		if (item_games->Favorite == 1)
-			set(App->CH_label_0, MUIA_Selected, TRUE);
+		if (item_games->favorite == 1)
+			set(app->CH_Favorite, MUIA_Selected, TRUE);
 		else
-			set(App->CH_label_0, MUIA_Selected, FALSE);
+			set(app->CH_Favorite, MUIA_Selected, FALSE);
 
-		if (item_games->Hidden == 1)
-			set(App->CH_label_1, MUIA_Selected, TRUE);
+		if (item_games->hidden == 1)
+			set(app->CH_Hidden, MUIA_Selected, TRUE);
 		else
-			set(App->CH_label_1, MUIA_Selected, FALSE);
+			set(app->CH_Hidden, MUIA_Selected, FALSE);
 
 		//set up the tooltypes
 
-		GetPath((char *)str, path);
+		get_path((char *)str, path);
 
 		/* strip the path from the slave file and get the rest */
 		for (i = strlen(path) - 1; i >= 0; i--)
@@ -1043,26 +1017,21 @@ void MenuGameProperties()
 
 		for (i = 0; i <= strlen(slave) - 1; i++) slave[i] = tolower(slave[i]);
 
-		//printf("Slave: [%s]\n", slave);
-
-		//printf("Passed : %ld\n", whdload);
-
-		oldlock = Lock("PROGDIR:", ACCESS_READ);
-
-		lock = Lock(naked_path, ACCESS_READ);
+		BPTR oldlock = Lock("PROGDIR:", ACCESS_READ);
+		BPTR lock = Lock(naked_path, ACCESS_READ);
 		CurrentDir(lock);
 
 		gamestooltypes[0] = '\0';
 
-		if (IconBase = (struct Library *)OpenLibrary("icon.library", 0))
+		if (icon_base = (struct Library *)OpenLibrary("icon.library", 0))
 		{
 			//scan the .info files in the current dir.
 			//one of them should be the game's project icon.
 
 			/*  allocate space for a FileInfoBlock */
-			m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
+			struct FileInfoBlock * m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
 
-			success = Examine(lock, m);
+			int success = Examine(lock, m);
 			if (m->fib_DirEntryType <= 0)
 			{
 				/*  We don't allow "opta file", only "opta dir" */
@@ -1075,7 +1044,6 @@ void MenuGameProperties()
 				{
 					NameFromLock(lock, str2, 512);
 					sprintf(fullpath, "%s/%s", str2, m->fib_FileName);
-					//printf("%s\n", fullpath);
 
 					//lose the .info
 					for (i = strlen(fullpath) - 1; i >= 0; i--)
@@ -1085,135 +1053,115 @@ void MenuGameProperties()
 					}
 					fullpath[i] = '\0';
 
-					//printf("Without info: [%s]\n", fullpath);
-
-					if (diskObj = GetDiskObject(fullpath))
+					if (disk_obj = GetDiskObject(fullpath))
 					{
-						//						  printf("trying: [%s]\n", fullpath);
-						if (MatchToolValue(FindToolType(diskObj->do_ToolTypes, "SLAVE"), slave) || MatchToolValue(
-							FindToolType(diskObj->do_ToolTypes, "slave"), slave))
+						//printf("trying: [%s]\n", fullpath);
+						if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "SLAVE"), slave) || MatchToolValue(
+							FindToolType(disk_obj->do_ToolTypes, "slave"), slave))
 						{
 							//printf("Winner!\n");
 						}
 						else
 						{
-							FreeDiskObject(diskObj);
+							FreeDiskObject(disk_obj);
 							continue;
 						}
 
-						//printf("Here\n");
-
-						for (tool_types = (char **)diskObj->do_ToolTypes; tool_type = *tool_types; ++tool_types)
+						for (char **tool_types = (char **)disk_obj->do_ToolTypes; tool_type = *tool_types; ++tool_types)
 						{
 							if (!strncmp(tool_type, "IM", 2)) continue;
-							//if (tool_type[0]==' ') continue;
-							//if (tool_type[0]=='(') continue;
-							//if (tool_type[0]=='*') continue;
-							//if (tool_type[0]==';') continue;
-							//if (tool_type[0]=='\0')  continue;
 
 							sprintf(gamestooltypes, "%s%s\n", gamestooltypes, tool_type);
-							set(App->TX_Tooltypes_0, MUIA_TextEditor_ReadOnly, FALSE);
+							set(app->TX_Tooltypes, MUIA_TextEditor_ReadOnly, FALSE);
 							//printf("[%s]\n", tool_type);
 						}
-						//printf("%s\n", diskObj->do_ToolTypes);
+						//printf("%s\n", disk_obj->do_ToolTypes);
 
-						FreeDiskObject(diskObj);
+						FreeDiskObject(disk_obj);
 
 						break;
 					}
 				}
 			}
 
-			CloseLibrary(IconBase);
+			CloseLibrary(icon_base);
 		}
 
 		if (strlen(gamestooltypes) == 0)
 		{
 			sprintf(gamestooltypes, "No .info file");
-			set(App->TX_Tooltypes_0, MUIA_TextEditor_ReadOnly, TRUE);
+			set(app->TX_Tooltypes, MUIA_TextEditor_ReadOnly, TRUE);
 		}
 
-		set(App->TX_Tooltypes_0, MUIA_TextEditor_Contents, gamestooltypes);
-		//set(App->TX_Tooltypes_0, MUIA_Floattext_Text, helperstr);
+		set(app->TX_Tooltypes, MUIA_TextEditor_Contents, gamestooltypes);
+		//set(App->TX_Tooltypes, MUIA_Floattext_Text, helperstr);
 		CurrentDir(oldlock);
 
-		set(App->WI_GameProperties_2, MUIA_Window_Open, TRUE);
+		set(app->WI_GameProperties, MUIA_Window_Open, TRUE);
 	}
 	else
 	{
-		MsgBox("Please select a game.");
+		msg_box("Please select a Game from the List.");
 	}
 }
 
 //when ok is pressed in GameProperties
-void GamePropertiesOk()
+void game_properties_ok()
 {
-	extern struct ObjApp* App;
 	char* str = NULL;
 	char *path = NULL, helperstr[256];
 	int fav = 0, genre = 0, hid = 0;
-	STRPTR tools;
-
-	//struct FileLock *lock, *oldlock;
-	BPTR lock, oldlock;
-	struct Library* IconBase;
-	struct DiskObject* diskObj;
-	char **temp_tbl = NULL, naked_path[256], *tool_type, **tool_types, **NewToolTypes, **ptr, **newptr, ModToolType[30];
-	//int success,k,open;
-	int i, k, success, z;
-	struct FileInfoBlock* m;
-	BPTR newlock, origlock;
-	int NewToolTypeCount = 1, OldToolTypeCount = 0, NewRealToolTypeCount = 1, OldRealToolTypeCount = 0;
-
+	struct Library* icon_base;
+	struct DiskObject* disk_obj;
+	char naked_path[256], *tool_type;
+	int i, k;
+	int new_tool_type_count = 1, old_tool_type_count = 0, old_real_tool_type_count = 0;
 	char str2[512], fullpath[800], slave[256];
 
-	//printf("GamePropertiesOk\n");
+	get(app->STR_GameTitle, MUIA_String_Contents, &str);
+	get(app->TX_GamePath, MUIA_Text_Contents, &path);
+	get(app->CY_Genre, MUIA_Cycle_Active, &genre);
+	get(app->CH_Favorite, MUIA_Selected, &fav);
+	get(app->CH_Hidden, MUIA_Selected, &hid);
 
-	get(App->STR_Title_1, MUIA_String_Contents, &str);
-	get(App->TX_Path_2, MUIA_Text_Contents, &path);
-	get(App->CY_Genre_0, MUIA_Cycle_Active, &genre);
-	get(App->CH_label_0, MUIA_Selected, &fav);
-	get(App->CH_label_1, MUIA_Selected, &hid);
-
-	//printf("%s\n", App->CY_Genre_0Content[genre]);
+	//printf("%s\n", App->CY_Genre_Content[genre]);
 
 	//find the entry, and update it:
-	for (item_games = Games; item_games != NULL; item_games = item_games->next)
+	for (item_games = games; item_games != NULL; item_games = item_games->next)
 	{
-		if (!strcmp(path, item_games->Path))
+		if (!strcmp(path, item_games->path))
 		{
-			if (strcmp(item_games->Title, str))
+			if (strcmp(item_games->title, str))
 			{
 				//check dup for title
-				if (CheckDupTitle(str))
+				if (check_dup_title(str))
 				{
-					MsgBox("The title you selected, already exists.");
+					msg_box("The Title you selected, already exists.");
 					return;
 				}
 			}
-			strcpy(item_games->Title, str);
-			strcpy(item_games->Genre, App->CY_Genre_0Content[genre]);
-			if (fav == 1) item_games->Favorite = 1;
-			else item_games->Favorite = 0;
+			strcpy(item_games->title, str);
+			strcpy(item_games->genre, app->CY_Genre_Content[genre]);
+			if (fav == 1) item_games->favorite = 1;
+			else item_games->favorite = 0;
 
 			//if it was previously not hidden, hide now
-			if (hid == 1 && item_games->Hidden != 1)
+			if (hid == 1 && item_games->hidden != 1)
 			{
-				item_games->Hidden = 1;
-				DoMethod(App->LV_GamesList_0, MUIM_List_Remove, MUIV_List_Remove_Selected);
-				TotalGames = TotalGames - 1;
-				sprintf(helperstr, "Total %d games.", TotalGames);
-				set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
+				item_games->hidden = 1;
+				DoMethod(app->LV_GamesList, MUIM_List_Remove, MUIV_List_Remove_Selected);
+				total_games = total_games - 1;
+				sprintf(helperstr, "Total %d games.", total_games);
+				set(app->TX_Status, MUIA_Text_Contents, helperstr);
 			}
 
-			if (hid == 0 && item_games->Hidden == 1)
+			if (hid == 0 && item_games->hidden == 1)
 			{
-				item_games->Hidden = 0;
-				DoMethod(App->LV_GamesList_0, MUIM_List_Remove, MUIV_List_Remove_Selected);
-				TotalHidden--;
-				sprintf(helperstr, "Total %d games.", TotalHidden);
-				set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
+				item_games->hidden = 0;
+				DoMethod(app->LV_GamesList, MUIM_List_Remove, MUIV_List_Remove_Selected);
+				total_hidden--;
+				sprintf(helperstr, "Total %d games.", total_hidden);
+				set(app->TX_Status, MUIA_Text_Contents, helperstr);
 			}
 			//RefreshList();
 			//SaveList();
@@ -1222,15 +1170,11 @@ void GamePropertiesOk()
 	}
 
 	//update the games tooltypes
-	tools = (STRPTR)DoMethod(App->TX_Tooltypes_0, MUIM_TextEditor_ExportText);
-
-	//	  printf("[%s]\n[%s]\n", tools, gamestooltypes);
+	STRPTR tools = (STRPTR)DoMethod(app->TX_Tooltypes, MUIM_TextEditor_ExportText);
 
 	//tooltypes changed
 	if (strcmp((char *)tools, gamestooltypes))
 	{
-		//		  printf("Tools changed\n");
-
 		/* strip the path from the slave file and get the rest */
 		for (i = strlen(path) - 1; i >= 0; i--)
 		{
@@ -1241,7 +1185,7 @@ void GamePropertiesOk()
 			naked_path[k] = path[k];
 		naked_path[k] = '\0';
 
-		z = 0;
+		int z = 0;
 		for (k = i + 1; k <= strlen(path) - 1; k++)
 		{
 			slave[z] = path[k];
@@ -1251,24 +1195,19 @@ void GamePropertiesOk()
 
 		for (i = 0; i <= strlen(slave) - 1; i++) slave[i] = tolower(slave[i]);
 
-		//		  printf("Slave: [%s]\n", slave);
-
-		//printf("Passed : %ld\n", whdload);
-
-		oldlock = Lock("PROGDIR:", ACCESS_READ);
-
-		lock = Lock(naked_path, ACCESS_READ);
+		BPTR oldlock = Lock("PROGDIR:", ACCESS_READ);
+		BPTR lock = Lock(naked_path, ACCESS_READ);
 		CurrentDir(lock);
 
-		if (IconBase = (struct Library *)OpenLibrary("icon.library", 0))
+		if (icon_base = (struct Library *)OpenLibrary("icon.library", 0))
 		{
 			//scan the .info files in the current dir.
 			//one of them should be the game's project icon.
 
 			/*  allocate space for a FileInfoBlock */
-			m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
+			struct FileInfoBlock * m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
 
-			success = Examine(lock, m);
+			int success = Examine(lock, m);
 			if (m->fib_DirEntryType <= 0)
 			{
 				/*  We don't allow "opta file", only "opta dir" */
@@ -1293,245 +1232,202 @@ void GamePropertiesOk()
 
 					//printf("Without info: [%s]\n", fullpath);
 
-					if (diskObj = (struct DiskObject *)GetDiskObject(fullpath))
+					if (disk_obj = (struct DiskObject *)GetDiskObject(fullpath))
 					{
 						//						  printf("trying: [%s]\n", fullpath);
-						if (MatchToolValue(FindToolType(diskObj->do_ToolTypes, "SLAVE"), slave) || MatchToolValue(
-							FindToolType(diskObj->do_ToolTypes, "slave"), slave))
+						if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "SLAVE"), slave) || MatchToolValue(
+							FindToolType(disk_obj->do_ToolTypes, "slave"), slave))
 						{
 							//							  printf("Winner!\n");
 						}
 						else
 						{
-							FreeDiskObject(diskObj);
+							FreeDiskObject(disk_obj);
 							continue;
 						}
 
 						//check numbers for old and new tooltypes
 						for (i = 0; i <= strlen(tools); i++)
 						{
-							if (tools[i] == '\n') NewToolTypeCount++;
+							if (tools[i] == '\n') new_tool_type_count++;
 						}
 						//add one for the last tooltype that doesnt end with \n
-						NewToolTypeCount++;
+						new_tool_type_count++;
 
 						for (i = 0; i <= strlen(gamestooltypes); i++)
 						{
-							if (gamestooltypes[i] == '\n') OldToolTypeCount++;
+							if (gamestooltypes[i] == '\n') old_tool_type_count++;
 						}
 
-						//						  printf("Old [%d] New [%d]\n", OldToolTypeCount, NewToolTypeCount);
-
-						for (tool_types = (char **)diskObj->do_ToolTypes; tool_type = *tool_types; ++tool_types)
+						for (char **tool_types = (char **)disk_obj->do_ToolTypes; tool_type = *tool_types; ++tool_types)
 						{
-							OldRealToolTypeCount++;
+							old_real_tool_type_count++;
 						}
 
-						//						  printf("Old real count [%d]\n", OldRealToolTypeCount);
+						unsigned char **new_tool_types = AllocVec(new_tool_type_count * sizeof(char *), MEMF_FAST | MEMF_CLEAR);
+						unsigned char **newptr = new_tool_types;
 
-						NewToolTypes = AllocVec(NewToolTypeCount * sizeof(char *), MEMF_FAST | MEMF_CLEAR);
-						newptr = NewToolTypes;
-
-						temp_tbl = my_split((char *)(tools), "\n");
+						char **temp_tbl = my_split((char *)tools, "\n");
 						if (temp_tbl == NULL || temp_tbl[0] == NULL || !strcmp((char *)temp_tbl[0], " ") || !strcmp((
-							char *)temp_tbl[0], ""))
+							unsigned char *)temp_tbl[0], ""))
 						{
 							break;
 						}
 
-						for (i = 0; i <= NewToolTypeCount - 2; i++)
+						for (i = 0; i <= new_tool_type_count - 2; i++)
 						{
-							//							  printf("[%s]\n", temp_tbl[i]);
-							*newptr++ = temp_tbl[i];
+							*newptr++ = (unsigned char*)temp_tbl[i];
 						}
 
 						*newptr = NULL;
 
-						diskObj->do_ToolTypes = NewToolTypes;
-						PutDiskObject(fullpath, diskObj);
-
-						//for (tool_types=diskObj->do_ToolTypes; tool_type = *tool_types; ++tool_types){
-
-						//	  if (!strncmp(tool_type, "IM", 2)) continue;
-						//if (tool_type[0]==' ') continue;
-						//if (tool_type[0]=='(') continue;
-						//if (tool_type[0]=='*') continue;
-						//if (tool_type[0]==';') continue;
-						//if (tool_type[0]=='\0')  continue;
-
-						//sprintf(gamestooltypes, "%s%s\n", gamestooltypes, tool_type);
-						//set(App->TX_Tooltypes_0, MUIA_TextEditor_ReadOnly, FALSE);
-						//printf("[%s]\n", tool_type);
-
-						//	  if(!strcmp(tool_type, "PreLoad")){
-						//		  sprintf((char *)tool_type, "PRELOADS");
-						//	  }
-						//
-						//	  printf("[%s]\n", tool_type);
-						//}
-
-						//diskObj->do_ToolTypes = tool_types;
-						//PutDiskObject(fullpath, diskObj);
-						//printf("%s\n", diskObj->do_ToolTypes);
-
-						FreeDiskObject(diskObj);
+						disk_obj->do_ToolTypes = new_tool_types;
+						PutDiskObject(fullpath, disk_obj);
+						FreeDiskObject(disk_obj);
 
 						break;
 					}
 				}
 			}
 
-			CloseLibrary(IconBase);
+			CloseLibrary(icon_base);
 		}
 	}
 	FreeVec(tools);
 
-	DoMethod(App->LV_GamesList_0, MUIM_List_Redraw, MUIV_List_Redraw_Active);
+	DoMethod(app->LV_GamesList, MUIM_List_Redraw, MUIV_List_Redraw_Active);
 
-	set(App->WI_GameProperties_2, MUIA_Window_Open, FALSE);
+	set(app->WI_GameProperties, MUIA_Window_Open, FALSE);
 	//RefreshList();
-	SaveList(0);
+	save_list(0);
 }
 
-void MenuShowHidden()
+void menu_show_hidden()
 {
-	extern struct ObjApp* App;
 	char helperstr[50];
-	//int mini_totals=0;
 
-	if (Showing_hidden == 0)
+	if (showing_hidden == 0)
 	{
-		set(App->LV_GamesList_0, MUIA_List_Quiet, TRUE);
-		TotalHidden = 0;
-		DoMethod(App->LV_GamesList_0, MUIM_List_Clear);
-		//DoMethod(App->LV_GenresList_1,MUIM_List_Select,1,MUIV_List_Select_Off, NULL);
-		set(App->LV_GenresList_1, MUIA_Disabled, TRUE);
-		set(App->STR_Filter_0, MUIA_Disabled, TRUE);
-		if (Games)
+		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
+		total_hidden = 0;
+		DoMethod(app->LV_GamesList, MUIM_List_Clear);
+		//DoMethod(App->LV_GenresList,MUIM_List_Select,1,MUIV_List_Select_Off, NULL);
+		set(app->LV_GenresList, MUIA_Disabled, TRUE);
+		set(app->STR_Filter, MUIA_Disabled, TRUE);
+		if (games)
 		{
 			/* Find the entries in Games and update the list */
-			for (item_games = Games; item_games != NULL; item_games = item_games->next)
+			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				if (item_games->Hidden == 1)
+				if (item_games->hidden == 1)
 				{
-					DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title, MUIV_List_Insert_Sorted);
-					TotalHidden++;
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+					total_hidden++;
 				}
 			}
 		}
 
-		set(App->LV_GamesList_0, MUIA_List_Quiet, FALSE);
+		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
 
-		sprintf(helperstr, "Total %d games.", TotalHidden);
-		set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
+		sprintf(helperstr, "Total %d games.", total_hidden);
+		set(app->TX_Status, MUIA_Text_Contents, helperstr);
 
-		Showing_hidden = 1;
+		showing_hidden = 1;
 	}
 	else
 	{
-		set(App->LV_GenresList_1, MUIA_Disabled, FALSE);
-		set(App->STR_Filter_0, MUIA_Disabled, FALSE);
-		Showing_hidden = 0;
-		RefreshList(0);
+		set(app->LV_GenresList, MUIA_Disabled, FALSE);
+		set(app->STR_Filter, MUIA_Disabled, FALSE);
+		showing_hidden = 0;
+		refresh_list(0);
 	}
 }
 
-void AppStop()
+void app_stop()
 {
-	free(Games);
-	free(Repos);
+	free(games);
+	free(repos);
+	free(genres);
 
-	if (SAVESTATSONEXIT == 1) SaveList(0);
-
-	/* free some more stuff here! */
-	//return 0;
+	if (SAVESTATSONEXIT == 1) save_list(0);
 }
 
-void GenresClick()
+void genres_click()
 {
-	extern struct ObjApp* App;
 	char *str = NULL, helperstr[50];
 	int max = 0, mini_totals = 0;
-	//int i,k;
-	//FILE *fp;
 
-	DoMethod(App->LV_GenresList_1, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str);
+	DoMethod(app->LV_GenresList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str);
 
 	if (!strcmp(str, "--Show All--"))
-		RefreshList(0);
+		refresh_list(0);
 	else if (!strcmp(str, "--Favorites--"))
 	{
 		/* Erase list */
-		DoMethod(App->LV_GamesList_0, MUIM_List_Clear);
-		//DoMethod(App->LV_GamesList_0,MUIM_Hide);
-		set(App->LV_GamesList_0, MUIA_List_Quiet, TRUE);
-		if (Games)
+		DoMethod(app->LV_GamesList, MUIM_List_Clear);
+		//DoMethod(App->LV_GamesList,MUIM_Hide);
+		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
+		if (games)
 		{
 			/* Find the entries in Games and update the list */
-			for (item_games = Games; item_games != NULL; item_games = item_games->next)
+			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				if (item_games->Favorite == 1 && item_games->Hidden != 1)
+				if (item_games->favorite == 1 && item_games->hidden != 1)
 				{
-					DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title, MUIV_List_Insert_Sorted);
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
 					mini_totals++;
 				}
 			}
 		}
 
-		//DoMethod(App->LV_GamesList_0,MUIM_Show);
-		set(App->LV_GamesList_0, MUIA_List_Quiet, FALSE);
-		//DoMethod(App->LV_GamesList_0,MUIM_List_Redraw,MUIV_List_Redraw_All);
-		//DoMethod(App->LV_GamesList_0,MUIM_List_Jump,mini_totals);
-		//DoMethod(App->LV_GamesList_0,MUIM_List_Jump,0);
+		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
 
 		sprintf(helperstr, "Total %d games.", mini_totals);
-		set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
-		//maybe re-sorting the list isn't needed.
-		//DoMethod(App->LV_GamesList_0,MUIM_List_Sort);
+		set(app->TX_Status, MUIA_Text_Contents, helperstr);
 	}
 	else if (!strcmp(str, "--Last Played--"))
 	{
 		/* Erase list */
-		DoMethod(App->LV_GamesList_0, MUIM_List_Clear);
+		DoMethod(app->LV_GamesList, MUIM_List_Clear);
 
-		if (Games)
+		if (games)
 		{
 			/* Find the entries in Games and update the list */
-			for (item_games = Games; item_games != NULL; item_games = item_games->next)
+			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				if (item_games->LastPlayed == 1)
+				if (item_games->last_played == 1)
 				{
-					DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title, MUIV_List_Insert_Sorted);
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
 					break;
 				}
 			}
 		}
 		sprintf(helperstr, "Total 1 games.");
-		set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
+		set(app->TX_Status, MUIA_Text_Contents, helperstr);
 	}
 	else if (!strcmp(str, "--Most Played--"))
 	{
-		DoMethod(App->LV_GamesList_0, MUIM_List_Clear);
-		//DoMethod(App->LV_GamesList_0,MUIM_Hide);
-		set(App->LV_GamesList_0, MUIA_List_Quiet, TRUE);
-		if (Games)
+		DoMethod(app->LV_GamesList, MUIM_List_Clear);
+		//DoMethod(App->LV_GamesList,MUIM_Hide);
+		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
+		if (games)
 		{
-			for (item_games = Games; item_games != NULL; item_games = item_games->next)
+			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				if (item_games->TimesPlayed)
+				if (item_games->times_played)
 				{
-					if (item_games->TimesPlayed >= max && item_games->Hidden != 1)
+					if (item_games->times_played >= max && item_games->hidden != 1)
 					{
-						max = item_games->TimesPlayed;
+						max = item_games->times_played;
 						//sprintf(helper, "%ld - %s", item_games->TimesPlayed, item_games->Title);
-						DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title, MUIV_List_Insert_Top);
+						DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Top);
 						mini_totals++;
 						//printf("%s - Top max:%d\n", item_games->Title, max);
 					}
-					else if (item_games->Hidden != 1)
+					else if (item_games->hidden != 1)
 					{
 						//sprintf(helper, "%ld - %s", item_games->TimesPlayed, item_games->Title);
-						DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title,
+						DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title,
 						         MUIV_List_Insert_Bottom);
 						mini_totals++;
 						//printf("%s - Bottom max:%d\n", item_games->Title, max);
@@ -1539,61 +1435,61 @@ void GenresClick()
 				}
 			}
 		}
-		//DoMethod(App->LV_GamesList_0,MUIM_Show);
-		set(App->LV_GamesList_0, MUIA_List_Quiet, FALSE);
-		// DoMethod(App->LV_GamesList_0,MUIM_List_Redraw,MUIV_List_Redraw_All);
-		//DoMethod(App->LV_GamesList_0,MUIM_List_Jump,mini_totals);
-		//DoMethod(App->LV_GamesList_0,MUIM_List_Jump,0);
+		//DoMethod(App->LV_GamesList,MUIM_Show);
+		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
+		// DoMethod(App->LV_GamesList,MUIM_List_Redraw,MUIV_List_Redraw_All);
+		//DoMethod(App->LV_GamesList,MUIM_List_Jump,mini_totals);
+		//DoMethod(App->LV_GamesList,MUIM_List_Jump,0);
 		sprintf(helperstr, "Total %d games.", mini_totals);
-		set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
+		set(app->TX_Status, MUIA_Text_Contents, helperstr);
 	}
 	else if (!strcmp(str, "--Never Played--"))
 	{
-		DoMethod(App->LV_GamesList_0, MUIM_List_Clear);
-		//DoMethod(App->LV_GamesList_0,MUIM_Hide);
-		set(App->LV_GamesList_0, MUIA_List_Quiet, TRUE);
-		if (Games)
+		DoMethod(app->LV_GamesList, MUIM_List_Clear);
+		//DoMethod(App->LV_GamesList,MUIM_Hide);
+		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
+		if (games)
 		{
-			for (item_games = Games; item_games != NULL; item_games = item_games->next)
+			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				if (item_games->TimesPlayed == 0)
+				if (item_games->times_played == 0)
 				{
-					DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title, MUIV_List_Insert_Top);
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Top);
 					mini_totals++;
 				}
 			}
 		}
 
-		set(App->LV_GamesList_0, MUIA_List_Quiet, FALSE);
+		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
 		sprintf(helperstr, "Total %d games.", mini_totals);
-		set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
+		set(app->TX_Status, MUIA_Text_Contents, helperstr);
 	}
 		// the
 	else
 	{
 		/* Erase list */
-		DoMethod(App->LV_GamesList_0, MUIM_List_Clear);
-		//DoMethod(App->LV_GamesList_0,MUIM_Hide);
-		set(App->LV_GamesList_0, MUIA_List_Quiet, TRUE);
-		if (Games)
+		DoMethod(app->LV_GamesList, MUIM_List_Clear);
+		//DoMethod(App->LV_GamesList,MUIM_Hide);
+		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
+		if (games)
 		{
 			/* Find the entries in Games and update the list */
-			for (item_games = Games; item_games != NULL; item_games = item_games->next)
+			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				if (!strcmp(item_games->Genre, str) && item_games->Hidden != 1)
+				if (!strcmp(item_games->genre, str) && item_games->hidden != 1)
 				{
-					DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title, MUIV_List_Insert_Sorted);
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
 					mini_totals++;
 				}
 			}
 		}
-		//DoMethod(App->LV_GamesList_0,MUIM_Show);
-		set(App->LV_GamesList_0, MUIA_List_Quiet, FALSE);
-		// DoMethod(App->LV_GamesList_0,MUIM_List_Redraw,MUIV_List_Redraw_All);
-		//DoMethod(App->LV_GamesList_0,MUIM_List_Jump,mini_totals);
-		//DoMethod(App->LV_GamesList_0,MUIM_List_Jump,0);
+		//DoMethod(App->LV_GamesList,MUIM_Show);
+		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
+		// DoMethod(App->LV_GamesList,MUIM_List_Redraw,MUIV_List_Redraw_All);
+		//DoMethod(App->LV_GamesList,MUIM_List_Jump,mini_totals);
+		//DoMethod(App->LV_GamesList,MUIM_List_Jump,0);
 		sprintf(helperstr, "Total %d games.", mini_totals);
-		set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
+		set(app->TX_Status, MUIA_Text_Contents, helperstr);
 	}
 }
 
@@ -1602,10 +1498,8 @@ void GenresClick()
 */
 char** my_split(char* str, char* spl)
 {
-	char* fptr;
-	char* sptr;
 	char **ret, *buffer[256], buf[4096];
-	int count, i, spl_len;
+	int i;
 
 	if (!spl)
 	{
@@ -1615,11 +1509,11 @@ char** my_split(char* str, char* spl)
 		return (ret);
 	}
 
-	count = 0;
+	int count = 0;
 
-	fptr = str;
-	spl_len = strlen(spl);
-	sptr = strstr(fptr, spl);
+	char * fptr = str;
+	const int spl_len = strlen(spl);
+	char * sptr = strstr(fptr, spl);
 	while (sptr)
 	{
 		i = sptr - fptr;
@@ -1647,17 +1541,9 @@ char** my_split(char* str, char* spl)
 }
 
 void followthread(BPTR lock, int tab_level)
-
-//BPTR lock;
-//	struct FileLock *lock;
-//int tab_level;
-
 {
-	struct FileInfoBlock* m;
-	BPTR oldlock, newlock;
-	//struct FileLock *newlock, *oldlock;
-	int s, success, i, exists = 0, j, k, n = 0, _kp = 0;
-	char str[512], fullpath[512], temptitle[256], helperstr[256];
+	int exists = 0, j;
+	char str[512], fullpath[512], temptitle[256];
 
 	/*  if at the end of the road, don't print anything */
 	if (!lock)
@@ -1668,9 +1554,9 @@ void followthread(BPTR lock, int tab_level)
 	//CurrentDir(lock);
 
 	/*  allocate space for a FileInfoBlock */
-	m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
+	struct FileInfoBlock * m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
 
-	success = Examine(lock, m);
+	int success = Examine(lock, m);
 	if (m->fib_DirEntryType <= 0)
 	{
 		return;
@@ -1693,31 +1579,29 @@ void followthread(BPTR lock, int tab_level)
 		}
 
 		//make m->fib_FileName to lower
-		_kp = strlen((char *)m->fib_FileName);
-		for (s = 0; s < _kp; s++) m->fib_FileName[s] = tolower(m->fib_FileName[s]);
+		const int kp = strlen((char *)m->fib_FileName);
+		for (int s = 0; s < kp; s++) m->fib_FileName[s] = tolower(m->fib_FileName[s]);
 		if (strstr(m->fib_FileName, ".slave"))
 		{
-			// || strstr(m->fib_FileName, ".Slave")){
-
 			NameFromLock(lock, str, 511);
 			sprintf(fullpath, "%s/%s", str, m->fib_FileName);
 
 			/* add the slave to the gameslist (if it does not already exist) */
-			for (item_games = Games; item_games != NULL; item_games = item_games->next)
+			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
 				//printf("[%s]\n", item_games->Path);
 				//printf("comparing [%s] - [%s]\n", fullpath, item_games->Path);
-				if (!strcmp(item_games->Path, fullpath))
+				if (!strcmp(item_games->path, fullpath))
 				{
 					exists = 1;
 					//printf("Exists: [%s]\n", fullpath);
-					item_games->Exists = 1;
+					item_games->exists = 1;
 					break;
 				}
 			}
 			if (exists == 0)
 			{
-				item_games = (Games_list *)calloc(1, sizeof(Games_list));
+				item_games = (games_list *)calloc(1, sizeof(games_list));
 				item_games->next = NULL;
 
 				/* strip the path from the slave file and get the rest */
@@ -1730,55 +1614,60 @@ void followthread(BPTR lock, int tab_level)
 				}
 
 				//CHANGE 2007-12-03: init n=0 here
-				n = 0;
-				for (k = j + 1; k <= strlen(str) - 1; k++)
+				int n = 0;
+				for (int k = j + 1; k <= strlen(str) - 1; k++)
 					temptitle[n++] = str[k];
 				temptitle[n] = '\0';
 				//printf("title: [%s]\n", temptitle);
 				//strcpy (item_games->Title, temptitle);
-				if (GetTitleFromSlave(fullpath, item_games->Title))
+				if (SCANBYDIRS)
 				{
-					strcpy(item_games->Title, temptitle);
+					// If the SCANBYDIRS tooltype is enabled, set Titles from Directory names
+					char* title = get_directory_name(fullpath);
+					if (title != NULL)
+						strcpy(item_games->title, title);
+				}
+				else 
+				{
+					// Default behavior: set Titles by the .slave contents
+					if (get_title_from_slave(fullpath, item_games->title))
+						strcpy(item_games->title, temptitle);
 				}
 
-				while (CheckDupTitle(item_games->Title))
+				while (check_dup_title(item_games->title))
 				{
-					strcat(item_games->Title, " Alt");
+					strcat(item_games->title, " Alt");
 				}
 
-				strcpy(item_games->Genre, "Unknown");
-				strcpy(item_games->Path, fullpath);
-				item_games->Favorite = 0;
-				item_games->TimesPlayed = 0;
-				item_games->LastPlayed = 0;
-				item_games->Exists = 1;
-				item_games->Hidden = 0;
+				strcpy(item_games->genre, "Unknown");
+				strcpy(item_games->path, fullpath);
+				item_games->favorite = 0;
+				item_games->times_played = 0;
+				item_games->last_played = 0;
+				item_games->exists = 1;
+				item_games->hidden = 0;
 
-				if (Games == NULL)
+				if (games == NULL)
 				{
-					Games = item_games;
+					games = item_games;
 				}
 				else
 				{
-					item_games->next = Games;
-					Games = item_games;
+					item_games->next = games;
+					games = item_games;
 				}
 			}
 			exists = 0;
 		}
-		//if (m->fib_DirEntryType > 0)
-		//{
-		//    printf(" [dir]");
-		//}
 
 		/*  If we have a directory, then enter it: */
 		if (m->fib_DirEntryType > 0)
 		{
 			/*  Since it is a directory, get a lock on it: */
-			newlock = Lock(m->fib_FileName, ACCESS_READ);
+			const BPTR newlock = Lock(m->fib_FileName, ACCESS_READ);
 
 			/*  cd to this directory: */
-			oldlock = CurrentDir(newlock);
+			const BPTR oldlock = CurrentDir(newlock);
 
 			/*  recursively follow the thread down to the bottom: */
 			followthread(newlock, tab_level + 1);
@@ -1794,100 +1683,95 @@ void followthread(BPTR lock, int tab_level)
 	FreeMem(m, sizeof(struct FileInfoBlock));
 }
 
-void RefreshList(int CheckExists)
+void refresh_list(const int check_exists)
 {
-	extern struct ObjApp* App;
 	char helperstr[512];
 
-	DoMethod(App->LV_GamesList_0, MUIM_List_Clear);
-	TotalGames = 0;
-	set(App->LV_GamesList_0, MUIA_List_Quiet, TRUE);
+	DoMethod(app->LV_GamesList, MUIM_List_Clear);
+	total_games = 0;
+	set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
 
-	if (CheckExists == 0)
+	if (check_exists == 0)
 	{
-		for (item_games = Games; item_games != NULL; item_games = item_games->next)
+		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
-			if (strlen(item_games->Path) != 0 && item_games->Hidden != 1)
+			if (strlen(item_games->path) != 0 && item_games->hidden != 1)
 			{
-				TotalGames++;
-				DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title, MUIV_List_Insert_Sorted);
+				total_games++;
+				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
 			}
 		}
 	}
 	else
 	{
-		for (item_games = Games; item_games != NULL; item_games = item_games->next)
+		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
-			if (strlen(item_games->Path) != 0 && item_games->Hidden != 1 && item_games->Exists == 1)
+			if (strlen(item_games->path) != 0 && item_games->hidden != 1 && item_games->exists == 1)
 			{
-				TotalGames++;
-				DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title, MUIV_List_Insert_Sorted);
+				total_games++;
+				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
 			}
 			else
 			{
-				printf("[%s] [%s] [%d]\n", item_games->Title, item_games->Path, item_games->Exists);
+				printf("[%s] [%s] [%d]\n", item_games->title, item_games->path, item_games->exists);
 			}
 		}
 	}
 
-	//DoMethod(App->LV_GamesList_0,MUIM_List_Redraw,MUIV_List_Redraw_All);
+	//DoMethod(App->LV_GamesList,MUIM_List_Redraw,MUIV_List_Redraw_All);
 
-	set(App->LV_GamesList_0, MUIA_List_Quiet, FALSE);
-	sprintf(helperstr, "Total %d games.", TotalGames);
-	set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
+	set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
+	sprintf(helperstr, "Total %d games.", total_games);
+	set(app->TX_Status, MUIA_Text_Contents, helperstr);
 }
 
 /*
 * Saves the current Games struct to disk
 */
-void SaveList(int CheckExists)
+void save_list(const int check_exists)
 {
-	extern struct ObjApp* App;
-	FILE* fpgames = NULL;
+	set(app->WI_Wait, MUIA_Window_Open, TRUE);
 
-	set(App->WI_Wait_0, MUIA_Window_Open, TRUE);
-
-	fpgames = fopen("PROGDIR:gameslist", "w");
-
+	FILE* fpgames = fopen("PROGDIR:gameslist", "w");
 	if (!fpgames)
 	{
-		MsgBox("Could not open gameslist file!");
+		msg_box("Could not open gameslist file!");
 	}
 	else
 	{
-		for (item_games = Games; item_games != NULL; item_games = item_games->next)
+		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
 			//printf("Saving: %s\n", item_games->Title);
-			if (CheckExists == 1)
+			if (check_exists == 1)
 			{
-				if (item_games->Exists == 1)
+				if (item_games->exists == 1)
 				{
-					fprintf(fpgames, "index=%d\n", item_games->Index);
-					fprintf(fpgames, "title=%s\n", item_games->Title);
-					fprintf(fpgames, "genre=%s\n", item_games->Genre);
-					fprintf(fpgames, "path=%s\n", item_games->Path);
-					fprintf(fpgames, "favorite=%d\n", item_games->Favorite);
-					fprintf(fpgames, "timesplayed=%d\n", item_games->TimesPlayed);
-					fprintf(fpgames, "lastplayed=%d\n", item_games->LastPlayed);
-					fprintf(fpgames, "hidden=%d\n\n", item_games->Hidden);
+					fprintf(fpgames, "index=%d\n", item_games->index);
+					fprintf(fpgames, "title=%s\n", item_games->title);
+					fprintf(fpgames, "genre=%s\n", item_games->genre);
+					fprintf(fpgames, "path=%s\n", item_games->path);
+					fprintf(fpgames, "favorite=%d\n", item_games->favorite);
+					fprintf(fpgames, "timesplayed=%d\n", item_games->times_played);
+					fprintf(fpgames, "lastplayed=%d\n", item_games->last_played);
+					fprintf(fpgames, "hidden=%d\n\n", item_games->hidden);
 
 					//fflush(fpgames);
 				}
 				else
 				{
-					strcpy(item_games->Path, "");
+					strcpy(item_games->path, "");
 				}
 			}
 			else
 			{
-				fprintf(fpgames, "index=%d\n", item_games->Index);
-				fprintf(fpgames, "title=%s\n", item_games->Title);
-				fprintf(fpgames, "genre=%s\n", item_games->Genre);
-				fprintf(fpgames, "path=%s\n", item_games->Path);
-				fprintf(fpgames, "favorite=%d\n", item_games->Favorite);
-				fprintf(fpgames, "timesplayed=%d\n", item_games->TimesPlayed);
-				fprintf(fpgames, "lastplayed=%d\n", item_games->LastPlayed);
-				fprintf(fpgames, "hidden=%d\n\n", item_games->Hidden);
+				fprintf(fpgames, "index=%d\n", item_games->index);
+				fprintf(fpgames, "title=%s\n", item_games->title);
+				fprintf(fpgames, "genre=%s\n", item_games->genre);
+				fprintf(fpgames, "path=%s\n", item_games->path);
+				fprintf(fpgames, "favorite=%d\n", item_games->favorite);
+				fprintf(fpgames, "timesplayed=%d\n", item_games->times_played);
+				fprintf(fpgames, "lastplayed=%d\n", item_games->last_played);
+				fprintf(fpgames, "hidden=%d\n\n", item_games->hidden);
 
 				//fflush(fpgames);
 			}
@@ -1896,7 +1780,7 @@ void SaveList(int CheckExists)
 		fclose(fpgames);
 	}
 
-	set(App->WI_Wait_0, MUIA_Window_Open, FALSE);
+	set(app->WI_Wait, MUIA_Window_Open, FALSE);
 }
 
 //function to return the dec eq of a hex no.
@@ -1909,56 +1793,39 @@ int hex2dec(char* hexin)
 	return dec;
 }
 
-void MsgBox(char* msg)
+void msg_box(char* msg)
 {
-	msgbox.es_StructSize = sizeof(msgbox);
+	msgbox.es_StructSize = sizeof msgbox;
 	msgbox.es_Flags = 0;
 	msgbox.es_Title = "iGame";
-	msgbox.es_TextFormat = msg;
+	msgbox.es_TextFormat = (unsigned char*)msg;
 	msgbox.es_GadgetFormat = "Ok";
 
 	EasyRequest(NULL, &msgbox, NULL);
 }
 
-/*
-void ReportBox(char *msg)
-{
-    msgbox.es_StructSize = sizeof(msgbox);
-	msgbox.es_Flags = 0;
-	msgbox.es_Title = "iGame";
-	msgbox.es_TextFormat = msg;
-	msgbox.es_GadgetFormat = "Ok";
-
-	EasyRequest(NULL, &msgbox, NULL);
-}*/
-
 void get_screen_size(int* width, int* height)
 {
 	struct Screen* wbscreen;
-	struct ViewPort* vp;
-	struct DrawInfo* drawinfo;
-	ULONG modeID;
+	ULONG mode_id;
 
-	//struct IntuitionBase *IntuitionBase;
-	struct Library* IntuitionBase;
-	//struct GfxBase *GfxBase;
-	struct Library* GfxBase;
-	extern struct Library* SysBase;
+	struct Library* intuition_base;
+	struct Library* gfx_base;
 
-	if (IntuitionBase = (struct Library *)OpenLibrary("intuition.library", 36))
+	if (intuition_base = (struct Library *)OpenLibrary("intuition.library", 36))
 	{
-		if (GfxBase = (struct Library *)OpenLibrary("graphics.library", 36))
+		if (gfx_base = (struct Library *)OpenLibrary("graphics.library", 36))
 		{
 			if (wbscreen = LockPubScreen("Workbench"))
 			{
 				/* Using intuition.library/GetScreenDrawInfo(), we get the pen
 				* array we'll use for the screen clone the easy way. */
-				drawinfo = GetScreenDrawInfo(wbscreen);
+				struct DrawInfo * drawinfo = GetScreenDrawInfo(wbscreen);
 
-				vp = &(wbscreen->ViewPort);
+				struct ViewPort * vp = &wbscreen->ViewPort;
 				/* Use graphics.library/GetVPModeID() to get the ModeID of the
 				* Workbench screen. */
-				if ((modeID = GetVPModeID(vp)) != INVALID_ID)
+				if ((mode_id = GetVPModeID(vp)) != (unsigned long)INVALID_ID)
 				{
 					*width = wbscreen->Width;
 					*height = wbscreen->Height;
@@ -1977,19 +1844,16 @@ void get_screen_size(int* width, int* height)
 				*width = -1;
 				*height = -1;
 			}
-			CloseLibrary(GfxBase);
+			CloseLibrary(gfx_base);
 		}
-		CloseLibrary(IntuitionBase);
+		CloseLibrary(intuition_base);
 	}
 }
 
-void ReadToolTypes()
+void read_tool_types()
 {
-	extern struct ObjApp* App;
-	struct FileLock* lock;
-	struct Library* IconBase;
-	struct DiskObject* diskObj;
-	char *tool_type, **tool_types, **temp_tbl = NULL, **temp_tbl2 = NULL;
+	struct Library* icon_base;
+	struct DiskObject* disk_obj;
 
 	int screen_width, screen_height;
 
@@ -1999,26 +1863,28 @@ void ReadToolTypes()
 	FILTERUSEENTER = 0;
 	NOSCREENSHOT = 0;
 	SAVESTATSONEXIT = 0;
+	SCANBYDIRS = 0;
 
-	if (IconBase = (struct Library *)OpenLibrary("icon.library", 0))
+	if (icon_base = (struct Library *)OpenLibrary("icon.library", 0))
 	{
-		if (diskObj = (struct DiskObject *)GetDiskObject("PROGDIR:iGame"))
+		//TODO Is there a way to detect the executable name, instead of hard-coding it here?
+		if (disk_obj = (struct DiskObject *)GetDiskObject("PROGDIR:iGame"))
 		{
-			if (FindToolType(diskObj->do_ToolTypes, "SCREENSHOT"))
+			if (FindToolType(disk_obj->do_ToolTypes, "SCREENSHOT"))
 			{
-				tool_types = (char **)diskObj->do_ToolTypes;
-				tool_type = *tool_types;
+				char **tool_types = (char **)disk_obj->do_ToolTypes;
+				char *tool_type = *tool_types;
 
-				temp_tbl = my_split((char *)(tool_type), "=");
+				char **temp_tbl = my_split((char *)tool_type, "=");
 				if (temp_tbl == NULL || temp_tbl[0] == NULL || !strcmp(temp_tbl[0], " ") || !strcmp(temp_tbl[0], ""))
 				{
-					MsgBox("Bad tooltype!");
+					msg_box("Bad tooltype!");
 					exit(0);
 				}
 
 				if (temp_tbl[1] != NULL)
 				{
-					temp_tbl2 = my_split((char *)(temp_tbl[1]), "x");
+					char **temp_tbl2 = my_split((char *)(temp_tbl[1]), "x");
 					if (temp_tbl2[0]) SS_WIDTH = atoi((char *)temp_tbl2[0]);
 					if (temp_tbl2[1]) SS_HEIGHT = atoi((char *)temp_tbl2[1]);
 
@@ -2031,28 +1897,33 @@ void ReadToolTypes()
 				}
 			}
 
-			if (FindToolType(diskObj->do_ToolTypes, "NOGUIGFX"))
+			if (FindToolType(disk_obj->do_ToolTypes, "NOGUIGFX"))
 			{
 				NOGUIGFX = 1;
 			}
 
-			if (FindToolType(diskObj->do_ToolTypes, "FILTERUSEENTER"))
+			if (FindToolType(disk_obj->do_ToolTypes, "FILTERUSEENTER"))
 			{
 				FILTERUSEENTER = 1;
 			}
 
-			if (FindToolType(diskObj->do_ToolTypes, "NOSCREENSHOT"))
+			if (FindToolType(disk_obj->do_ToolTypes, "NOSCREENSHOT"))
 			{
 				NOSCREENSHOT = 1;
 			}
 
-			if (FindToolType(diskObj->do_ToolTypes, "SAVESTATSONEXIT"))
+			if (FindToolType(disk_obj->do_ToolTypes, "SAVESTATSONEXIT"))
 			{
 				SAVESTATSONEXIT = 1;
 			}
+
+			if (FindToolType(disk_obj->do_ToolTypes, "SCANBYDIRS"))
+			{
+				SCANBYDIRS = 1;
+			}
 		}
 
-		CloseLibrary(IconBase);
+		CloseLibrary(icon_base);
 	}
 
 	//check screen res and adjust image box accordingly
@@ -2083,120 +1954,100 @@ void ReadToolTypes()
 	}
 }
 
-//void MenuMUISettings()
-//{
-//	  extern struct ObjApp * App;
-//
-//	  set(App, MUIM_Application_OpenConfigWindow, 0);
-//
-//}
-
-void MenuAddNonWhdload()
+void menu_add_non_whdload()
 {
-	extern struct ObjApp* App;
+	set(app->STR_AddGameTitle, MUIA_String_Contents, NULL);
+	set(app->PA_AddGamePath, MUIA_String_Contents, NULL);
 
-	set(App->STR_Title_2, MUIA_String_Contents, NULL);
-	set(App->PA_label_1, MUIA_String_Contents, NULL);
-
-	set(App->WI_NonWhdload, MUIA_Window_Open, TRUE);
+	set(app->WI_NonWhdload, MUIA_Window_Open, TRUE);
 }
 
-void NonWhdloadOk()
+void non_whdload_ok()
 {
-	extern struct ObjApp* App;
 	char *str, *str_title, helperstr[200];
-	//printf("Here!!!\n");
 
 	//for some reason it needs this twice to get the contents...
-	get(App->PA_label_1, MUIA_String_Contents, &str);
-	get(App->STR_Title_2, MUIA_String_Contents, &str_title);
+	get(app->PA_AddGamePath, MUIA_String_Contents, &str);
+	get(app->STR_AddGameTitle, MUIA_String_Contents, &str_title);
 
-	get(App->PA_label_1, MUIA_String_Contents, &str);
-	get(App->STR_Title_2, MUIA_String_Contents, &str_title);
+	get(app->PA_AddGamePath, MUIA_String_Contents, &str);
+	get(app->STR_AddGameTitle, MUIA_String_Contents, &str_title);
 
 	//printf("[%s] - [%s]\n", str, str_title);
 
 	if (strlen(str_title) == 0)
 	{
-		MsgBox("Please let me know the name of the game...");
+		msg_box("Please let me know the name of the game...");
 		return;
 	}
 	if (strlen(str) == 0)
 	{
-		MsgBox("Please pick the game executable...");
+		msg_box("Please pick the game executable...");
 		return;
 	}
 
 	//add the game to the list
-	item_games = (Games_list *)calloc(1, sizeof(Games_list));
+	item_games = (games_list *)calloc(1, sizeof(games_list));
 	item_games->next = NULL;
+	item_games->index = 0;
+	strcpy(item_games->title, (char *)str_title);
+	strcpy(item_games->genre, "Unknown");
+	strcpy(item_games->path, (char *)str);
+	item_games->favorite = 0;
+	item_games->times_played = 0;
+	item_games->last_played = 0;
 
-	item_games->Index = 0;
-
-	strcpy(item_games->Title, (char *)str_title);
-
-	strcpy(item_games->Genre, "Unknown");
-
-	strcpy(item_games->Path, (char *)str);
-	item_games->Favorite = 0;
-
-	item_games->TimesPlayed = 0;
-
-	item_games->LastPlayed = 0;
-
-	if (Games == NULL)
+	if (games == NULL)
 	{
-		Games = item_games;
+		games = item_games;
 	}
 	else
 	{
-		item_games->next = Games;
-		Games = item_games;
+		item_games->next = games;
+		games = item_games;
 	}
 
-	DoMethod(App->LV_GamesList_0, MUIM_List_InsertSingle, item_games->Title, MUIV_List_Insert_Sorted);
+	DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
 
+	sprintf(helperstr, "Total %d games.", ++total_games);
+	set(app->TX_Status, MUIA_Text_Contents, helperstr);
 
-	sprintf(helperstr, "Total %d games.", ++TotalGames);
-	set(App->TX_Status_0, MUIA_Text_Contents, helperstr);
+	save_list(0);
 
-	SaveList(0);
-
-	set(App->WI_NonWhdload, MUIA_Window_Open, FALSE);
+	set(app->WI_NonWhdload, MUIA_Window_Open, FALSE);
 }
 
 /*
 * Gets title from a slave file
 * returns 0 on success, 1 on fail
 */
-int GetTitleFromSlave(char* slave, char* title)
+int get_title_from_slave(char* slave, char* title)
 {
-	FILE* fp;
-	char Title[100];
+	char slave_title[100];
 	int i = -1;
 
-	struct SlaveInfo
+	struct slave_info
 	{
-		unsigned long Security;
-		char ID[8];
-		unsigned short Version;
-		unsigned short Flags;
-		unsigned long BaseMemSize;
-		unsigned long ExecInstall;
-		unsigned short GameLoader;
-		unsigned short CurrentDir;
-		unsigned short DontCache;
+		unsigned long security;
+		char id[8];
+		unsigned short version;
+		unsigned short flags;
+		unsigned long base_mem_size;
+		unsigned long exec_install;
+		unsigned short game_loader;
+		unsigned short current_dir;
+		unsigned short dont_cache;
 		char keydebug;
 		char keyexit;
-		unsigned long ExpMem;
+		unsigned long exp_mem;
 		unsigned short name;
 		unsigned short copy;
 		unsigned short info;
 	};
 
-	struct SlaveInfo sl;
+	struct slave_info sl;
 
-	fp = fopen(slave, "rb");
+	FILE * fp = fopen(slave, "rb");
 	if (fp == NULL)
 	{
 		return 1;
@@ -2204,9 +2055,7 @@ int GetTitleFromSlave(char* slave, char* title)
 
 	//seek to +0x20
 	fseek(fp, 32, SEEK_SET);
-
-	fread(&sl, 1, sizeof(sl), fp);
-
+	fread(&sl, 1, sizeof sl, fp);
 
 	//sl.Version = (sl.Version>>8) | (sl.Version<<8);
 	//sl.name = (sl.name>>8) | (sl.name<<8);
@@ -2218,25 +2067,22 @@ int GetTitleFromSlave(char* slave, char* title)
 	//title = calloc (1, 100);
 	//fread (title, 1, 100, fp);
 
-	if (sl.Version < 10)
+	if (sl.version < 10)
 	{
 		return 1;
 	}
 
 	for (i = 0; i <= 99; i++)
 	{
-		Title[i] = fgetc(fp);
-		if (Title[i] == '\n')
+		slave_title[i] = fgetc(fp);
+		if (slave_title[i] == '\n')
 		{
-			Title[i] = '\0';
+			slave_title[i] = '\0';
 			break;
 		}
 	}
 
-	strcpy(title, Title);
-
-	//printf("[%s]\n", Title);
-
+	strcpy(title, slave_title);
 	fclose(fp);
 
 	return 0;
@@ -2246,15 +2092,13 @@ int GetTitleFromSlave(char* slave, char* title)
 * Checks if the title already exists
 * returns 1 if yes, 0 otherwise
 */
-int CheckDupTitle(char* title)
+int check_dup_title(char* title)
 {
-	Games_list* check_games = NULL;
-
-	for (check_games = Games; check_games != NULL; check_games = check_games->next)
+	for (games_list* check_games = games; check_games != NULL; check_games = check_games->next)
 	{
-		if (!strcmp(check_games->Title, title))
+		if (!strcmp(check_games->title, title))
 		{
-			//			  printf("[%s] [%s]\n", check_games->Title, title);
+			//printf("[%s] [%s]\n", check_games->Title, title);
 			return 1;
 		}
 	}
@@ -2262,93 +2106,47 @@ int CheckDupTitle(char* title)
 	return 0;
 }
 
-//void ReadToolTypes()
-//{
-//	  struct  Library *IconBase;
-//	  struct  WBArg   *wbArg;
-//
-//	  struct  ExecBase        *SysBase;
-//	  struct  Library         *DOSBase;
-//	  struct  Process         *proc;
-//	  struct  RDArgs          *rdargs=NULL;
-//	  struct  WBStartup       *msg=NULL;
-//	  struct  RDArgs          *myRDArgs=NULL;
-//	  ULONG           rc=RETURN_FAIL;
-//	  LONG            opts[OPT_COUNT];
-//
-//	  struct  DiskObject      *diskObj;
-//	  BPTR            tmplock;
+int get_delimiter_position(const char* str)
+{
+	char* delimiter = strrchr(str, '/');
+	if (!delimiter)
+		delimiter = strrchr(str, ':');
 
-//	  char    **ToolTypes;
-//	  char    *TotalString;
-//				  ULONG   totalSize=3;
+	if (!delimiter)
+	{
+		//printf("Invalid path detected!\n");
+		return 0;
+	}
 
-//	  char    *CurrentPos=TotalString;
-//					  ULONG   currentLength;
+	const int pos = delimiter - str;
+	return pos;
+}
 
-//	  /*
-//	   * Started from Workbench so do icon magic...
-//	   *
-//	   * What we will do here is try all of the tooltypes
-//	   * in the icon and keep only those which do not cause
-//	   * errors in the RDArgs.
-//	   */
-//	  if (wbArg=msg->sm_ArgList) if (IconBase=OpenLibrary("icon.library",0))
-//	  {
-//
+// Get the Directory part from a full path containing a file
+char* get_directory_name(char* str)
+{
+	int pos1 = get_delimiter_position(str);
+	if (!pos1)
+		return NULL;
 
-//		  /*
-//		   * Use project icon if it is there...
-//		   */
-//		  if (msg->sm_NumArgs > 1) wbArg++;
-//
-//		  tmplock=CurrentDir(wbArg->wa_Lock);
-//		  if (diskObj=GetDiskObject(wbArg->wa_Name))
-//		  {
-//				if (ToolTypes=diskObj->do_ToolTypes)
-//				{
-//					while (*ToolTypes)
-//					{
-//						totalSize+=strlen(*ToolTypes)+1;
-//						ToolTypes++;
-//				  }
-//
-//				  if (TotalString=AllocVec(totalSize,MEMF_PUBLIC))
-//				  {
-//					  ToolTypes=diskObj->do_ToolTypes;
-//					  do
-//					  {
-//						  *CurrentPos='\0';
-//						  if (*ToolTypes) strcpy(CurrentPos,*ToolTypes);
-//						  currentLength=strlen(CurrentPos);
-//						  CurrentPos[currentLength+0]='\n';
-//						  CurrentPos[currentLength+1]='\0';
-//
-//						  if (rdargs) FreeArgs(rdargs);
-//						  rdargs=NULL;
-//						  memset((char *)opts, 0, sizeof(opts));
-//
-//						  if (myRDArgs) FreeDosObject(DOS_RDARGS,myRDArgs);
-//						  if (myRDArgs=AllocDosObject(DOS_RDARGS,NULL))
-//						  {
-//							  myRDArgs->RDA_Source.CS_Buffer=TotalString;
-//							  myRDArgs->RDA_Source.CS_Length=strlen(TotalString);
-//
-//							  if (rdargs=ReadArgs(TEMPLATE, opts, myRDArgs))
-//							  {
-//								  CurrentPos[currentLength]=' ';
-//								  CurrentPos+=currentLength+1;
-//							  }
-//						  }
-//					  } while (*ToolTypes++);
-//					  FreeVec(TotalString);
-//				  }
-//			  }
-//
-//		  }
-//		  FreeDiskObject(diskObj);
-//	  }
+	char full_path[100];
+	strncpy(full_path, str, pos1);
+	full_path[pos1] = '\0';
 
-//	  CurrentDir(tmplock);
-//	  CloseLibrary(IconBase);
-//}
+	const int pos2 = get_delimiter_position(full_path);
+	if (!pos2)
+		return NULL;
+
+	char* dir_name = malloc(sizeof full_path);
+	int c = 0;
+	for (unsigned int i = pos2 + 1; i <= sizeof full_path; i++)
+	{
+		dir_name[c] = full_path[i];
+		c++;
+	}
+	dir_name[c] = '\0';
+
+	//printf("%s -> %s\n", str, dirName);
+	return dir_name;
+}
+
