@@ -33,6 +33,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <exec/memory.h>
+#include <workbench/startup.h>
+#include <exec/types.h>
 #include <workbench/workbench.h>
 #include <clib/graphics_protos.h>
 
@@ -43,6 +45,7 @@
 
 extern char* strdup(const char* s);
 extern struct ObjApp* app;
+extern char* executable_name;
 
 /* global variables */
 int global_filter_check = 0;
@@ -73,6 +76,7 @@ int get_title_from_slave(char* slave, char* title);
 int check_dup_title(char* title);
 int get_delimiter_position(const char* str);
 char* get_directory_name(char* str);
+char* get_executable_name(int argc, char** argv);
 
 /* structures */
 struct EasyStruct msgbox;
@@ -1867,8 +1871,8 @@ void read_tool_types()
 
 	if (icon_base = (struct Library *)OpenLibrary("icon.library", 0))
 	{
-		//TODO Is there a way to detect the executable name, instead of hard-coding it here?
-		if (disk_obj = (struct DiskObject *)GetDiskObject("PROGDIR:iGame"))
+		char* filename = strcat("PROGDIR:", executable_name);
+		if (disk_obj = (struct DiskObject *)GetDiskObject((unsigned char*)filename))
 		{
 			if (FindToolType(disk_obj->do_ToolTypes, "SCREENSHOT"))
 			{
@@ -2150,3 +2154,29 @@ char* get_directory_name(char* str)
 	return dir_name;
 }
 
+// Get the application's executable name
+char* get_executable_name(int argc, char** argv)
+{
+	struct WBStartup *argmsg;
+	struct WBArg *wb_arg;
+	BPTR olddir;
+
+	// argc is zero when run from the Workbench,
+	// positive when run from the CLI
+	if (argc == 0)
+	{
+		// in AmigaOS, argv is a pointer to the WBStartup message
+		// when argc is zero (run under the Workbench)
+		argmsg = (struct WBStartup *)argv;
+		wb_arg = argmsg->sm_ArgList;         /* head of the arg list */
+
+		executable_name = wb_arg->wa_Name;
+	}
+	else
+	{
+		// Run from the CLI
+		executable_name = argv[0];
+	}
+
+	return executable_name;
+}
