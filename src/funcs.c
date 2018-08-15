@@ -26,7 +26,7 @@
 #include <clib/icon_protos.h>
 #include <libraries/mui.h>
 #include <MUI/Guigfx_mcc.h>
-#include <MUI/TextEditor_mcc.h>
+#include <mui/TextEditor_mcc.h>
 #include <clib/muimaster_protos.h>
 #include <stdio.h>
 #include <string.h>

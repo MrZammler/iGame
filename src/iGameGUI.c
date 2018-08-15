@@ -28,7 +28,7 @@
 #include <libraries/mui.h>
 
 #include <MUI/Guigfx_mcc.h>
-#include <MUI/TextEditor_mcc.h>
+#include <mui/TextEditor_mcc.h>
 //#include <libraries/NList_mcc.h>
 //#include <libraries/NListview_mcc.h>
 #include <libraries/gadtools.h> /* for Barlabel in MenuItem */
