@@ -2157,18 +2157,14 @@ char* get_directory_name(char* str)
 // Get the application's executable name
 char* get_executable_name(int argc, char** argv)
 {
-	struct WBStartup *argmsg;
-	struct WBArg *wb_arg;
-	BPTR olddir;
-
 	// argc is zero when run from the Workbench,
 	// positive when run from the CLI
 	if (argc == 0)
 	{
 		// in AmigaOS, argv is a pointer to the WBStartup message
 		// when argc is zero (run under the Workbench)
-		argmsg = (struct WBStartup *)argv;
-		wb_arg = argmsg->sm_ArgList;         /* head of the arg list */
+		struct WBStartup *argmsg = (struct WBStartup *)argv;
+		struct WBArg *wb_arg = argmsg->sm_ArgList;         /* head of the arg list */
 
 		executable_name = wb_arg->wa_Name;
 	}
