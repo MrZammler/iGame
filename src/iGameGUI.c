@@ -106,9 +106,17 @@ struct ObjApp * CreateApp(void)
 	if (!(object_app = AllocVec(sizeof(struct ObjApp), MEMF_PUBLIC | MEMF_CLEAR)))
 		return(NULL);
 
+	char* about_text = "iGame ";
+	strcat(about_text, VERSION);
+	strcat(about_text, "\n\n");
+	strcat(about_text, "(c) 2005-2018 Emmanuel Vasilakis\n");
+	strcat(about_text, "mrzammler@gmail.com\n\n");
+	strcat(about_text, "Updates by Dimitris Panokostas\n");
+	strcat(about_text, "midwan@gmail.com\n\n");
+
 	object_app->STR_TX_Status = NULL;
 	object_app->STR_TX_Path = NULL;
-	object_app->STR_TX_About = "iGame version 1.8 beta\n\n(c) 2005-2018 Emmanuel Vasilakis\nmrzammler@gmail.com\n\nUpdates by Dimitris Panokostas\nmidwan@gmail.com";
+	object_app->STR_TX_About = about_text;
 	object_app->STR_TX_Wait = "Writing to disk, please wait...";
 
 	object_app->CY_Genre_Content[0] = "Unknown";
