@@ -282,7 +282,7 @@ void load_genres()
 	}
 }
 
-void AppStart()
+void app_start()
 {
 	load_games_list();
 	load_repos();

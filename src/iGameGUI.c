@@ -92,7 +92,7 @@ struct ObjApp * CreateApp(void)
 	static struct Hook FilterChangeHook = {{NULL,NULL}, HookEntry, (HOOKFUNC)filter_change, NULL };
 	static struct Hook GameDoubleClickHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_double_click, NULL };
 	static struct Hook MenuScanHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)menu_scan, NULL };
-	static struct Hook AppStartHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)AppStart, NULL };
+	static struct Hook AppStartHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)app_start, NULL };
 	static struct Hook RepoAddHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)repo_add, NULL };
 	static struct Hook RepoRemoveHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)repo_remove, NULL };
 	static struct Hook RepoStopHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)repo_stop, NULL };

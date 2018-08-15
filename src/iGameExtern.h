@@ -29,7 +29,7 @@ APTR menu_scan(struct Hook* a0, APTR a2, APTR a1);
 APTR game_click(struct Hook* a0, APTR a2, APTR a1);
 
 
-APTR AppStart(struct Hook* a0, APTR a2, APTR a1);
+APTR app_start(struct Hook* a0, APTR a2, APTR a1);
 APTR repo_add(struct Hook* a0, APTR a2, APTR a1);
 APTR repo_remove(struct Hook* a0, APTR a2, APTR a1);
 

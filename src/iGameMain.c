@@ -18,7 +18,7 @@ LONG __stack = 32000;
 #include "iGameGUI.h"
 
 struct ObjApp* app = NULL; /* Object */
-extern void AppStart();
+extern void app_start();
 extern void app_stop();
 extern void read_tool_types();
 extern char* get_executable_name(int argc, char** argv);
@@ -26,7 +26,7 @@ extern char* get_executable_name(int argc, char** argv);
 struct Library *MUIMasterBase;
 char* executable_name;
 
-void CleanExit(CONST_STRPTR s)
+void clean_exit(CONST_STRPTR s)
 {
 	if (s)
 	{
@@ -36,29 +36,29 @@ void CleanExit(CONST_STRPTR s)
 	CloseLibrary(MUIMasterBase);
 }
 
-BOOL InitApp(int argc, char** argv)
+BOOL init_app(int argc, char** argv)
 {
 	if ((MUIMasterBase = OpenLibrary("muimaster.library", 19)) == NULL)
 	{
-		CleanExit("Can't open muimaster.library v19\n");
+		clean_exit("Can't open muimaster.library v19\n");
 		return FALSE;
 	}
 
 	app = CreateApp();
 	if (!app)
-		CleanExit("Can't initialize application\n");
+		clean_exit("Can't initialize application\n");
 	else
 	{
 		executable_name = get_executable_name(argc, argv);
 		read_tool_types();
-		AppStart();
+		app_start();
 	}
 	return TRUE;
 }
 
 int main(int argc, char** argv)
 {
-	InitApp(argc, argv);
+	init_app(argc, argv);
 	ULONG sigs = 0;
 
 	if (app)
@@ -77,9 +77,9 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		CleanExit("Can't create application\n");
+		clean_exit("Can't create application\n");
 	}
 
-	CleanExit(NULL);
+	clean_exit(NULL);
 	return 0;
 }
