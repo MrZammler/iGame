@@ -302,7 +302,7 @@ void AppStart()
 	);
 }
 
-void FilterChange()
+void filter_change()
 {
 	char *str = NULL, helper[210];
 	char *str_gen = NULL, helperstr[200];

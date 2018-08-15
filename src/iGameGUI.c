@@ -88,7 +88,7 @@ struct ObjApp * CreateApp(void)
 	APTR	MNlabel1Gamespath, MNlabel1Game, MNlabel1GameProperties, GROUP_ROOT_0, IM_Pic;
 	APTR	GR_grp_Img, GR_grp_5, GR_grp_2, obj_aux0, obj_aux1, obj_aux2, obj_aux3, obj_aux4, GR_grp_0, GROUP_ROOT_1, GR_grp_4, GR_grp_6, GR_grp_7;
 	APTR	GROUP_ROOT_2, GR_grp_3, GROUP_ROOT_3, GROUP_ROOT_4, GROUP_ROOT_5, GROUP_ROOT_6;
-	static struct Hook FilterChangeHook = {{NULL,NULL}, HookEntry, (HOOKFUNC)FilterChange, NULL };
+	static struct Hook FilterChangeHook = {{NULL,NULL}, HookEntry, (HOOKFUNC)filter_change, NULL };
 	static struct Hook GameDoubleClickHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_double_click, NULL };
 	static struct Hook MenuScanHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)menu_scan, NULL };
 	static struct Hook AppStartHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)AppStart, NULL };

@@ -23,7 +23,7 @@
 #pragma once
 #include <utility/hooks.h>
 
-APTR FilterChange(struct Hook* a0, APTR a2, APTR a1);
+APTR filter_change(struct Hook* a0, APTR a2, APTR a1);
 APTR game_double_click(struct Hook* a0, APTR a2, APTR a1);
 APTR menu_scan(struct Hook* a0, APTR a2, APTR a1);
 APTR game_click(struct Hook* a0, APTR a2, APTR a1);
