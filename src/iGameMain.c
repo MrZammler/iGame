@@ -21,8 +21,10 @@ struct ObjApp* app = NULL; /* Object */
 extern void AppStart();
 extern void app_stop();
 extern void read_tool_types();
+extern char* get_executable_name(int argc, char** argv);
 
 struct Library *MUIMasterBase;
+char* executable_name;
 
 void CleanExit(CONST_STRPTR s)
 {
@@ -45,7 +47,7 @@ BOOL InitApp(int argc, char **argv)
 		CleanExit("Can't initialize application\n");
 	else
 	{
-		//read tooltypes here
+		executable_name = get_executable_name(argc, argv);
 		read_tool_types();
 		AppStart();
 	}
