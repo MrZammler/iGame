@@ -38,6 +38,7 @@
 #include <dos/dos.h>
 #include <clib/alib_protos.h>
 #include "version.h"
+#include <string.h>
 
 #define MUIA_Dtpic_Name 0x80423d72
 
