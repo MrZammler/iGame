@@ -60,7 +60,7 @@ int NOGUIGFX;
 int FILTERUSEENTER;
 int NOSCREENSHOT;
 int SAVESTATSONEXIT;
-int SCANBYDIRS;
+int TITLESFROMDIRS;
 int IntroPic = 0;
 
 /* function definitions */
@@ -1624,9 +1624,9 @@ void followthread(BPTR lock, int tab_level)
 				temptitle[n] = '\0';
 				//printf("title: [%s]\n", temptitle);
 				//strcpy (item_games->Title, temptitle);
-				if (SCANBYDIRS)
+				if (TITLESFROMDIRS)
 				{
-					// If the SCANBYDIRS tooltype is enabled, set Titles from Directory names
+					// If the TITLESFROMDIRS tooltype is enabled, set Titles from Directory names
 					char* title = get_directory_name(fullpath);
 					if (title != NULL)
 						strcpy(item_games->title, title);
@@ -1867,7 +1867,7 @@ void read_tool_types()
 	FILTERUSEENTER = 0;
 	NOSCREENSHOT = 0;
 	SAVESTATSONEXIT = 0;
-	SCANBYDIRS = 0;
+	TITLESFROMDIRS = 0;
 
 	if (icon_base = (struct Library *)OpenLibrary("icon.library", 0))
 	{
@@ -1921,9 +1921,9 @@ void read_tool_types()
 				SAVESTATSONEXIT = 1;
 			}
 
-			if (FindToolType(disk_obj->do_ToolTypes, "SCANBYDIRS"))
+			if (FindToolType(disk_obj->do_ToolTypes, "TITLESFROMDIRS"))
 			{
-				SCANBYDIRS = 1;
+				TITLESFROMDIRS = 1;
 			}
 		}
 
