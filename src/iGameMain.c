@@ -36,12 +36,14 @@ void CleanExit(CONST_STRPTR s)
 	CloseLibrary(MUIMasterBase);
 }
 
-BOOL InitApp(int argc, char **argv)
+BOOL InitApp(int argc, char** argv)
 {
 	if ((MUIMasterBase = OpenLibrary("muimaster.library", 19)) == NULL)
 	{
 		CleanExit("Can't open muimaster.library v19\n");
+		return FALSE;
 	}
+
 	app = CreateApp();
 	if (!app)
 		CleanExit("Can't initialize application\n");
@@ -51,7 +53,6 @@ BOOL InitApp(int argc, char **argv)
 		read_tool_types();
 		AppStart();
 	}
-	
 	return TRUE;
 }
 
@@ -78,7 +79,7 @@ int main(int argc, char** argv)
 	{
 		CleanExit("Can't create application\n");
 	}
-	
+
 	CleanExit(NULL);
 	return 0;
 }
