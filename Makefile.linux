@@ -35,7 +35,7 @@ LIBFLAGS_MOS = +morphos -lamiga -lauto -o
 ##########################################################################
 # Object files which are part of the GLFW library
 ##########################################################################
-OBJS = src/funcs.o src/iGameGUI.o src/iGameMain.o src/Hook_utility.o src/strdup.o
+OBJS = src/funcs.o src/iGameGUI.o src/iGameMain.o src/strdup.o
 OBJS_030 = src/funcs_030.o src/iGameGUI_030.o src/iGameMain_030.o src/strdup_030.o
 OBJS_040 = src/funcs_040.o src/iGameGUI_040.o src/iGameMain_040.o src/strdup_040.o
 OBJS_060 = src/funcs_060.o src/iGameGUI_060.o src/iGameMain_060.o src/strdup_060.o
@@ -55,6 +55,9 @@ iGame.040: $(OBJS_040)
 
 iGame.060: $(OBJS_060)
 	$(LINK) $(OBJS_060) $(LIBFLAGS) $@
+
+iGame.MOS: $(OBJS_MOS)
+	$(LINK) $(OBJS_MOS) $(LIBFLAGS_MOS) $@
 
 #iGame.AOS4: $(OBJS_AOS4)
 #	$(LINK) $(OBJS_AOS4) $(LIBFLAGS_AOS4) $@
@@ -129,16 +132,16 @@ src/strdup_060.o: src/strdup.c
 ##########################################################################
 
 src/funcs_MOS.o: src/funcs.c
-	$(CC) $(CFLAGS_MOS) -o $@ src/funcs.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/funcs.c
 
 src/iGameGUI_MOS.o: src/iGameGUI.c src/iGameGUI.h
-	$(CC) $(CFLAGS_MOS) -o $@ src/iGameGUI.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/iGameGUI.c
 
 src/iGameMain_MOS.o: src/iGameMain.c
-	$(CC) $(CFLAGS_MOS) -o $@ src/iGameMain.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/iGameMain.c
 
 src/strdup_MOS.o: src/strdup.c
-	$(CC) $(CFLAGS_MOS) -o $@ src/strdup.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/strdup.c
 
 clean:
 	rm iGame iGame.* src/funcs*.o src/iGameGUI*.o src/iGameMain*.o src/strdup*.o
