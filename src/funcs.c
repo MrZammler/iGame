@@ -1021,7 +1021,7 @@ void menu_game_properties()
 		set(app->STR_PropertiesGameTitle, MUIA_String_Contents, str);
 		set(app->TX_PropertiesSlavePath, MUIA_Text_Contents, item_games->path);
 
-		sprintf(helperstr, "Times Played: %d", item_games->times_played);
+		sprintf(helperstr, "%d", item_games->times_played);
 		set(app->TX_PropertiesTimesPlayed, MUIA_Text_Contents, helperstr);
 
 		//set the genre
