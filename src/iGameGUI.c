@@ -28,7 +28,7 @@
 #include <libraries/mui.h>
 
 #include <MUI/Guigfx_mcc.h>
-#include <MUI/TextEditor_mcc.h>
+#include <mui/TextEditor_mcc.h>
 //#include <libraries/NList_mcc.h>
 //#include <libraries/NListview_mcc.h>
 #include <libraries/gadtools.h> /* for Barlabel in MenuItem */
@@ -38,6 +38,7 @@
 #include <dos/dos.h>
 #include <clib/alib_protos.h>
 #include "version.h"
+#include <string.h>
 
 #define MUIA_Dtpic_Name 0x80423d72
 
@@ -88,10 +89,10 @@ struct ObjApp * CreateApp(void)
 	APTR	MNlabel1Gamespath, MNlabel1Game, MNlabel1GameProperties, GROUP_ROOT_0, IM_Pic;
 	APTR	GR_grp_Img, GR_grp_5, GR_grp_2, obj_aux0, obj_aux1, obj_aux2, obj_aux3, obj_aux4, GR_grp_0, GROUP_ROOT_1, GR_grp_4, GR_grp_6, GR_grp_7;
 	APTR	GROUP_ROOT_2, GR_grp_3, GROUP_ROOT_3, GROUP_ROOT_4, GROUP_ROOT_5, GROUP_ROOT_6;
-	static struct Hook FilterChangeHook = {{NULL,NULL}, HookEntry, (HOOKFUNC)FilterChange, NULL };
+	static struct Hook FilterChangeHook = {{NULL,NULL}, HookEntry, (HOOKFUNC)filter_change, NULL };
 	static struct Hook GameDoubleClickHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_double_click, NULL };
 	static struct Hook MenuScanHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)menu_scan, NULL };
-	static struct Hook AppStartHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)AppStart, NULL };
+	static struct Hook AppStartHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)app_start, NULL };
 	static struct Hook RepoAddHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)repo_add, NULL };
 	static struct Hook RepoRemoveHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)repo_remove, NULL };
 	static struct Hook RepoStopHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)repo_stop, NULL };
@@ -106,9 +107,17 @@ struct ObjApp * CreateApp(void)
 	if (!(object_app = AllocVec(sizeof(struct ObjApp), MEMF_PUBLIC | MEMF_CLEAR)))
 		return(NULL);
 
+	char* about_text = "iGame ";
+	strcat(about_text, VERSION);
+	strcat(about_text, "\n\n");
+	strcat(about_text, "(c) 2005-2018 Emmanuel Vasilakis\n");
+	strcat(about_text, "mrzammler@gmail.com\n\n");
+	strcat(about_text, "Updates by Dimitris Panokostas\n");
+	strcat(about_text, "midwan@gmail.com\n\n");
+
 	object_app->STR_TX_Status = NULL;
 	object_app->STR_TX_Path = NULL;
-	object_app->STR_TX_About = "iGame version 1.8 beta\n\n(c) 2005-2018 Emmanuel Vasilakis\nmrzammler@gmail.com\n\nUpdates by Dimitris Panokostas\nmidwan@gmail.com";
+	object_app->STR_TX_About = about_text;
 	object_app->STR_TX_Wait = "Writing to disk, please wait...";
 
 	object_app->CY_Genre_Content[0] = "Unknown";
@@ -599,7 +608,7 @@ struct ObjApp * CreateApp(void)
 		MUIA_Application_Base, "iGame",
 		MUIA_Application_Title, "iGame",
 		MUIA_Application_Version, VERSION,
-		MUIA_Application_Copyright, "2014",
+		MUIA_Application_Copyright, "2018",
 		MUIA_Application_Description, "A frontend to WHDLoad",
 		MUIA_Application_HelpFile, "igame.guide",
 		SubWindow, object_app->WI_MainWindow,
