@@ -1,2 +1,2 @@
 #pragma once
-#define VERSION "$VER:version 1.8b (2018-08-13)"
+#define VERSION "$VER:version 1.9b (2018-08-16)"

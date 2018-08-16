@@ -608,7 +608,7 @@ struct ObjApp * CreateApp(void)
 		MUIA_Application_Base, "iGame",
 		MUIA_Application_Title, "iGame",
 		MUIA_Application_Version, VERSION,
-		MUIA_Application_Copyright, "2014",
+		MUIA_Application_Copyright, "2018",
 		MUIA_Application_Description, "A frontend to WHDLoad",
 		MUIA_Application_HelpFile, "igame.guide",
 		SubWindow, object_app->WI_MainWindow,
