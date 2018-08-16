@@ -61,6 +61,7 @@ int FILTERUSEENTER;
 int NOSCREENSHOT;
 int SAVESTATSONEXIT;
 int TITLESFROMDIRS;
+int NOSMARTSPACES;
 int IntroPic = 0;
 
 /* function definitions */
@@ -75,8 +76,9 @@ void msg_box(char* msg);
 int get_title_from_slave(char* slave, char* title);
 int check_dup_title(char* title);
 int get_delimiter_position(const char* str);
-char* get_directory_name(char* str);
-char* get_executable_name(int argc, char** argv);
+const char* get_directory_name(const char* str);
+const char* get_executable_name(int argc, char** argv);
+const char* add_spaces_to_string(const char* input);
 
 /* structures */
 struct EasyStruct msgbox;
@@ -622,7 +624,7 @@ void game_double_click()
 								sprintf(to_check, "%s", temp_tbl[1]);
 								if (to_check[0] == '$')
 								{
-									int dec_rep = hex2dec(to_check);
+									const int dec_rep = hex2dec(to_check);
 									sprintf(tool_type, "%s=%d", temp_tbl[0], dec_rep);
 								}
 							}
@@ -703,14 +705,14 @@ void menu_scan()
 			}
 		}
 
-		BPTR currentlock = Lock("PROGDIR:", ACCESS_READ);
+		const BPTR currentlock = Lock("PROGDIR:", ACCESS_READ);
 
 		for (item_repos = repos; item_repos != NULL; item_repos = item_repos->next)
 		{
 			sprintf(repotemp, "%s", item_repos->repo);
 			sprintf(helperstr, "Scanning [%s]. Please wait...", repotemp);
 			set(app->TX_Status, MUIA_Text_Contents, helperstr);
-			BPTR oldlock = Lock(repotemp, ACCESS_READ);
+			const BPTR oldlock = Lock(repotemp, ACCESS_READ);
 
 			if (oldlock != 0)
 			{
@@ -1021,8 +1023,8 @@ void menu_game_properties()
 
 		for (i = 0; i <= strlen(slave) - 1; i++) slave[i] = tolower(slave[i]);
 
-		BPTR oldlock = Lock("PROGDIR:", ACCESS_READ);
-		BPTR lock = Lock(naked_path, ACCESS_READ);
+		const BPTR oldlock = Lock("PROGDIR:", ACCESS_READ);
+		const BPTR lock = Lock(naked_path, ACCESS_READ);
 		CurrentDir(lock);
 
 		gamestooltypes[0] = '\0';
@@ -1200,7 +1202,7 @@ void game_properties_ok()
 		for (i = 0; i <= strlen(slave) - 1; i++) slave[i] = tolower(slave[i]);
 
 		BPTR oldlock = Lock("PROGDIR:", ACCESS_READ);
-		BPTR lock = Lock(naked_path, ACCESS_READ);
+		const BPTR lock = Lock(naked_path, ACCESS_READ);
 		CurrentDir(lock);
 
 		if (icon_base = (struct Library *)OpenLibrary("icon.library", 0))
@@ -1622,14 +1624,23 @@ void followthread(BPTR lock, int tab_level)
 				for (int k = j + 1; k <= strlen(str) - 1; k++)
 					temptitle[n++] = str[k];
 				temptitle[n] = '\0';
-				//printf("title: [%s]\n", temptitle);
-				//strcpy (item_games->Title, temptitle);
+
 				if (TITLESFROMDIRS)
 				{
 					// If the TITLESFROMDIRS tooltype is enabled, set Titles from Directory names
-					char* title = get_directory_name(fullpath);
+					const char* title = get_directory_name(fullpath);
 					if (title != NULL)
-						strcpy(item_games->title, title);
+					{
+						if (NOSMARTSPACES)
+						{
+							strcpy(item_games->title, title);
+						}
+						else
+						{
+							const char* title_with_spaces = add_spaces_to_string(title);
+							strcpy(item_games->title, title_with_spaces);
+						}
+					}
 				}
 				else 
 				{
@@ -1868,6 +1879,7 @@ void read_tool_types()
 	NOSCREENSHOT = 0;
 	SAVESTATSONEXIT = 0;
 	TITLESFROMDIRS = 0;
+	NOSMARTSPACES = 0;
 
 	if (icon_base = (struct Library *)OpenLibrary("icon.library", 0))
 	{
@@ -1902,29 +1914,22 @@ void read_tool_types()
 			}
 
 			if (FindToolType(disk_obj->do_ToolTypes, "NOGUIGFX"))
-			{
 				NOGUIGFX = 1;
-			}
 
 			if (FindToolType(disk_obj->do_ToolTypes, "FILTERUSEENTER"))
-			{
 				FILTERUSEENTER = 1;
-			}
 
 			if (FindToolType(disk_obj->do_ToolTypes, "NOSCREENSHOT"))
-			{
 				NOSCREENSHOT = 1;
-			}
 
 			if (FindToolType(disk_obj->do_ToolTypes, "SAVESTATSONEXIT"))
-			{
 				SAVESTATSONEXIT = 1;
-			}
 
 			if (FindToolType(disk_obj->do_ToolTypes, "TITLESFROMDIRS"))
-			{
 				TITLESFROMDIRS = 1;
-			}
+
+			if (FindToolType(disk_obj->do_ToolTypes, "NOSMARTSPACES"))
+				NOSMARTSPACES = 1;
 		}
 
 		CloseLibrary(icon_base);
@@ -2024,7 +2029,6 @@ void non_whdload_ok()
 int get_title_from_slave(char* slave, char* title)
 {
 	char slave_title[100];
-	int i = -1;
 
 	struct slave_info
 	{
@@ -2072,7 +2076,7 @@ int get_title_from_slave(char* slave, char* title)
 		return 1;
 	}
 
-	for (i = 0; i <= 99; i++)
+	for (int i = 0; i <= 99; i++)
 	{
 		slave_title[i] = fgetc(fp);
 		if (slave_title[i] == '\n')
@@ -2123,7 +2127,7 @@ int get_delimiter_position(const char* str)
 }
 
 // Get the Directory part from a full path containing a file
-char* get_directory_name(char* str)
+const char* get_directory_name(const char* str)
 {
 	int pos1 = get_delimiter_position(str);
 	if (!pos1)
@@ -2151,7 +2155,7 @@ char* get_directory_name(char* str)
 }
 
 // Get the application's executable name
-char* get_executable_name(int argc, char** argv)
+const char* get_executable_name(int argc, char** argv)
 {
 	// argc is zero when run from the Workbench,
 	// positive when run from the CLI
@@ -2171,4 +2175,57 @@ char* get_executable_name(int argc, char** argv)
 	}
 
 	return executable_name;
+}
+
+// Add spaces to a string, based on letter capitalization and numbers
+// E.g. input "A10TankKiller2Disk" -> "A10 Tank Killer 2 Disk"
+const char* add_spaces_to_string(const char* input)
+{
+	char input_string[100];
+	strcpy(input_string, input);
+
+	char* output = (char*)malloc(sizeof input_string * 2);
+	const char mc[] = "Mc";
+
+	// Special case for the first character, we don't touch it
+	output[0] = input_string[0];
+
+	unsigned int output_index = 1;
+	unsigned int input_index = 1;
+	unsigned int capital_found = 0;
+	unsigned int number_found = 0;
+	while (input_string[input_index])
+	{
+		if (isspace(input_string[input_index]))
+			return input;
+
+		if (isdigit(input_string[input_index]))
+		{
+			if (number_found < input_index - 1)
+			{
+				output[output_index] = ' ';
+				output_index++;
+				output[output_index] = input_string[input_index];
+			}
+			number_found = input_index;
+		}
+
+		else if (isupper(input_string[input_index]))
+		{
+			if (capital_found < input_index - 1)
+			{
+				output[output_index] = ' ';
+				output_index++;
+				output[output_index] = input_string[input_index];
+			}
+			capital_found = input_index;
+		}
+
+		output[output_index] = input_string[input_index];
+		output_index++;
+		input_index++;
+	}
+	output[output_index] = '\0';
+
+	return output;
 }
