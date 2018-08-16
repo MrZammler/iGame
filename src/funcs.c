@@ -71,6 +71,11 @@ void get_path(char* title, char* path);
 void followthread(BPTR lock, int tab_level);
 void refresh_list(int check_exists);
 void save_list(int check_exists);
+void save_list_as();
+void export_list();
+void menu_copy();
+void menu_paste_as_new();
+void menu_delete();
 int hex2dec(char* hexin);
 void msg_box(char* msg);
 int get_title_from_slave(char* slave, char* title);
@@ -115,21 +120,44 @@ typedef struct genres
 
 genres_list *item_genres = NULL, *genres = NULL;
 
+void status_show_total()
+{
+	char helper[200];
+	set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
+	sprintf(helper, "Total %d games.", total_games);
+	set(app->TX_Status, MUIA_Text_Contents, helper);
+}
+
+void add_games_to_listview()
+{
+	total_games = 0;
+	for (item_games = games; item_games != NULL; item_games = item_games->next)
+	{
+		if (item_games->hidden != 1)
+		{
+			total_games++;
+			DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+		}
+	}
+	status_show_total();
+}
+
 void load_games_list()
 {
 	char file_line[500];
-	char helperstr[250];
 
 	FILE* fpgames = fopen("PROGDIR:gameslist", "r");
 	if (fpgames)
 	{
 		do
 		{
-			if (fgets(file_line, sizeof file_line, fpgames) == NULL) { break; }
+			if (fgets(file_line, sizeof file_line, fpgames) == NULL) 
+				break;
 
 			file_line[strlen(file_line) - 1] = '\0';
 
-			if (strlen(file_line) == 0) continue;
+			if (strlen(file_line) == 0) 
+				continue;
 
 			item_games = (games_list *)calloc(1, sizeof(games_list));
 			item_games->next = NULL;
@@ -141,11 +169,13 @@ void load_games_list()
 
 				do
 				{
-					if (fgets(file_line, sizeof file_line, fpgames) == NULL) { break; }
+					if (fgets(file_line, sizeof file_line, fpgames) == NULL) 
+						break;
 
 					file_line[strlen(file_line) - 1] = '\0';
 
-					if (strlen(file_line) == 0) break;
+					if (strlen(file_line) == 0) 
+						break;
 
 					//this is to make sure that gameslist goes ok from 1.2 to 1.3
 					item_games->hidden = 0;
@@ -180,18 +210,7 @@ void load_games_list()
 		}
 		while (1); //read of gameslist ends here
 
-		//add the games to the list
-		total_games = 0;
-		for (item_games = games; item_games != NULL; item_games = item_games->next)
-		{
-			if (item_games->hidden != 1)
-			{
-				total_games++;
-				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-			}
-		}
-		sprintf(helperstr, "Total %d games.", total_games);
-		set(app->TX_Status, MUIA_Text_Contents, helperstr);
+		add_games_to_listview();
 
 		fclose(fpgames);
 	}
@@ -226,7 +245,7 @@ void load_repos()
 				repos = item_repos;
 			}
 
-			DoMethod(app->LV_RepoList, MUIM_List_InsertSingle, item_repos->repo, 1, MUIV_List_Insert_Bottom);
+			DoMethod(app->LV_GameRepositories, MUIM_List_InsertSingle, item_repos->repo, 1, MUIV_List_Insert_Bottom);
 		}
 		while (1);
 
@@ -272,29 +291,32 @@ void load_genres()
 
 		for (i = 0; i < no_of_genres; i++)
 		{
-			DoMethod(app->LV_GenresList, MUIM_List_GetEntry, i + 5, &app->CY_Genre_Content[i]);
+			DoMethod(app->LV_GenresList, MUIM_List_GetEntry, i + 5, &app->CY_PropertiesGenreContent[i]);
 		}
 
-		app->CY_Genre_Content[i] = "Unknown";
-		app->CY_Genre_Content[i + 1] = NULL;
+		app->CY_PropertiesGenreContent[i] = "Unknown";
+		app->CY_PropertiesGenreContent[i + 1] = NULL;
 
-		set(app->CY_Genre, MUIA_Cycle_Entries, app->CY_Genre_Content);
+		set(app->CY_PropertiesGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
 
 		fclose(fpgenres);
 	}
+}
+
+void add_default_filters()
+{
+	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, "--Show All--", MUIV_List_Insert_Bottom);
+	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, "--Favorites--", MUIV_List_Insert_Bottom);
+	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, "--Last Played--", MUIV_List_Insert_Bottom);
+	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, "--Most Played--", MUIV_List_Insert_Bottom);
+	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, "--Never Played--", MUIV_List_Insert_Bottom);
 }
 
 void app_start()
 {
 	load_games_list();
 	load_repos();
-
-	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, "--Show All--", MUIV_List_Insert_Bottom);
-	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, "--Favorites--", MUIV_List_Insert_Bottom);
-	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, "--Last Played--", MUIV_List_Insert_Bottom);
-	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, "--Most Played--", MUIV_List_Insert_Bottom);
-	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, "--Never Played--", MUIV_List_Insert_Bottom);
-
+	add_default_filters();
 	load_genres();
 
 	IntroPic = 1;
@@ -304,207 +326,221 @@ void app_start()
 	);
 }
 
+void clear_gameslist()
+{
+	// Erase list
+	DoMethod(app->LV_GamesList, MUIM_List_Clear);
+	set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
+}
+
+void list_show_all(char* str)
+{
+	char helper[210];
+
+	clear_gameslist();
+
+	total_games = 0;
+
+	if (games)
+	{
+		for (item_games = games; item_games != NULL; item_games = item_games->next)
+		{
+			strcpy(helper, item_games->title);
+			const int length = strlen(helper);
+			for (int i = 0; i <= length - 1; i++) helper[i] = tolower(helper[i]);
+
+			if (strstr(helper, (char *)str))
+			{
+				if (item_games->hidden != 1)
+				{
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title,
+					         MUIV_List_Insert_Sorted);
+					total_games++;
+				}
+			}
+		}
+	}
+
+	status_show_total();
+}
+
+void list_show_favorites(char* str)
+{
+	char helper[210];
+
+	clear_gameslist();
+
+	total_games = 0;
+	if (games)
+	{
+		for (item_games = games; item_games != NULL; item_games = item_games->next)
+		{
+			strcpy(helper, item_games->title);
+			const int length = strlen(helper);
+			for (int i = 0; i <= length - 1; i++) helper[i] = tolower(helper[i]);
+
+			if (item_games->favorite == 1 && item_games->hidden != 1 && strstr(helper, (char *)str))
+			{
+				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+				total_games++;
+			}
+		}
+	}
+	status_show_total();
+}
+
+void list_show_last_played(char* str)
+{
+	char helper[210];
+
+	clear_gameslist();
+
+	total_games = 0;
+	if (games)
+	{
+		for (item_games = games; item_games != NULL; item_games = item_games->next)
+		{
+			strcpy(helper, item_games->title);
+			const int length = strlen(helper);
+			for (int i = 0; i <= length - 1; i++) helper[i] = tolower(helper[i]);
+
+			if (item_games->last_played == 1 && strstr(helper, (char *)str))
+			{
+				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+				total_games++;
+			}
+		}
+	}
+	status_show_total();
+}
+
+void list_show_most_played(char* str)
+{
+	char helper[210];
+	int max = 0;
+
+	clear_gameslist();
+
+	total_games = 0;
+	if (games)
+	{
+		for (item_games = games; item_games != NULL; item_games = item_games->next)
+		{
+			strcpy(helper, item_games->title);
+			const int length = strlen(helper);
+
+			for (int i = 0; i <= length - 1; i++) 
+				helper[i] = tolower(helper[i]);
+
+			if (item_games->times_played && strstr(helper, (char *)str))
+			{
+				if (item_games->times_played >= max && item_games->hidden != 1)
+				{
+					max = item_games->times_played;
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Top);
+					total_games++;
+				}
+				else
+				{
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title,
+					         MUIV_List_Insert_Bottom);
+					total_games++;
+				}
+			}
+		}
+	}
+	status_show_total();
+}
+
+void list_show_never_played(char* str)
+{
+	char helper[210];
+
+	clear_gameslist();
+
+	total_games = 0;
+	if (games)
+	{
+		for (item_games = games; item_games != NULL; item_games = item_games->next)
+		{
+			strcpy(helper, item_games->title);
+			const int length = strlen(helper);
+
+			for (int i = 0; i <= length - 1; i++) 
+				helper[i] = tolower(helper[i]);
+
+			if (item_games->times_played == 0 && item_games->hidden != 1 && strstr(helper, (char *)str))
+			{
+				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+				total_games++;
+			}
+		}
+	}
+	status_show_total();
+}
+
+void list_show_filtered(char* str, char* str_gen)
+{
+	char helper[210];
+
+	clear_gameslist();
+
+	total_games = 0;
+	// Find the entries in Games and update the list
+	if (games)
+	{
+		for (item_games = games; item_games != NULL; item_games = item_games->next)
+		{
+			strcpy(helper, item_games->title);
+			const int length = strlen(helper);
+			for (int i = 0; i <= length - 1; i++) 
+				helper[i] = tolower(helper[i]);
+
+			if (!strcmp(item_games->genre, str_gen) && item_games->hidden != 1 && strstr(helper, (char *)str))
+			{
+				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+				total_games++;
+			}
+		}
+	}
+	status_show_total();
+}
+
 void filter_change()
 {
-	char *str = NULL, helper[210];
-	char *str_gen = NULL, helperstr[200];
-	int i, max = 0, _strlen;
+	char *str = NULL;
+	char *str_gen = NULL;
 
 	get(app->STR_Filter, MUIA_String_Contents, &str);
-
 	DoMethod(app->LV_GenresList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str_gen);
-	if (str && strlen(str) != 0) for (i = 0; i <= strlen((char *)str) - 1; i++) str[i] = tolower(str[i]);
+
+	if (str && strlen(str) != 0) 
+		for (int i = 0; i <= strlen((char *)str) - 1; i++) 
+			str[i] = tolower(str[i]);
 
 	if (str_gen == NULL || !strcmp(str_gen, "--Show All--"))
-	{
-		// Erase list
-		DoMethod(app->LV_GamesList, MUIM_List_Clear);
-
-		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
-
-		total_games = 0;
-		// Find the entries in Games and update the list
-		if (games)
-		{
-			for (item_games = games; item_games != NULL; item_games = item_games->next)
-			{
-				strcpy(helper, item_games->title);
-				_strlen = strlen(helper);
-				for (i = 0; i <= _strlen - 1; i++) helper[i] = tolower(helper[i]);
-
-				if (strstr(helper, (char *)str))
-				{
-					if (item_games->hidden != 1)
-					{
-						DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title,
-						         MUIV_List_Insert_Sorted);
-						total_games++;
-					}
-				}
-			}
-		}
-
-		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
-
-		sprintf(helper, "Total %d games.", total_games);
-		set(app->TX_Status, MUIA_Text_Contents, helper);
-	}
+		list_show_all(str);
 
 	else if (!strcmp(str_gen, "--Favorites--"))
-	{
-		// Erase list
-		DoMethod(app->LV_GamesList, MUIM_List_Clear);
-		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
+		list_show_favorites(str);
 
-		total_games = 0;
-		if (games)
-		{
-			for (item_games = games; item_games != NULL; item_games = item_games->next)
-			{
-				strcpy(helper, item_games->title);
-				_strlen = strlen(helper);
-				for (i = 0; i <= _strlen - 1; i++) helper[i] = tolower(helper[i]);
-
-				if (item_games->favorite == 1 && item_games->hidden != 1 && strstr(helper, (char *)str))
-				{
-					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-					total_games++;
-				}
-			}
-		}
-
-		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
-
-		sprintf(helperstr, "Total %d games.", total_games);
-		set(app->TX_Status, MUIA_Text_Contents, helperstr);
-	}
 	else if (!strcmp(str_gen, "--Last Played--"))
-	{
-		DoMethod(app->LV_GamesList, MUIM_List_Clear);
-		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
-		total_games = 0;
-		if (games)
-		{
-			for (item_games = games; item_games != NULL; item_games = item_games->next)
-			{
-				strcpy(helper, item_games->title);
-				_strlen = strlen(helper);
-				for (i = 0; i <= _strlen - 1; i++) helper[i] = tolower(helper[i]);
+		list_show_last_played(str);
 
-				if (item_games->last_played == 1 && strstr(helper, (char *)str))
-				{
-					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-					total_games++;
-				}
-			}
-		}
-
-		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
-
-		sprintf(helperstr, "Total %d games.", total_games);
-		set(app->TX_Status, MUIA_Text_Contents, helperstr);
-	}
 	else if (!strcmp(str_gen, "--Most Played--"))
-	{
-		DoMethod(app->LV_GamesList, MUIM_List_Clear);
-		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
-		total_games = 0;
-		if (games)
-		{
-			for (item_games = games; item_games != NULL; item_games = item_games->next)
-			{
-				strcpy(helper, item_games->title);
-				_strlen = strlen(helper);
-				for (i = 0; i <= _strlen - 1; i++) helper[i] = tolower(helper[i]);
+		list_show_most_played(str);
 
-				if (item_games->times_played && strstr(helper, (char *)str))
-				{
-					if (item_games->times_played >= max && item_games->hidden != 1)
-					{
-						max = item_games->times_played;
-						//sprintf(helper, "%ld - %s", item_games->TimesPlayed, item_games->Title);
-						DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Top);
-						total_games++;
-						//printf("%s - Top max:%d\n", item_games->Title, max);
-					}
-					else
-					{
-						//sprintf(helper, "%ld - %s", item_games->TimesPlayed, item_games->Title);
-						DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title,
-						         MUIV_List_Insert_Bottom);
-						total_games++;
-						//printf("%s - Bottom max:%d\n", item_games->Title, max);
-					}
-				}
-			}
-		}
-		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
-		sprintf(helperstr, "Total %d games.", total_games);
-		set(app->TX_Status, MUIA_Text_Contents, helperstr);
-	}
 	else if (!strcmp(str_gen, "--Never Played--"))
-	{
-		DoMethod(app->LV_GamesList, MUIM_List_Clear);
-		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
-		total_games = 0;
-		if (games)
-		{
-			for (item_games = games; item_games != NULL; item_games = item_games->next)
-			{
-				strcpy(helper, item_games->title);
-				_strlen = strlen(helper);
-				for (i = 0; i <= _strlen - 1; i++) helper[i] = tolower(helper[i]);
+		list_show_never_played(str);
 
-				if (item_games->times_played == 0 && item_games->hidden != 1 && strstr(helper, (char *)str))
-				{
-					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-					total_games++;
-				}
-			}
-		}
-
-		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
-
-		sprintf(helperstr, "Total %d games.", total_games);
-		set(app->TX_Status, MUIA_Text_Contents, helperstr);
-	}
-		// the
 	else
-	{
-		// Erase list
-		DoMethod(app->LV_GamesList, MUIM_List_Clear);
-
-		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
-		//if (strlen(str)>0) for (i=0;i<=strlen((char *)str)-1;i++) str[i] = tolower(str[i]);
-		total_games = 0;
-		// Find the entries in Games and update the list
-		if (games)
-		{
-			for (item_games = games; item_games != NULL; item_games = item_games->next)
-			{
-				strcpy(helper, item_games->title);
-				_strlen = strlen(helper);
-				for (i = 0; i <= _strlen - 1; i++) helper[i] = tolower(helper[i]);
-
-				if (!strcmp(item_games->genre, str_gen) && item_games->hidden != 1 && strstr(helper, (char *)str))
-				{
-					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-					total_games++;
-				}
-			}
-		}
-
-		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
-
-		sprintf(helper, "Total %d games.", total_games);
-		set(app->TX_Status, MUIA_Text_Contents, helper);
-	}
+		list_show_filtered(str, str_gen);
 }
 
 /*
 *   Executes whdload with the slave
 */
-void game_double_click()
+void launch_game()
 {
 	struct Library* icon_base;
 	struct DiskObject* disk_obj;
@@ -553,8 +589,10 @@ void game_double_click()
 	const BPTR lock = Lock(naked_path, ACCESS_READ);
 	CurrentDir(lock);
 
-	if (whdload == 1) sprintf(exec, "whdload ");
-	else strcpy(exec, slave);
+	if (whdload == 1) 
+		sprintf(exec, "whdload ");
+	else 
+		strcpy(exec, slave);
 
 	//tooltypes only for whdload games
 	if (whdload == 1)
@@ -681,28 +719,20 @@ void game_double_click()
 /*
 * Scans the repos for games
 */
-void menu_scan()
+void scan_repositories()
 {
 	char repotemp[256], helperstr[256];
 
-	if (!repos)
-	{
-		//printf("Nothing to scan!\n");
-	}
-	else
+	if (repos)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
 			//only apply the not exists hack to slaves that are in the current repos, that will be scanned later
 			//Binaries (that are added through add-non-whdload, should be handled afterwards
 			if (strstr(item_games->path, ".slave") || strlen(item_games->path) == 0)
-			{
 				item_games->exists = 0;
-			}
 			else
-			{
 				item_games->exists = 1;
-			}
 		}
 
 		const BPTR currentlock = Lock("PROGDIR:", ACCESS_READ);
@@ -731,33 +761,53 @@ void menu_scan()
 	}
 }
 
+void refresh_sidepanel()
+{
+	DoMethod(app->GR_sidepanel, MUIM_Group_InitChange);
+	DoMethod(app->GR_sidepanel, OM_REMMEMBER, app->IM_GameImage_0);
+	DoMethod(app->GR_sidepanel, OM_REMMEMBER, app->Space_Sidepanel);
+	DoMethod(app->GR_sidepanel, OM_REMMEMBER, app->LV_GenresList);
+	MUI_DisposeObject(app->IM_GameImage_0);
+	DoMethod(app->GR_sidepanel, OM_ADDMEMBER, app->IM_GameImage_0 = app->IM_GameImage_1);
+	DoMethod(app->GR_sidepanel, OM_ADDMEMBER, app->Space_Sidepanel);
+	DoMethod(app->GR_sidepanel, OM_ADDMEMBER, app->LV_GenresList);
+	DoMethod(app->GR_sidepanel, MUIM_Group_ExitChange);
+}
+
+void strip_path(char* path, char* naked_path)
+{
+	int i;
+	int k;
+	/* strip the path from the slave file and get the rest */
+	for (i = strlen(path) - 1; i >= 0; i--)
+	{
+		if (path[i] == '/')
+			break;
+	}
+
+	for (k = 0; k <= i - 1; k++)
+		naked_path[k] = path[k];
+	naked_path[k] = '\0';
+}
+
 void game_click()
 {
-	char *game_title = NULL, path[350], naked_path[400];
-	int i, k;
+	char *game_title = NULL;
 	FILE* fp = NULL;
 
 	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
 
 	if (!NOSCREENSHOT && game_title) //for some reason, game_click is called and game_title is null??
 	{
+		char path[350];
 		get_path((char *)game_title, path);
-
-		/* strip the path from the slave file and get the rest */
-		for (i = strlen(path) - 1; i >= 0; i--)
-		{
-			if (path[i] == '/')
-				break;
-		}
-
-		for (k = 0; k <= i - 1; k++)
-			naked_path[k] = path[k];
-		naked_path[k] = '\0';
+		char naked_path[400];
+		strip_path(path, naked_path);
 
 		//Check the string, when filter is populated there is trouble
 		if (strlen(naked_path) != 0)
 		{
-			sprintf(naked_path, "%s/igame.iff", naked_path);
+			sprintf(naked_path, "%s/igame.iff", (const char*)naked_path);
 
 			fp = fopen(naked_path, "r");
 			if (!fp) //no igame.iff, try .info and newicons
@@ -765,7 +815,7 @@ void game_click()
 				if (strstr(path, ".slave")) //check for whdload game
 				{
 					path[strlen(path) - 6] = '\0';
-					sprintf(naked_path, "%s.info", path);
+					sprintf(naked_path, "%s.info", (const char*)path);
 					fp = fopen(naked_path, "r");
 				}
 			}
@@ -794,13 +844,7 @@ void game_click()
 
 				if (app->IM_GameImage_1)
 				{
-					DoMethod(app->GR_grp_1, MUIM_Group_InitChange);
-					DoMethod(app->GR_grp_1, OM_REMMEMBER, app->IM_GameImage_0);
-					DoMethod(app->GR_grp_1, OM_REMMEMBER, app->LV_GenresList);
-					MUI_DisposeObject(app->IM_GameImage_0);
-					DoMethod(app->GR_grp_1, OM_ADDMEMBER, app->IM_GameImage_0 = app->IM_GameImage_1);
-					DoMethod(app->GR_grp_1, OM_ADDMEMBER, app->LV_GenresList);
-					DoMethod(app->GR_grp_1, MUIM_Group_ExitChange);
+					refresh_sidepanel();
 					IntroPic = 0;
 				}
 				else
@@ -835,20 +879,15 @@ void game_click()
 					}
 					if (app->IM_GameImage_1)
 					{
-						DoMethod(app->GR_grp_1, MUIM_Group_InitChange);
-						DoMethod(app->GR_grp_1, OM_REMMEMBER, app->IM_GameImage_0);
-						DoMethod(app->GR_grp_1, OM_REMMEMBER, app->LV_GenresList);
-						MUI_DisposeObject(app->IM_GameImage_0);
-						DoMethod(app->GR_grp_1, OM_ADDMEMBER, app->IM_GameImage_0 = app->IM_GameImage_1);
-						DoMethod(app->GR_grp_1, OM_ADDMEMBER, app->LV_GenresList);
-						DoMethod(app->GR_grp_1, MUIM_Group_ExitChange);
+						refresh_sidepanel();
 						IntroPic = 1;
 					}
 				}
 			}
 		}
 
-		if (fp) fclose(fp);
+		if (fp) 
+			fclose(fp);
 	}
 }
 
@@ -906,13 +945,13 @@ void repo_add()
 			repos = item_repos;
 		}
 
-		DoMethod(app->LV_RepoList, MUIM_List_InsertSingle, item_repos->repo, 1, MUIV_List_Insert_Bottom);
+		DoMethod(app->LV_GameRepositories, MUIM_List_InsertSingle, item_repos->repo, 1, MUIV_List_Insert_Bottom);
 	}
 }
 
 void repo_remove()
 {
-	DoMethod(app->LV_RepoList, MUIM_List_Remove, MUIV_List_Remove_Active);
+	DoMethod(app->LV_GameRepositories, MUIM_List_Remove, MUIV_List_Remove_Active);
 }
 
 /*
@@ -930,7 +969,7 @@ void repo_stop()
 		for (int i = 0;; i++)
 		{
 			char* str = NULL;
-			DoMethod(app->LV_RepoList, MUIM_List_GetEntry, i, &str);
+			DoMethod(app->LV_GameRepositories, MUIM_List_GetEntry, i, &str);
 			if (!str) break;
 			//printf("%d - %s\n", i, str);
 			fprintf(fprepos, "%s\n", (char *)str);
@@ -956,7 +995,7 @@ void menu_game_properties()
 	char str2[512], fullpath[800], slave[256];
 
 	//if window is already open
-	get(app->WI_GameProperties, MUIA_Window_Open, &open);
+	get(app->WI_Properties, MUIA_Window_Open, &open);
 	if (open) return;
 
 	//set the elements on the window
@@ -979,26 +1018,26 @@ void menu_game_properties()
 
 	if (found == 1)
 	{
-		set(app->STR_GameTitle, MUIA_String_Contents, str);
-		set(app->TX_GamePath, MUIA_Text_Contents, item_games->path);
+		set(app->STR_PropertiesGameTitle, MUIA_String_Contents, str);
+		set(app->TX_PropertiesSlavePath, MUIA_Text_Contents, item_games->path);
 
 		sprintf(helperstr, "Times Played: %d", item_games->times_played);
-		set(app->TX_NumPlayed, MUIA_Text_Contents, helperstr);
+		set(app->TX_PropertiesTimesPlayed, MUIA_Text_Contents, helperstr);
 
 		//set the genre
 		for (i = 0; i < no_of_genres; i++)
-			if (!strcmp(app->CY_Genre_Content[i], item_games->genre)) break;
-		set(app->CY_Genre, MUIA_Cycle_Active, i);
+			if (!strcmp(app->CY_PropertiesGenreContent[i], item_games->genre)) break;
+		set(app->CY_PropertiesGenre, MUIA_Cycle_Active, i);
 
 		if (item_games->favorite == 1)
-			set(app->CH_Favorite, MUIA_Selected, TRUE);
+			set(app->CH_PropertiesFavorite, MUIA_Selected, TRUE);
 		else
-			set(app->CH_Favorite, MUIA_Selected, FALSE);
+			set(app->CH_PropertiesFavorite, MUIA_Selected, FALSE);
 
 		if (item_games->hidden == 1)
-			set(app->CH_Hidden, MUIA_Selected, TRUE);
+			set(app->CH_PropertiesHidden, MUIA_Selected, TRUE);
 		else
-			set(app->CH_Hidden, MUIA_Selected, FALSE);
+			set(app->CH_PropertiesHidden, MUIA_Selected, FALSE);
 
 		//set up the tooltypes
 
@@ -1078,7 +1117,7 @@ void menu_game_properties()
 							if (!strncmp(tool_type, "IM", 2)) continue;
 
 							sprintf(gamestooltypes, "%s%s\n", gamestooltypes, tool_type);
-							set(app->TX_Tooltypes, MUIA_TextEditor_ReadOnly, FALSE);
+							set(app->TX_PropertiesTooltypes, MUIA_TextEditor_ReadOnly, FALSE);
 							//printf("[%s]\n", tool_type);
 						}
 						//printf("%s\n", disk_obj->do_ToolTypes);
@@ -1096,14 +1135,14 @@ void menu_game_properties()
 		if (strlen(gamestooltypes) == 0)
 		{
 			sprintf(gamestooltypes, "No .info file");
-			set(app->TX_Tooltypes, MUIA_TextEditor_ReadOnly, TRUE);
+			set(app->TX_PropertiesTooltypes, MUIA_TextEditor_ReadOnly, TRUE);
 		}
 
-		set(app->TX_Tooltypes, MUIA_TextEditor_Contents, gamestooltypes);
+		set(app->TX_PropertiesTooltypes, MUIA_TextEditor_Contents, gamestooltypes);
 		//set(App->TX_Tooltypes, MUIA_Floattext_Text, helperstr);
 		CurrentDir(oldlock);
 
-		set(app->WI_GameProperties, MUIA_Window_Open, TRUE);
+		set(app->WI_Properties, MUIA_Window_Open, TRUE);
 	}
 	else
 	{
@@ -1124,11 +1163,11 @@ void game_properties_ok()
 	int new_tool_type_count = 1, old_tool_type_count = 0, old_real_tool_type_count = 0;
 	char str2[512], fullpath[800], slave[256];
 
-	get(app->STR_GameTitle, MUIA_String_Contents, &str);
-	get(app->TX_GamePath, MUIA_Text_Contents, &path);
-	get(app->CY_Genre, MUIA_Cycle_Active, &genre);
-	get(app->CH_Favorite, MUIA_Selected, &fav);
-	get(app->CH_Hidden, MUIA_Selected, &hid);
+	get(app->STR_PropertiesGameTitle, MUIA_String_Contents, &str);
+	get(app->TX_PropertiesSlavePath, MUIA_Text_Contents, &path);
+	get(app->CY_PropertiesGenre, MUIA_Cycle_Active, &genre);
+	get(app->CH_PropertiesFavorite, MUIA_Selected, &fav);
+	get(app->CH_PropertiesHidden, MUIA_Selected, &hid);
 
 	//printf("%s\n", App->CY_Genre_Content[genre]);
 
@@ -1147,7 +1186,7 @@ void game_properties_ok()
 				}
 			}
 			strcpy(item_games->title, str);
-			strcpy(item_games->genre, app->CY_Genre_Content[genre]);
+			strcpy(item_games->genre, app->CY_PropertiesGenreContent[genre]);
 			if (fav == 1) item_games->favorite = 1;
 			else item_games->favorite = 0;
 
@@ -1176,7 +1215,7 @@ void game_properties_ok()
 	}
 
 	//update the games tooltypes
-	STRPTR tools = (STRPTR)DoMethod(app->TX_Tooltypes, MUIM_TextEditor_ExportText);
+	STRPTR tools = (STRPTR)DoMethod(app->TX_PropertiesTooltypes, MUIM_TextEditor_ExportText);
 
 	//tooltypes changed
 	if (strcmp((char *)tools, gamestooltypes))
@@ -1303,7 +1342,7 @@ void game_properties_ok()
 
 	DoMethod(app->LV_GamesList, MUIM_List_Redraw, MUIV_List_Redraw_Active);
 
-	set(app->WI_GameProperties, MUIA_Window_Open, FALSE);
+	set(app->WI_Properties, MUIA_Window_Open, FALSE);
 	//RefreshList();
 	save_list(0);
 }
@@ -1745,7 +1784,8 @@ void refresh_list(const int check_exists)
 */
 void save_list(const int check_exists)
 {
-	set(app->WI_Wait, MUIA_Window_Open, TRUE);
+	const char* saving_message = "Please wait, saving gameslist...";
+	set(app->TX_Status, MUIA_Text_Contents, saving_message);
 
 	FILE* fpgames = fopen("PROGDIR:gameslist", "w");
 	if (!fpgames)
@@ -1795,7 +1835,20 @@ void save_list(const int check_exists)
 		fclose(fpgames);
 	}
 
-	set(app->WI_Wait, MUIA_Window_Open, FALSE);
+	saving_message = "Done.";
+	set(app->TX_Status, MUIA_Text_Contents, saving_message);
+}
+
+void save_list_as()
+{
+	//TODO implement a file requester
+	save_list(0);
+}
+
+void export_list()
+{
+	//TODO implement this
+	save_list(0);
 }
 
 //function to return the dec eq of a hex no.
@@ -1806,6 +1859,19 @@ int hex2dec(char* hexin)
 	hexin++;
 	sscanf(hexin, "%lx", &dec);
 	return dec;
+}
+
+void menu_copy()
+{
+	//TODO
+}
+void menu_paste_as_new()
+{
+	//TODO
+}
+void menu_delete()
+{
+	//TODO
 }
 
 void msg_box(char* msg)
@@ -1965,18 +2031,18 @@ void read_tool_types()
 
 void menu_add_non_whdload()
 {
-	set(app->STR_AddGameTitle, MUIA_String_Contents, NULL);
-	set(app->PA_AddGamePath, MUIA_String_Contents, NULL);
+	set(app->STR_AddTitle, MUIA_String_Contents, NULL);
+	set(app->PA_AddGame, MUIA_String_Contents, NULL);
 
-	set(app->WI_NonWhdload, MUIA_Window_Open, TRUE);
+	set(app->WI_AddNonWHDLoad, MUIA_Window_Open, TRUE);
 }
 
 void non_whdload_ok()
 {
 	char *str, *str_title, helperstr[200];
 
-	get(app->PA_AddGamePath, MUIA_String_Contents, &str);
-	get(app->STR_AddGameTitle, MUIA_String_Contents, &str_title);
+	get(app->PA_AddGame, MUIA_String_Contents, &str);
+	get(app->STR_AddTitle, MUIA_String_Contents, &str_title);
 
 	//printf("[%s] - [%s]\n", str, str_title);
 
@@ -2019,7 +2085,7 @@ void non_whdload_ok()
 
 	save_list(0);
 
-	set(app->WI_NonWhdload, MUIA_Window_Open, FALSE);
+	set(app->WI_AddNonWHDLoad, MUIA_Window_Open, FALSE);
 }
 
 /*

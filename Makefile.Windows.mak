@@ -35,11 +35,11 @@ LIBFLAGS_MOS = +morphos -lamiga -lauto -o
 ##########################################################################
 # Object files which are part of the GLFW library
 ##########################################################################
-OBJS = src/funcs.o src/iGameGUI.o src/iGameMain.o src/Hook_utility.o src/strdup.o
-OBJS_030 = src/funcs_030.o src/iGameGUI_030.o src/iGameMain_030.o src/strdup_030.o
-OBJS_040 = src/funcs_040.o src/iGameGUI_040.o src/iGameMain_040.o src/strdup_040.o
-OBJS_060 = src/funcs_060.o src/iGameGUI_060.o src/iGameMain_060.o src/strdup_060.o
-OBJS_MOS = src/funcs_MOS.o src/iGameGUI_MOS.o src/iGameMain_MOS.o src/strdup_MOS.o
+OBJS = src/funcs.o src/iGameGUI.o src/iGameMain.o src/Hook_utility.o src/strdup.o src/iGameStrings_cat.o
+OBJS_030 = src/funcs_030.o src/iGameGUI_030.o src/iGameMain_030.o src/strdup_030.o src/iGameStrings_cat_030.o
+OBJS_040 = src/funcs_040.o src/iGameGUI_040.o src/iGameMain_040.o src/strdup_040.o src/iGameStrings_cat_040.o
+OBJS_060 = src/funcs_060.o src/iGameGUI_060.o src/iGameMain_060.o src/strdup_060.o src/iGameStrings_cat_060.o
+OBJS_MOS = src/funcs_MOS.o src/iGameGUI_MOS.o src/iGameMain_MOS.o src/strdup_MOS.o src/iGameStrings_cat_MOS.o
 
 ##########################################################################
 # Rule for building library
@@ -77,6 +77,9 @@ src/iGameMain.o: src/iGameMain.c
 src/strdup.o: src/strdup.c
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/strdup.c
 
+src/iGameStrings_cat.o: src/iGameStrings_cat.c
+	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/iGameStrings_cat.c
+
 ##########################################################################
 # object files (030)
 ##########################################################################
@@ -93,6 +96,9 @@ src/iGameMain_030.o: src/iGameMain.c
 src/strdup_030.o: src/strdup.c
 	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/strdup.c
 
+src/iGameStrings_cat_030.o: src/iGameStrings_cat.c
+	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/iGameStrings_cat.c
+
 ##########################################################################
 # object files (040)
 ##########################################################################
@@ -108,7 +114,10 @@ src/iGameMain_040.o: src/iGameMain.c
 
 src/strdup_040.o: src/strdup.c
 	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/strdup.c
-	
+
+src/iGameStrings_cat_040.o: src/iGameStrings_cat.c
+	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/iGameStrings_cat.c
+
 ##########################################################################
 # object files (060)
 ##########################################################################
@@ -124,6 +133,9 @@ src/iGameMain_060.o: src/iGameMain.c
 
 src/strdup_060.o: src/strdup.c
 	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/strdup.c
+
+src/iGameStrings_cat_060.o: src/iGameStrings_cat.c
+	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/iGameStrings_cat.c
 
 ##########################################################################
 # object files (MOS)
@@ -141,7 +153,11 @@ src/iGameMain_MOS.o: src/iGameMain.c
 src/strdup_MOS.o: src/strdup.c
 	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/strdup.c
 
+src/iGameStrings_cat_MOS.o: src/iGameStrings_cat.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/iGameStrings_cat.c
+
+
 clean:
-	del iGame iGame.* src\funcs*.o src\iGameGUI*.o src\iGameMain*.o src\strdup*.o
+	del iGame iGame.* src\funcs*.o src\iGameGUI*.o src\iGameMain*.o src\strdup*.o src\iGameStrings_cat*.o
 
 

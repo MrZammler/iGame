@@ -1,48 +1,23 @@
-/*
-  iGameExtern.h
-  Function protos for iGame
-  
-  Copyright (c) 2016, Emmanuel Vasilakis
-  
-  This file is part of iGame.
-
-  iGame is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  iGame is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with iGame. If not, see <http://www.gnu.org/licenses/>.
-*/
-
 #pragma once
-#include <utility/hooks.h>
 
-APTR filter_change(struct Hook* a0, APTR a2, APTR a1);
-APTR game_double_click(struct Hook* a0, APTR a2, APTR a1);
-APTR menu_scan(struct Hook* a0, APTR a2, APTR a1);
-APTR game_click(struct Hook* a0, APTR a2, APTR a1);
-
-
-APTR app_start(struct Hook* a0, APTR a2, APTR a1);
-APTR repo_add(struct Hook* a0, APTR a2, APTR a1);
-APTR repo_remove(struct Hook* a0, APTR a2, APTR a1);
-
-APTR repo_stop(struct Hook* a0, APTR a2, APTR a1);
-
-APTR menu_game_properties(struct Hook* a0, APTR a2, APTR a1);
-APTR game_properties_ok(struct Hook* a0, APTR a2, APTR a1);
-
-APTR menu_add_non_whdload(struct Hook* a0, APTR a2, APTR a1);
-APTR non_whdload_ok(struct Hook* a0, APTR a2, APTR a1);
-
-APTR genres_click(struct Hook* a0, APTR a2, APTR a1);
-
-APTR menu_show_hidden(struct Hook* a0, APTR a2, APTR a1);
-
-//APTR MenuMUISettings( struct Hook *a0, APTR a2, APTR a1 );
+void scan_repositories(struct Hook* h, Object* o);
+void save_list(struct Hook* h, Object* o);
+void save_list_as(struct Hook* h, Object* o);
+void export_list(struct Hook* h, Object* o);
+void menu_copy(struct Hook* h, Object* o);
+void menu_paste_as_new(struct Hook* h, Object* o);
+void menu_delete(struct Hook* h, Object* o);
+void game_properties_ok(struct Hook* h, Object* o);
+void add_non_whd_load_game(struct Hook* h, Object* o);
+void filter_change(struct Hook* h, Object* o);
+void launch_game(struct Hook* h, Object* o);
+void menu_show_hidden(struct Hook* h, Object* o);
+void app_start(struct Hook* h, Object* o);
+void menu_game_properties(struct Hook* h, Object* o);
+void menu_add_non_whdload(struct Hook* h, Object* o);
+void game_click(struct Hook* h, Object* o);
+void genres_click(struct Hook* h, Object* o);
+void non_whdload_ok(struct Hook* h, Object* o);
+void repo_stop(struct Hook* h, Object* o);
+void repo_add(struct Hook* h, Object* o);
+void repo_remove(struct Hook* h, Object* o);
