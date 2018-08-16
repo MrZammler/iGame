@@ -1349,11 +1349,11 @@ void menu_show_hidden()
 
 void app_stop()
 {
+	if (SAVESTATSONEXIT == 1) save_list(0);
+
 	free(games);
 	free(repos);
 	free(genres);
-
-	if (SAVESTATSONEXIT == 1) save_list(0);
 }
 
 void genres_click()
@@ -1969,10 +1969,6 @@ void menu_add_non_whdload()
 void non_whdload_ok()
 {
 	char *str, *str_title, helperstr[200];
-
-	//for some reason it needs this twice to get the contents...
-	get(app->PA_AddGamePath, MUIA_String_Contents, &str);
-	get(app->STR_AddGameTitle, MUIA_String_Contents, &str_title);
 
 	get(app->PA_AddGamePath, MUIA_String_Contents, &str);
 	get(app->STR_AddGameTitle, MUIA_String_Contents, &str_title);
