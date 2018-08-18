@@ -73,9 +73,16 @@ void refresh_list(int check_exists);
 void save_list(int check_exists);
 void save_list_as();
 void export_list();
-void menu_copy();
-void menu_paste_as_new();
+void menu_duplicate();
 void menu_delete();
+void setting_filter_use_enter_changed();
+void setting_save_stats_on_exit_changed();
+void setting_smart_spaces_changed();
+void setting_titles_from_changed();
+void setting_show_screenshot_changed();
+void setting_use_gui_gfx_changed();
+void setting_screenshot_size_changed();
+void settings_save();
 int hex2dec(char* hexin);
 void msg_box(char* msg);
 int get_title_from_slave(char* slave, char* title);
@@ -1861,15 +1868,51 @@ int hex2dec(char* hexin)
 	return dec;
 }
 
-void menu_copy()
-{
-	//TODO
-}
-void menu_paste_as_new()
+void menu_duplicate()
 {
 	//TODO
 }
 void menu_delete()
+{
+	//TODO
+}
+
+void setting_filter_use_enter_changed()
+{
+	//TODO
+}
+
+void setting_save_stats_on_exit_changed()
+{
+	//TODO
+}
+
+void setting_smart_spaces_changed()
+{
+	//TODO
+}
+
+void setting_titles_from_changed()
+{
+	//TODO
+}
+
+void setting_show_screenshot_changed()
+{
+	//TODO
+}
+
+void setting_use_gui_gfx_changed()
+{
+	//TODO
+}
+
+void setting_screenshot_size_changed()
+{
+	//TODO
+}
+
+void settings_save()
 {
 	//TODO
 }

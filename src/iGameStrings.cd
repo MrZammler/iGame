@@ -62,29 +62,20 @@ Q_
 MSG_MNlabel2Edit (//)
 Edit
 ;MUIB Menu Title
-MSG_MNMainCopy (//)
-Copy
-;MUIB Menu ShortCut
-MSG_MNMainCopyChar (//)
-C_
-;MUIB Menu Title
-MSG_MNMainPasteasNew (//)
-Paste as New...
-;MUIB Menu ShortCut
-MSG_MNMainPasteasNewChar (//)
-V_
-;MUIB Menu Title
-MSG_MNMainDelete (//)
-Delete
-;MUIB Menu ShortCut
-MSG_MNMainDeleteChar (//)
-D_
+MSG_MNMainMenuDuplicate (//)
+Duplicate...
 ;MUIB Menu Title
 MSG_MNMainProperties (//)
 Properties...
 ;MUIB Menu ShortCut
 MSG_MNMainPropertiesChar (//)
 P_
+;MUIB Menu Title
+MSG_MNMainDelete (//)
+Delete
+;MUIB Menu ShortCut
+MSG_MNMainDeleteChar (//)
+D_
 ;MUIB Menu Title
 MSG_MNlabel2Tools (//)
 Settings
@@ -174,7 +165,7 @@ MSG_WI_About (//)
 About iGame
 ;MUIB text content
 MSG_TX_About (//)
-iGame version 1.7 beta
+iGame version 2.0b\n\n(C) Emmanuel Vasilakis\nmrzammler@gmail.com\n\nUpdates by Dimitris Panokostas\nmidwan@gmail.com\n\n
 ;MUIB button text
 MSG_BT_AboutOK (//)
 OK
@@ -182,5 +173,59 @@ OK
 MSG_WI_Settings (//)
 iGame Settings
 ;MUIB Label
-MSG_LA_Nothing (//)
-Nothing here yet!
+MSG_LA_ShowScreenshots (//)
+Show Screenshots
+;MUIB group
+MSG_GR_ScreenshotsTitle (//)
+Screenshots
+;MUIB Label
+MSG_LA_UseGuiGfx (//)
+Use GuiGfx
+;MUIB Label
+MSG_LA_ScreenshotSize (//)
+Screenshot Size:
+;MUIB Cycle Entry number 0
+MSG_CY_ScreenshotSize0 (//)
+160x128
+;MUIB Cycle Entry number 1
+MSG_CY_ScreenshotSize1 (//)
+320x256
+;MUIB Cycle Entry number 2
+MSG_CY_ScreenshotSize2 (//)
+Custom
+;MUIB Label
+MSG_LA_Width (//)
+Width
+;MUIB Label
+MSG_LA_Height (//)
+Height
+;MUIB group
+MSG_GR_TitlesTitle (//)
+Game Titles
+;MUIB Label
+MSG_LA_TitlesFrom (//)
+Game Titles From:
+;MUIB Radio Entry number 0
+MSG_RA_TitlesFrom0 (//)
+Slave Contents
+;MUIB Radio Entry number 1
+MSG_RA_TitlesFrom1 (//)
+Directories
+;MUIB Label
+MSG_LA_SmartSpaces (//)
+Use Smart Spaces
+;MUIB group
+MSG_GR_MiscTitle (//)
+Misc
+;MUIB Label
+MSG_LA_SaveStatsOnExit (//)
+Save Stats on Exit
+;MUIB Label
+MSG_LA_FilterUseEnter (//)
+Use Enter to Filter
+;MUIB button text
+MSG_BT_SettingsSave (//)
+Save
+;MUIB button text
+MSG_BT_SettingsCancel (//)
+Cancel

@@ -50,7 +50,7 @@
     Variables
 */
 
-struct FC_String iGameStrings_Strings[60] = {
+struct FC_String iGameStrings_Strings[75] = {
     { (STRPTR) "A front-end to WHDLoad", 0 },
     { (STRPTR) "Dimitris Panokostas 2018", 1 },
     { (STRPTR) "iGame", 2 },
@@ -70,47 +70,62 @@ struct FC_String iGameStrings_Strings[60] = {
     { (STRPTR) "Quit", 16 },
     { (STRPTR) "Q_", 17 },
     { (STRPTR) "Edit", 18 },
-    { (STRPTR) "Copy", 19 },
-    { (STRPTR) "C_", 20 },
-    { (STRPTR) "Paste as New...", 21 },
-    { (STRPTR) "V_", 22 },
-    { (STRPTR) "Delete", 23 },
-    { (STRPTR) "D_", 24 },
-    { (STRPTR) "Properties...", 25 },
-    { (STRPTR) "P_", 26 },
-    { (STRPTR) "Settings", 27 },
-    { (STRPTR) "Settings...", 28 },
-    { (STRPTR) "Game Repositories...", 29 },
-    { (STRPTR) "MUI Settings...", 30 },
-    { (STRPTR) "Filter:", 31 },
-    { (STRPTR) "Genres", 32 },
-    { (STRPTR) "Game Properties", 33 },
-    { (STRPTR) "Title", 34 },
-    { (STRPTR) "Genre:", 35 },
-    { (STRPTR) "Unknown", 36 },
-    { (STRPTR) "Favorite:", 37 },
-    { (STRPTR) "Hidden:", 38 },
-    { (STRPTR) "Times Played:", 39 },
-    { (STRPTR) "Slave Path:", 40 },
-    { (STRPTR) "Tooltypes", 41 },
-    { (STRPTR) "OK", 42 },
-    { (STRPTR) "Cancel", 43 },
-    { (STRPTR) "Game Repositories", 44 },
-    { (STRPTR) "Add", 45 },
-    { (STRPTR) "Remove", 46 },
-    { (STRPTR) "Close", 47 },
-    { (STRPTR) "Add a non-WHDLoad Game", 48 },
-    { (STRPTR) "Title:", 49 },
-    { (STRPTR) "Path:", 50 },
-    { (STRPTR) "Genre:", 51 },
-    { (STRPTR) "Unknown", 52 },
-    { (STRPTR) "OK", 53 },
-    { (STRPTR) "Cancel", 54 },
-    { (STRPTR) "About iGame", 55 },
-    { (STRPTR) "iGame version 1.7 beta", 56 },
-    { (STRPTR) "OK", 57 },
-    { (STRPTR) "iGame Settings", 58 },
-    { (STRPTR) "Nothing here yet!", 59 }
+    { (STRPTR) "Duplicate...", 19 },
+    { (STRPTR) "Properties...", 20 },
+    { (STRPTR) "P_", 21 },
+    { (STRPTR) "Delete", 22 },
+    { (STRPTR) "D_", 23 },
+    { (STRPTR) "Settings", 24 },
+    { (STRPTR) "Settings...", 25 },
+    { (STRPTR) "Game Repositories...", 26 },
+    { (STRPTR) "MUI Settings...", 27 },
+    { (STRPTR) "Filter:", 28 },
+    { (STRPTR) "Genres", 29 },
+    { (STRPTR) "Game Properties", 30 },
+    { (STRPTR) "Title", 31 },
+    { (STRPTR) "Genre:", 32 },
+    { (STRPTR) "Unknown", 33 },
+    { (STRPTR) "Favorite:", 34 },
+    { (STRPTR) "Hidden:", 35 },
+    { (STRPTR) "Times Played:", 36 },
+    { (STRPTR) "Slave Path:", 37 },
+    { (STRPTR) "Tooltypes", 38 },
+    { (STRPTR) "OK", 39 },
+    { (STRPTR) "Cancel", 40 },
+    { (STRPTR) "Game Repositories", 41 },
+    { (STRPTR) "Add", 42 },
+    { (STRPTR) "Remove", 43 },
+    { (STRPTR) "Close", 44 },
+    { (STRPTR) "Add a non-WHDLoad Game", 45 },
+    { (STRPTR) "Title:", 46 },
+    { (STRPTR) "Path:", 47 },
+    { (STRPTR) "Genre:", 48 },
+    { (STRPTR) "Unknown", 49 },
+    { (STRPTR) "OK", 50 },
+    { (STRPTR) "Cancel", 51 },
+    { (STRPTR) "About iGame", 52 },
+    { (STRPTR) "iGame version 2.0b\n\n(C) Emmanuel Vasilakis\nmrzammler@gmail.com\n\nUpdates by Dimitris Panokostas\nmidwan@gmail.com\n\n", 53 },
+    { (STRPTR) "OK", 54 },
+    { (STRPTR) "iGame Settings", 55 },
+    { (STRPTR) "Show Screenshots", 56 },
+    { (STRPTR) "Screenshots", 57 },
+    { (STRPTR) "Use GuiGfx", 58 },
+    { (STRPTR) "Screenshot Size:", 59 },
+    { (STRPTR) "160x128", 60 },
+    { (STRPTR) "320x256", 61 },
+    { (STRPTR) "Custom", 62 },
+    { (STRPTR) "Width", 63 },
+    { (STRPTR) "Height", 64 },
+    { (STRPTR) "Game Titles", 65 },
+    { (STRPTR) "Game Titles From:", 66 },
+    { (STRPTR) "Slave Contents", 67 },
+    { (STRPTR) "Directories", 68 },
+    { (STRPTR) "Use Smart Spaces", 69 },
+    { (STRPTR) "Misc", 70 },
+    { (STRPTR) "Save Stats on Exit", 71 },
+    { (STRPTR) "Use Enter to Filter", 72 },
+    { (STRPTR) "Save", 73 },
+    { (STRPTR) "Cancel", 74 }
 };
 
 STATIC struct Catalog *iGameStringsCatalog = NULL;
@@ -161,7 +176,7 @@ VOID OpeniGameStringsCatalog(VOID)
 	    struct FC_String *fc;
 	    int i;
 
-	    for (i = 0, fc = iGameStrings_Strings;  i < 60;  i++, fc++) {
+	    for (i = 0, fc = iGameStrings_Strings;  i < 75;  i++, fc++) {
 		 fc->msg = GetCatalogStr(iGameStringsCatalog, fc->id, (STRPTR) fc->msg);
 	    }
 	}
@@ -264,7 +279,7 @@ VOID InitiGameStringsCatalog(STRPTR language)
 				    bytesRemaining -= 8 + (skipSize << 2);
 				    ptr += skipSize;
 
-				    for (i = 0, fc = iGameStrings_Strings;  i < 60;  i++, fc++) {
+				    for (i = 0, fc = iGameStrings_Strings;  i < 75;  i++, fc++) {
 					if (fc->id == id) {
 					    fc->msg = sptr;
 					}

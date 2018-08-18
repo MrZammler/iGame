@@ -45,6 +45,17 @@ struct ObjApp
 	APTR TX_About;
 	APTR BT_AboutOK;
 	APTR WI_Settings;
+	APTR	CH_Screenshots;
+	APTR	CH_UseGuiGfx;
+	APTR	CY_ScreenshotSize;
+	APTR	STR_Width;
+	APTR	STR_Height;
+	APTR	RA_TitlesFrom;
+	APTR	CH_SmartSpaces;
+	APTR	CH_SaveStatsOnExit;
+	APTR	CH_FilterUseEnter;
+	APTR	BT_SettingsSave;
+	APTR	BT_SettingsCancel;
 	CONST_STRPTR STR_TX_Status;
 	CONST_STRPTR STR_TX_PropertiesTimesPlayed;
 	CONST_STRPTR STR_TX_PropertiesSlavePath;
@@ -52,6 +63,8 @@ struct ObjApp
 	CONST_STRPTR STR_TX_About;
 	CONST_STRPTR CY_PropertiesGenreContent[512];
 	CONST_STRPTR CY_AddGameGenreContent[512];
+	CONST_STRPTR	CY_ScreenshotSizeContent[4];
+	CONST_STRPTR	RA_TitlesFromContent[3];
 };
 
 extern struct ObjApp* CreateApp(void);

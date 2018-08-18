@@ -71,8 +71,8 @@ struct ObjApp * CreateApp(void)
 	APTR	MNlabel2File, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainMenuShowHidehiddenentries;
 	APTR	MNMainBarLabel5, MNMainOpenList, MNMainSaveList, MNMainSaveListAs;
 	APTR	MNMainBarLabel3, MNMainExportListtoTextfile, MNMainBarLabel0, MNMainAbout;
-	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Edit, MNMainCopy, MNMainPasteasNew;
-	APTR	MNMainDelete, MNMainBarLabel4, MNMainProperties, MNlabel2Tools, MNMainiGameSettings;
+	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Edit, MNMainMenuDuplicate, MNMainProperties;
+	APTR	MNMainBarLabel4, MNMainDelete, MNlabel2Tools, MNMainiGameSettings;
 	APTR	MNlabel2GameRepositories, MNMainBarLabel2, MNMainMUISettings, GROUP_ROOT;
 	APTR	GR_Filter, LA_Filter, GR_main, Space_Gamelist;
 	APTR	GROUP_ROOT_1, GR_Genre, LA_PropertiesGenre, Space_Genre;
@@ -82,7 +82,14 @@ struct ObjApp * CreateApp(void)
 	APTR	GR_PropertiesButtons, Space_Buttons, GROUP_ROOT_2, GR_Path, GR_ReposButtons;
 	APTR	GROUP_ROOT_3, GR_AddGameTitle, LA_AddGameTitle, GR_AddGamePath, LA_AddGamePath;
 	APTR	GR_AddGameGenre, LA_AddGameGenre, Space_AddGame, GR_AddGameButtons;
-	APTR	GROUP_ROOT_4, GROUP_ROOT_5, LA_Nothing;
+	APTR	GROUP_ROOT_4, GROUP_ROOT_Settings, Space_SettingsTop, GR_ShowScreenshots;
+	APTR	Space_ShowScreenshots, LA_ShowScreenshots, GR_Screenshots, GR_UseGuiGfx;
+	APTR	Space_UseGuiGfx, LA_UseGuiGfx, GR_ScreenshotSize, LA_ScreenshotSize;
+	APTR	Space_ScreenshotSize, GR_CustomSize, LA_Width, LA_Height, GR_Titles;
+	APTR	GR_TitlesFrom, LA_TitlesFrom, Space_TitlesFrom, GR_SmartSpaces, LA_SmartSpaces;
+	APTR	GR_Misc, GR_SaveStatsOnExit, Space_SaveStatsOnExit, LA_SaveStatsOnExit;
+	APTR	GR_FilterUseEnter, Space_FilterUseEnter, LA_FilterUseEnter, GR_SettingsButtons;
+	APTR	Space_SettingsButtons, Space_SettingsBottom;
 #if defined(__amigaos4__)
 	static const struct Hook MenuScanHook = { { NULL,NULL }, (HOOKFUNC)scan_repositories, NULL, NULL };
 #else
@@ -104,14 +111,9 @@ struct ObjApp * CreateApp(void)
 	static const struct Hook MenuExportListHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)export_list, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook MenuCopyHook = { { NULL,NULL }, (HOOKFUNC)menu_copy, NULL, NULL };
+	static const struct Hook MenuDuplicateHook = { { NULL,NULL }, (HOOKFUNC)menu_duplicate, NULL, NULL };
 #else
-	static const struct Hook MenuCopyHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)menu_copy, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook MenuPasteAsNewHook = { { NULL,NULL }, (HOOKFUNC)menu_paste_as_new, NULL, NULL };
-#else
-	static const struct Hook MenuPasteAsNewHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)menu_paste_as_new, NULL };
+	static const struct Hook MenuDuplicateHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)menu_duplicate, NULL };
 #endif
 #if defined(__amigaos4__)
 	static const struct Hook MenuDeleteHook = { { NULL,NULL }, (HOOKFUNC)menu_delete, NULL, NULL };
@@ -122,16 +124,6 @@ struct ObjApp * CreateApp(void)
 	static const struct Hook PropertiesOKButtonHook = { { NULL,NULL }, (HOOKFUNC)game_properties_ok, NULL, NULL };
 #else
 	static const struct Hook PropertiesOKButtonHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_properties_ok, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook RepositoriesAddButtonHook = { { NULL,NULL }, (HOOKFUNC)repo_add, NULL, NULL };
-#else
-	static const struct Hook RepositoriesAddButtonHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)repo_add, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook AddNonWHDLoadGameHook = { { NULL,NULL }, (HOOKFUNC)add_non_whd_load_game, NULL, NULL };
-#else
-	static const struct Hook AddNonWHDLoadGameHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)add_non_whd_load_game, NULL };
 #endif
 #if defined(__amigaos4__)
 	static const struct Hook FilterChangeHook = { { NULL,NULL }, (HOOKFUNC)filter_change, NULL, NULL };
@@ -193,29 +185,67 @@ struct ObjApp * CreateApp(void)
 #else
 	static const struct Hook RepoRemoveHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)repo_remove, NULL };
 #endif
+#if defined(__amigaos4__)
+	static const struct Hook SettingFilterUseEnterChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingFilterUseEnterChanged, NULL, NULL };
+#else
+	static const struct Hook SettingFilterUseEnterChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_filter_use_enter_changed, NULL };
+#endif
+#if defined(__amigaos4__)
+	static const struct Hook SettingSaveStatsOnExitChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingSaveStatsOnExitChanged, NULL, NULL };
+#else
+	static const struct Hook SettingSaveStatsOnExitChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_save_stats_on_exit_changed, NULL };
+#endif
+#if defined(__amigaos4__)
+	static const struct Hook SettingSmartSpacesChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingSmartSpacesChanged, NULL, NULL };
+#else
+	static const struct Hook SettingSmartSpacesChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_smart_spaces_changed, NULL };
+#endif
+#if defined(__amigaos4__)
+	static const struct Hook SettingTitlesFromChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingTitlesFromChanged, NULL, NULL };
+#else
+	static const struct Hook SettingTitlesFromChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_titles_from_changed, NULL };
+#endif
+#if defined(__amigaos4__)
+	static const struct Hook SettingShowScreenshotChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingShowScreenshotChanged, NULL, NULL };
+#else
+	static const struct Hook SettingShowScreenshotChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_show_screenshot_changed, NULL };
+#endif
+#if defined(__amigaos4__)
+	static const struct Hook SettingUseGuiGfxChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingUseGuiGfxChanged, NULL, NULL };
+#else
+	static const struct Hook SettingUseGuiGfxChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_use_gui_gfx_changed, NULL };
+#endif
+#if defined(__amigaos4__)
+	static const struct Hook SettingScreenshotSizeChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingScreenshotSizeChanged, NULL, NULL };
+#else
+	static const struct Hook SettingScreenshotSizeChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_screenshot_size_changed, NULL };
+#endif
+#if defined(__amigaos4__)
+	static const struct Hook SettingsSaveHook = { { NULL,NULL }, (HOOKFUNC)SettingsSave, NULL, NULL };
+#else
+	static const struct Hook SettingsSaveHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)settings_save, NULL };
+#endif
 
 	if (!(object = AllocVec(sizeof(struct ObjApp), MEMF_PUBLIC | MEMF_CLEAR)))
 		return NULL;
-
-	char* about_text = "iGame ";
-	strcat(about_text, VERSION);
-	strcat(about_text, "\n\n");
-	strcat(about_text, "(c) 2005-2018 Emmanuel Vasilakis\n");
-	strcat(about_text, "mrzammler@gmail.com\n\n");
-	strcat(about_text, "Updates by Dimitris Panokostas\n");
-	strcat(about_text, "midwan@gmail.com\n\n");
 
 	object->STR_TX_Status = NULL;
 	object->STR_TX_PropertiesTimesPlayed = NULL;
 	object->STR_TX_PropertiesSlavePath = NULL;
 	object->STR_TX_PropertiesTooltypes = NULL;
-	object->STR_TX_About = about_text;
-	//object->STR_TX_Wait = "Writing to disk, please wait...";
+	object->STR_TX_About = GetMBString(MSG_TX_About);
 
 	object->CY_PropertiesGenreContent[0] = GetMBString(MSG_CY_PropertiesGenre0);
 	object->CY_PropertiesGenreContent[1] = NULL;
 	object->CY_AddGameGenreContent[0] = GetMBString(MSG_CY_AddGameGenre0);
 	object->CY_AddGameGenreContent[1] = NULL;
+	object->CY_ScreenshotSizeContent[0] = GetMBString(MSG_CY_ScreenshotSize0);
+	object->CY_ScreenshotSizeContent[1] = GetMBString(MSG_CY_ScreenshotSize1);
+	object->CY_ScreenshotSizeContent[2] = GetMBString(MSG_CY_ScreenshotSize2);
+	object->CY_ScreenshotSizeContent[3] = NULL;
+	object->RA_TitlesFromContent[0] = GetMBString(MSG_RA_TitlesFrom0);
+	object->RA_TitlesFromContent[1] = GetMBString(MSG_RA_TitlesFrom1);
+	object->RA_TitlesFromContent[2] = NULL;
 
 	LA_Filter = Label(GetMBString(MSG_LA_Filter));
 
@@ -394,35 +424,28 @@ struct ObjApp * CreateApp(void)
 		MUIA_Family_Child, MNMainQuit,
 		End;
 
-	MNMainCopy = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNMainCopy),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainCopyChar),
+	MNMainMenuDuplicate = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNMainMenuDuplicate),
 		End;
-
-	MNMainPasteasNew = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNMainPasteasNew),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainPasteasNewChar),
-		End;
-
-	MNMainDelete = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNMainDelete),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainDeleteChar),
-		End;
-
-	MNMainBarLabel4 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
 
 	MNMainProperties = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainProperties),
 		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainPropertiesChar),
 		End;
 
+	MNMainBarLabel4 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
+
+	MNMainDelete = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNMainDelete),
+		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainDeleteChar),
+		End;
+
 	MNlabel2Edit = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Edit),
-		MUIA_Family_Child, MNMainCopy,
-		MUIA_Family_Child, MNMainPasteasNew,
-		MUIA_Family_Child, MNMainDelete,
-		MUIA_Family_Child, MNMainBarLabel4,
+		MUIA_Family_Child, MNMainMenuDuplicate,
 		MUIA_Family_Child, MNMainProperties,
+		MUIA_Family_Child, MNMainBarLabel4,
+		MUIA_Family_Child, MNMainDelete,
 		End;
 
 	MNMainiGameSettings = MenuitemObject,
@@ -814,16 +837,244 @@ struct ObjApp * CreateApp(void)
 		WindowContents, GROUP_ROOT_4,
 		End;
 
-	LA_Nothing = Label(GetMBString(MSG_LA_Nothing));
+	Space_SettingsTop = VSpace(1);
 
-	GROUP_ROOT_5 = GroupObject,
-		Child, LA_Nothing,
+	object->CH_Screenshots = CheckMark(TRUE);
+
+	Space_ShowScreenshots = HSpace(1);
+
+	LA_ShowScreenshots = Label(GetMBString(MSG_LA_ShowScreenshots));
+
+	GR_ShowScreenshots = GroupObject,
+		MUIA_HelpNode, "GR_ShowScreenshots",
+		MUIA_Group_Horiz, TRUE,
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
+		Child, object->CH_Screenshots,
+		Child, Space_ShowScreenshots,
+		Child, LA_ShowScreenshots,
+		End;
+
+	object->CH_UseGuiGfx = CheckMark(TRUE);
+
+	Space_UseGuiGfx = HSpace(1);
+
+	LA_UseGuiGfx = Label(GetMBString(MSG_LA_UseGuiGfx));
+
+	GR_UseGuiGfx = GroupObject,
+		MUIA_HelpNode, "GR_UseGuiGfx",
+		MUIA_Group_Horiz, TRUE,
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
+		Child, object->CH_UseGuiGfx,
+		Child, Space_UseGuiGfx,
+		Child, LA_UseGuiGfx,
+		End;
+
+	LA_ScreenshotSize = Label(GetMBString(MSG_LA_ScreenshotSize));
+
+	Space_ScreenshotSize = HSpace(1);
+
+	object->CY_ScreenshotSize = CycleObject,
+		MUIA_HelpNode, "CY_ScreenshotSize",
+		MUIA_Frame, MUIV_Frame_Button,
+		MUIA_Cycle_Entries, object->CY_ScreenshotSizeContent,
+		End;
+
+	GR_ScreenshotSize = GroupObject,
+		MUIA_HelpNode, "GR_ScreenshotSize",
+		MUIA_Group_Horiz, TRUE,
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
+		Child, LA_ScreenshotSize,
+		Child, Space_ScreenshotSize,
+		Child, object->CY_ScreenshotSize,
+		End;
+
+	LA_Width = TextObject,
+		MUIA_Text_PreParse, "\033r",
+		MUIA_Text_Contents, GetMBString(MSG_LA_Width),
+		MUIA_Disabled, TRUE,
+		MUIA_InnerLeft, 0,
+		MUIA_InnerRight, 0,
+		End;
+
+	object->STR_Width = StringObject,
+		MUIA_Disabled, TRUE,
+		MUIA_Frame, MUIV_Frame_String,
+		MUIA_HelpNode, "STR_Width",
+		MUIA_String_Accept, "-0123456789",
+		End;
+
+	LA_Height = TextObject,
+		MUIA_Text_PreParse, "\033r",
+		MUIA_Text_Contents, GetMBString(MSG_LA_Height),
+		MUIA_Disabled, TRUE,
+		MUIA_InnerLeft, 0,
+		MUIA_InnerRight, 0,
+		End;
+
+	object->STR_Height = StringObject,
+		MUIA_Disabled, TRUE,
+		MUIA_Frame, MUIV_Frame_String,
+		MUIA_HelpNode, "STR_Height",
+		MUIA_String_Accept, "-0123456789",
+		End;
+
+	GR_CustomSize = GroupObject,
+		MUIA_HelpNode, "GR_CustomSize",
+		MUIA_Group_Horiz, TRUE,
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
+		Child, LA_Width,
+		Child, object->STR_Width,
+		Child, LA_Height,
+		Child, object->STR_Height,
+		End;
+
+	GR_Screenshots = GroupObject,
+		MUIA_HelpNode, "GR_Screenshots",
+		MUIA_Frame, MUIV_Frame_Group,
+		MUIA_FrameTitle, GetMBString(MSG_GR_ScreenshotsTitle),
+		MUIA_Group_HorizSpacing, 10,
+		MUIA_Group_VertSpacing, 10,
+		Child, GR_UseGuiGfx,
+		Child, GR_ScreenshotSize,
+		Child, GR_CustomSize,
+		End;
+
+	LA_TitlesFrom = Label(GetMBString(MSG_LA_TitlesFrom));
+
+	Space_TitlesFrom = VSpace(1);
+
+	object->RA_TitlesFrom = RadioObject,
+		MUIA_Frame, MUIV_Frame_Group,
+		MUIA_HelpNode, "RA_TitlesFrom",
+		MUIA_Radio_Entries, object->RA_TitlesFromContent,
+		End;
+
+	GR_TitlesFrom = GroupObject,
+		MUIA_HelpNode, "GR_TitlesFrom",
+		MUIA_Group_Horiz, TRUE,
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
+		Child, LA_TitlesFrom,
+		Child, Space_TitlesFrom,
+		Child, object->RA_TitlesFrom,
+		End;
+
+	object->CH_SmartSpaces = ImageObject,
+		MUIA_Disabled, TRUE,
+		MUIA_InputMode, MUIV_InputMode_Toggle,
+		MUIA_Image_Spec, MUII_CheckMark,
+		MUIA_Image_FreeVert, TRUE,
+		MUIA_Selected, TRUE,
+		MUIA_ShowSelState, FALSE,
+		End;
+
+	LA_SmartSpaces = TextObject,
+		MUIA_Text_PreParse, "\033r",
+		MUIA_Text_Contents, GetMBString(MSG_LA_SmartSpaces),
+		MUIA_Disabled, TRUE,
+		MUIA_InnerLeft, 0,
+		MUIA_InnerRight, 0,
+		End;
+
+	GR_SmartSpaces = GroupObject,
+		MUIA_HelpNode, "GR_SmartSpaces",
+		MUIA_Group_Horiz, TRUE,
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
+		Child, object->CH_SmartSpaces,
+		Child, LA_SmartSpaces,
+		End;
+
+	GR_Titles = GroupObject,
+		MUIA_HelpNode, "GR_Titles",
+		MUIA_Frame, MUIV_Frame_Group,
+		MUIA_FrameTitle, GetMBString(MSG_GR_TitlesTitle),
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
+		Child, GR_TitlesFrom,
+		Child, GR_SmartSpaces,
+		End;
+
+	object->CH_SaveStatsOnExit = CheckMark(FALSE);
+
+	Space_SaveStatsOnExit = VSpace(1);
+
+	LA_SaveStatsOnExit = Label(GetMBString(MSG_LA_SaveStatsOnExit));
+
+	GR_SaveStatsOnExit = GroupObject,
+		MUIA_HelpNode, "GR_SaveStatsOnExit",
+		MUIA_Group_Horiz, TRUE,
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
+		Child, object->CH_SaveStatsOnExit,
+		Child, Space_SaveStatsOnExit,
+		Child, LA_SaveStatsOnExit,
+		End;
+
+	object->CH_FilterUseEnter = CheckMark(FALSE);
+
+	Space_FilterUseEnter = VSpace(1);
+
+	LA_FilterUseEnter = Label(GetMBString(MSG_LA_FilterUseEnter));
+
+	GR_FilterUseEnter = GroupObject,
+		MUIA_HelpNode, "GR_FilterUseEnter",
+		MUIA_Group_Horiz, TRUE,
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
+		Child, object->CH_FilterUseEnter,
+		Child, Space_FilterUseEnter,
+		Child, LA_FilterUseEnter,
+		End;
+
+	GR_Misc = GroupObject,
+		MUIA_HelpNode, "GR_Misc",
+		MUIA_Frame, MUIV_Frame_Group,
+		MUIA_FrameTitle, GetMBString(MSG_GR_MiscTitle),
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
+		Child, GR_SaveStatsOnExit,
+		Child, GR_FilterUseEnter,
+		End;
+
+	object->BT_SettingsSave = SimpleButton(GetMBString(MSG_BT_SettingsSave));
+
+	Space_SettingsButtons = VSpace(1);
+
+	object->BT_SettingsCancel = SimpleButton(GetMBString(MSG_BT_SettingsCancel));
+
+	GR_SettingsButtons = GroupObject,
+		MUIA_HelpNode, "GR_SettingsButtons",
+		MUIA_Group_Horiz, TRUE,
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
+		Child, object->BT_SettingsSave,
+		Child, Space_SettingsButtons,
+		Child, object->BT_SettingsCancel,
+		End;
+
+	Space_SettingsBottom = HVSpace;
+
+	GROUP_ROOT_Settings = GroupObject,
+		MUIA_Group_HorizSpacing, 10,
+		MUIA_Group_VertSpacing, 10,
+		Child, Space_SettingsTop,
+		Child, GR_ShowScreenshots,
+		Child, GR_Screenshots,
+		Child, GR_Titles,
+		Child, GR_Misc,
+		Child, GR_SettingsButtons,
+		Child, Space_SettingsBottom,
 		End;
 
 	object->WI_Settings = WindowObject,
 		MUIA_Window_Title, GetMBString(MSG_WI_Settings),
 		MUIA_Window_ID, MAKE_ID('5', 'I', 'G', 'A'),
-		WindowContents, GROUP_ROOT_5,
+		WindowContents, GROUP_ROOT_Settings,
 		End;
 
 	object->App = ApplicationObject,
@@ -918,25 +1169,11 @@ struct ObjApp * CreateApp(void)
 		MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit
 	);
 
-	DoMethod(MNMainCopy,
+	DoMethod(MNMainMenuDuplicate,
 		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
 		object->App,
 		2,
-		MUIM_CallHook, &MenuCopyHook
-	);
-
-	DoMethod(MNMainPasteasNew,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->App,
-		2,
-		MUIM_CallHook, &MenuPasteAsNewHook
-	);
-
-	DoMethod(MNMainDelete,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->App,
-		2,
-		MUIM_CallHook, &MenuDeleteHook
+		MUIM_CallHook, &MenuDuplicateHook
 	);
 
 	DoMethod(MNMainProperties,
@@ -944,6 +1181,13 @@ struct ObjApp * CreateApp(void)
 		object->App,
 		2,
 		MUIM_CallHook, &MenuPropertiesHook
+	);
+
+	DoMethod(MNMainDelete,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &MenuDeleteHook
 	);
 
 	DoMethod(MNMainiGameSettings,
@@ -1188,8 +1432,103 @@ struct ObjApp * CreateApp(void)
 		MUIM_Set, MUIA_Window_Open, FALSE
 	);
 
+	DoMethod(object->CH_Screenshots,
+		MUIM_Notify, MUIA_Selected, TRUE,
+		GR_Screenshots,
+		3,
+		MUIM_Set, MUIA_Disabled, FALSE
+	);
+
+	DoMethod(object->CH_Screenshots,
+		MUIM_Notify, MUIA_Selected, FALSE,
+		GR_Screenshots,
+		3,
+		MUIM_Set, MUIA_Disabled, TRUE
+	);
+
+	DoMethod(object->CH_Screenshots,
+		MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &SettingShowScreenshotChangedHook
+	);
+
+	DoMethod(object->CH_UseGuiGfx,
+		MUIM_Notify, MUIA_ShowMe, FALSE,
+		object->App,
+		2,
+		MUIM_CallHook, &SettingUseGuiGfxChangedHook
+	);
+
+	DoMethod(object->CY_ScreenshotSize,
+		MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &SettingScreenshotSizeChangedHook
+	);
+
+	DoMethod(object->RA_TitlesFrom,
+		MUIM_Notify, MUIA_Radio_Active, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &SettingTitlesFromChangedHook
+	);
+
+	DoMethod(object->CH_SmartSpaces,
+		MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &SettingSmartSpacesChangedHook
+	);
+
+	DoMethod(object->CH_SaveStatsOnExit,
+		MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &SettingSaveStatsOnExitChangedHook
+	);
+
+	DoMethod(object->CH_FilterUseEnter,
+		MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &SettingFilterUseEnterChangedHook
+	);
+
+	DoMethod(object->BT_SettingsSave,
+		MUIM_Notify, MUIA_Pressed, FALSE,
+		object->App,
+		2,
+		MUIM_CallHook, &SettingsSaveHook
+	);
+
+	DoMethod(object->BT_SettingsSave,
+		MUIM_Notify, MUIA_Pressed, FALSE,
+		object->WI_Settings,
+		3,
+		MUIM_Set, MUIA_Window_Open, FALSE
+	);
+
+	DoMethod(object->BT_SettingsCancel,
+		MUIM_Notify, MUIA_Pressed, FALSE,
+		object->WI_Settings,
+		3,
+		MUIM_Set, MUIA_Window_Open, FALSE
+	);
+
 	DoMethod(object->WI_Settings,
-		MUIM_Window_SetCycleChain, 0
+		MUIM_Window_SetCycleChain, object->CH_Screenshots,
+		object->CH_UseGuiGfx,
+		object->CY_ScreenshotSize,
+		object->STR_Width,
+		object->STR_Height,
+		object->RA_TitlesFrom,
+		object->CH_SmartSpaces,
+		object->CH_SaveStatsOnExit,
+		object->CH_FilterUseEnter,
+		object->BT_SettingsSave,
+		object->BT_SettingsCancel,
+		0
 	);
 
 	// Delay opening the Window until after we've loaded everything
