@@ -9,8 +9,6 @@
 
 #include <MUI/Guigfx_mcc.h>
 #include <mui/TextEditor_mcc.h>
-//#include <libraries/NList_mcc.h>
-//#include <libraries/NListview_mcc.h>
 #include <libraries/gadtools.h> /* for Barlabel in MenuItem */
 #include <exec/memory.h>
 #include <proto/icon.h>
@@ -28,34 +26,11 @@
 #include "iGameExtern.h"
 #include "iGameStrings_cat.h"
 
-#define MUIA_Dtpic_Name 0x80423d72
-
 extern int SS_WIDTH, SS_HEIGHT;
 extern int NOGUIGFX;
 extern int FILTERUSEENTER;
 extern int NOSCREENSHOT;
 extern int NOSIDEPANEL;
-
-#define FILENAME_DEFAULT "PROGDIR:igame.iff"
-#define FILENAME_HOTKEY 'f'
-#define QUALITY_HOTKEY 'q'
-#define QUALITY_DEFAULT MUIV_Guigfx_Quality_Low
-#define SCALEUP_HOTKEY 'u'
-#define SCALEUP_DEFAULT FALSE
-#define SCALEDOWN_HOTKEY 'd'
-#define SCALEDOWN_DEFAULT TRUE
-#define TRANSMASK_HOTKEY 'm'
-#define TRANSMASK_DEFAULT FALSE
-#define TRANSCOLOR_HOTKEY 'c'
-#define TRANSCOLOR_DEFAULT FALSE
-#define TRANSRGB_HOTKEY 'r'
-#define TRANSRGB_DEFAULT (0x0)
-#define PICASPECT_DEFAULT TRUE
-#define PICASPECT_HOTKEY 'a'
-#define SCREENASPECT_DEFAULT TRUE
-#define SCREENASPECT_HOTKEY 's'
-
-#define SCALEMODEMASK(u,d,p,s) (((u)?GGSMF_SCALEUP:0)|((d)?GGSMF_SCALEDOWN:0)|((p)?GGSMF_KEEPASPECT_PICTURE:0)|((s)?GGSMF_KEEPASPECT_SCREEN:0))
 
 static CONST_STRPTR GetMBString(CONST_STRPTR ref)
 {
@@ -301,13 +276,13 @@ struct ObjApp * CreateApp(void)
 
 			if (NOGUIGFX) {
 				object->IM_GameImage_0 = MUI_NewObject("Dtpic.mui",
-					MUIA_Dtpic_Name, "PROGDIR:igame.iff",
+					MUIA_Dtpic_Name, DEFAULT_SCREENSHOT_FILE,
 					MUIA_Frame, MUIV_Frame_ImageButton,
 					End;
 			}
 			else {
 				object->IM_GameImage_0 = GuigfxObject,
-					MUIA_Guigfx_FileName, FILENAME_DEFAULT,
+					MUIA_Guigfx_FileName, DEFAULT_SCREENSHOT_FILE,
 					MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
 					MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
 					MUIA_Frame, MUIV_Frame_ImageButton,

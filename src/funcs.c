@@ -39,13 +39,7 @@
 #include <clib/graphics_protos.h>
 
 #include "iGameGUI.h"
-
-#define MUIA_Dtpic_Name 0x80423d72
-#define TEMPLATE "SCREENSHOT/K"
-#define DEFAULT_GAMELIST_FILE "PROGDIR:gameslist"
-#define DEFAULT_REPOS_FILE "PROGDIR:repos.prefs"
-#define DEFAULT_GENRES_FILE "PROGDIR:genres"
-#define DEFAULT_SCREENSHOT_FILE "PROGDIR:igame.iff"
+#include "iGameExtern.h"
 
 extern char* strdup(const char* s);
 extern struct ObjApp* app;
