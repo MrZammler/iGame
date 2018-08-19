@@ -118,14 +118,14 @@ struct ObjApp * CreateApp(void)
 	static const struct Hook MenuExportListHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)export_list, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook MenuDuplicateHook = { { NULL,NULL }, (HOOKFUNC)menu_duplicate, NULL, NULL };
+	static const struct Hook MenuDuplicateHook = { { NULL,NULL }, (HOOKFUNC)game_duplicate, NULL, NULL };
 #else
-	static const struct Hook MenuDuplicateHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)menu_duplicate, NULL };
+	static const struct Hook MenuDuplicateHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_duplicate, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook MenuDeleteHook = { { NULL,NULL }, (HOOKFUNC)menu_delete, NULL, NULL };
+	static const struct Hook MenuDeleteHook = { { NULL,NULL }, (HOOKFUNC)game_delete, NULL, NULL };
 #else
-	static const struct Hook MenuDeleteHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)menu_delete, NULL };
+	static const struct Hook MenuDeleteHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_delete, NULL };
 #endif
 #if defined(__amigaos4__)
 	static const struct Hook PropertiesOKButtonHook = { { NULL,NULL }, (HOOKFUNC)game_properties_ok, NULL, NULL };
@@ -143,9 +143,9 @@ struct ObjApp * CreateApp(void)
 	static const struct Hook LaunchGameHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)launch_game, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook MenuShowHideHiddenHook = { { NULL,NULL }, (HOOKFUNC)menu_show_hidden, NULL, NULL };
+	static const struct Hook MenuShowHideHiddenHook = { { NULL,NULL }, (HOOKFUNC)list_show_hidden, NULL, NULL };
 #else
-	static const struct Hook MenuShowHideHiddenHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)menu_show_hidden, NULL };
+	static const struct Hook MenuShowHideHiddenHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)list_show_hidden, NULL };
 #endif
 #if defined(__amigaos4__)
 	static const struct Hook AppStartHook = { { NULL,NULL }, (HOOKFUNC)app_start, NULL, NULL };
@@ -153,14 +153,14 @@ struct ObjApp * CreateApp(void)
 	static const struct Hook AppStartHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)app_start, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook MenuPropertiesHook = { { NULL,NULL }, (HOOKFUNC)menu_game_properties, NULL, NULL };
+	static const struct Hook MenuPropertiesHook = { { NULL,NULL }, (HOOKFUNC)game_properties, NULL, NULL };
 #else
-	static const struct Hook MenuPropertiesHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)menu_game_properties, NULL };
+	static const struct Hook MenuPropertiesHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_properties, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook MenuAddNonWhdloadHook = { { NULL,NULL }, (HOOKFUNC)menu_add_non_whdload, NULL, NULL };
+	static const struct Hook MenuAddNonWhdloadHook = { { NULL,NULL }, (HOOKFUNC)add_non_whdload, NULL, NULL };
 #else
-	static const struct Hook MenuAddNonWhdloadHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)menu_add_non_whdload, NULL };
+	static const struct Hook MenuAddNonWhdloadHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)add_non_whdload, NULL };
 #endif
 #if defined(__amigaos4__)
 	static const struct Hook GameClickHook = { { NULL,NULL }, (HOOKFUNC)game_click, NULL, NULL };

@@ -75,8 +75,8 @@ void save_list(int check_exists);
 void save_list_as();
 void export_list();
 void open_list();
-void menu_duplicate();
-void menu_delete();
+void game_duplicate();
+void game_delete();
 void setting_filter_use_enter_changed();
 void setting_save_stats_on_exit_changed();
 void setting_smart_spaces_changed();
@@ -1020,7 +1020,7 @@ void repo_stop()
 }
 
 //shows and inits the GameProperties Window
-void menu_game_properties()
+void game_properties()
 {
 	char* str = NULL;
 	char helperstr[512];
@@ -1391,7 +1391,7 @@ void game_properties_ok()
 	save_list(0);
 }
 
-void menu_show_hidden()
+void list_show_hidden()
 {
 	char helperstr[50];
 
@@ -1920,12 +1920,12 @@ int getlistindex(Object* obj)
 	return index;
 }
 
-void menu_duplicate()
+void game_duplicate()
 {
 	//TODO
 }
 
-void menu_delete()
+void game_delete()
 {
 	char* str = NULL;
 
@@ -2164,7 +2164,7 @@ void read_tool_types()
 	}
 }
 
-void menu_add_non_whdload()
+void add_non_whdload()
 {
 	set(app->STR_AddTitle, MUIA_String_Contents, NULL);
 	set(app->PA_AddGame, MUIA_String_Contents, NULL);
