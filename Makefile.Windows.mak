@@ -30,17 +30,17 @@ DATE = $(shell date --iso=date)
 # Library builder settings
 ##########################################################################
 #MKLIB	 = join
-LIBFLAGS				= +aos68k -lamiga -lauto -lmieee -o
-LIBFLAGS_MOS		= +morphos -lamiga -lauto -o
+LIBFLAGS		= +aos68k -lamiga -lauto -lmieee -o
+LIBFLAGS_MOS	= +morphos -lamiga -lauto -o
 LIBFLAGS_AOS4	= +aosppc -lamiga -lauto -o
 
 ##########################################################################
 # Object files which are part of the GLFW library
 ##########################################################################
-OBJS			= src/funcs.o src/iGameGUI.o src/iGameMain.o src/Hook_utility.o src/strdup.o src/iGameStrings_cat.o
-OBJS_030		= src/funcs_030.o src/iGameGUI_030.o src/iGameMain_030.o src/strdup_030.o src/iGameStrings_cat_030.o
-OBJS_040		= src/funcs_040.o src/iGameGUI_040.o src/iGameMain_040.o src/strdup_040.o src/iGameStrings_cat_040.o
-OBJS_060		= src/funcs_060.o src/iGameGUI_060.o src/iGameMain_060.o src/strdup_060.o src/iGameStrings_cat_060.o
+OBJS		= src/funcs.o src/iGameGUI.o src/iGameMain.o src/strdup.o src/iGameStrings_cat.o
+OBJS_030	= src/funcs_030.o src/iGameGUI_030.o src/iGameMain_030.o src/strdup_030.o src/iGameStrings_cat_030.o
+OBJS_040	= src/funcs_040.o src/iGameGUI_040.o src/iGameMain_040.o src/strdup_040.o src/iGameStrings_cat_040.o
+OBJS_060	= src/funcs_060.o src/iGameGUI_060.o src/iGameMain_060.o src/strdup_060.o src/iGameStrings_cat_060.o
 OBJS_MOS	= src/funcs_MOS.o src/iGameGUI_MOS.o src/iGameMain_MOS.o src/strdup_MOS.o src/iGameStrings_cat_MOS.o
 OBJS_AOS4	= src/funcs_AOS4.o src/iGameGUI_AOS4.o src/iGameMain_AOS4.o src/strdup_AOS4.o src/iGameStrings_cat_AOS4.o
 
