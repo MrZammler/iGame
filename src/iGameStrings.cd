@@ -201,10 +201,10 @@ MSG_LA_Height (//)
 Height
 ;MUIB group
 MSG_GR_TitlesTitle (//)
-Game Titles
-;MUIB Label
-MSG_LA_TitlesFrom (//)
-Game Titles From:
+Titles
+;MUIB Radio TitleFrame
+MSG_RA_TitlesFromTitle (//)
+Titles From:
 ;MUIB Radio Entry number 0
 MSG_RA_TitlesFrom0 (//)
 Slave Contents
@@ -223,9 +223,15 @@ Save Stats on Exit
 ;MUIB Label
 MSG_LA_FilterUseEnter (//)
 Use Enter to Filter
+;MUIB Label
+MSG_LA_HideSidepanel (//)
+Hide Side panel
 ;MUIB button text
 MSG_BT_SettingsSave (//)
 Save
+;MUIB button text
+MSG_BT_SettingsUse (//)
+Use
 ;MUIB button text
 MSG_BT_SettingsCancel (//)
 Cancel

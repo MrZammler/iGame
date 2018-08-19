@@ -50,7 +50,7 @@
     Variables
 */
 
-struct FC_String iGameStrings_Strings[75] = {
+struct FC_String iGameStrings_Strings[77] = {
     { (STRPTR) "A front-end to WHDLoad", 0 },
     { (STRPTR) "Dimitris Panokostas 2018", 1 },
     { (STRPTR) "iGame", 2 },
@@ -116,16 +116,18 @@ struct FC_String iGameStrings_Strings[75] = {
     { (STRPTR) "Custom", 62 },
     { (STRPTR) "Width", 63 },
     { (STRPTR) "Height", 64 },
-    { (STRPTR) "Game Titles", 65 },
-    { (STRPTR) "Game Titles From:", 66 },
+    { (STRPTR) "Titles", 65 },
+    { (STRPTR) "Titles From:", 66 },
     { (STRPTR) "Slave Contents", 67 },
     { (STRPTR) "Directories", 68 },
     { (STRPTR) "Use Smart Spaces", 69 },
     { (STRPTR) "Misc", 70 },
     { (STRPTR) "Save Stats on Exit", 71 },
     { (STRPTR) "Use Enter to Filter", 72 },
-    { (STRPTR) "Save", 73 },
-    { (STRPTR) "Cancel", 74 }
+    { (STRPTR) "Hide Side panel", 73 },
+    { (STRPTR) "Save", 74 },
+    { (STRPTR) "Use", 75 },
+    { (STRPTR) "Cancel", 76 }
 };
 
 STATIC struct Catalog *iGameStringsCatalog = NULL;
@@ -176,7 +178,7 @@ VOID OpeniGameStringsCatalog(VOID)
 	    struct FC_String *fc;
 	    int i;
 
-	    for (i = 0, fc = iGameStrings_Strings;  i < 75;  i++, fc++) {
+	    for (i = 0, fc = iGameStrings_Strings;  i < 77;  i++, fc++) {
 		 fc->msg = GetCatalogStr(iGameStringsCatalog, fc->id, (STRPTR) fc->msg);
 	    }
 	}
@@ -279,7 +281,7 @@ VOID InitiGameStringsCatalog(STRPTR language)
 				    bytesRemaining -= 8 + (skipSize << 2);
 				    ptr += skipSize;
 
-				    for (i = 0, fc = iGameStrings_Strings;  i < 75;  i++, fc++) {
+				    for (i = 0, fc = iGameStrings_Strings;  i < 77;  i++, fc++) {
 					if (fc->id == id) {
 					    fc->msg = sptr;
 					}

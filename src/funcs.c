@@ -62,6 +62,7 @@ int NOSCREENSHOT;
 int SAVESTATSONEXIT;
 int TITLESFROMDIRS;
 int NOSMARTSPACES;
+int NOSIDEPANEL;
 int IntroPic = 0;
 
 /* function definitions */
@@ -73,6 +74,7 @@ void refresh_list(int check_exists);
 void save_list(int check_exists);
 void save_list_as();
 void export_list();
+void open_list();
 void menu_duplicate();
 void menu_delete();
 void setting_filter_use_enter_changed();
@@ -82,7 +84,9 @@ void setting_titles_from_changed();
 void setting_show_screenshot_changed();
 void setting_use_gui_gfx_changed();
 void setting_screenshot_size_changed();
+void setting_hide_side_panel_changed();
 void settings_save();
+void setttings_use();
 int hex2dec(char* hexin);
 void msg_box(char* msg);
 int get_title_from_slave(char* slave, char* title);
@@ -803,6 +807,9 @@ void game_click()
 	FILE* fp = NULL;
 
 	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
+
+	if (NOSIDEPANEL)
+		return;
 
 	if (!NOSCREENSHOT && game_title) //for some reason, game_click is called and game_title is null??
 	{
@@ -1858,6 +1865,11 @@ void export_list()
 	save_list(0);
 }
 
+void open_list()
+{
+	//TODO
+}
+
 //function to return the dec eq of a hex no.
 int hex2dec(char* hexin)
 {
@@ -1913,6 +1925,16 @@ void setting_screenshot_size_changed()
 }
 
 void settings_save()
+{
+	//TODO
+}
+
+void setttings_use()
+{
+	//TODO
+}
+
+void setting_hide_side_panel_changed()
 {
 	//TODO
 }
@@ -1989,6 +2011,7 @@ void read_tool_types()
 	SAVESTATSONEXIT = 0;
 	TITLESFROMDIRS = 0;
 	NOSMARTSPACES = 0;
+	NOSIDEPANEL = 0;
 
 	if (icon_base = (struct Library *)OpenLibrary("icon.library", 0))
 	{
@@ -2009,7 +2032,7 @@ void read_tool_types()
 
 				if (temp_tbl[1] != NULL)
 				{
-					char **temp_tbl2 = my_split((char *)(temp_tbl[1]), "x");
+					char **temp_tbl2 = my_split((char *)temp_tbl[1], "x");
 					if (temp_tbl2[0]) SS_WIDTH = atoi((char *)temp_tbl2[0]);
 					if (temp_tbl2[1]) SS_HEIGHT = atoi((char *)temp_tbl2[1]);
 
@@ -2039,35 +2062,41 @@ void read_tool_types()
 
 			if (FindToolType(disk_obj->do_ToolTypes, "NOSMARTSPACES"))
 				NOSMARTSPACES = 1;
+
+			if (FindToolType(disk_obj->do_ToolTypes, "NOSIDEPANEL"))
+				NOSIDEPANEL = 1;
 		}
 
 		CloseLibrary(icon_base);
 	}
 
-	//check screen res and adjust image box accordingly
-	if (SS_HEIGHT == -1 && SS_WIDTH == -1)
+	if (!NOSIDEPANEL)
 	{
-		get_screen_size(&screen_width, &screen_height);
-
-		//if values are ok from the previous function, and user has not provided his own values, calculate a nice size
-		if (screen_width != -1 && screen_height != -1)
+		//check screen res and adjust image box accordingly
+		if (SS_HEIGHT == -1 && SS_WIDTH == -1)
 		{
-			//for hi res (>1024x768) default values is ok
-			if (screen_width >= 800 && screen_height >= 600)
+			get_screen_size(&screen_width, &screen_height);
+
+			//if values are ok from the previous function, and user has not provided his own values, calculate a nice size
+			if (screen_width != -1 && screen_height != -1)
+			{
+				//for hi res (>1024x768) default values is ok
+				if (screen_width >= 800 && screen_height >= 600)
+				{
+					SS_HEIGHT = 128;
+					SS_WIDTH = 160;
+				}
+				else
+				{
+					SS_WIDTH = screen_width / 4.5;
+					SS_HEIGHT = screen_height / 4;
+				}
+			}
+			else
 			{
 				SS_HEIGHT = 128;
 				SS_WIDTH = 160;
 			}
-			else
-			{
-				SS_WIDTH = screen_width / 4.5;
-				SS_HEIGHT = screen_height / 4;
-			}
-		}
-		else
-		{
-			SS_HEIGHT = 128;
-			SS_WIDTH = 160;
 		}
 	}
 }

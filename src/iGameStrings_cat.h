@@ -35,7 +35,7 @@ struct FC_String {
     LONG id;
 };
 
-extern struct FC_String iGameStrings_Strings[75];
+extern struct FC_String iGameStrings_Strings[77];
 
 #define MSG_AppDescription (iGameStrings_Strings[0].msg)
 #define _MSG_AppDescription (iGameStrings_Strings+0)
@@ -169,8 +169,8 @@ extern struct FC_String iGameStrings_Strings[75];
 #define _MSG_LA_Height (iGameStrings_Strings+64)
 #define MSG_GR_TitlesTitle (iGameStrings_Strings[65].msg)
 #define _MSG_GR_TitlesTitle (iGameStrings_Strings+65)
-#define MSG_LA_TitlesFrom (iGameStrings_Strings[66].msg)
-#define _MSG_LA_TitlesFrom (iGameStrings_Strings+66)
+#define MSG_RA_TitlesFromTitle (iGameStrings_Strings[66].msg)
+#define _MSG_RA_TitlesFromTitle (iGameStrings_Strings+66)
 #define MSG_RA_TitlesFrom0 (iGameStrings_Strings[67].msg)
 #define _MSG_RA_TitlesFrom0 (iGameStrings_Strings+67)
 #define MSG_RA_TitlesFrom1 (iGameStrings_Strings[68].msg)
@@ -183,9 +183,13 @@ extern struct FC_String iGameStrings_Strings[75];
 #define _MSG_LA_SaveStatsOnExit (iGameStrings_Strings+71)
 #define MSG_LA_FilterUseEnter (iGameStrings_Strings[72].msg)
 #define _MSG_LA_FilterUseEnter (iGameStrings_Strings+72)
-#define MSG_BT_SettingsSave (iGameStrings_Strings[73].msg)
-#define _MSG_BT_SettingsSave (iGameStrings_Strings+73)
-#define MSG_BT_SettingsCancel (iGameStrings_Strings[74].msg)
-#define _MSG_BT_SettingsCancel (iGameStrings_Strings+74)
+#define MSG_LA_HideSidepanel (iGameStrings_Strings[73].msg)
+#define _MSG_LA_HideSidepanel (iGameStrings_Strings+73)
+#define MSG_BT_SettingsSave (iGameStrings_Strings[74].msg)
+#define _MSG_BT_SettingsSave (iGameStrings_Strings+74)
+#define MSG_BT_SettingsUse (iGameStrings_Strings[75].msg)
+#define _MSG_BT_SettingsUse (iGameStrings_Strings+75)
+#define MSG_BT_SettingsCancel (iGameStrings_Strings[76].msg)
+#define _MSG_BT_SettingsCancel (iGameStrings_Strings+76)
 
 #endif

@@ -34,6 +34,7 @@ extern int SS_WIDTH, SS_HEIGHT;
 extern int NOGUIGFX;
 extern int FILTERUSEENTER;
 extern int NOSCREENSHOT;
+extern int NOSIDEPANEL;
 
 #define FILENAME_DEFAULT "PROGDIR:igame.iff"
 #define FILENAME_HOTKEY 'f'
@@ -78,22 +79,28 @@ struct ObjApp * CreateApp(void)
 	APTR	GROUP_ROOT_1, GR_Genre, LA_PropertiesGenre, Space_Genre;
 	APTR	GR_PropertiesChecks, obj_aux0, obj_aux1, Space_Properties, obj_aux2;
 	APTR	obj_aux3, GR_TimesPlayed, LA_PropertiesTimesPlayed, Space_TimesPlayed;
-	APTR	GR_SlavePath, LA_PropertiesSlavePath, Space_Path, GR_Tooltypes, Space_Tooltypes;
-	APTR	GR_PropertiesButtons, Space_Buttons, GROUP_ROOT_2, GR_Path, GR_ReposButtons;
-	APTR	GROUP_ROOT_3, GR_AddGameTitle, LA_AddGameTitle, GR_AddGamePath, LA_AddGamePath;
+	APTR	GR_SlavePath, LA_PropertiesSlavePath, Space_Path, GR_Tooltypes, GR_PropertiesButtons;
+	APTR	Space_Buttons, GROUP_ROOT_2, GR_Path, GR_ReposButtons, GROUP_ROOT_3;
+	APTR	GR_AddGameTitle, LA_AddGameTitle, GR_AddGamePath, LA_AddGamePath;
 	APTR	GR_AddGameGenre, LA_AddGameGenre, Space_AddGame, GR_AddGameButtons;
 	APTR	GROUP_ROOT_4, GROUP_ROOT_Settings, Space_SettingsTop, GR_ShowScreenshots;
 	APTR	Space_ShowScreenshots, LA_ShowScreenshots, GR_Screenshots, GR_UseGuiGfx;
 	APTR	Space_UseGuiGfx, LA_UseGuiGfx, GR_ScreenshotSize, LA_ScreenshotSize;
 	APTR	Space_ScreenshotSize, GR_CustomSize, LA_Width, LA_Height, GR_Titles;
-	APTR	GR_TitlesFrom, LA_TitlesFrom, Space_TitlesFrom, GR_SmartSpaces, LA_SmartSpaces;
-	APTR	GR_Misc, GR_SaveStatsOnExit, Space_SaveStatsOnExit, LA_SaveStatsOnExit;
-	APTR	GR_FilterUseEnter, Space_FilterUseEnter, LA_FilterUseEnter, GR_SettingsButtons;
-	APTR	Space_SettingsButtons, Space_SettingsBottom;
+	APTR	GR_TitlesFrom, Space_TitlesFrom, GR_SmartSpaces, Space_SmartSpaces;
+	APTR	LA_SmartSpaces, GR_Misc, GR_SaveStatsOnExit, Space_SaveStatsOnExit;
+	APTR	LA_SaveStatsOnExit, GR_FilterUseEnter, Space_FilterUseEnter, LA_FilterUseEnter;
+	APTR	GR_HideSidepanel, Space_HideSidepanel, LA_HideSidepanel, Space_SettingsBottom;
+	APTR	GR_SettingsButtons, Space_SettingsButtons1, Space_SettingsButtons2;
 #if defined(__amigaos4__)
 	static const struct Hook MenuScanHook = { { NULL,NULL }, (HOOKFUNC)scan_repositories, NULL, NULL };
 #else
 	static const struct Hook MenuScanHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)scan_repositories, NULL };
+#endif
+#if defined(__amigaos4__)
+	static const struct Hook MenuOpenListHook = { { NULL,NULL }, (HOOKFUNC)MenuOpenList, NULL, NULL };
+#else
+	static const struct Hook MenuOpenListHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)open_list, NULL };
 #endif
 #if defined(__amigaos4__)
 	static const struct Hook MenuSaveListHook = { { NULL,NULL }, (HOOKFUNC)save_list, NULL, NULL };
@@ -225,6 +232,17 @@ struct ObjApp * CreateApp(void)
 #else
 	static const struct Hook SettingsSaveHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)settings_save, NULL };
 #endif
+#if defined(__amigaos4__)
+	static const struct Hook SettingHideSidePanelChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_hide_side_panel_changed, NULL, NULL };
+#else
+	static const struct Hook SettingHideSidePanelChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_hide_side_panel_changed, NULL };
+#endif
+#if defined(__amigaos4__)
+	static const struct Hook SetttingsUseHook = { { NULL,NULL }, (HOOKFUNC)setttings_use, NULL, NULL };
+#else
+	static const struct Hook SetttingsUseHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setttings_use, NULL };
+#endif
+
 
 	if (!(object = AllocVec(sizeof(struct ObjApp), MEMF_PUBLIC | MEMF_CLEAR)))
 		return NULL;
@@ -275,73 +293,84 @@ struct ObjApp * CreateApp(void)
 		MUIA_Listview_List, object->LV_GamesList,
 		End;
 
-	Space_Gamelist = HSpace(1);
+	if (!NOSIDEPANEL)
+	{
+		Space_Gamelist = HSpace(1);
 
-	if (!NOSCREENSHOT) {
+		if (!NOSCREENSHOT) {
 
-		if (NOGUIGFX) {
-			object->IM_GameImage_0 = MUI_NewObject("Dtpic.mui",
-				MUIA_Dtpic_Name, "PROGDIR:igame.iff",
-				MUIA_Frame, MUIV_Frame_ImageButton,
+			if (NOGUIGFX) {
+				object->IM_GameImage_0 = MUI_NewObject("Dtpic.mui",
+					MUIA_Dtpic_Name, "PROGDIR:igame.iff",
+					MUIA_Frame, MUIV_Frame_ImageButton,
+					End;
+			}
+			else {
+				object->IM_GameImage_0 = GuigfxObject,
+					MUIA_Guigfx_FileName, FILENAME_DEFAULT,
+					MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
+					MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
+					MUIA_Frame, MUIV_Frame_ImageButton,
+					MUIA_FixHeight, SS_HEIGHT,
+					MUIA_FixWidth, SS_WIDTH,
+					End;
+			}
+		}
+
+		object->Space_Sidepanel = VSpace(1);
+
+		object->LV_GenresList = ListObject,
+			MUIA_Frame, MUIV_Frame_InputList,
+			MUIA_List_Active, MUIV_List_Active_Top,
+			End;
+
+		object->LV_GenresList = ListviewObject,
+			MUIA_HelpNode, "LV_GenresList",
+			MUIA_FrameTitle, GetMBString(MSG_LV_GenresListTitle),
+			MUIA_Listview_List, object->LV_GenresList,
+			MUIA_MaxWidth, SS_WIDTH,	//keep the same width as if there was a screenshot area
+			End;
+
+		if (!NOSCREENSHOT) {
+
+			object->GR_sidepanel = GroupObject,
+				MUIA_HelpNode, "GR_sidepanel",
+				MUIA_Weight, 80,
+				MUIA_Group_Rows, 3,
+				Child, object->IM_GameImage_0,
+				Child, object->Space_Sidepanel,
+				Child, object->LV_GenresList,
 				End;
 		}
 		else {
-			object->IM_GameImage_0 = GuigfxObject,
-				MUIA_Guigfx_FileName, FILENAME_DEFAULT,
-				MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
-				MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
-				MUIA_Frame, MUIV_Frame_ImageButton,
-				MUIA_FixHeight, SS_HEIGHT,
-				MUIA_FixWidth, SS_WIDTH,
+
+			object->GR_sidepanel = GroupObject,
+				MUIA_HelpNode, "GR_sidepanel",
+				MUIA_Weight, 80,
+				MUIA_Group_Rows, 2,
+				Child, object->Space_Sidepanel,
+				Child, object->LV_GenresList,
 				End;
+
 		}
-	}
 
-	object->Space_Sidepanel = VSpace(1);
-
-	object->LV_GenresList = ListObject,
-		MUIA_Frame, MUIV_Frame_InputList,
-		MUIA_List_Active, MUIV_List_Active_Top,
-		End;
-
-	object->LV_GenresList = ListviewObject,
-		MUIA_HelpNode, "LV_GenresList",
-		MUIA_FrameTitle, GetMBString(MSG_LV_GenresListTitle),
-		MUIA_Listview_List, object->LV_GenresList,
-		MUIA_MaxWidth, SS_WIDTH,	//keep the same width as if there was a screenshot area
-		End;
-
-	if (!NOSCREENSHOT) {
-
-		object->GR_sidepanel = GroupObject,
-			MUIA_HelpNode, "GR_sidepanel",
-			MUIA_Weight, 80,
-			MUIA_Group_Rows, 3,
-			Child, object->IM_GameImage_0,
-			Child, object->Space_Sidepanel,
-			Child, object->LV_GenresList,
+		GR_main = GroupObject,
+			MUIA_HelpNode, "GR_main",
+			MUIA_Group_Columns, 3,
+			Child, object->LV_GamesList,
+			Child, Space_Gamelist,
+			Child, object->GR_sidepanel,
 			End;
 	}
-	else {
-
-		object->GR_sidepanel = GroupObject,
-			MUIA_HelpNode, "GR_sidepanel",
-			MUIA_Weight, 80,
-			MUIA_Group_Rows, 2,
-			Child, object->Space_Sidepanel,
-			Child, object->LV_GenresList,
+	else
+	{
+		GR_main = GroupObject,
+			MUIA_HelpNode, "GR_main",
+			MUIA_Group_Columns, 1,
+			Child, object->LV_GamesList,
 			End;
-
 	}
-
-	GR_main = GroupObject,
-		MUIA_HelpNode, "GR_main",
-		MUIA_Group_Columns, 3,
-		Child, object->LV_GamesList,
-		Child, Space_Gamelist,
-		Child, object->GR_sidepanel,
-		End;
-
+	
 	object->TX_Status = TextObject,
 		MUIA_Background, MUII_TextBack,
 		MUIA_Frame, MUIV_Frame_Text,
@@ -590,17 +619,14 @@ struct ObjApp * CreateApp(void)
 		MUIA_FrameTitle, GetMBString(MSG_TX_PropertiesTooltypesTitle),
 		End;
 
-	Space_Tooltypes = HVSpace;
-
 	GR_Tooltypes = GroupObject,
 		MUIA_HelpNode, "GR_Tooltypes",
 		Child, object->TX_PropertiesTooltypes,
-		Child, Space_Tooltypes,
 		End;
 
 	object->BT_PropertiesOK = SimpleButton(GetMBString(MSG_BT_PropertiesOK));
 
-	Space_Buttons = HSpace(1);
+	Space_Buttons = VSpace(1);
 
 	object->BT_PropertiesCancel = SimpleButton(GetMBString(MSG_BT_PropertiesCancel));
 
@@ -673,25 +699,9 @@ struct ObjApp * CreateApp(void)
 		MUIA_Listview_List, object->LV_GameRepositories,
 		End;
 
-	object->BT_RemoveRepo = TextObject,
-		ButtonFrame,
-		MUIA_Weight, 50,
-		MUIA_Background, MUII_ButtonBack,
-		MUIA_Text_Contents, GetMBString(MSG_BT_RemoveRepo),
-		MUIA_Text_PreParse, "\033c",
-		MUIA_HelpNode, "BT_RepoRemove",
-		MUIA_InputMode, MUIV_InputMode_RelVerify,
-		End;
+	object->BT_RemoveRepo = SimpleButton(GetMBString(MSG_BT_RemoveRepo));
 
-	object->BT_CloseRepoWindow = TextObject,
-		ButtonFrame,
-		MUIA_Weight, 50,
-		MUIA_Background, MUII_ButtonBack,
-		MUIA_Text_Contents, GetMBString(MSG_BT_CloseRepoWindow),
-		MUIA_Text_PreParse, "\033c",
-		MUIA_HelpNode, "BT_RepoClose",
-		MUIA_InputMode, MUIV_InputMode_RelVerify,
-		End;
+	object->BT_CloseRepoWindow = SimpleButton(GetMBString(MSG_BT_CloseRepoWindow));
 
 	GR_ReposButtons = GroupObject,
 		MUIA_HelpNode, "GR_ReposButtons",
@@ -772,25 +782,9 @@ struct ObjApp * CreateApp(void)
 
 	Space_AddGame = VSpace(10);
 
-	object->BT_AddGameOK = TextObject,
-		ButtonFrame,
-		MUIA_Weight, 50,
-		MUIA_Background, MUII_ButtonBack,
-		MUIA_Text_Contents, GetMBString(MSG_BT_AddGameOK),
-		MUIA_Text_PreParse, "\033c",
-		MUIA_HelpNode, "BT_AddGameOk",
-		MUIA_InputMode, MUIV_InputMode_RelVerify,
-		End;
+	object->BT_AddGameOK = SimpleButton(GetMBString(MSG_BT_AddGameOK));
 
-	object->BT_AddGameCancel = TextObject,
-		ButtonFrame,
-		MUIA_Weight, 50,
-		MUIA_Background, MUII_ButtonBack,
-		MUIA_Text_Contents, GetMBString(MSG_BT_AddGameCancel),
-		MUIA_Text_PreParse, "\033c",
-		MUIA_HelpNode, "BT_AddGameCancel",
-		MUIA_InputMode, MUIV_InputMode_RelVerify,
-		End;
+	object->BT_AddGameCancel = SimpleButton(GetMBString(MSG_BT_AddGameCancel));
 
 	GR_AddGameButtons = GroupObject,
 		MUIA_HelpNode, "GR_AddGameButtons",
@@ -943,25 +937,14 @@ struct ObjApp * CreateApp(void)
 		Child, GR_CustomSize,
 		End;
 
-	LA_TitlesFrom = Label(GetMBString(MSG_LA_TitlesFrom));
-
-	Space_TitlesFrom = VSpace(1);
-
 	object->RA_TitlesFrom = RadioObject,
 		MUIA_Frame, MUIV_Frame_Group,
+		MUIA_FrameTitle, GetMBString(MSG_RA_TitlesFromTitle),
 		MUIA_HelpNode, "RA_TitlesFrom",
 		MUIA_Radio_Entries, object->RA_TitlesFromContent,
 		End;
 
-	GR_TitlesFrom = GroupObject,
-		MUIA_HelpNode, "GR_TitlesFrom",
-		MUIA_Group_Horiz, TRUE,
-		MUIA_Group_HorizSpacing, 5,
-		MUIA_Group_VertSpacing, 5,
-		Child, LA_TitlesFrom,
-		Child, Space_TitlesFrom,
-		Child, object->RA_TitlesFrom,
-		End;
+	Space_TitlesFrom = VSpace(1);
 
 	object->CH_SmartSpaces = ImageObject,
 		MUIA_Disabled, TRUE,
@@ -971,6 +954,8 @@ struct ObjApp * CreateApp(void)
 		MUIA_Selected, TRUE,
 		MUIA_ShowSelState, FALSE,
 		End;
+
+	Space_SmartSpaces = VSpace(1);
 
 	LA_SmartSpaces = TextObject,
 		MUIA_Text_PreParse, "\033r",
@@ -986,8 +971,18 @@ struct ObjApp * CreateApp(void)
 		MUIA_Group_HorizSpacing, 5,
 		MUIA_Group_VertSpacing, 5,
 		Child, object->CH_SmartSpaces,
+		Child, Space_SmartSpaces,
 		Child, LA_SmartSpaces,
 		End;
+
+	GR_TitlesFrom = GroupObject,
+		MUIA_HelpNode, "GR_TitlesFrom",
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
+		Child, object->RA_TitlesFrom,
+		Child, Space_TitlesFrom,
+		Child, GR_SmartSpaces,
+	End;
 
 	GR_Titles = GroupObject,
 		MUIA_HelpNode, "GR_Titles",
@@ -996,7 +991,6 @@ struct ObjApp * CreateApp(void)
 		MUIA_Group_HorizSpacing, 5,
 		MUIA_Group_VertSpacing, 5,
 		Child, GR_TitlesFrom,
-		Child, GR_SmartSpaces,
 		End;
 
 	object->CH_SaveStatsOnExit = CheckMark(FALSE);
@@ -1031,6 +1025,22 @@ struct ObjApp * CreateApp(void)
 		Child, LA_FilterUseEnter,
 		End;
 
+	object->CH_HideSidepanel = CheckMark(FALSE);
+
+	Space_HideSidepanel = VSpace(1);
+
+	LA_HideSidepanel = Label(GetMBString(MSG_LA_HideSidepanel));
+
+	GR_HideSidepanel = GroupObject,
+		MUIA_HelpNode, "GR_HideSidepanel",
+		MUIA_Group_Horiz, TRUE,
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
+		Child, object->CH_HideSidepanel,
+		Child, Space_HideSidepanel,
+		Child, LA_HideSidepanel,
+		End;
+
 	GR_Misc = GroupObject,
 		MUIA_HelpNode, "GR_Misc",
 		MUIA_Frame, MUIV_Frame_Group,
@@ -1039,11 +1049,18 @@ struct ObjApp * CreateApp(void)
 		MUIA_Group_VertSpacing, 5,
 		Child, GR_SaveStatsOnExit,
 		Child, GR_FilterUseEnter,
-		End;
+		Child, GR_HideSidepanel,
+	End;
+
+	Space_SettingsBottom = VSpace(5);
 
 	object->BT_SettingsSave = SimpleButton(GetMBString(MSG_BT_SettingsSave));
 
-	Space_SettingsButtons = VSpace(1);
+	Space_SettingsButtons1 = VSpace(1);
+
+	object->BT_SettingsUse = SimpleButton(GetMBString(MSG_BT_SettingsUse));
+
+	Space_SettingsButtons2 = VSpace(1);
 
 	object->BT_SettingsCancel = SimpleButton(GetMBString(MSG_BT_SettingsCancel));
 
@@ -1053,11 +1070,11 @@ struct ObjApp * CreateApp(void)
 		MUIA_Group_HorizSpacing, 5,
 		MUIA_Group_VertSpacing, 5,
 		Child, object->BT_SettingsSave,
-		Child, Space_SettingsButtons,
+		Child, Space_SettingsButtons1,
+		Child, object->BT_SettingsUse,
+		Child, Space_SettingsButtons2,
 		Child, object->BT_SettingsCancel,
 		End;
-
-	Space_SettingsBottom = HVSpace;
 
 	GROUP_ROOT_Settings = GroupObject,
 		MUIA_Group_HorizSpacing, 10,
@@ -1067,8 +1084,8 @@ struct ObjApp * CreateApp(void)
 		Child, GR_Screenshots,
 		Child, GR_Titles,
 		Child, GR_Misc,
-		Child, GR_SettingsButtons,
 		Child, Space_SettingsBottom,
+		Child, GR_SettingsButtons,
 		End;
 
 	object->WI_Settings = WindowObject,
@@ -1084,7 +1101,7 @@ struct ObjApp * CreateApp(void)
 		MUIA_Application_Version, VERSION,
 		MUIA_Application_Copyright, GetMBString(MSG_AppCopyright),
 		MUIA_Application_Description, GetMBString(MSG_AppDescription),
-		MUIA_Application_HelpFile, "igame.guide",
+		MUIA_Application_HelpFile, "iGame.guide",
 		SubWindow, object->WI_MainWindow,
 		SubWindow, object->WI_Properties,
 		SubWindow, object->WI_GameRepositories,
@@ -1093,10 +1110,11 @@ struct ObjApp * CreateApp(void)
 		SubWindow, object->WI_Settings,
 		End;
 
+
 	if (!object->App)
 	{
 		FreeVec(object);
-		return(NULL);
+		return NULL;
 	}
 
 	DoMethod(object->App,
@@ -1112,6 +1130,13 @@ struct ObjApp * CreateApp(void)
 		2,
 		MUIM_CallHook, &AppStartHook
 	);
+
+	DoMethod(object->App,
+		MUIM_Notify, MUIA_Application_Iconified, FALSE,
+		object->WI_MainWindow,
+		3,
+		MUIM_Set, MUIA_Window_ActiveObject, object->LV_GamesList
+		);
 
 	DoMethod(MNlabelScan,
 		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
@@ -1133,6 +1158,13 @@ struct ObjApp * CreateApp(void)
 		2,
 		MUIM_CallHook, &MenuShowHideHiddenHook
 	);
+
+	DoMethod(MNMainOpenList,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &MenuOpenListHook
+		);
 
 	DoMethod(MNMainSaveList,
 		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
@@ -1230,7 +1262,7 @@ struct ObjApp * CreateApp(void)
 
 		DoMethod(object->STR_Filter,
 			MUIM_Notify, MUIA_String_Contents, MUIV_EveryTime,
-			object->STR_Filter,
+		object->App,
 			2,
 			MUIM_CallHook, &FilterChangeHook
 		);
@@ -1246,17 +1278,17 @@ struct ObjApp * CreateApp(void)
 	}
 
 	DoMethod(object->LV_GamesList,
-		MUIM_Notify, MUIA_Listview_DoubleClick, TRUE,
-		object->LV_GamesList,
-		2,
-		MUIM_CallHook, &LaunchGameHook
-	);
-
-	DoMethod(object->LV_GamesList,
 		MUIM_Notify, MUIA_List_Active, MUIV_EveryTime,
 		object->LV_GamesList,
 		2,
 		MUIM_CallHook, &GameClickHook
+	);
+
+	DoMethod(object->LV_GamesList,
+		MUIM_Notify, MUIA_Listview_DoubleClick, TRUE,
+		object->LV_GamesList,
+		2,
+		MUIM_CallHook, &LaunchGameHook
 	);
 
 	DoMethod(object->LV_GenresList,
@@ -1313,7 +1345,7 @@ struct ObjApp * CreateApp(void)
 
 	DoMethod(object->WI_GameRepositories,
 		MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
-		object->WI_GameRepositories,
+		object->App,
 		2,
 		MUIM_CallHook, &RepoStopHook
 	);
@@ -1495,6 +1527,13 @@ struct ObjApp * CreateApp(void)
 		MUIM_CallHook, &SettingFilterUseEnterChangedHook
 	);
 
+	DoMethod(object->CH_HideSidepanel,
+		MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &SettingHideSidePanelChangedHook
+	);
+
 	DoMethod(object->BT_SettingsSave,
 		MUIM_Notify, MUIA_Pressed, FALSE,
 		object->App,
@@ -1507,6 +1546,13 @@ struct ObjApp * CreateApp(void)
 		object->WI_Settings,
 		3,
 		MUIM_Set, MUIA_Window_Open, FALSE
+	);
+
+	DoMethod(object->BT_SettingsUse,
+		MUIM_Notify, MUIA_Pressed, FALSE,
+		object->App,
+		2,
+		MUIM_CallHook, &SetttingsUseHook
 	);
 
 	DoMethod(object->BT_SettingsCancel,
@@ -1526,7 +1572,9 @@ struct ObjApp * CreateApp(void)
 		object->CH_SmartSpaces,
 		object->CH_SaveStatsOnExit,
 		object->CH_FilterUseEnter,
+		object->CH_HideSidepanel,
 		object->BT_SettingsSave,
+		object->BT_SettingsUse,
 		object->BT_SettingsCancel,
 		0
 	);
