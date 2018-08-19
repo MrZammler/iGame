@@ -69,22 +69,6 @@ int get_genre(char* title, char* genre);
 void get_path(char* title, char* path);
 void followthread(BPTR lock, int tab_level);
 void refresh_list(int check_exists);
-void save_list(int check_exists);
-void save_list_as();
-void export_list();
-void open_list();
-void game_duplicate();
-void game_delete();
-void setting_filter_use_enter_changed();
-void setting_save_stats_on_exit_changed();
-void setting_smart_spaces_changed();
-void setting_titles_from_changed();
-void setting_show_screenshot_changed();
-void setting_use_gui_gfx_changed();
-void setting_screenshot_size_changed();
-void setting_hide_side_panel_changed();
-void settings_save();
-void setttings_use();
 int hex2dec(char* hexin);
 void msg_box(char* msg);
 int get_title_from_slave(char* slave, char* title);
@@ -1379,7 +1363,6 @@ void game_properties_ok()
 
 	DoMethod(app->LV_GamesList, MUIM_List_Redraw, MUIV_List_Redraw_Active);
 	set(app->WI_Properties, MUIA_Window_Open, FALSE);
-	//RefreshList();
 	save_list(0);
 }
 
@@ -1408,11 +1391,7 @@ void list_show_hidden()
 			}
 		}
 
-		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
-
-		sprintf(helperstr, "Total %d games.", total_hidden);
-		set(app->TX_Status, MUIA_Text_Contents, helperstr);
-
+		status_show_total();
 		showing_hidden = 1;
 	}
 	else
@@ -1739,18 +1718,19 @@ void save_list(const int check_exists)
 void save_list_as()
 {
 	//TODO implement a file requester
-	save_list(0);
+	msg_box("Not yet implemented...");
 }
 
 void export_list()
 {
 	//TODO implement this
-	save_list(0);
+	msg_box("Not yet implemented...");
 }
 
 void open_list()
 {
 	//TODO
+	msg_box("Not yet implemented...");
 }
 
 //function to return the dec eq of a hex no.
@@ -1782,7 +1762,6 @@ void game_duplicate()
 	}
 
 	int found = 0;
-	games_list* source_game;
 	for (item_games = games; item_games != NULL; item_games = item_games->next)
 	{
 		if (!strcmp(str, item_games->title) && item_games->deleted != 1)
@@ -2081,7 +2060,7 @@ void add_non_whdload()
 
 void non_whdload_ok()
 {
-	char *str, *str_title, helperstr[200];
+	char *str, *str_title;
 
 	get(app->PA_AddGame, MUIA_String_Contents, &str);
 	get(app->STR_AddTitle, MUIA_String_Contents, &str_title);
@@ -2121,9 +2100,8 @@ void non_whdload_ok()
 	}
 
 	DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-
-	sprintf(helperstr, "Total %d games.", ++total_games);
-	set(app->TX_Status, MUIA_Text_Contents, helperstr);
+	total_games++;
+	status_show_total();
 
 	save_list(0);
 
