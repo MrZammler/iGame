@@ -110,6 +110,7 @@ typedef struct games
 	int last_played; //indicates whether this one was the last game played
 	int exists; //indicates whether this game still exists after a scan
 	int hidden; //game is hidden from normal operation
+	int deleted; // indicates this entry should be deleted when the list is saved
 	struct games* next;
 } games_list;
 
@@ -144,7 +145,7 @@ void add_games_to_listview()
 	total_games = 0;
 	for (item_games = games; item_games != NULL; item_games = item_games->next)
 	{
-		if (item_games->hidden != 1)
+		if (item_games->hidden != 1 && item_games->deleted != 1)
 		{
 			total_games++;
 			DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
@@ -162,12 +163,12 @@ void load_games_list()
 	{
 		do
 		{
-			if (fgets(file_line, sizeof file_line, fpgames) == NULL) 
+			if (fgets(file_line, sizeof file_line, fpgames) == NULL)
 				break;
 
 			file_line[strlen(file_line) - 1] = '\0';
 
-			if (strlen(file_line) == 0) 
+			if (strlen(file_line) == 0)
 				continue;
 
 			item_games = (games_list *)calloc(1, sizeof(games_list));
@@ -177,15 +178,16 @@ void load_games_list()
 			{
 				item_games->index = 0;
 				item_games->exists = 0;
+				item_games->deleted = 0;
 
 				do
 				{
-					if (fgets(file_line, sizeof file_line, fpgames) == NULL) 
+					if (fgets(file_line, sizeof file_line, fpgames) == NULL)
 						break;
 
 					file_line[strlen(file_line) - 1] = '\0';
 
-					if (strlen(file_line) == 0) 
+					if (strlen(file_line) == 0)
 						break;
 
 					//this is to make sure that gameslist goes ok from 1.2 to 1.3
@@ -356,17 +358,20 @@ void list_show_all(char* str)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
-			strcpy(helper, item_games->title);
-			const int length = strlen(helper);
-			for (int i = 0; i <= length - 1; i++) helper[i] = tolower(helper[i]);
-
-			if (strstr(helper, (char *)str))
+			if (item_games->deleted != 1)
 			{
-				if (item_games->hidden != 1)
+				strcpy(helper, item_games->title);
+				const int length = strlen(helper);
+				for (int i = 0; i <= length - 1; i++) helper[i] = tolower(helper[i]);
+
+				if (strstr(helper, (char *)str))
 				{
-					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title,
-					         MUIV_List_Insert_Sorted);
-					total_games++;
+					if (item_games->hidden != 1)
+					{
+						DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title,
+							MUIV_List_Insert_Sorted);
+						total_games++;
+					}
 				}
 			}
 		}
@@ -386,14 +391,17 @@ void list_show_favorites(char* str)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
-			strcpy(helper, item_games->title);
-			const int length = strlen(helper);
-			for (int i = 0; i <= length - 1; i++) helper[i] = tolower(helper[i]);
-
-			if (item_games->favorite == 1 && item_games->hidden != 1 && strstr(helper, (char *)str))
+			if (item_games->deleted != 1)
 			{
-				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-				total_games++;
+				strcpy(helper, item_games->title);
+				const int length = strlen(helper);
+				for (int i = 0; i <= length - 1; i++) helper[i] = tolower(helper[i]);
+
+				if (item_games->favorite == 1 && item_games->hidden != 1 && strstr(helper, (char *)str))
+				{
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+					total_games++;
+				}
 			}
 		}
 	}
@@ -411,14 +419,17 @@ void list_show_last_played(char* str)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
-			strcpy(helper, item_games->title);
-			const int length = strlen(helper);
-			for (int i = 0; i <= length - 1; i++) helper[i] = tolower(helper[i]);
-
-			if (item_games->last_played == 1 && strstr(helper, (char *)str))
+			if (item_games->deleted != 1)
 			{
-				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-				total_games++;
+				strcpy(helper, item_games->title);
+				const int length = strlen(helper);
+				for (int i = 0; i <= length - 1; i++) helper[i] = tolower(helper[i]);
+
+				if (item_games->last_played == 1 && strstr(helper, (char *)str))
+				{
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+					total_games++;
+				}
 			}
 		}
 	}
@@ -437,25 +448,28 @@ void list_show_most_played(char* str)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
-			strcpy(helper, item_games->title);
-			const int length = strlen(helper);
-
-			for (int i = 0; i <= length - 1; i++) 
-				helper[i] = tolower(helper[i]);
-
-			if (item_games->times_played && strstr(helper, (char *)str))
+			if (item_games->deleted != 1)
 			{
-				if (item_games->times_played >= max && item_games->hidden != 1)
+				strcpy(helper, item_games->title);
+				const int length = strlen(helper);
+
+				for (int i = 0; i <= length - 1; i++)
+					helper[i] = tolower(helper[i]);
+
+				if (item_games->times_played && strstr(helper, (char *)str))
 				{
-					max = item_games->times_played;
-					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Top);
-					total_games++;
-				}
-				else
-				{
-					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title,
-					         MUIV_List_Insert_Bottom);
-					total_games++;
+					if (item_games->times_played >= max && item_games->hidden != 1)
+					{
+						max = item_games->times_played;
+						DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Top);
+						total_games++;
+					}
+					else
+					{
+						DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title,
+							MUIV_List_Insert_Bottom);
+						total_games++;
+					}
 				}
 			}
 		}
@@ -474,16 +488,19 @@ void list_show_never_played(char* str)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
-			strcpy(helper, item_games->title);
-			const int length = strlen(helper);
-
-			for (int i = 0; i <= length - 1; i++) 
-				helper[i] = tolower(helper[i]);
-
-			if (item_games->times_played == 0 && item_games->hidden != 1 && strstr(helper, (char *)str))
+			if (item_games->deleted != 1)
 			{
-				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-				total_games++;
+				strcpy(helper, item_games->title);
+				const int length = strlen(helper);
+
+				for (int i = 0; i <= length - 1; i++)
+					helper[i] = tolower(helper[i]);
+
+				if (item_games->times_played == 0 && item_games->hidden != 1 && strstr(helper, (char *)str))
+				{
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+					total_games++;
+				}
 			}
 		}
 	}
@@ -502,15 +519,18 @@ void list_show_filtered(char* str, char* str_gen)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
-			strcpy(helper, item_games->title);
-			const int length = strlen(helper);
-			for (int i = 0; i <= length - 1; i++) 
-				helper[i] = tolower(helper[i]);
-
-			if (!strcmp(item_games->genre, str_gen) && item_games->hidden != 1 && strstr(helper, (char *)str))
+			if (item_games->deleted != 1)
 			{
-				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-				total_games++;
+				strcpy(helper, item_games->title);
+				const int length = strlen(helper);
+				for (int i = 0; i <= length - 1; i++)
+					helper[i] = tolower(helper[i]);
+
+				if (!strcmp(item_games->genre, str_gen) && item_games->hidden != 1 && strstr(helper, (char *)str))
+				{
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+					total_games++;
+				}
 			}
 		}
 	}
@@ -519,14 +539,14 @@ void list_show_filtered(char* str, char* str_gen)
 
 void filter_change()
 {
-	char *str = NULL;
-	char *str_gen = NULL;
+	char* str = NULL;
+	char* str_gen = NULL;
 
 	get(app->STR_Filter, MUIA_String_Contents, &str);
 	DoMethod(app->LV_GenresList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str_gen);
 
-	if (str && strlen(str) != 0) 
-		for (int i = 0; i <= strlen((char *)str) - 1; i++) 
+	if (str && strlen(str) != 0)
+		for (int i = 0; i <= strlen((char *)str) - 1; i++)
 			str[i] = tolower(str[i]);
 
 	if (str_gen == NULL || !strcmp(str_gen, "--Show All--"))
@@ -581,15 +601,15 @@ void launch_game()
 	naked_path[k] = '\0';
 
 	int length = strlen(path);
-	for (k = i + 1; k <=  length - 1; k++)
+	for (k = i + 1; k <= length - 1; k++)
 	{
 		slave[z] = path[k];
 		z++;
 	}
 
 	slave[z] = '\0';
-	 length = strlen(slave);
-	for (i = 0; i <=  length - 1; i++) slave[i] = tolower(slave[i]);
+	length = strlen(slave);
+	for (i = 0; i <= length - 1; i++) slave[i] = tolower(slave[i]);
 
 	if (strstr(slave, ".slave"))
 	{
@@ -600,9 +620,9 @@ void launch_game()
 	const BPTR lock = Lock(naked_path, ACCESS_READ);
 	CurrentDir(lock);
 
-	if (whdload == 1) 
+	if (whdload == 1)
 		sprintf(exec, "whdload ");
-	else 
+	else
 		strcpy(exec, slave);
 
 	//tooltypes only for whdload games
@@ -650,7 +670,7 @@ void launch_game()
 							continue;
 						}
 
-						for (char **tool_types = (char **)disk_obj->do_ToolTypes; tool_type = *tool_types; ++tool_types)
+						for (char** tool_types = (char **)disk_obj->do_ToolTypes; tool_type = *tool_types; ++tool_types)
 						{
 							if (!strncmp(tool_type, "IM", 2)) continue;
 							if (tool_type[0] == ' ') continue;
@@ -661,7 +681,7 @@ void launch_game()
 
 							/* Must check here for numerical values */
 							/* Those (starting with $ should be transformed to dec from hex) */
-							char **temp_tbl = my_split((char *)(tool_type), "=");
+							char** temp_tbl = my_split((char *)(tool_type), "=");
 							if (temp_tbl == NULL || temp_tbl[0] == NULL || !strcmp((char *)temp_tbl[0], " ") || !strcmp(
 								(char *)temp_tbl[0], ""))
 							{
@@ -803,7 +823,7 @@ void strip_path(char* path, char* naked_path)
 
 void game_click()
 {
-	char *game_title = NULL;
+	char* game_title = NULL;
 	FILE* fp = NULL;
 
 	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
@@ -900,7 +920,7 @@ void game_click()
 			}
 		}
 
-		if (fp) 
+		if (fp)
 			fclose(fp);
 	}
 }
@@ -910,10 +930,13 @@ int get_genre(char* title, char* genre)
 {
 	for (item_games = games; item_games != NULL; item_games = item_games->next)
 	{
-		if (!strcmp(title, item_games->title))
+		if (item_games->deleted != 1)
 		{
-			strcpy(genre, item_games->genre);
-			break;
+			if (!strcmp(title, item_games->title))
+			{
+				strcpy(genre, item_games->genre);
+				break;
+			}
 		}
 	}
 
@@ -924,10 +947,13 @@ void get_path(char* title, char* path)
 {
 	for (item_games = games; item_games != NULL; item_games = item_games->next)
 	{
-		if (!strcmp(title, item_games->title))
+		if (item_games->deleted != 1)
 		{
-			strcpy(path, item_games->path);
-			break;
+			if (!strcmp(title, item_games->title))
+			{
+				strcpy(path, item_games->path);
+				break;
+			}
 		}
 	}
 }
@@ -1023,10 +1049,13 @@ void menu_game_properties()
 
 	for (item_games = games; item_games != NULL; item_games = item_games->next)
 	{
-		if (!strcmp(str, item_games->title))
+		if (item_games->deleted != 1)
 		{
-			found = 1;
-			break;
+			if (!strcmp(str, item_games->title))
+			{
+				found = 1;
+				break;
+			}
 		}
 	}
 
@@ -1088,7 +1117,7 @@ void menu_game_properties()
 			//one of them should be the game's project icon.
 
 			/*  allocate space for a FileInfoBlock */
-			struct FileInfoBlock * m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
+			struct FileInfoBlock* m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
 
 			int success = Examine(lock, m);
 			if (m->fib_DirEntryType <= 0)
@@ -1126,7 +1155,7 @@ void menu_game_properties()
 							continue;
 						}
 
-						for (char **tool_types = (char **)disk_obj->do_ToolTypes; tool_type = *tool_types; ++tool_types)
+						for (char** tool_types = (char **)disk_obj->do_ToolTypes; tool_type = *tool_types; ++tool_types)
 						{
 							if (!strncmp(tool_type, "IM", 2)) continue;
 
@@ -1264,7 +1293,7 @@ void game_properties_ok()
 			//one of them should be the game's project icon.
 
 			/*  allocate space for a FileInfoBlock */
-			struct FileInfoBlock * m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
+			struct FileInfoBlock* m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
 
 			int success = Examine(lock, m);
 			if (m->fib_DirEntryType <= 0)
@@ -1318,15 +1347,16 @@ void game_properties_ok()
 							if (gamestooltypes[i] == '\n') old_tool_type_count++;
 						}
 
-						for (char **tool_types = (char **)disk_obj->do_ToolTypes; tool_type = *tool_types; ++tool_types)
+						for (char** tool_types = (char **)disk_obj->do_ToolTypes; tool_type = *tool_types; ++tool_types)
 						{
 							old_real_tool_type_count++;
 						}
 
-						unsigned char **new_tool_types = AllocVec(new_tool_type_count * sizeof(char *), MEMF_FAST | MEMF_CLEAR);
-						unsigned char **newptr = new_tool_types;
+						unsigned char** new_tool_types = AllocVec(new_tool_type_count * sizeof(char *),
+						                                          MEMF_FAST | MEMF_CLEAR);
+						unsigned char** newptr = new_tool_types;
 
-						char **temp_tbl = my_split((char *)tools, "\n");
+						char** temp_tbl = my_split((char *)tools, "\n");
 						if (temp_tbl == NULL || temp_tbl[0] == NULL || !strcmp((char *)temp_tbl[0], " ") || !strcmp((
 							unsigned char *)temp_tbl[0], ""))
 						{
@@ -1378,7 +1408,7 @@ void menu_show_hidden()
 			/* Find the entries in Games and update the list */
 			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				if (item_games->hidden == 1)
+				if (item_games->hidden == 1 && item_games->deleted != 1)
 				{
 					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
 					total_hidden++;
@@ -1431,7 +1461,7 @@ void genres_click()
 			/* Find the entries in Games and update the list */
 			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				if (item_games->favorite == 1 && item_games->hidden != 1)
+				if (item_games->favorite == 1 && item_games->hidden != 1 && item_games->deleted != 1)
 				{
 					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
 					mini_totals++;
@@ -1454,7 +1484,7 @@ void genres_click()
 			/* Find the entries in Games and update the list */
 			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				if (item_games->last_played == 1)
+				if (item_games->last_played == 1 && item_games->deleted != 1)
 				{
 					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
 					break;
@@ -1475,7 +1505,7 @@ void genres_click()
 			{
 				if (item_games->times_played)
 				{
-					if (item_games->times_played >= max && item_games->hidden != 1)
+					if (item_games->times_played >= max && item_games->hidden != 1 && item_games->deleted != 1)
 					{
 						max = item_games->times_played;
 						//sprintf(helper, "%ld - %s", item_games->TimesPlayed, item_games->Title);
@@ -1511,7 +1541,7 @@ void genres_click()
 		{
 			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				if (item_games->times_played == 0)
+				if (item_games->times_played == 0 && item_games->deleted != 1)
 				{
 					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Top);
 					mini_totals++;
@@ -1535,7 +1565,7 @@ void genres_click()
 			/* Find the entries in Games and update the list */
 			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				if (!strcmp(item_games->genre, str) && item_games->hidden != 1)
+				if (!strcmp(item_games->genre, str) && item_games->hidden != 1 && item_games->deleted != 1)
 				{
 					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
 					mini_totals++;
@@ -1570,9 +1600,9 @@ char** my_split(char* str, char* spl)
 
 	int count = 0;
 
-	char * fptr = str;
+	char* fptr = str;
 	const int spl_len = strlen(spl);
-	char * sptr = strstr(fptr, spl);
+	char* sptr = strstr(fptr, spl);
 	while (sptr)
 	{
 		i = sptr - fptr;
@@ -1613,7 +1643,7 @@ void followthread(BPTR lock, int tab_level)
 	//CurrentDir(lock);
 
 	/*  allocate space for a FileInfoBlock */
-	struct FileInfoBlock * m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
+	struct FileInfoBlock* m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
 
 	int success = Examine(lock, m);
 	if (m->fib_DirEntryType <= 0)
@@ -1695,7 +1725,7 @@ void followthread(BPTR lock, int tab_level)
 						}
 					}
 				}
-				else 
+				else
 				{
 					// Default behavior: set Titles by the .slave contents
 					if (get_title_from_slave(fullpath, item_games->title))
@@ -1763,7 +1793,7 @@ void refresh_list(const int check_exists)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
-			if (strlen(item_games->path) != 0 && item_games->hidden != 1)
+			if (strlen(item_games->path) != 0 && item_games->hidden != 1 && item_games->deleted != 1)
 			{
 				total_games++;
 				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
@@ -1774,7 +1804,7 @@ void refresh_list(const int check_exists)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
-			if (strlen(item_games->path) != 0 && item_games->hidden != 1 && item_games->exists == 1)
+			if (strlen(item_games->path) != 0 && item_games->hidden != 1 && item_games->exists == 1 && item_games->deleted != 1)
 			{
 				total_games++;
 				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
@@ -1810,10 +1840,30 @@ void save_list(const int check_exists)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
-			//printf("Saving: %s\n", item_games->Title);
-			if (check_exists == 1)
+			if (item_games->deleted != 1)
 			{
-				if (item_games->exists == 1)
+				//printf("Saving: %s\n", item_games->Title);
+				if (check_exists == 1)
+				{
+					if (item_games->exists == 1)
+					{
+						fprintf(fpgames, "index=%d\n", item_games->index);
+						fprintf(fpgames, "title=%s\n", item_games->title);
+						fprintf(fpgames, "genre=%s\n", item_games->genre);
+						fprintf(fpgames, "path=%s\n", item_games->path);
+						fprintf(fpgames, "favorite=%d\n", item_games->favorite);
+						fprintf(fpgames, "timesplayed=%d\n", item_games->times_played);
+						fprintf(fpgames, "lastplayed=%d\n", item_games->last_played);
+						fprintf(fpgames, "hidden=%d\n\n", item_games->hidden);
+
+						//fflush(fpgames);
+					}
+					else
+					{
+						strcpy(item_games->path, "");
+					}
+				}
+				else
 				{
 					fprintf(fpgames, "index=%d\n", item_games->index);
 					fprintf(fpgames, "title=%s\n", item_games->title);
@@ -1826,24 +1876,7 @@ void save_list(const int check_exists)
 
 					//fflush(fpgames);
 				}
-				else
-				{
-					strcpy(item_games->path, "");
-				}
-			}
-			else
-			{
-				fprintf(fpgames, "index=%d\n", item_games->index);
-				fprintf(fpgames, "title=%s\n", item_games->title);
-				fprintf(fpgames, "genre=%s\n", item_games->genre);
-				fprintf(fpgames, "path=%s\n", item_games->path);
-				fprintf(fpgames, "favorite=%d\n", item_games->favorite);
-				fprintf(fpgames, "timesplayed=%d\n", item_games->times_played);
-				fprintf(fpgames, "lastplayed=%d\n", item_games->last_played);
-				fprintf(fpgames, "hidden=%d\n\n", item_games->hidden);
-
-				//fflush(fpgames);
-			}
+			}	
 		}
 		fflush(fpgames);
 		fclose(fpgames);
@@ -1880,13 +1913,43 @@ int hex2dec(char* hexin)
 	return dec;
 }
 
+int getlistindex(Object* obj)
+{
+	int index = 0;
+	get(obj, MUIA_List_Active, &index);
+	return index;
+}
+
 void menu_duplicate()
 {
 	//TODO
 }
+
 void menu_delete()
 {
-	//TODO
+	char* str = NULL;
+
+	if (getlistindex(app->LV_GamesList) >= 0)
+	{
+		DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str);
+		for (item_games = games; item_games != NULL; item_games = item_games->next)
+		{
+			if (!strcmp(str, item_games->title))
+			{
+				item_games->deleted = 1;
+				break;
+			}
+		}
+
+		DoMethod(app->LV_GamesList, MUIM_List_Remove, MUIV_List_Remove_Active);
+
+		total_games--;
+		status_show_total();
+	}
+	else
+	{
+		msg_box("Please select a Game from the List.");
+	}
 }
 
 void setting_filter_use_enter_changed()
@@ -1966,9 +2029,9 @@ void get_screen_size(int* width, int* height)
 			{
 				/* Using intuition.library/GetScreenDrawInfo(), we get the pen
 				* array we'll use for the screen clone the easy way. */
-				struct DrawInfo * drawinfo = GetScreenDrawInfo(wbscreen);
+				struct DrawInfo* drawinfo = GetScreenDrawInfo(wbscreen);
 
-				struct ViewPort * vp = &wbscreen->ViewPort;
+				struct ViewPort* vp = &wbscreen->ViewPort;
 				/* Use graphics.library/GetVPModeID() to get the ModeID of the
 				* Workbench screen. */
 				if ((mode_id = GetVPModeID(vp)) != (unsigned long)INVALID_ID)
@@ -2020,10 +2083,10 @@ void read_tool_types()
 		{
 			if (FindToolType(disk_obj->do_ToolTypes, "SCREENSHOT"))
 			{
-				char **tool_types = (char **)disk_obj->do_ToolTypes;
-				char *tool_type = *tool_types;
+				char** tool_types = (char **)disk_obj->do_ToolTypes;
+				char* tool_type = *tool_types;
 
-				char **temp_tbl = my_split((char *)tool_type, "=");
+				char** temp_tbl = my_split((char *)tool_type, "=");
 				if (temp_tbl == NULL || temp_tbl[0] == NULL || !strcmp(temp_tbl[0], " ") || !strcmp(temp_tbl[0], ""))
 				{
 					msg_box("Bad tooltype!");
@@ -2032,7 +2095,7 @@ void read_tool_types()
 
 				if (temp_tbl[1] != NULL)
 				{
-					char **temp_tbl2 = my_split((char *)temp_tbl[1], "x");
+					char** temp_tbl2 = my_split((char *)temp_tbl[1], "x");
 					if (temp_tbl2[0]) SS_WIDTH = atoi((char *)temp_tbl2[0]);
 					if (temp_tbl2[1]) SS_HEIGHT = atoi((char *)temp_tbl2[1]);
 
@@ -2189,7 +2252,7 @@ int get_title_from_slave(char* slave, char* title)
 
 	struct slave_info sl;
 
-	FILE * fp = fopen(slave, "rb");
+	FILE* fp = fopen(slave, "rb");
 	if (fp == NULL)
 	{
 		return 1;
@@ -2301,8 +2364,8 @@ const char* get_executable_name(int argc, char** argv)
 	{
 		// in AmigaOS, argv is a pointer to the WBStartup message
 		// when argc is zero (run under the Workbench)
-		struct WBStartup *argmsg = (struct WBStartup *)argv;
-		struct WBArg *wb_arg = argmsg->sm_ArgList;         /* head of the arg list */
+		struct WBStartup* argmsg = (struct WBStartup *)argv;
+		struct WBArg* wb_arg = argmsg->sm_ArgList; /* head of the arg list */
 
 		executable_name = wb_arg->wa_Name;
 	}
