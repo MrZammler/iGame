@@ -44,13 +44,15 @@ BOOL init_app(int argc, char** argv)
 		return FALSE;
 	}
 
+	executable_name = get_executable_name(argc, argv);
+	read_tool_types();
 	app = CreateApp();
+
 	if (!app)
 		clean_exit("Can't initialize application\n");
 	else
 	{
-		executable_name = get_executable_name(argc, argv);
-		read_tool_types();
+		
 		app_start();
 	}
 	return TRUE;
