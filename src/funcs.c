@@ -41,7 +41,11 @@
 #include "iGameGUI.h"
 
 #define MUIA_Dtpic_Name 0x80423d72
-#define TEMPLATE 	"SCREENSHOT/K"
+#define TEMPLATE "SCREENSHOT/K"
+#define DEFAULT_GAMELIST_FILE "PROGDIR:gameslist"
+#define DEFAULT_REPOS_FILE "PROGDIR:repos.prefs"
+#define DEFAULT_GENRES_FILE "PROGDIR:genres"
+#define DEFAULT_SCREENSHOT_FILE "PROGDIR:igame.iff"
 
 extern char* strdup(const char* s);
 extern struct ObjApp* app;
@@ -154,11 +158,11 @@ void add_games_to_listview()
 	status_show_total();
 }
 
-void load_games_list()
+void load_games_list(const char* filename)
 {
 	char file_line[500];
 
-	FILE* fpgames = fopen("PROGDIR:gameslist", "r");
+	FILE* fpgames = fopen(filename, "r");
 	if (fpgames)
 	{
 		do
@@ -229,11 +233,11 @@ void load_games_list()
 	}
 }
 
-void load_repos()
+void load_repos(const char* filename)
 {
 	char file_line[500];
 
-	FILE* fprepos = fopen("PROGDIR:repos.prefs", "r");
+	FILE* fprepos = fopen(filename, "r");
 	if (fprepos)
 	{
 		do
@@ -266,11 +270,11 @@ void load_repos()
 	}
 }
 
-void load_genres()
+void load_genres(const char* filename)
 {
 	char file_line[500];
 	int i;
-	FILE* fpgenres = fopen("PROGDIR:genres", "r");
+	FILE* fpgenres = fopen(filename, "r");
 	if (fpgenres)
 	{
 		no_of_genres = 0;
@@ -327,10 +331,10 @@ void add_default_filters()
 
 void app_start()
 {
-	load_games_list();
-	load_repos();
+	load_games_list(DEFAULT_GAMELIST_FILE);
+	load_repos(DEFAULT_REPOS_FILE);
 	add_default_filters();
-	load_genres();
+	load_genres(DEFAULT_GENRES_FILE);
 
 	IntroPic = 1;
 
@@ -895,14 +899,14 @@ void game_click()
 					if (NOGUIGFX)
 					{
 						app->IM_GameImage_1 = (Object *)MUI_NewObject("Dtpic.mui",
-						                                              MUIA_Dtpic_Name, "PROGDIR:igame.iff",
+						                                              MUIA_Dtpic_Name, DEFAULT_SCREENSHOT_FILE,
 						                                              MUIA_Frame, MUIV_Frame_ImageButton,
 						End;
 					}
 					else
 					{
 						app->IM_GameImage_1 = GuigfxObject,
-						                                  MUIA_Guigfx_FileName, "PROGDIR:igame.iff",
+						                                  MUIA_Guigfx_FileName, DEFAULT_SCREENSHOT_FILE,
 						                                  MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
 						                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
 						                                  MUIA_Guigfx_Transparency, 0,
@@ -999,7 +1003,7 @@ void repo_remove()
 */
 void repo_stop()
 {
-	FILE* fprepos = fopen("PROGDIR:repos.prefs", "w");
+	FILE* fprepos = fopen(DEFAULT_REPOS_FILE, "w");
 	if (!fprepos)
 	{
 		msg_box("Could not create repos.prefs file!");
@@ -1819,7 +1823,7 @@ void save_list(const int check_exists)
 	const char* saving_message = "Please wait, saving gameslist...";
 	set(app->TX_Status, MUIA_Text_Contents, saving_message);
 
-	FILE* fpgames = fopen("PROGDIR:gameslist", "w");
+	FILE* fpgames = fopen(DEFAULT_GAMELIST_FILE, "w");
 	if (!fpgames)
 	{
 		msg_box("Could not open gameslist file!");
