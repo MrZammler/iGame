@@ -324,9 +324,8 @@ void app_start()
 
 	IntroPic = 1;
 
-	set(app->WI_MainWindow,
-		MUIA_Window_Open, TRUE
-	);
+	set(app->WI_MainWindow,	MUIA_Window_Open, TRUE);
+	set(app->WI_MainWindow, MUIA_Window_ActiveObject, app->LV_GamesList);
 }
 
 void clear_gameslist()
