@@ -1409,8 +1409,11 @@ void app_stop()
 		save_list(0);
 
 	free(games);
+	games = NULL;
 	free(repos);
+	repos = NULL;
 	free(genres);
+	genres = NULL;
 }
 
 void genres_click()

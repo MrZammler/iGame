@@ -7,6 +7,7 @@
 #include <proto/exec.h>
 #include <proto/intuition.h>
 #include <proto/dos.h>
+#include <stdlib.h>
 
 /* Increase stack size */
 LONG __stack = 32768;
@@ -33,6 +34,7 @@ void clean_exit(CONST_STRPTR s)
 		PutStr(s);
 	}
 	app_stop();
+	executable_name = NULL;
 	CloseLibrary(MUIMasterBase);
 }
 
