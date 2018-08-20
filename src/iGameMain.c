@@ -9,7 +9,7 @@
 #include <proto/dos.h>
 
 /* Increase stack size */
-LONG __stack = 32000;
+LONG __stack = 32768;
 
 #ifndef MAKE_ID
 #define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
