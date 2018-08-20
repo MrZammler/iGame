@@ -47,10 +47,8 @@ extern struct ObjApp* app;
 extern char* executable_name;
 
 /* global variables */
-int global_filter_check = 0;
 int total_hidden = 0;
 int showing_hidden = 0;
-char pathstr[512];
 int total_games;
 int no_of_genres;
 char gamestooltypes[1024];
