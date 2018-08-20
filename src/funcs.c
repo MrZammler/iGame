@@ -119,8 +119,7 @@ static CONST_STRPTR GetMBString(CONST_STRPTR ref)
 {
 	if (ref[1] == '\0')
 		return &ref[2];
-	else
-		return ref;
+	return ref;
 }
 
 void status_show_total()
@@ -360,7 +359,7 @@ void list_show_all(char* str)
 					if (item_games->hidden != 1)
 					{
 						DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title,
-							MUIV_List_Insert_Sorted);
+						         MUIV_List_Insert_Sorted);
 						total_games++;
 					}
 				}
@@ -458,7 +457,7 @@ void list_show_most_played(char* str)
 					else
 					{
 						DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title,
-							MUIV_List_Insert_Bottom);
+						         MUIV_List_Insert_Bottom);
 						total_games++;
 					}
 				}
@@ -730,7 +729,7 @@ void launch_game()
 	if (SAVESTATSONEXIT == 0) save_list(0);
 	success = Execute(exec, 0, 0);
 
-	if (success == 0) 
+	if (success == 0)
 		msg_box(GetMBString(MSG_ErrorExecutingWhdload));
 
 	CurrentDir(oldlock);
@@ -1409,7 +1408,8 @@ void list_show_hidden()
 
 void app_stop()
 {
-	if (SAVESTATSONEXIT == 1) save_list(0);
+	if (SAVESTATSONEXIT == 1) 
+		save_list(0);
 
 	free(games);
 	free(repos);
@@ -1630,7 +1630,9 @@ void refresh_list(const int check_exists)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
-			if (strlen(item_games->path) != 0 && item_games->hidden != 1 && item_games->deleted != 1)
+			if (strlen(item_games->path) != 0
+				&& item_games->hidden != 1
+				&& item_games->deleted != 1)
 			{
 				total_games++;
 				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
@@ -1641,7 +1643,10 @@ void refresh_list(const int check_exists)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
-			if (strlen(item_games->path) != 0 && item_games->hidden != 1 && item_games->exists == 1 && item_games->deleted != 1)
+			if (strlen(item_games->path) != 0
+				&& item_games->hidden != 1
+				&& item_games->exists == 1
+				&& item_games->deleted != 1)
 			{
 				total_games++;
 				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
@@ -1709,7 +1714,7 @@ void save_list(const int check_exists)
 
 					//fflush(fpgames);
 				}
-			}	
+			}
 		}
 		fflush(fpgames);
 		fclose(fpgames);
