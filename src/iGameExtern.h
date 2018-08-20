@@ -1,10 +1,12 @@
 #pragma once
+#define Dtpic_Classname "Dtpic.mui"
 #define MUIA_Dtpic_Name 0x80423d72
 #define TEMPLATE "SCREENSHOT/K"
 #define DEFAULT_GAMELIST_FILE "PROGDIR:gameslist"
 #define DEFAULT_REPOS_FILE "PROGDIR:repos.prefs"
 #define DEFAULT_GENRES_FILE "PROGDIR:genres"
 #define DEFAULT_SCREENSHOT_FILE "PROGDIR:igame.iff"
+#define PROGDIR "PROGDIR:"
 
 #define FILENAME_HOTKEY 'f'
 #define QUALITY_HOTKEY 'q'

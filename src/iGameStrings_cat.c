@@ -50,7 +50,7 @@
     Variables
 */
 
-struct FC_String iGameStrings_Strings[77] = {
+struct FC_String iGameStrings_Strings[97] = {
     { (STRPTR) "A front-end to WHDLoad", 0 },
     { (STRPTR) "Dimitris Panokostas 2018", 1 },
     { (STRPTR) "iGame", 2 },
@@ -127,7 +127,27 @@ struct FC_String iGameStrings_Strings[77] = {
     { (STRPTR) "Hide Side panel", 73 },
     { (STRPTR) "Save", 74 },
     { (STRPTR) "Use", 75 },
-    { (STRPTR) "Cancel", 76 }
+    { (STRPTR) "Cancel", 76 },
+	{ (STRPTR) "Select dir...", 77},
+	{ (STRPTR) "Select Game executable...", 78},
+	{ (STRPTR) "Total %d games.", 79},
+	{ (STRPTR) "Unknown", 80},
+	{ (STRPTR) "--Show All--", 81},
+	{ (STRPTR) "--Favorites--", 82},
+	{ (STRPTR) "--Last Played--", 83},
+	{ (STRPTR) "--Most Played--", 84},
+	{ (STRPTR) "--Never Played--", 85},
+	{ (STRPTR) "Running %s...", 86},
+	{ (STRPTR) "Error while executing WHDLoad or Game.\nPlease make sure WHDLoad is in your path.", 87},
+	{ (STRPTR) "Scanning [%s]. Please wait...", 88},
+	{ (STRPTR) "Could not create repos.prefs file!", 89},
+	{ (STRPTR) "Please select a Game from the List.", 90},
+	{ (STRPTR) "The Title you selected, already exists.", 91},
+	{ (STRPTR) "Please wait, saving gameslist...", 92},
+	{ (STRPTR) "Could not open gameslist file!", 93},
+	{ (STRPTR) "Bad tooltype!", 94},
+	{ (STRPTR) "Please let me know the name of the game...", 95},
+	{ (STRPTR) "Please pick the game executable...", 96}
 };
 
 STATIC struct Catalog *iGameStringsCatalog = NULL;
@@ -178,7 +198,7 @@ VOID OpeniGameStringsCatalog(VOID)
 	    struct FC_String *fc;
 	    int i;
 
-	    for (i = 0, fc = iGameStrings_Strings;  i < 77;  i++, fc++) {
+	    for (i = 0, fc = iGameStrings_Strings;  i < 97;  i++, fc++) {
 		 fc->msg = GetCatalogStr(iGameStringsCatalog, fc->id, (STRPTR) fc->msg);
 	    }
 	}
@@ -281,7 +301,7 @@ VOID InitiGameStringsCatalog(STRPTR language)
 				    bytesRemaining -= 8 + (skipSize << 2);
 				    ptr += skipSize;
 
-				    for (i = 0, fc = iGameStrings_Strings;  i < 77;  i++, fc++) {
+				    for (i = 0, fc = iGameStrings_Strings;  i < 82;  i++, fc++) {
 					if (fc->id == id) {
 					    fc->msg = sptr;
 					}

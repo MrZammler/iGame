@@ -235,3 +235,63 @@ Use
 ;MUIB button text
 MSG_BT_SettingsCancel (//)
 Cancel
+;Directory requester message
+MSG_SelectDir (//)
+Select dir...
+;File requester for game executable
+MSG_GameExecutable (//)
+Select Game executable...
+;Status text for Total number of games
+MSG_TotalNumberOfGames (//)
+Total %d games.
+;Default Unknown genre text
+MSG_UnknownGenre (//)
+Unknown
+;The Show All filter name
+MSG_FilterShowAll (//)
+--Show All--
+;The Favorites filter name
+MSG_FilterFavorites (//)
+--Favorites--
+;The Last Played filter name
+MSG_FilterLastPlayed (//)
+--Last Played--
+;The Most Played filter name
+MSG_FilterMostPlayed (//)
+--Most Played--
+;The Never Played filter name
+MSG_FilterNeverPlayed (//)
+--Never Played--
+;Status text when running a title
+MSG_RunningGameTitle (//)
+Running %s...
+;Error when executing WHDLoad or game
+MSG_ErrorExecutingWhdload (//)
+Error while executing WHDLoad or Game.\nPlease make sure WHDLoad is in your path.
+;Scanning repositories message
+MSG_ScanningPleaseWait (//)
+Scanning [%s]. Please wait...
+;Failed to create the repos.prefs file
+MSG_CouldNotCreateReposFile (//)
+Could not create repos.prefs file!
+;Select a game from the list
+MSG_SelectGameFromList (//)
+Please select a Game from the List.
+;Title already exists
+MSG_TitleAlreadyExists (//)
+The Title you selected, already exists.
+;Status message while saving gameslist
+MSG_SavingGamelist (//)
+Please wait, saving gameslist...
+;Failed to open gameslist file
+MSG_FailedOpeningGameslist (//)
+Could not open gameslist file!
+;Bad tooltype
+MSG_BadTooltype (//)
+Bad tooltype!
+;No Title specified
+MSG_NoTitleSpecified (//)
+Please let me know the name of the game...
+;No executable selected
+MSG_NoExecutableSpecified (//)
+Please pick the game executable...

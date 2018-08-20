@@ -275,7 +275,7 @@ struct ObjApp * CreateApp(void)
 		if (!NOSCREENSHOT) {
 
 			if (NOGUIGFX) {
-				object->IM_GameImage_0 = MUI_NewObject("Dtpic.mui",
+				object->IM_GameImage_0 = MUI_NewObject(Dtpic_Classname,
 					MUIA_Dtpic_Name, DEFAULT_SCREENSHOT_FILE,
 					MUIA_Frame, MUIV_Frame_ImageButton,
 					End;
@@ -642,7 +642,7 @@ struct ObjApp * CreateApp(void)
 		MUIA_Popasl_Type, 0,
 		MUIA_Popstring_String, object->STR_PA_RepoPath,
 		MUIA_Popstring_Button, object->PA_RepoPath,
-		ASLFR_TitleText, "Select dir...",
+		ASLFR_TitleText, GetMBString(MSG_SelectDir),
 		End;
 
 	object->BT_AddRepo = TextObject,
@@ -726,7 +726,7 @@ struct ObjApp * CreateApp(void)
 		MUIA_Popasl_Type, 0,
 		MUIA_Popstring_String, object->STR_PA_AddGame,
 		MUIA_Popstring_Button, object->PA_AddGame,
-		ASLFR_TitleText, "Select game executable...",
+		ASLFR_TitleText, GetMBString(MSG_GameExecutable),
 		End;
 
 	GR_AddGamePath = GroupObject,
