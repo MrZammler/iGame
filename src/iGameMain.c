@@ -23,7 +23,7 @@ extern void app_stop();
 extern void read_tool_types();
 extern char* get_executable_name(int argc, char** argv);
 
-struct Library *MUIMasterBase;
+struct Library* MUIMasterBase;
 char* executable_name;
 
 void clean_exit(CONST_STRPTR s)
@@ -52,7 +52,6 @@ BOOL init_app(int argc, char** argv)
 		clean_exit("Can't initialize application\n");
 	else
 	{
-		
 		app_start();
 	}
 	return TRUE;
