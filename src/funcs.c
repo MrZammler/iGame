@@ -1665,30 +1665,29 @@ void refresh_list(const int check_exists)
 	status_show_total();
 }
 
-BOOL get_filename(const char* title, const char* positive_text, BOOL save_mode)
+BOOL get_filename(const char* title, const char* positive_text, const BOOL save_mode)
 {
 	BOOL result = FALSE;
-	request = (struct FileRequester*)MUI_AllocAslRequestTags(
-		ASL_FileRequest, ASL_Hail, "Save List As...", (struct TagItem*)TAG_DONE);
-
-	if (MUI_AslRequestTags(request,
-		ASLFR_Window, app->WI_MainWindow,
-		ASLFR_TitleText, title,
-		ASLFR_PositiveText, positive_text,
-		ASLFR_DoSaveMode, save_mode,
-		ASLFR_InitialDrawer, PROGDIR,
-		TAG_DONE))
+	if ((request = MUI_AllocAslRequest(ASL_FileRequest, NULL)) != NULL)
 	{
-		strcat(fname, request->rf_Dir);
-		if (fname[strlen(fname) - 1] != (UBYTE)58) /* Check for : */
-			strcat(fname, "/");
-		strcat(fname, request->rf_File);
+		if (MUI_AslRequestTags(request,
+			ASLFR_TitleText, title,
+			ASLFR_PositiveText, positive_text,
+			ASLFR_DoSaveMode, save_mode,
+			ASLFR_InitialDrawer, PROGDIR,
+			TAG_DONE))
+		{
+			strcat(fname, request->rf_Dir);
+			if (fname[strlen(fname) - 1] != (UBYTE)58) /* Check for : */
+				strcat(fname, "/");
+			strcat(fname, request->rf_File);
 
-		result = TRUE;
+			result = TRUE;
+		}
+
+		if (request)
+			MUI_FreeAslRequest(request);
 	}
-	
-	if (request)
-		MUI_FreeAslRequest(request);
 
 	return result;
 }
@@ -1763,7 +1762,7 @@ void save_list(const int check_exists)
 void save_list_as()
 {
 	//TODO Check if file exists, warn the user about overwriting it
-	if(get_filename("Save List As...", "Save", TRUE))
+	if (get_filename("Save List As...", "Save", TRUE))
 		save_to_file(fname, 0);
 }
 
@@ -1776,7 +1775,11 @@ void export_list()
 void open_list()
 {
 	if (get_filename("Open List", "Open", FALSE))
+	{
+		//TODO clear games struct, otherwise we'll get the new list appended to it
+		clear_gameslist();
 		load_games_list(fname);
+	}
 }
 
 //function to return the dec eq of a hex no.
