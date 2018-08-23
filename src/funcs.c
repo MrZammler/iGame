@@ -153,6 +153,12 @@ void load_games_list(const char* filename)
 	FILE* fpgames = fopen(filename, "r");
 	if (fpgames)
 	{
+		if (games != NULL)
+		{
+			free(games);
+			games = NULL;
+		}
+
 		do
 		{
 			if (fgets(file_line, sizeof file_line, fpgames) == NULL)
@@ -1412,12 +1418,21 @@ void app_stop()
 	if (SAVESTATSONEXIT == 1)
 		save_list(0);
 
-	free(games);
-	games = NULL;
-	free(repos);
-	repos = NULL;
-	free(genres);
-	genres = NULL;
+	if (games)
+	{
+		free(games);
+		games = NULL;
+	}
+	if (repos)
+	{
+		free(repos);
+		repos = NULL;
+	}
+	if (genres)
+	{
+		free(genres);
+		genres = NULL;
+	}
 }
 
 void genres_click()
@@ -1776,7 +1791,6 @@ void open_list()
 {
 	if (get_filename("Open List", "Open", FALSE))
 	{
-		//TODO clear games struct, otherwise we'll get the new list appended to it
 		clear_gameslist();
 		load_games_list(fname);
 	}
