@@ -1,4 +1,6 @@
-#pragma once
+#ifndef IGAME_EXT_H
+#define IGAME_EXT_H
+
 #define Dtpic_Classname "Dtpic.mui"
 #define MUIA_Dtpic_Name 0x80423d72
 #define TEMPLATE "SCREENSHOT/K"
@@ -57,3 +59,5 @@ void setting_screenshot_size_changed();
 void settings_save();
 void setting_hide_side_panel_changed();
 void setttings_use();
+
+#endif
