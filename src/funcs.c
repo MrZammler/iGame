@@ -2038,22 +2038,23 @@ void read_tool_types()
 			//if values are ok from the previous function, and user has not provided his own values, calculate a nice size
 			if (screen_width != -1 && screen_height != -1)
 			{
-				//for hi res (>1024x768) default values is ok
+				//for hi-res screens (800x600 or greater) we'll use 320x256
 				if (screen_width >= 800 && screen_height >= 600)
 				{
-					SS_HEIGHT = 128;
-					SS_WIDTH = 160;
+					SS_WIDTH = 320;
+					SS_HEIGHT = 256;
 				}
 				else
 				{
-					SS_WIDTH = screen_width / 4.5;
-					SS_HEIGHT = screen_height / 4;
+					// for anything less, we'll go with half that
+					SS_WIDTH = 160;
+					SS_HEIGHT = 128;
 				}
 			}
 			else
 			{
-				SS_HEIGHT = 128;
 				SS_WIDTH = 160;
+				SS_HEIGHT = 128;
 			}
 		}
 	}

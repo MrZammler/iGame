@@ -19,8 +19,8 @@ LINK		= vc
 INCLUDES	= -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
 CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99
 CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99
-CFLAGS_040	= -c +aos68k -cpu=68040 -fpu=68040 -dontwarn=-1 -O2 -c99
-CFLAGS_060	= -c +aos68k -cpu=68060 -fpu=68060 -dontwarn=-1 -O2 -c99
+CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99
+CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99
 CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99
 CFLAGS_AOS4	= -c +aosppc -dontwarn=-1 -O2 -c99
 
@@ -30,7 +30,7 @@ DATE = $(shell date --iso=date)
 # Library builder settings
 ##########################################################################
 #MKLIB	 = join
-LIBFLAGS		= +aos68k -lamiga -lauto -lmieee -o
+LIBFLAGS		= +aos68k -lamiga -lauto -o
 LIBFLAGS_MOS	= +morphos -lamiga -lauto -o
 LIBFLAGS_AOS4	= +aosppc -lamiga -lauto -o
 
