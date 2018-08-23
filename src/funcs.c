@@ -1692,6 +1692,7 @@ BOOL get_filename(const char* title, const char* positive_text, const BOOL save_
 			ASLFR_InitialDrawer, PROGDIR,
 			TAG_DONE))
 		{
+			memset(&fname[0], 0, sizeof fname);
 			strcat(fname, request->rf_Dir);
 			if (fname[strlen(fname) - 1] != (UBYTE)58) /* Check for : */
 				strcat(fname, "/");
@@ -1738,8 +1739,6 @@ void save_to_file(const char* filename, const int check_exists)
 						fprintf(fpgames, "timesplayed=%d\n", item_games->times_played);
 						fprintf(fpgames, "lastplayed=%d\n", item_games->last_played);
 						fprintf(fpgames, "hidden=%d\n\n", item_games->hidden);
-
-						//fflush(fpgames);
 					}
 					else
 					{
@@ -1756,8 +1755,6 @@ void save_to_file(const char* filename, const int check_exists)
 					fprintf(fpgames, "timesplayed=%d\n", item_games->times_played);
 					fprintf(fpgames, "lastplayed=%d\n", item_games->last_played);
 					fprintf(fpgames, "hidden=%d\n\n", item_games->hidden);
-
-					//fflush(fpgames);
 				}
 			}
 		}
