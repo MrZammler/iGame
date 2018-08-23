@@ -41,6 +41,8 @@
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGameStrings_cat.h"
+#include <libraries/asl.h>
+#include "iGameExtern.h"
 
 extern char* strdup(const char* s);
 extern struct ObjApp* app;
@@ -79,6 +81,8 @@ const char* add_spaces_to_string(const char* input);
 
 /* structures */
 struct EasyStruct msgbox;
+struct FileRequester* request;
+char fname[255];
 
 typedef struct games
 {
@@ -322,7 +326,7 @@ void app_start()
 
 	IntroPic = 1;
 
-	set(app->WI_MainWindow,	MUIA_Window_Open, TRUE);
+	set(app->WI_MainWindow, MUIA_Window_Open, TRUE);
 	set(app->WI_MainWindow, MUIA_Window_ActiveObject, app->LV_GamesList);
 }
 
@@ -1405,7 +1409,7 @@ void list_show_hidden()
 
 void app_stop()
 {
-	if (SAVESTATSONEXIT == 1) 
+	if (SAVESTATSONEXIT == 1)
 		save_list(0);
 
 	free(games);
@@ -1661,15 +1665,42 @@ void refresh_list(const int check_exists)
 	status_show_total();
 }
 
+BOOL get_filename(const char* title, const char* positive_text, BOOL save_mode)
+{
+	BOOL result = FALSE;
+	request = (struct FileRequester*)MUI_AllocAslRequestTags(
+		ASL_FileRequest, ASL_Hail, "Save List As...", (struct TagItem*)TAG_DONE);
+
+	if (MUI_AslRequestTags(request,
+		ASLFR_Window, app->WI_MainWindow,
+		ASLFR_TitleText, title,
+		ASLFR_PositiveText, positive_text,
+		ASLFR_DoSaveMode, save_mode,
+		ASLFR_InitialDrawer, PROGDIR,
+		TAG_DONE))
+	{
+		strcat(fname, request->rf_Dir);
+		if (fname[strlen(fname) - 1] != (UBYTE)58) /* Check for : */
+			strcat(fname, "/");
+		strcat(fname, request->rf_File);
+
+		result = TRUE;
+	}
+	
+	if (request)
+		MUI_FreeAslRequest(request);
+
+	return result;
+}
 /*
 * Saves the current Games struct to disk
 */
-void save_list(const int check_exists)
+void save_to_file(const char* filename, const int check_exists)
 {
 	const char* saving_message = GetMBString(MSG_SavingGamelist);
 	set(app->TX_Status, MUIA_Text_Contents, saving_message);
 
-	FILE* fpgames = fopen(DEFAULT_GAMELIST_FILE, "w");
+	FILE* fpgames = fopen(filename, "w");
 	if (!fpgames)
 	{
 		msg_box(GetMBString(MSG_FailedOpeningGameslist));
@@ -1724,22 +1755,28 @@ void save_list(const int check_exists)
 	set(app->TX_Status, MUIA_Text_Contents, saving_message);
 }
 
+void save_list(const int check_exists)
+{
+	save_to_file(DEFAULT_GAMELIST_FILE, check_exists);
+}
+
 void save_list_as()
 {
-	//TODO implement a file requester
-	msg_box("Not yet implemented...");
+	//TODO Check if file exists, warn the user about overwriting it
+	if(get_filename("Save List As...", "Save", TRUE))
+		save_to_file(fname, 0);
 }
 
 void export_list()
 {
 	//TODO implement this
-	msg_box("Not yet implemented...");
+	msg_box("This feature is not yet implemented...");
 }
 
 void open_list()
 {
-	//TODO
-	msg_box("Not yet implemented...");
+	if (get_filename("Open List", "Open", FALSE))
+		load_games_list(fname);
 }
 
 //function to return the dec eq of a hex no.
