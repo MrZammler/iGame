@@ -1107,7 +1107,7 @@ void game_properties()
 	const BPTR lock = Lock(naked_path, ACCESS_READ);
 	CurrentDir(lock);
 
-	gamestooltypes[0] = '\0';
+	memset(&gamestooltypes[0], 0, sizeof gamestooltypes);
 
 	if (icon_base = (struct Library *)OpenLibrary("icon.library", 0))
 	{
@@ -1417,6 +1417,9 @@ void app_stop()
 {
 	if (SAVESTATSONEXIT == 1)
 		save_list(0);
+
+	memset(&fname[0], 0, sizeof fname);
+	memset(&gamestooltypes[0], 0, sizeof gamestooltypes);
 
 	if (games)
 	{
