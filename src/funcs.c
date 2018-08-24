@@ -229,19 +229,18 @@ void load_games_list(const char* filename)
 
 void load_repos(const char* filename)
 {
-	char file_line[500];
+	STRPTR file_line = malloc(500 * sizeof(char));
+	if (file_line == NULL)
+	{
+		msg_box("Could not allocate memory! Aborting...");
+		return;
+	}
 
-	FILE* fprepos = fopen(filename, "r");
+	BPTR fprepos = Open(filename, MODE_OLDFILE);
 	if (fprepos)
 	{
-		do
+		while(FGets(fprepos, file_line, 500))
 		{
-			if (fgets(file_line, sizeof file_line, fprepos) == NULL) { break; }
-
-			file_line[strlen(file_line) - 1] = '\0';
-
-			if (strlen(file_line) == 0) continue;
-
 			item_repos = (repos_list *)calloc(1, sizeof(repos_list));
 			item_repos->next = NULL;
 			strcpy(item_repos->repo, file_line);
@@ -258,28 +257,29 @@ void load_repos(const char* filename)
 
 			DoMethod(app->LV_GameRepositories, MUIM_List_InsertSingle, item_repos->repo, 1, MUIV_List_Insert_Bottom);
 		}
-		while (1);
 
-		fclose(fprepos);
+		Close(fprepos);
 	}
+	if (file_line)
+		free(file_line);
 }
 
 void load_genres(const char* filename)
 {
-	char file_line[500];
+	STRPTR file_line = malloc(500 * sizeof(char));
+	if (file_line == NULL)
+	{
+		msg_box("Could not allocate memory! Aborting...");
+		return;
+	}
+
 	int i;
-	FILE* fpgenres = fopen(filename, "r");
+	BPTR fpgenres = Open(filename, MODE_OLDFILE);
 	if (fpgenres)
 	{
 		no_of_genres = 0;
-		do
+		while(FGets(fpgenres, file_line, 500))
 		{
-			if (fgets(file_line, sizeof file_line, fpgenres) == NULL) { break; }
-
-			file_line[strlen(file_line) - 1] = '\0';
-
-			if (strlen(file_line) == 0) continue;
-
 			item_genres = (genres_list *)calloc(1, sizeof(genres_list));
 			item_genres->next = NULL;
 			strcpy(item_genres->genre, file_line);
@@ -298,7 +298,6 @@ void load_genres(const char* filename)
 
 			DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, item_genres->genre, MUIV_List_Insert_Sorted);
 		}
-		while (1);
 
 		for (i = 0; i < no_of_genres; i++)
 		{
@@ -310,8 +309,10 @@ void load_genres(const char* filename)
 
 		set(app->CY_PropertiesGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
 
-		fclose(fpgenres);
+		Close(fpgenres);
 	}
+	if (file_line)
+		free(file_line);
 }
 
 void add_default_filters()
@@ -345,7 +346,12 @@ void clear_gameslist()
 
 void list_show_all(char* str)
 {
-	char helper[210];
+	char* helper = malloc(200 * sizeof(char));
+	if (helper == NULL)
+	{
+		msg_box("Could not allocate memory! Aborting...");
+		return;
+	}
 
 	clear_gameslist();
 
@@ -375,12 +381,19 @@ void list_show_all(char* str)
 	}
 
 	status_show_total();
+
+	if (helper)
+		free(helper);
 }
 
 void list_show_favorites(char* str)
 {
-	char helper[210];
-
+	char* helper=malloc(200 * sizeof(char));
+	if (helper == NULL)
+	{
+		msg_box("Could not allocate memory! Aborting...");
+		return;
+	}
 	clear_gameslist();
 
 	total_games = 0;
@@ -403,11 +416,19 @@ void list_show_favorites(char* str)
 		}
 	}
 	status_show_total();
+
+	if (helper)
+		free(helper);
 }
 
 void list_show_last_played(char* str)
 {
-	char helper[210];
+	char* helper = malloc(200 * sizeof(char));
+	if (helper == NULL)
+	{
+		msg_box("Could not allocate memory! Aborting...");
+		return;
+	}
 
 	clear_gameslist();
 
@@ -431,11 +452,19 @@ void list_show_last_played(char* str)
 		}
 	}
 	status_show_total();
+
+	if (helper)
+		free(helper);
 }
 
 void list_show_most_played(char* str)
 {
-	char helper[210];
+	char* helper = malloc(200 * sizeof(char));
+	if (helper == NULL)
+	{
+		msg_box("Could not allocate memory! Aborting...");
+		return;
+	}
 	int max = 0;
 
 	clear_gameslist();
@@ -472,11 +501,19 @@ void list_show_most_played(char* str)
 		}
 	}
 	status_show_total();
+
+	if (helper)
+		free(helper);
 }
 
 void list_show_never_played(char* str)
 {
-	char helper[210];
+	char* helper = malloc(200 * sizeof(char));
+	if (helper == NULL)
+	{
+		msg_box("Could not allocate memory! Aborting...");
+		return;
+	}
 
 	clear_gameslist();
 
@@ -502,11 +539,19 @@ void list_show_never_played(char* str)
 		}
 	}
 	status_show_total();
+
+	if (helper)
+		free(helper);
 }
 
 void list_show_filtered(char* str, char* str_gen)
 {
-	char helper[210];
+	char* helper = malloc(200 * sizeof(char));
+	if (helper == NULL)
+	{
+		msg_box("Could not allocate memory! Aborting...");
+		return;
+	}
 
 	clear_gameslist();
 
@@ -532,6 +577,9 @@ void list_show_filtered(char* str, char* str_gen)
 		}
 	}
 	status_show_total();
+
+	if (helper)
+		free(helper);
 }
 
 void filter_change()
@@ -733,14 +781,15 @@ void launch_game()
 		}
 	}
 
-	if (SAVESTATSONEXIT == 0) save_list(0);
+	if (SAVESTATSONEXIT == 0) 
+		save_list(0);
+
 	success = Execute(exec, 0, 0);
 
 	if (success == 0)
 		msg_box(GetMBString(MSG_ErrorExecutingWhdload));
 
 	CurrentDir(oldlock);
-
 	status_show_total();
 }
 
@@ -1009,23 +1058,23 @@ void repo_remove()
 */
 void repo_stop()
 {
-	FILE* fprepos = fopen(DEFAULT_REPOS_FILE, "w");
+	BPTR fprepos = Open(DEFAULT_REPOS_FILE, MODE_NEWFILE);
 	if (!fprepos)
 	{
 		msg_box(GetMBString(MSG_CouldNotCreateReposFile));
 	}
 	else
 	{
+		CONST_STRPTR str = NULL;
 		for (int i = 0;; i++)
 		{
-			char* str = NULL;
 			DoMethod(app->LV_GameRepositories, MUIM_List_GetEntry, i, &str);
-			if (!str) break;
-			//printf("%d - %s\n", i, str);
-			fprintf(fprepos, "%s\n", (char *)str);
-			fflush(fprepos);
+			if (!str) 
+				break;
+
+			FPuts(fprepos, str);
 		}
-		fclose(fprepos);
+		Close(fprepos);
 	}
 }
 
