@@ -802,10 +802,9 @@ void refresh_sidepanel()
 	DoMethod(app->GR_sidepanel, MUIM_Group_ExitChange);
 }
 
-void strip_path(char* path, char* naked_path)
+void strip_path(const char* path, char* naked_path)
 {
-	int i;
-	int k;
+	int i, k;
 	/* strip the path from the slave file and get the rest */
 	for (i = strlen(path) - 1; i >= 0; i--)
 	{
@@ -820,39 +819,52 @@ void strip_path(char* path, char* naked_path)
 
 void game_click()
 {
-	char* game_title = NULL;
-	FILE* fp = NULL;
-
-	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
-
-	if (NOSIDEPANEL)
+	if (NOSIDEPANEL || NOSCREENSHOT)
 		return;
 
-	if (!NOSCREENSHOT && game_title) //for some reason, game_click is called and game_title is null??
+	char* game_title = NULL;
+	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
+
+	if (game_title) //for some reason, game_click is called and game_title is null??
 	{
-		char path[350];
-		get_path((char *)game_title, path);
-		char naked_path[400];
-		strip_path(path, naked_path);
+		char* path = malloc(256 * sizeof(char));
+		if (path != NULL)
+			get_path(game_title, path);
+		else
+		{
+			msg_box("Failed to allocate memory! Aborting...");
+			return;
+		}
+
+		char* naked_path = malloc(300 * sizeof(char));
+		if (naked_path != NULL)
+			strip_path(path, naked_path);
+		else
+		{
+			msg_box("Failed to allocate memory! Aborting...");
+			return;
+		}
 
 		//Check the string, when filter is populated there is trouble
 		if (strlen(naked_path) != 0)
 		{
 			sprintf(naked_path, "%s/igame.iff", (const char*)naked_path);
-
-			fp = fopen(naked_path, "r");
+			BPTR fp = Open((CONST_STRPTR)naked_path, MODE_OLDFILE);
 			if (!fp) //no igame.iff, try .info and newicons
 			{
 				if (strstr(path, ".slave")) //check for whdload game
 				{
 					path[strlen(path) - 6] = '\0';
 					sprintf(naked_path, "%s.info", (const char*)path);
-					fp = fopen(naked_path, "r");
+					fp = Open((CONST_STRPTR)naked_path, MODE_OLDFILE);
 				}
 			}
 
 			if (fp)
 			{
+				// We don't need the file open anymore
+				Close(fp);
+
 				if (NOGUIGFX)
 				{
 					app->IM_GameImage_1 = MUI_NewObject(Dtpic_Classname,
@@ -915,10 +927,11 @@ void game_click()
 					}
 				}
 			}
+			if (path)
+				free(path);
+			if (naked_path)
+				free(naked_path);
 		}
-
-		if (fp)
-			fclose(fp);
 	}
 }
 
@@ -1689,11 +1702,11 @@ BOOL get_filename(const char* title, const char* positive_text, const BOOL save_
 	if ((request = MUI_AllocAslRequest(ASL_FileRequest, NULL)) != NULL)
 	{
 		if (MUI_AslRequestTags(request,
-			ASLFR_TitleText, title,
-			ASLFR_PositiveText, positive_text,
-			ASLFR_DoSaveMode, save_mode,
-			ASLFR_InitialDrawer, PROGDIR,
-			TAG_DONE))
+		                       ASLFR_TitleText, title,
+		                       ASLFR_PositiveText, positive_text,
+		                       ASLFR_DoSaveMode, save_mode,
+		                       ASLFR_InitialDrawer, PROGDIR,
+		                       TAG_DONE))
 		{
 			memset(&fname[0], 0, sizeof fname);
 			strcat(fname, request->rf_Dir);
@@ -1710,6 +1723,7 @@ BOOL get_filename(const char* title, const char* positive_text, const BOOL save_
 
 	return result;
 }
+
 /*
 * Saves the current Games struct to disk
 */
