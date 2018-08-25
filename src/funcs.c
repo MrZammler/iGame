@@ -879,7 +879,7 @@ void game_click()
 			get_path(game_title, path);
 		else
 		{
-			msg_box("Failed to allocate memory! Aborting...");
+			msg_box(GetMBString(MSG_NotEnoughMemory));
 			return;
 		}
 
@@ -888,7 +888,7 @@ void game_click()
 			strip_path(path, naked_path);
 		else
 		{
-			msg_box("Failed to allocate memory! Aborting...");
+			msg_box(GetMBString(MSG_NotEnoughMemory));
 			return;
 		}
 
@@ -1445,7 +1445,7 @@ void list_show_hidden()
 		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
 		total_hidden = 0;
 		DoMethod(app->LV_GamesList, MUIM_List_Clear);
-		//DoMethod(App->LV_GenresList,MUIM_List_Select,1,MUIV_List_Select_Off, NULL);
+
 		set(app->LV_GenresList, MUIA_Disabled, TRUE);
 		set(app->STR_Filter, MUIA_Disabled, TRUE);
 		if (games)
