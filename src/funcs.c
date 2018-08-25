@@ -149,7 +149,6 @@ void add_games_to_listview()
 void load_games_list(const char* filename)
 {
 	char file_line[500];
-
 	FILE* fpgames = fopen(filename, "r");
 	if (fpgames)
 	{
@@ -222,7 +221,6 @@ void load_games_list(const char* filename)
 		while (1); //read of gameslist ends here
 
 		add_games_to_listview();
-
 		fclose(fpgames);
 	}
 }
@@ -232,7 +230,7 @@ void load_repos(const char* filename)
 	STRPTR file_line = malloc(500 * sizeof(char));
 	if (file_line == NULL)
 	{
-		msg_box("Could not allocate memory! Aborting...");
+		msg_box(GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
@@ -269,7 +267,7 @@ void load_genres(const char* filename)
 	STRPTR file_line = malloc(500 * sizeof(char));
 	if (file_line == NULL)
 	{
-		msg_box("Could not allocate memory! Aborting...");
+		msg_box(GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
@@ -349,7 +347,7 @@ void list_show_all(char* str)
 	char* helper = malloc(200 * sizeof(char));
 	if (helper == NULL)
 	{
-		msg_box("Could not allocate memory! Aborting...");
+		msg_box(GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
@@ -391,7 +389,7 @@ void list_show_favorites(char* str)
 	char* helper=malloc(200 * sizeof(char));
 	if (helper == NULL)
 	{
-		msg_box("Could not allocate memory! Aborting...");
+		msg_box(GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 	clear_gameslist();
@@ -426,7 +424,7 @@ void list_show_last_played(char* str)
 	char* helper = malloc(200 * sizeof(char));
 	if (helper == NULL)
 	{
-		msg_box("Could not allocate memory! Aborting...");
+		msg_box(GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
@@ -462,7 +460,7 @@ void list_show_most_played(char* str)
 	char* helper = malloc(200 * sizeof(char));
 	if (helper == NULL)
 	{
-		msg_box("Could not allocate memory! Aborting...");
+		msg_box(GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 	int max = 0;
@@ -511,7 +509,7 @@ void list_show_never_played(char* str)
 	char* helper = malloc(200 * sizeof(char));
 	if (helper == NULL)
 	{
-		msg_box("Could not allocate memory! Aborting...");
+		msg_box(GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
@@ -549,7 +547,7 @@ void list_show_filtered(char* str, char* str_gen)
 	char* helper = malloc(200 * sizeof(char));
 	if (helper == NULL)
 	{
-		msg_box("Could not allocate memory! Aborting...");
+		msg_box(GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
