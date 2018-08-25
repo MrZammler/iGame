@@ -78,6 +78,8 @@ int get_delimiter_position(const char* str);
 const char* get_directory_name(const char* str);
 const char* get_executable_name(int argc, char** argv);
 const char* add_spaces_to_string(const char* input);
+void strip_path(const char* path, char* naked_path);
+char* get_slave_from_path(char* slave, int start, char* path);
 
 /* structures */
 struct EasyStruct msgbox;
@@ -293,7 +295,6 @@ void load_genres(const char* filename)
 			}
 
 			no_of_genres++;
-
 			DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, item_genres->genre, MUIV_List_Insert_Sorted);
 		}
 
@@ -304,7 +305,6 @@ void load_genres(const char* filename)
 
 		app->CY_PropertiesGenreContent[i] = GetMBString(MSG_UnknownGenre);
 		app->CY_PropertiesGenreContent[i + 1] = NULL;
-
 		set(app->CY_PropertiesGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
 
 		Close(fpgenres);
@@ -352,7 +352,6 @@ void list_show_all(char* str)
 	}
 
 	clear_gameslist();
-
 	total_games = 0;
 
 	if (games)
@@ -392,9 +391,10 @@ void list_show_favorites(char* str)
 		msg_box(GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
-	clear_gameslist();
 
+	clear_gameslist();
 	total_games = 0;
+
 	if (games)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
@@ -429,8 +429,8 @@ void list_show_last_played(char* str)
 	}
 
 	clear_gameslist();
-
 	total_games = 0;
+
 	if (games)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
@@ -463,11 +463,11 @@ void list_show_most_played(char* str)
 		msg_box(GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
+
 	int max = 0;
-
 	clear_gameslist();
-
 	total_games = 0;
+
 	if (games)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
@@ -514,8 +514,8 @@ void list_show_never_played(char* str)
 	}
 
 	clear_gameslist();
-
 	total_games = 0;
+
 	if (games)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
@@ -552,8 +552,8 @@ void list_show_filtered(char* str, char* str_gen)
 	}
 
 	clear_gameslist();
-
 	total_games = 0;
+
 	// Find the entries in Games and update the list
 	if (games)
 	{
@@ -611,6 +611,12 @@ void filter_change()
 		list_show_filtered(str, str_gen);
 }
 
+void string_to_lower(char* slave)
+{
+	for (int i = 0; i <= strlen(slave) - 1; i++)
+		slave[i] = tolower(slave[i]);
+}
+
 /*
 *   Executes whdload with the slave
 */
@@ -618,60 +624,73 @@ void launch_game()
 {
 	struct Library* icon_base;
 	struct DiskObject* disk_obj;
-	char *game_title = NULL, path[256], exec[256], naked_path[256], *tool_type;
-	int success, i, k, whdload = 0;
-	int z = 0;
-	char str2[512], fullpath[800], slave[256], helperstr[250], to_check[256];
+	char *game_title = NULL, exec[256], *tool_type;
+	int success, i, whdload = 0;
+	char str2[512], fullpath[800], helperstr[250], to_check[256];
 
 	//clear vars:
 	str2[0] = '\0';
 	fullpath[0] = '\0';
 
 	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
-	get_path((char *)game_title, path);
+	if (game_title == NULL || strlen(game_title) == 0)
+	{
+		msg_box(GetMBString(MSG_SelectGameFromList));
+		return;
+	}
+
+	char* path = malloc(256 * sizeof(char));
+	if (path != NULL)
+		get_path(game_title, path);
+	else
+	{
+		msg_box(GetMBString(MSG_NotEnoughMemory));
+		return;
+	}
 
 	sprintf(helperstr, GetMBString(MSG_RunningGameTitle), game_title);
 	set(app->TX_Status, MUIA_Text_Contents, helperstr);
 
-	/* strip the path from the slave file and get the rest */
-	for (i = strlen(path) - 1; i >= 0; i--)
+	char* naked_path = malloc(256 * sizeof(char));
+	if (naked_path != NULL)
+		strip_path(path, naked_path);
+	else
 	{
-		if (path[i] == '/')
-			break;
-	}
-	for (k = 0; k <= i - 1; k++)
-		naked_path[k] = path[k];
-	naked_path[k] = '\0';
-
-	int length = strlen(path);
-	for (k = i + 1; k <= length - 1; k++)
-	{
-		slave[z] = path[k];
-		z++;
+		msg_box(GetMBString(MSG_NotEnoughMemory));
+		return;
 	}
 
-	slave[z] = '\0';
-	length = strlen(slave);
-	for (i = 0; i <= length - 1; i++) slave[i] = tolower(slave[i]);
-
+	char* slave = malloc(256 * sizeof(char));
+	if (slave != NULL)
+		slave = get_slave_from_path(slave, strlen(naked_path), path);
+	else
+	{
+		msg_box(GetMBString(MSG_NotEnoughMemory));
+		return;
+	}
+	string_to_lower(slave);
 	if (strstr(slave, ".slave"))
-	{
 		whdload = 1;
-	}
 
 	const BPTR oldlock = Lock(PROGDIR, ACCESS_READ);
 	const BPTR lock = Lock(naked_path, ACCESS_READ);
-	CurrentDir(lock);
+	if (lock)
+		CurrentDir(lock);
+	else
+	{
+		msg_box(GetMBString(MSG_DirectoryNotFound));
+		return;
+	}
 
 	if (whdload == 1)
 		sprintf(exec, "whdload ");
 	else
-		strcpy(exec, slave);
+		strcpy(exec, path);
 
 	//tooltypes only for whdload games
 	if (whdload == 1)
 	{
-		if (icon_base = (struct Library *)OpenLibrary("icon.library", 0))
+		if ((icon_base = (struct Library *)OpenLibrary("icon.library", 0)))
 		{
 			//scan the .info files in the current dir.
 			//one of them should be the game's project icon.
@@ -686,7 +705,7 @@ void launch_game()
 				return;
 			}
 
-			while (success = ExNext(lock, m))
+			while ((success = ExNext(lock, m)))
 			{
 				if (strstr(m->fib_FileName, ".info"))
 				{
@@ -701,55 +720,49 @@ void launch_game()
 					}
 					fullpath[i] = '\0';
 
-					if (disk_obj = (struct DiskObject *)GetDiskObject(fullpath))
+					if ((disk_obj = GetDiskObject((STRPTR)fullpath)))
 					{
-						if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "SLAVE"), slave) || MatchToolValue(
-							FindToolType(disk_obj->do_ToolTypes, "slave"), slave))
+						if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "SLAVE"), slave)
+							|| MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "slave"), slave))
 						{
-						}
-						else
-						{
-							FreeDiskObject(disk_obj);
-							continue;
-						}
-
-						for (char** tool_types = (char **)disk_obj->do_ToolTypes; tool_type = *tool_types; ++tool_types)
-						{
-							if (!strncmp(tool_type, "IM", 2)) continue;
-							if (tool_type[0] == ' ') continue;
-							if (tool_type[0] == '(') continue;
-							if (tool_type[0] == '*') continue;
-							if (tool_type[0] == ';') continue;
-							if (tool_type[0] == '\0') continue;
-
-							/* Must check here for numerical values */
-							/* Those (starting with $ should be transformed to dec from hex) */
-							char** temp_tbl = my_split((char *)tool_type, "=");
-							if (temp_tbl == NULL || temp_tbl[0] == NULL || !strcmp((char *)temp_tbl[0], " ") || !strcmp(
-								(char *)temp_tbl[0], ""))
+							for (char** tool_types = (char **)disk_obj->do_ToolTypes; (tool_type = *tool_types); ++tool_types)
 							{
-								continue;
-							}
+								if (!strncmp(tool_type, "IM", 2)) continue;
+								if (tool_type[0] == ' ') continue;
+								if (tool_type[0] == '(') continue;
+								if (tool_type[0] == '*') continue;
+								if (tool_type[0] == ';') continue;
+								if (tool_type[0] == '\0') continue;
 
-							if (temp_tbl[1] != NULL)
-							{
-								sprintf(to_check, "%s", temp_tbl[1]);
-								if (to_check[0] == '$')
+								/* Must check here for numerical values */
+								/* Those (starting with $ should be transformed to dec from hex) */
+								char** temp_tbl = my_split((char *)tool_type, "=");
+								if (temp_tbl == NULL || temp_tbl[0] == NULL || !strcmp((char *)temp_tbl[0], " ") || !strcmp(
+									(char *)temp_tbl[0], ""))
 								{
-									const int dec_rep = hex2dec(to_check);
-									sprintf(tool_type, "%s=%d", temp_tbl[0], dec_rep);
+									continue;
 								}
+
+								if (temp_tbl[1] != NULL)
+								{
+									sprintf(to_check, "%s", temp_tbl[1]);
+									if (to_check[0] == '$')
+									{
+										const int dec_rep = hex2dec(to_check);
+										sprintf(tool_type, "%s=%d", temp_tbl[0], dec_rep);
+									}
+								}
+								if (temp_tbl)
+									free(temp_tbl);
+								//req: more free's
+
+								sprintf(exec, "%s %s", exec, tool_type);
 							}
 
-							free(temp_tbl);
-							//req: more free's
-
-							sprintf(exec, "%s %s", exec, tool_type);
+							FreeDiskObject(disk_obj);
+							break;
 						}
-
 						FreeDiskObject(disk_obj);
-
-						break;
 					}
 				}
 			}
@@ -760,9 +773,17 @@ void launch_game()
 		//if we're still here, and exec contains just whdload, add the slave and execute
 		if (!strcmp(exec, "whdload "))
 		{
-			sprintf(exec, "%s %s", exec, slave);
+			sprintf(exec, "%s %s", exec, path);
 		}
 	}
+
+	// Cleanup the memory allocations
+	if (slave)
+		free(slave);
+	if (path)
+		free(path);
+	if (naked_path)
+		free(naked_path);
 
 	//set the counters for this game
 	for (item_games = games; item_games != NULL; item_games = item_games->next)
@@ -1076,6 +1097,31 @@ void repo_stop()
 	}
 }
 
+int title_exists(char* game_title)
+{
+	for (item_games = games; item_games != NULL; item_games = item_games->next)
+	{
+		if (!strcmp(game_title, item_games->title) && item_games->deleted != 1)
+		{
+			// Title found
+			return 1;
+		}
+	}
+	// Title not found
+	return 0;
+}
+
+char* get_slave_from_path(char* slave, int start, char* path)
+{
+	int z = 0;
+	for (int k = start + 1; k <= strlen(path); k++)
+	{
+		slave[z] = path[k];
+		z++;
+	}
+	return slave;
+}
+
 //shows and inits the GameProperties Window
 void game_properties()
 {
@@ -1084,26 +1130,16 @@ void game_properties()
 	get(app->WI_Properties, MUIA_Window_Open, &open);
 	if (open) return;
 
-	char* str = NULL;
+	char* game_title = NULL;
 	//set the elements on the window
-	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str);
-
-	if (str == NULL || strlen(str) == 0)
+	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
+	if (game_title == NULL || strlen(game_title) == 0)
 	{
 		msg_box(GetMBString(MSG_SelectGameFromList));
 		return;
 	}
 
-	int found = 0;
-	for (item_games = games; item_games != NULL; item_games = item_games->next)
-	{
-		if (!strcmp(str, item_games->title) && item_games->deleted != 1)
-		{
-			found = 1;
-			break;
-		}
-	}
-
+	const int found = title_exists(game_title);
 	if (!found)
 	{
 		msg_box(GetMBString(MSG_SelectGameFromList));
@@ -1111,16 +1147,13 @@ void game_properties()
 	}
 
 	char helperstr[512];
-	char path[512];
 	int i;
 	struct Library* icon_base;
 	struct DiskObject* disk_obj;
-	char naked_path[256], *tool_type;
-	int k;
-	int z = 0;
-	char str2[512], fullpath[800], slave[256];
+	char *tool_type;
+	char str2[512], fullpath[800];
 
-	set(app->STR_PropertiesGameTitle, MUIA_String_Contents, str);
+	set(app->STR_PropertiesGameTitle, MUIA_String_Contents, game_title);
 	set(app->TX_PropertiesSlavePath, MUIA_Text_Contents, item_games->path);
 
 	sprintf(helperstr, "%d", item_games->times_played);
@@ -1128,7 +1161,8 @@ void game_properties()
 
 	//set the genre
 	for (i = 0; i < no_of_genres; i++)
-		if (!strcmp(app->CY_PropertiesGenreContent[i], item_games->genre)) break;
+		if (!strcmp(app->CY_PropertiesGenreContent[i], item_games->genre)) 
+			break;
 	set(app->CY_PropertiesGenre, MUIA_Cycle_Active, i);
 
 	if (item_games->favorite == 1)
@@ -1142,34 +1176,48 @@ void game_properties()
 		set(app->CH_PropertiesHidden, MUIA_Selected, FALSE);
 
 	//set up the tooltypes
-	get_path((char *)str, path);
-
-	/* strip the path from the slave file and get the rest */
-	for (i = strlen(path) - 1; i >= 0; i--)
+	char* path = malloc(256 * sizeof(char));
+	if (path != NULL)
+		get_path(game_title, path);
+	else
 	{
-		if (path[i] == '/')
-			break;
+		msg_box(GetMBString(MSG_NotEnoughMemory));
+		return;
 	}
-	for (k = 0; k <= i - 1; k++)
-		naked_path[k] = path[k];
-	naked_path[k] = '\0';
 
-	for (k = i + 1; k <= strlen(path) - 1; k++)
+	char* naked_path = malloc(256 * sizeof(char));
+	if (naked_path != NULL)
+		strip_path(path, naked_path);
+	else
 	{
-		slave[z] = path[k];
-		z++;
+		msg_box(GetMBString(MSG_NotEnoughMemory));
+		return;
 	}
-	slave[z] = '\0';
 
-	for (i = 0; i <= strlen(slave) - 1; i++) slave[i] = tolower(slave[i]);
+	char* slave = malloc(256 * sizeof(char));
+	if (slave != NULL)
+		slave = get_slave_from_path(slave, strlen(naked_path), path);
+	else
+	{
+		msg_box(GetMBString(MSG_NotEnoughMemory));
+		return;
+	}
+
+	string_to_lower(slave);
 
 	const BPTR oldlock = Lock(PROGDIR, ACCESS_READ);
 	const BPTR lock = Lock(naked_path, ACCESS_READ);
-	CurrentDir(lock);
+	if (lock)
+		CurrentDir(lock);
+	else
+	{
+		msg_box(GetMBString(MSG_DirectoryNotFound));
+		return;
+	}
 
 	memset(&gamestooltypes[0], 0, sizeof gamestooltypes);
 
-	if (icon_base = (struct Library *)OpenLibrary("icon.library", 0))
+	if ((icon_base = (struct Library *)OpenLibrary("icon.library", 0)))
 	{
 		//scan the .info files in the current dir.
 		//one of them should be the game's project icon.
@@ -1184,7 +1232,7 @@ void game_properties()
 			return;
 		}
 
-		while (success = ExNext(lock, m))
+		while ((success = ExNext(lock, m)))
 		{
 			if (strstr(m->fib_FileName, ".info"))
 			{
@@ -1199,39 +1247,38 @@ void game_properties()
 				}
 				fullpath[i] = '\0';
 
-				if (disk_obj = GetDiskObject(fullpath))
+				if ((disk_obj = GetDiskObject((STRPTR)fullpath)))
 				{
-					//printf("trying: [%s]\n", fullpath);
-					if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "SLAVE"), slave) || MatchToolValue(
-						FindToolType(disk_obj->do_ToolTypes, "slave"), slave))
+					if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "SLAVE"), (STRPTR)slave)
+						|| MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "slave"), (STRPTR)slave))
 					{
-						//printf("Winner!\n");
-					}
-					else
-					{
+						for (char** tool_types = (char **)disk_obj->do_ToolTypes; (tool_type = *tool_types); ++tool_types)
+						{
+							if (!strncmp(tool_type, "IM", 2))
+								continue;
+
+							sprintf(gamestooltypes, "%s%s\n", gamestooltypes, tool_type);
+							set(app->TX_PropertiesTooltypes, MUIA_TextEditor_ReadOnly, FALSE);
+						}
+
 						FreeDiskObject(disk_obj);
-						continue;
+						break;
 					}
-
-					for (char** tool_types = (char **)disk_obj->do_ToolTypes; tool_type = *tool_types; ++tool_types)
-					{
-						if (!strncmp(tool_type, "IM", 2)) continue;
-
-						sprintf(gamestooltypes, "%s%s\n", gamestooltypes, tool_type);
-						set(app->TX_PropertiesTooltypes, MUIA_TextEditor_ReadOnly, FALSE);
-						//printf("[%s]\n", tool_type);
-					}
-					//printf("%s\n", disk_obj->do_ToolTypes);
-
 					FreeDiskObject(disk_obj);
-
-					break;
 				}
 			}
 		}
 
 		CloseLibrary(icon_base);
 	}
+
+	// Cleanup the memory allocations
+	if (slave)
+		free(slave);
+	if (path)
+		free(path);
+	if (naked_path)
+		free(naked_path);
 
 	if (strlen(gamestooltypes) == 0)
 	{
@@ -1240,7 +1287,6 @@ void game_properties()
 	}
 
 	set(app->TX_PropertiesTooltypes, MUIA_TextEditor_Contents, gamestooltypes);
-	//set(App->TX_Tooltypes, MUIA_Floattext_Text, helperstr);
 	CurrentDir(oldlock);
 	set(app->WI_Properties, MUIA_Window_Open, TRUE);
 }
@@ -1254,7 +1300,7 @@ void game_properties_ok()
 	struct Library* icon_base;
 	struct DiskObject* disk_obj;
 	char naked_path[256], *tool_type;
-	int i, k;
+	int i = 0;
 	int new_tool_type_count = 1, old_tool_type_count = 0, old_real_tool_type_count = 0;
 	char str2[512], fullpath[800], slave[256];
 
@@ -1312,18 +1358,10 @@ void game_properties_ok()
 	//tooltypes changed
 	if (strcmp((char *)tools, gamestooltypes))
 	{
-		/* strip the path from the slave file and get the rest */
-		for (i = strlen(path) - 1; i >= 0; i--)
-		{
-			if (path[i] == '/')
-				break;
-		}
-		for (k = 0; k <= i - 1; k++)
-			naked_path[k] = path[k];
-		naked_path[k] = '\0';
+		strip_path(path, naked_path);
 
 		int z = 0;
-		for (k = i + 1; k <= strlen(path) - 1; k++)
+		for (int k = i + 1; k <= strlen(path) - 1; k++)
 		{
 			slave[z] = path[k];
 			z++;
@@ -1615,12 +1653,10 @@ void followthread(BPTR lock, int tab_level)
 				item_games->next = NULL;
 
 				/* strip the path from the slave file and get the rest */
-				//printf("str- [%s]\n", str);
 				for (j = strlen(str) - 1; j >= 0; j--)
 				{
 					if (str[j] == '/' || str[j] == ':')
 						break;
-					//		  printf("Break. j=%ld\n", j);
 				}
 
 				//CHANGE 2007-12-03: init n=0 here
@@ -1938,7 +1974,6 @@ void game_duplicate()
 void game_delete()
 {
 	char* str = NULL;
-
 	if (getlistindex(app->LV_GamesList) >= 0)
 	{
 		DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str);
