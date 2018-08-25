@@ -236,10 +236,10 @@ void load_repos(const char* filename)
 		return;
 	}
 
-	BPTR fprepos = Open(filename, MODE_OLDFILE);
+	BPTR fprepos = Open((CONST_STRPTR)filename, MODE_OLDFILE);
 	if (fprepos)
 	{
-		while(FGets(fprepos, file_line, 500))
+		while (FGets(fprepos, file_line, 500))
 		{
 			item_repos = (repos_list *)calloc(1, sizeof(repos_list));
 			item_repos->next = NULL;
@@ -274,11 +274,11 @@ void load_genres(const char* filename)
 	}
 
 	int i;
-	BPTR fpgenres = Open(filename, MODE_OLDFILE);
+	BPTR fpgenres = Open((CONST_STRPTR)filename, MODE_OLDFILE);
 	if (fpgenres)
 	{
 		no_of_genres = 0;
-		while(FGets(fpgenres, file_line, 500))
+		while (FGets(fpgenres, file_line, 500))
 		{
 			item_genres = (genres_list *)calloc(1, sizeof(genres_list));
 			item_genres->next = NULL;
@@ -385,7 +385,7 @@ void list_show_all(char* str)
 
 void list_show_favorites(char* str)
 {
-	char* helper=malloc(200 * sizeof(char));
+	char* helper = malloc(200 * sizeof(char));
 	if (helper == NULL)
 	{
 		msg_box(GetMBString(MSG_NotEnoughMemory));
@@ -651,7 +651,7 @@ void launch_game()
 	sprintf(helperstr, GetMBString(MSG_RunningGameTitle), game_title);
 	set(app->TX_Status, MUIA_Text_Contents, helperstr);
 
-	char* naked_path = malloc(256 * sizeof(char));
+	unsigned char* naked_path = malloc(256 * sizeof(char));
 	if (naked_path != NULL)
 		strip_path(path, naked_path);
 	else
@@ -722,10 +722,11 @@ void launch_game()
 
 					if ((disk_obj = GetDiskObject((STRPTR)fullpath)))
 					{
-						if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "SLAVE"), slave)
-							|| MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "slave"), slave))
+						if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "SLAVE"), (STRPTR)slave)
+							|| MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "slave"), (STRPTR)slave))
 						{
-							for (char** tool_types = (char **)disk_obj->do_ToolTypes; (tool_type = *tool_types); ++tool_types)
+							for (char** tool_types = (char **)disk_obj->do_ToolTypes; (tool_type = *tool_types); ++
+							     tool_types)
 							{
 								if (!strncmp(tool_type, "IM", 2)) continue;
 								if (tool_type[0] == ' ') continue;
@@ -737,11 +738,11 @@ void launch_game()
 								/* Must check here for numerical values */
 								/* Those (starting with $ should be transformed to dec from hex) */
 								char** temp_tbl = my_split((char *)tool_type, "=");
-								if (temp_tbl == NULL || temp_tbl[0] == NULL || !strcmp((char *)temp_tbl[0], " ") || !strcmp(
-									(char *)temp_tbl[0], ""))
-								{
+								if (temp_tbl == NULL
+									|| temp_tbl[0] == NULL
+									|| !strcmp((char *)temp_tbl[0], " ")
+									|| !strcmp((char *)temp_tbl[0], ""))
 									continue;
-								}
 
 								if (temp_tbl[1] != NULL)
 								{
@@ -800,7 +801,7 @@ void launch_game()
 		}
 	}
 
-	if (SAVESTATSONEXIT == 0) 
+	if (SAVESTATSONEXIT == 0)
 		save_list(0);
 
 	success = Execute(exec, 0, 0);
@@ -831,7 +832,7 @@ void scan_repositories()
 				item_games->exists = 1;
 		}
 
-		const BPTR currentlock = Lock(PROGDIR, ACCESS_READ);
+		const BPTR currentlock = Lock((CONST_STRPTR)PROGDIR, ACCESS_READ);
 
 		for (item_repos = repos; item_repos != NULL; item_repos = item_repos->next)
 		{
@@ -942,8 +943,7 @@ void game_click()
 				}
 				else
 				{
-					app->IM_GameImage_1 = GuigfxObject,
-					                                  MUIA_Guigfx_FileName, naked_path,
+					app->IM_GameImage_1 = GuigfxObject, MUIA_Guigfx_FileName, naked_path,
 					                                  MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
 					                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
 					                                  MUIA_Guigfx_Transparency, 0,
@@ -978,8 +978,7 @@ void game_click()
 					}
 					else
 					{
-						app->IM_GameImage_1 = GuigfxObject,
-						                                  MUIA_Guigfx_FileName, DEFAULT_SCREENSHOT_FILE,
+						app->IM_GameImage_1 = GuigfxObject, MUIA_Guigfx_FileName, DEFAULT_SCREENSHOT_FILE,
 						                                  MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
 						                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
 						                                  MUIA_Guigfx_Transparency, 0,
@@ -1042,21 +1041,18 @@ void get_path(char* title, char* path)
 */
 void repo_add()
 {
-	char* str = NULL;
+	char* repo_path = NULL;
+	get(app->PA_RepoPath, MUIA_String_Contents, &repo_path);
 
-	get(app->PA_RepoPath, MUIA_String_Contents, &str);
-
-	if (str && strlen((char *)str) != 0)
+	if (repo_path && strlen(repo_path) != 0)
 	{
 		item_repos = (repos_list *)calloc(1, sizeof(repos_list));
 		item_repos->next = NULL;
 
-		strcpy(item_repos->repo, (char *)str);
+		strcpy(item_repos->repo, repo_path);
 
 		if (repos == NULL)
-		{
 			repos = item_repos;
-		}
 		else
 		{
 			item_repos->next = repos;
@@ -1077,21 +1073,21 @@ void repo_remove()
 */
 void repo_stop()
 {
-	BPTR fprepos = Open(DEFAULT_REPOS_FILE, MODE_NEWFILE);
+	BPTR fprepos = Open((CONST_STRPTR)DEFAULT_REPOS_FILE, MODE_NEWFILE);
 	if (!fprepos)
 	{
 		msg_box(GetMBString(MSG_CouldNotCreateReposFile));
 	}
 	else
 	{
-		CONST_STRPTR str = NULL;
+		CONST_STRPTR repo_path = NULL;
 		for (int i = 0;; i++)
 		{
-			DoMethod(app->LV_GameRepositories, MUIM_List_GetEntry, i, &str);
-			if (!str) 
+			DoMethod(app->LV_GameRepositories, MUIM_List_GetEntry, i, &repo_path);
+			if (!repo_path)
 				break;
 
-			FPuts(fprepos, str);
+			FPuts(fprepos, repo_path);
 		}
 		Close(fprepos);
 	}
@@ -1150,7 +1146,7 @@ void game_properties()
 	int i;
 	struct Library* icon_base;
 	struct DiskObject* disk_obj;
-	char *tool_type;
+	char* tool_type;
 	char str2[512], fullpath[800];
 
 	set(app->STR_PropertiesGameTitle, MUIA_String_Contents, game_title);
@@ -1161,7 +1157,7 @@ void game_properties()
 
 	//set the genre
 	for (i = 0; i < no_of_genres; i++)
-		if (!strcmp(app->CY_PropertiesGenreContent[i], item_games->genre)) 
+		if (!strcmp(app->CY_PropertiesGenreContent[i], item_games->genre))
 			break;
 	set(app->CY_PropertiesGenre, MUIA_Cycle_Active, i);
 
@@ -1206,7 +1202,7 @@ void game_properties()
 	string_to_lower(slave);
 
 	const BPTR oldlock = Lock(PROGDIR, ACCESS_READ);
-	const BPTR lock = Lock(naked_path, ACCESS_READ);
+	const BPTR lock = Lock((CONST_STRPTR)naked_path, ACCESS_READ);
 	if (lock)
 		CurrentDir(lock);
 	else
@@ -1252,7 +1248,8 @@ void game_properties()
 					if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "SLAVE"), (STRPTR)slave)
 						|| MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "slave"), (STRPTR)slave))
 					{
-						for (char** tool_types = (char **)disk_obj->do_ToolTypes; (tool_type = *tool_types); ++tool_types)
+						for (char** tool_types = (char **)disk_obj->do_ToolTypes; (tool_type = *tool_types); ++
+						     tool_types)
 						{
 							if (!strncmp(tool_type, "IM", 2))
 								continue;
@@ -1294,39 +1291,38 @@ void game_properties()
 //when ok is pressed in GameProperties
 void game_properties_ok()
 {
-	char* str = NULL;
-	char *path = NULL, helperstr[256];
+	char* game_title = NULL;
+	char* path = NULL;
 	int fav = 0, genre = 0, hid = 0;
 	struct Library* icon_base;
 	struct DiskObject* disk_obj;
-	char naked_path[256], *tool_type;
-	int i = 0;
+	char* tool_type;
+	int i;
 	int new_tool_type_count = 1, old_tool_type_count = 0, old_real_tool_type_count = 0;
-	char str2[512], fullpath[800], slave[256];
+	char str2[512], fullpath[800];
 
-	get(app->STR_PropertiesGameTitle, MUIA_String_Contents, &str);
+	get(app->STR_PropertiesGameTitle, MUIA_String_Contents, &game_title);
 	get(app->TX_PropertiesSlavePath, MUIA_Text_Contents, &path);
 	get(app->CY_PropertiesGenre, MUIA_Cycle_Active, &genre);
 	get(app->CH_PropertiesFavorite, MUIA_Selected, &fav);
 	get(app->CH_PropertiesHidden, MUIA_Selected, &hid);
 
-	//printf("%s\n", App->CY_Genre_Content[genre]);
 
 	//find the entry, and update it:
 	for (item_games = games; item_games != NULL; item_games = item_games->next)
 	{
 		if (!strcmp(path, item_games->path))
 		{
-			if (strcmp(item_games->title, str))
+			if (strcmp(item_games->title, game_title))
 			{
 				//check dup for title
-				if (check_dup_title(str))
+				if (check_dup_title(game_title))
 				{
 					msg_box(GetMBString(MSG_TitleAlreadyExists));
 					return;
 				}
 			}
-			strcpy(item_games->title, str);
+			strcpy(item_games->title, game_title);
 			strcpy(item_games->genre, app->CY_PropertiesGenreContent[genre]);
 			if (fav == 1) item_games->favorite = 1;
 			else item_games->favorite = 0;
@@ -1358,23 +1354,30 @@ void game_properties_ok()
 	//tooltypes changed
 	if (strcmp((char *)tools, gamestooltypes))
 	{
-		strip_path(path, naked_path);
-
-		int z = 0;
-		for (int k = i + 1; k <= strlen(path) - 1; k++)
+		char* naked_path = malloc(256 * sizeof(char));
+		if (naked_path != NULL)
+			strip_path(path, naked_path);
+		else
 		{
-			slave[z] = path[k];
-			z++;
+			msg_box(GetMBString(MSG_NotEnoughMemory));
+			return;
 		}
-		slave[z] = '\0';
-
-		for (i = 0; i <= strlen(slave) - 1; i++) slave[i] = tolower(slave[i]);
+		strip_path(path, naked_path);
+		char* slave = malloc(256 * sizeof(char));
+		if (slave != NULL)
+			get_slave_from_path(slave, strlen(naked_path), path);
+		else
+		{
+			msg_box(GetMBString(MSG_NotEnoughMemory));
+			return;
+		}
+		string_to_lower(slave);
 
 		BPTR oldlock = Lock(PROGDIR, ACCESS_READ);
-		const BPTR lock = Lock(naked_path, ACCESS_READ);
+		const BPTR lock = Lock((CONST_STRPTR)naked_path, ACCESS_READ);
 		CurrentDir(lock);
 
-		if (icon_base = (struct Library *)OpenLibrary("icon.library", 0))
+		if ((icon_base = (struct Library *)OpenLibrary("icon.library", 0)))
 		{
 			//scan the .info files in the current dir.
 			//one of them should be the game's project icon.
@@ -1389,13 +1392,12 @@ void game_properties_ok()
 				return;
 			}
 
-			while (success = ExNext(lock, m))
+			while ((success = ExNext(lock, m)))
 			{
 				if (strstr(m->fib_FileName, ".info"))
 				{
 					NameFromLock(lock, str2, 512);
 					sprintf(fullpath, "%s/%s", str2, m->fib_FileName);
-					//printf("%s\n", fullpath);
 
 					//lose the .info
 					for (i = strlen(fullpath) - 1; i >= 0; i--)
@@ -1405,69 +1407,66 @@ void game_properties_ok()
 					}
 					fullpath[i] = '\0';
 
-					//printf("Without info: [%s]\n", fullpath);
-
-					if (disk_obj = (struct DiskObject *)GetDiskObject(fullpath))
+					if ((disk_obj = GetDiskObject((STRPTR)fullpath)))
 					{
-						//						  printf("trying: [%s]\n", fullpath);
-						if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "SLAVE"), slave) || MatchToolValue(
-							FindToolType(disk_obj->do_ToolTypes, "slave"), slave))
+						if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "SLAVE"), (STRPTR)slave)
+							|| MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "slave"), (STRPTR)slave))
 						{
-							//							  printf("Winner!\n");
-						}
-						else
-						{
+							//check numbers for old and new tooltypes
+							for (i = 0; i <= strlen(tools); i++)
+								if (tools[i] == '\n') new_tool_type_count++;
+
+							//add one for the last tooltype that doesnt end with \n
+							new_tool_type_count++;
+
+							for (i = 0; i <= strlen(gamestooltypes); i++)
+								if (gamestooltypes[i] == '\n') old_tool_type_count++;
+
+							for (char** tool_types = (char **)disk_obj->do_ToolTypes; (tool_type = *tool_types); ++
+							     tool_types)
+								old_real_tool_type_count++;
+
+							unsigned char** new_tool_types = AllocVec(new_tool_type_count * sizeof(char *),
+							                                          MEMF_FAST | MEMF_CLEAR);
+							unsigned char** newptr = new_tool_types;
+
+							char** temp_tbl = my_split((char *)tools, "\n");
+							if (temp_tbl == NULL
+								|| temp_tbl[0] == NULL
+								|| !strcmp((char *)temp_tbl[0], " ")
+								|| !strcmp((unsigned char *)temp_tbl[0], ""))
+								break;
+
+							for (i = 0; i <= new_tool_type_count - 2; i++)
+								*newptr++ = (unsigned char*)temp_tbl[i];
+
+							*newptr = NULL;
+
+							disk_obj->do_ToolTypes = new_tool_types;
+							PutDiskObject((STRPTR)fullpath, disk_obj);
 							FreeDiskObject(disk_obj);
-							continue;
-						}
 
-						//check numbers for old and new tooltypes
-						for (i = 0; i <= strlen(tools); i++)
-						{
-							if (tools[i] == '\n') new_tool_type_count++;
-						}
-						//add one for the last tooltype that doesnt end with \n
-						new_tool_type_count++;
+							if (temp_tbl)
+								free(temp_tbl);
+							if (new_tool_types)
+								free(new_tool_types);
 
-						for (i = 0; i <= strlen(gamestooltypes); i++)
-						{
-							if (gamestooltypes[i] == '\n') old_tool_type_count++;
-						}
-
-						for (char** tool_types = (char **)disk_obj->do_ToolTypes; tool_type = *tool_types; ++tool_types)
-						{
-							old_real_tool_type_count++;
-						}
-
-						unsigned char** new_tool_types = AllocVec(new_tool_type_count * sizeof(char *),
-						                                          MEMF_FAST | MEMF_CLEAR);
-						unsigned char** newptr = new_tool_types;
-
-						char** temp_tbl = my_split((char *)tools, "\n");
-						if (temp_tbl == NULL || temp_tbl[0] == NULL || !strcmp((char *)temp_tbl[0], " ") || !strcmp((
-							unsigned char *)temp_tbl[0], ""))
-						{
 							break;
 						}
-
-						for (i = 0; i <= new_tool_type_count - 2; i++)
-						{
-							*newptr++ = (unsigned char*)temp_tbl[i];
-						}
-
-						*newptr = NULL;
-
-						disk_obj->do_ToolTypes = new_tool_types;
-						PutDiskObject(fullpath, disk_obj);
 						FreeDiskObject(disk_obj);
-
-						break;
 					}
 				}
 			}
 
 			CloseLibrary(icon_base);
 		}
+		// Cleanup the memory allocations
+		if (slave)
+			free(slave);
+		if (path)
+			free(path);
+		if (naked_path)
+			free(naked_path);
 	}
 	FreeVec(tools);
 
@@ -1585,7 +1584,7 @@ char** my_split(char* str, char* spl)
 	}
 	ret[count] = NULL;
 
-	return (ret);
+	return ret;
 }
 
 void followthread(BPTR lock, int tab_level)
@@ -1595,20 +1594,14 @@ void followthread(BPTR lock, int tab_level)
 
 	/*  if at the end of the road, don't print anything */
 	if (!lock)
-	{
 		return;
-	}
-
-	//CurrentDir(lock);
 
 	/*  allocate space for a FileInfoBlock */
 	struct FileInfoBlock* m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
 
 	int success = Examine(lock, m);
 	if (m->fib_DirEntryType <= 0)
-	{
 		return;
-	}
 
 	/*  The first call to Examine fills the FileInfoBlock with information
 	about the directory.  If it is called at the root level, it contains
@@ -1616,12 +1609,9 @@ void followthread(BPTR lock, int tab_level)
 	the output of ExNext rather than both Examine and ExNext.  If it
 	printed both, it would list directory entries twice! */
 
-	while (success = ExNext(lock, m))
+	while ((success = ExNext(lock, m)))
 	{
 		/*  Print what we've got: */
-		//printf("\n");
-		//for (i = 0; i < tab_level; i++)
-		//    printf("\t");
 		if (m->fib_DirEntryType > 0)
 		{
 		}
@@ -1637,12 +1627,9 @@ void followthread(BPTR lock, int tab_level)
 			/* add the slave to the gameslist (if it does not already exist) */
 			for (item_games = games; item_games != NULL; item_games = item_games->next)
 			{
-				//printf("[%s]\n", item_games->Path);
-				//printf("comparing [%s] - [%s]\n", fullpath, item_games->Path);
 				if (!strcmp(item_games->path, fullpath))
 				{
 					exists = 1;
-					//printf("Exists: [%s]\n", fullpath);
 					item_games->exists = 1;
 					break;
 				}
@@ -2061,16 +2048,14 @@ void msg_box(const char* msg)
 void get_screen_size(int* width, int* height)
 {
 	struct Screen* wbscreen;
-	ULONG mode_id;
-
 	struct Library* intuition_base;
 	struct Library* gfx_base;
 
-	if (intuition_base = (struct Library *)OpenLibrary("intuition.library", 36))
+	if ((intuition_base = (struct Library *)OpenLibrary("intuition.library", 36)))
 	{
-		if (gfx_base = (struct Library *)OpenLibrary("graphics.library", 36))
+		if ((gfx_base = (struct Library *)OpenLibrary("graphics.library", 36)))
 		{
-			if (wbscreen = LockPubScreen("Workbench"))
+			if ((wbscreen = LockPubScreen("Workbench")))
 			{
 				/* Using intuition.library/GetScreenDrawInfo(), we get the pen
 				* array we'll use for the screen clone the easy way. */
@@ -2079,7 +2064,7 @@ void get_screen_size(int* width, int* height)
 				struct ViewPort* vp = &wbscreen->ViewPort;
 				/* Use graphics.library/GetVPModeID() to get the ModeID of the
 				* Workbench screen. */
-				if ((mode_id = GetVPModeID(vp)) != (unsigned long)INVALID_ID)
+				if (GetVPModeID(vp) != (long)INVALID_ID)
 				{
 					*width = wbscreen->Width;
 					*height = wbscreen->Height;
@@ -2121,10 +2106,10 @@ void read_tool_types()
 	NOSMARTSPACES = 0;
 	NOSIDEPANEL = 0;
 
-	if (icon_base = (struct Library *)OpenLibrary("icon.library", 0))
+	if ((icon_base = (struct Library *)OpenLibrary("icon.library", 0)))
 	{
 		char* filename = strcat(PROGDIR, executable_name);
-		if (disk_obj = (struct DiskObject *)GetDiskObject((unsigned char*)filename))
+		if ((disk_obj = GetDiskObject((STRPTR)filename)))
 		{
 			if (FindToolType(disk_obj->do_ToolTypes, "SCREENSHOT"))
 			{
@@ -2132,7 +2117,10 @@ void read_tool_types()
 				char* tool_type = *tool_types;
 
 				char** temp_tbl = my_split((char *)tool_type, "=");
-				if (temp_tbl == NULL || temp_tbl[0] == NULL || !strcmp(temp_tbl[0], " ") || !strcmp(temp_tbl[0], ""))
+				if (temp_tbl == NULL
+					|| temp_tbl[0] == NULL
+					|| !strcmp(temp_tbl[0], " ")
+					|| !strcmp(temp_tbl[0], ""))
 				{
 					msg_box(GetMBString(MSG_BadTooltype));
 					exit(0);
@@ -2214,7 +2202,6 @@ void add_non_whdload()
 {
 	set(app->STR_AddTitle, MUIA_String_Contents, NULL);
 	set(app->PA_AddGame, MUIA_String_Contents, NULL);
-
 	set(app->WI_AddNonWHDLoad, MUIA_Window_Open, TRUE);
 }
 
@@ -2224,8 +2211,6 @@ void non_whdload_ok()
 
 	get(app->PA_AddGame, MUIA_String_Contents, &str);
 	get(app->STR_AddTitle, MUIA_String_Contents, &str_title);
-
-	//printf("[%s] - [%s]\n", str, str_title);
 
 	if (strlen(str_title) == 0)
 	{
@@ -2348,11 +2333,9 @@ int check_dup_title(char* title)
 	{
 		if (!strcmp(check_games->title, title))
 		{
-			//printf("[%s] [%s]\n", check_games->Title, title);
 			return 1;
 		}
 	}
-
 	return 0;
 }
 
@@ -2364,7 +2347,6 @@ int get_delimiter_position(const char* str)
 
 	if (!delimiter)
 	{
-		//printf("Invalid path detected!\n");
 		return 0;
 	}
 
@@ -2396,7 +2378,6 @@ const char* get_directory_name(const char* str)
 	}
 	dir_name[c] = '\0';
 
-	//printf("%s -> %s\n", str, dirName);
 	return dir_name;
 }
 
