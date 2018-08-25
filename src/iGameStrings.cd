@@ -298,3 +298,6 @@ Please pick the game executable...
 ;Not enough memory
 MSG_NotEnoughMemory (//)
 Could not allocate memory! Aborting...
+;Game directory not found
+MSG_DirectoryNotFound (//)
+Game Directory not found!

@@ -50,7 +50,7 @@
     Variables
 */
 
-struct FC_String iGameStrings_Strings[98] = {
+struct FC_String iGameStrings_Strings[99] = {
     { (STRPTR) "A front-end to WHDLoad", 0 },
     { (STRPTR) "Dimitris Panokostas 2018", 1 },
     { (STRPTR) "iGame", 2 },
@@ -148,7 +148,8 @@ struct FC_String iGameStrings_Strings[98] = {
 	{ (STRPTR) "Bad tooltype!", 94},
 	{ (STRPTR) "Please let me know the name of the game...", 95},
 	{ (STRPTR) "Please pick the game executable...", 96},
-	{ (STRPTR) "Could not allocate memory! Aborting...", 97}
+	{ (STRPTR) "Could not allocate memory! Aborting...", 97},
+	{ (STRPTR) "Game Directory not found!", 98}
 };
 
 STATIC struct Catalog *iGameStringsCatalog = NULL;
@@ -199,7 +200,7 @@ VOID OpeniGameStringsCatalog(VOID)
 	    struct FC_String *fc;
 	    int i;
 
-	    for (i = 0, fc = iGameStrings_Strings;  i < 98;  i++, fc++) {
+	    for (i = 0, fc = iGameStrings_Strings;  i < 99;  i++, fc++) {
 		 fc->msg = GetCatalogStr(iGameStringsCatalog, fc->id, (STRPTR) fc->msg);
 	    }
 	}
