@@ -58,14 +58,14 @@ struct ObjApp * CreateApp(void)
 	APTR	Space_Buttons, GROUP_ROOT_2, GR_Path, GR_ReposButtons, GROUP_ROOT_3;
 	APTR	GR_AddGameTitle, LA_AddGameTitle, GR_AddGamePath, LA_AddGamePath;
 	APTR	GR_AddGameGenre, LA_AddGameGenre, Space_AddGame, GR_AddGameButtons;
-	APTR	GROUP_ROOT_4, GROUP_ROOT_Settings, Space_SettingsTop, GR_ShowScreenshots;
+	APTR	GROUP_ROOT_4, GROUP_ROOT_Settings, GR_Settings, GR_ShowScreenshots;
 	APTR	Space_ShowScreenshots, LA_ShowScreenshots, GR_Screenshots, GR_UseGuiGfx;
 	APTR	Space_UseGuiGfx, LA_UseGuiGfx, GR_ScreenshotSize, LA_ScreenshotSize;
 	APTR	Space_ScreenshotSize, GR_CustomSize, LA_Width, LA_Height, GR_Titles;
 	APTR	GR_TitlesFrom, Space_TitlesFrom, GR_SmartSpaces, Space_SmartSpaces;
 	APTR	LA_SmartSpaces, GR_Misc, GR_SaveStatsOnExit, Space_SaveStatsOnExit;
 	APTR	LA_SaveStatsOnExit, GR_FilterUseEnter, Space_FilterUseEnter, LA_FilterUseEnter;
-	APTR	GR_HideSidepanel, Space_HideSidepanel, LA_HideSidepanel, Space_SettingsBottom;
+	APTR	GR_HideSidepanel, Space_HideSidepanel, LA_HideSidepanel;
 	APTR	GR_SettingsButtons, Space_SettingsButtons1, Space_SettingsButtons2;
 #if defined(__amigaos4__)
 	static const struct Hook MenuScanHook = { { NULL,NULL }, (HOOKFUNC)scan_repositories, NULL, NULL };
@@ -219,7 +219,7 @@ struct ObjApp * CreateApp(void)
 #endif
 
 
-	if (!(object = AllocVec(sizeof(struct ObjApp), MEMF_PUBLIC | MEMF_CLEAR)))
+	if (!((object = AllocVec(sizeof(struct ObjApp), MEMF_PUBLIC | MEMF_CLEAR))))
 		return NULL;
 
 	object->STR_TX_Status = NULL;
@@ -806,8 +806,6 @@ struct ObjApp * CreateApp(void)
 		WindowContents, GROUP_ROOT_4,
 		End;
 
-	Space_SettingsTop = VSpace(1);
-
 	object->CH_Screenshots = CheckMark(TRUE);
 
 	Space_ShowScreenshots = HSpace(1);
@@ -907,6 +905,7 @@ struct ObjApp * CreateApp(void)
 		MUIA_FrameTitle, GetMBString(MSG_GR_ScreenshotsTitle),
 		MUIA_Group_HorizSpacing, 10,
 		MUIA_Group_VertSpacing, 10,
+		Child, GR_ShowScreenshots,
 		Child, GR_UseGuiGfx,
 		Child, GR_ScreenshotSize,
 		Child, GR_CustomSize,
@@ -968,6 +967,13 @@ struct ObjApp * CreateApp(void)
 		Child, GR_TitlesFrom,
 		End;
 
+	GR_Settings = GroupObject,
+		MUIA_HelpNode, "GR_Settings",
+		MUIA_Group_Columns, 2,
+		Child, GR_Screenshots,
+		Child, GR_Titles,
+		End;
+
 	object->CH_SaveStatsOnExit = CheckMark(FALSE);
 
 	Space_SaveStatsOnExit = VSpace(1);
@@ -1027,8 +1033,6 @@ struct ObjApp * CreateApp(void)
 		Child, GR_HideSidepanel,
 	End;
 
-	Space_SettingsBottom = VSpace(5);
-
 	object->BT_SettingsSave = SimpleButton(GetMBString(MSG_BT_SettingsSave));
 
 	Space_SettingsButtons1 = VSpace(1);
@@ -1054,12 +1058,8 @@ struct ObjApp * CreateApp(void)
 	GROUP_ROOT_Settings = GroupObject,
 		MUIA_Group_HorizSpacing, 10,
 		MUIA_Group_VertSpacing, 10,
-		Child, Space_SettingsTop,
-		Child, GR_ShowScreenshots,
-		Child, GR_Screenshots,
-		Child, GR_Titles,
+		Child, GR_Settings,
 		Child, GR_Misc,
-		Child, Space_SettingsBottom,
 		Child, GR_SettingsButtons,
 		End;
 
@@ -1440,24 +1440,45 @@ struct ObjApp * CreateApp(void)
 	);
 
 	DoMethod(object->CH_Screenshots,
+		MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &SettingShowScreenshotChangedHook
+	);
+
+	DoMethod(object->CH_Screenshots,
 		MUIM_Notify, MUIA_Selected, TRUE,
-		GR_Screenshots,
+		GR_UseGuiGfx,
+		3,
+		MUIM_Set, MUIA_Disabled, FALSE
+	);
+
+	DoMethod(object->CH_Screenshots,
+		MUIM_Notify, MUIA_Selected, TRUE,
+		GR_ScreenshotSize,
 		3,
 		MUIM_Set, MUIA_Disabled, FALSE
 	);
 
 	DoMethod(object->CH_Screenshots,
 		MUIM_Notify, MUIA_Selected, FALSE,
-		GR_Screenshots,
+		GR_UseGuiGfx,
 		3,
 		MUIM_Set, MUIA_Disabled, TRUE
 	);
 
 	DoMethod(object->CH_Screenshots,
-		MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
-		object->App,
-		2,
-		MUIM_CallHook, &SettingShowScreenshotChangedHook
+		MUIM_Notify, MUIA_Selected, FALSE,
+		GR_ScreenshotSize,
+		3,
+		MUIM_Set, MUIA_Disabled, TRUE
+	);
+
+	DoMethod(object->CH_Screenshots,
+		MUIM_Notify, MUIA_Selected, FALSE,
+		GR_CustomSize,
+		3,
+		MUIM_Set, MUIA_Disabled, TRUE
 	);
 
 	DoMethod(object->CH_UseGuiGfx,
