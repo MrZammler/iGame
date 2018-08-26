@@ -903,8 +903,8 @@ struct ObjApp * CreateApp(void)
 		MUIA_HelpNode, "GR_Screenshots",
 		MUIA_Frame, MUIV_Frame_Group,
 		MUIA_FrameTitle, GetMBString(MSG_GR_ScreenshotsTitle),
-		MUIA_Group_HorizSpacing, 10,
-		MUIA_Group_VertSpacing, 10,
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
 		Child, GR_ShowScreenshots,
 		Child, GR_UseGuiGfx,
 		Child, GR_ScreenshotSize,
@@ -1056,8 +1056,8 @@ struct ObjApp * CreateApp(void)
 		End;
 
 	GROUP_ROOT_Settings = GroupObject,
-		MUIA_Group_HorizSpacing, 10,
-		MUIA_Group_VertSpacing, 10,
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
 		Child, GR_Settings,
 		Child, GR_Misc,
 		Child, GR_SettingsButtons,
