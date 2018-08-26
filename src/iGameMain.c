@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 	if (app)
 	{
 		while (DoMethod(app->App, MUIM_Application_NewInput, &sigs)
-			!= MUIV_Application_ReturnID_Quit)
+			!= (ULONG)MUIV_Application_ReturnID_Quit)
 		{
 			if (sigs)
 			{
