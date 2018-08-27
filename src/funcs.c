@@ -119,12 +119,11 @@ typedef struct genres
 
 genres_list *item_genres = NULL, *genres = NULL;
 
-static const unsigned char* GetMBString(const unsigned char* ref)
+const unsigned char* GetMBString(const unsigned char* ref)
 {
 	if (ref[1] == '\0')
 		return &ref[2];
-	else
-		return ref;
+	return ref;
 }
 
 void status_show_total()

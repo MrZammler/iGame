@@ -73,5 +73,6 @@ void setting_screenshot_size_changed();
 void settings_save();
 void setting_hide_side_panel_changed();
 void setttings_use();
+const unsigned char* GetMBString(const unsigned char* ref);
 
 #endif

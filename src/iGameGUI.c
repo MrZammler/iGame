@@ -32,14 +32,6 @@ extern int FILTERUSEENTER;
 extern int NOSCREENSHOT;
 extern int NOSIDEPANEL;
 
-static const unsigned char* GetMBString(const unsigned char* ref)
-{
-	if (ref[1] == '\0')
-		return &ref[2];
-	else
-		return ref;
-}
-
 struct ObjApp * CreateApp(void)
 {
 	struct ObjApp * object;
@@ -226,18 +218,18 @@ struct ObjApp * CreateApp(void)
 	object->STR_TX_PropertiesTimesPlayed = NULL;
 	object->STR_TX_PropertiesSlavePath = NULL;
 	object->STR_TX_PropertiesTooltypes = NULL;
-	object->STR_TX_About = GetMBString(MSG_TX_About);
+	object->STR_TX_About = (CONST_STRPTR)GetMBString(MSG_TX_About);
 
-	object->CY_PropertiesGenreContent[0] = GetMBString(MSG_CY_PropertiesGenre0);
+	object->CY_PropertiesGenreContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_PropertiesGenre0);
 	object->CY_PropertiesGenreContent[1] = NULL;
-	object->CY_AddGameGenreContent[0] = GetMBString(MSG_CY_AddGameGenre0);
+	object->CY_AddGameGenreContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_AddGameGenre0);
 	object->CY_AddGameGenreContent[1] = NULL;
-	object->CY_ScreenshotSizeContent[0] = GetMBString(MSG_CY_ScreenshotSize0);
-	object->CY_ScreenshotSizeContent[1] = GetMBString(MSG_CY_ScreenshotSize1);
-	object->CY_ScreenshotSizeContent[2] = GetMBString(MSG_CY_ScreenshotSize2);
+	object->CY_ScreenshotSizeContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_ScreenshotSize0);
+	object->CY_ScreenshotSizeContent[1] = (CONST_STRPTR)GetMBString(MSG_CY_ScreenshotSize1);
+	object->CY_ScreenshotSizeContent[2] = (CONST_STRPTR)GetMBString(MSG_CY_ScreenshotSize2);
 	object->CY_ScreenshotSizeContent[3] = NULL;
-	object->RA_TitlesFromContent[0] = GetMBString(MSG_RA_TitlesFrom0);
-	object->RA_TitlesFromContent[1] = GetMBString(MSG_RA_TitlesFrom1);
+	object->RA_TitlesFromContent[0] = (CONST_STRPTR)GetMBString(MSG_RA_TitlesFrom0);
+	object->RA_TitlesFromContent[1] = (CONST_STRPTR)GetMBString(MSG_RA_TitlesFrom1);
 	object->RA_TitlesFromContent[2] = NULL;
 
 	LA_Filter = Label(GetMBString(MSG_LA_Filter));
