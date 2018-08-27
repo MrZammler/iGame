@@ -1,5 +1,7 @@
 #define MUI_OBSOLETE
 
+#define MUIMASTER_LIBRARY "muimaster.library"
+
 #include <libraries/mui.h>
 
 #include <clib/alib_protos.h>
@@ -40,7 +42,7 @@ void clean_exit(CONST_STRPTR s)
 
 BOOL init_app(int argc, char** argv)
 {
-	if ((MUIMasterBase = OpenLibrary("muimaster.library", 19)) == NULL)
+	if ((MUIMasterBase = OpenLibrary((CONST_STRPTR)MUIMASTER_LIBRARY, 19)) == NULL)
 	{
 		clean_exit("Can't open muimaster.library v19\n");
 		return FALSE;

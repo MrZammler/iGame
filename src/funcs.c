@@ -119,18 +119,19 @@ typedef struct genres
 
 genres_list *item_genres = NULL, *genres = NULL;
 
-static CONST_STRPTR GetMBString(CONST_STRPTR ref)
+static const unsigned char* GetMBString(const unsigned char* ref)
 {
 	if (ref[1] == '\0')
 		return &ref[2];
-	return ref;
+	else
+		return ref;
 }
 
 void status_show_total()
 {
 	char helper[200];
 	set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
-	sprintf(helper, GetMBString(MSG_TotalNumberOfGames), total_games);
+	sprintf(helper, (const char*)GetMBString(MSG_TotalNumberOfGames), total_games);
 	set(app->TX_Status, MUIA_Text_Contents, helper);
 }
 
@@ -151,7 +152,7 @@ void add_games_to_listview()
 void load_games_list(const char* filename)
 {
 	char file_line[500];
-	FILE* fpgames = fopen(filename, "r");
+	FILE* fpgames = fopen(filename, "re");
 	if (fpgames)
 	{
 		if (games != NULL)
@@ -232,7 +233,7 @@ void load_repos(const char* filename)
 	STRPTR file_line = malloc(500 * sizeof(char));
 	if (file_line == NULL)
 	{
-		msg_box(GetMBString(MSG_NotEnoughMemory));
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
@@ -269,7 +270,7 @@ void load_genres(const char* filename)
 	STRPTR file_line = malloc(500 * sizeof(char));
 	if (file_line == NULL)
 	{
-		msg_box(GetMBString(MSG_NotEnoughMemory));
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
@@ -303,7 +304,7 @@ void load_genres(const char* filename)
 			DoMethod(app->LV_GenresList, MUIM_List_GetEntry, i + 5, &app->CY_PropertiesGenreContent[i]);
 		}
 
-		app->CY_PropertiesGenreContent[i] = GetMBString(MSG_UnknownGenre);
+		app->CY_PropertiesGenreContent[i] = (unsigned char*)GetMBString(MSG_UnknownGenre);
 		app->CY_PropertiesGenreContent[i + 1] = NULL;
 		set(app->CY_PropertiesGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
 
@@ -347,7 +348,7 @@ void list_show_all(char* str)
 	char* helper = malloc(200 * sizeof(char));
 	if (helper == NULL)
 	{
-		msg_box(GetMBString(MSG_NotEnoughMemory));
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
@@ -388,7 +389,7 @@ void list_show_favorites(char* str)
 	char* helper = malloc(200 * sizeof(char));
 	if (helper == NULL)
 	{
-		msg_box(GetMBString(MSG_NotEnoughMemory));
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
@@ -424,7 +425,7 @@ void list_show_last_played(char* str)
 	char* helper = malloc(200 * sizeof(char));
 	if (helper == NULL)
 	{
-		msg_box(GetMBString(MSG_NotEnoughMemory));
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
@@ -460,7 +461,7 @@ void list_show_most_played(char* str)
 	char* helper = malloc(200 * sizeof(char));
 	if (helper == NULL)
 	{
-		msg_box(GetMBString(MSG_NotEnoughMemory));
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
@@ -509,7 +510,7 @@ void list_show_never_played(char* str)
 	char* helper = malloc(200 * sizeof(char));
 	if (helper == NULL)
 	{
-		msg_box(GetMBString(MSG_NotEnoughMemory));
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
@@ -547,7 +548,7 @@ void list_show_filtered(char* str, char* str_gen)
 	char* helper = malloc(200 * sizeof(char));
 	if (helper == NULL)
 	{
-		msg_box(GetMBString(MSG_NotEnoughMemory));
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
@@ -635,7 +636,7 @@ void launch_game()
 	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
 	if (game_title == NULL || strlen(game_title) == 0)
 	{
-		msg_box(GetMBString(MSG_SelectGameFromList));
+		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
 		return;
 	}
 
@@ -644,19 +645,19 @@ void launch_game()
 		get_path(game_title, path);
 	else
 	{
-		msg_box(GetMBString(MSG_NotEnoughMemory));
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
-	sprintf(helperstr, GetMBString(MSG_RunningGameTitle), game_title);
+	sprintf(helperstr, (const char*)GetMBString(MSG_RunningGameTitle), game_title);
 	set(app->TX_Status, MUIA_Text_Contents, helperstr);
 
 	unsigned char* naked_path = malloc(256 * sizeof(char));
 	if (naked_path != NULL)
-		strip_path(path, naked_path);
+		strip_path(path, (char*)naked_path);
 	else
 	{
-		msg_box(GetMBString(MSG_NotEnoughMemory));
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
@@ -665,20 +666,20 @@ void launch_game()
 		slave = get_slave_from_path(slave, strlen(naked_path), path);
 	else
 	{
-		msg_box(GetMBString(MSG_NotEnoughMemory));
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 	string_to_lower(slave);
 	if (strstr(slave, ".slave"))
 		whdload = 1;
 
-	const BPTR oldlock = Lock(PROGDIR, ACCESS_READ);
+	const BPTR oldlock = Lock((CONST_STRPTR)PROGDIR, ACCESS_READ);
 	const BPTR lock = Lock(naked_path, ACCESS_READ);
 	if (lock)
 		CurrentDir(lock);
 	else
 	{
-		msg_box(GetMBString(MSG_DirectoryNotFound));
+		msg_box((const char*)GetMBString(MSG_DirectoryNotFound));
 		return;
 	}
 
@@ -690,7 +691,7 @@ void launch_game()
 	//tooltypes only for whdload games
 	if (whdload == 1)
 	{
-		if ((icon_base = (struct Library *)OpenLibrary("icon.library", 0)))
+		if ((icon_base = (struct Library *)OpenLibrary((CONST_STRPTR)ICON_LIBRARY, 0)))
 		{
 			//scan the .info files in the current dir.
 			//one of them should be the game's project icon.
@@ -807,7 +808,7 @@ void launch_game()
 	success = Execute(exec, 0, 0);
 
 	if (success == 0)
-		msg_box(GetMBString(MSG_ErrorExecutingWhdload));
+		msg_box((const char*)GetMBString(MSG_ErrorExecutingWhdload));
 
 	CurrentDir(oldlock);
 	status_show_total();
@@ -837,7 +838,7 @@ void scan_repositories()
 		for (item_repos = repos; item_repos != NULL; item_repos = item_repos->next)
 		{
 			sprintf(repotemp, "%s", item_repos->repo);
-			sprintf(helperstr, GetMBString(MSG_ScanningPleaseWait), repotemp);
+			sprintf(helperstr, (const char*)GetMBString(MSG_ScanningPleaseWait), repotemp);
 			set(app->TX_Status, MUIA_Text_Contents, helperstr);
 			const BPTR oldlock = Lock(repotemp, ACCESS_READ);
 
@@ -901,7 +902,7 @@ void game_click()
 			get_path(game_title, path);
 		else
 		{
-			msg_box(GetMBString(MSG_NotEnoughMemory));
+			msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 			return;
 		}
 
@@ -910,7 +911,7 @@ void game_click()
 			strip_path(path, naked_path);
 		else
 		{
-			msg_box(GetMBString(MSG_NotEnoughMemory));
+			msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 			return;
 		}
 
@@ -1076,7 +1077,7 @@ void repo_stop()
 	BPTR fprepos = Open((CONST_STRPTR)DEFAULT_REPOS_FILE, MODE_NEWFILE);
 	if (!fprepos)
 	{
-		msg_box(GetMBString(MSG_CouldNotCreateReposFile));
+		msg_box((const char*)GetMBString(MSG_CouldNotCreateReposFile));
 	}
 	else
 	{
@@ -1131,14 +1132,14 @@ void game_properties()
 	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
 	if (game_title == NULL || strlen(game_title) == 0)
 	{
-		msg_box(GetMBString(MSG_SelectGameFromList));
+		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
 		return;
 	}
 
 	const int found = title_exists(game_title);
 	if (!found)
 	{
-		msg_box(GetMBString(MSG_SelectGameFromList));
+		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
 		return;
 	}
 
@@ -1177,7 +1178,7 @@ void game_properties()
 		get_path(game_title, path);
 	else
 	{
-		msg_box(GetMBString(MSG_NotEnoughMemory));
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
@@ -1186,7 +1187,7 @@ void game_properties()
 		strip_path(path, naked_path);
 	else
 	{
-		msg_box(GetMBString(MSG_NotEnoughMemory));
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
@@ -1195,25 +1196,25 @@ void game_properties()
 		slave = get_slave_from_path(slave, strlen(naked_path), path);
 	else
 	{
-		msg_box(GetMBString(MSG_NotEnoughMemory));
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
 	string_to_lower(slave);
 
-	const BPTR oldlock = Lock(PROGDIR, ACCESS_READ);
+	const BPTR oldlock = Lock((CONST_STRPTR)PROGDIR, ACCESS_READ);
 	const BPTR lock = Lock((CONST_STRPTR)naked_path, ACCESS_READ);
 	if (lock)
 		CurrentDir(lock);
 	else
 	{
-		msg_box(GetMBString(MSG_DirectoryNotFound));
+		msg_box((const char*)GetMBString(MSG_DirectoryNotFound));
 		return;
 	}
 
 	memset(&gamestooltypes[0], 0, sizeof gamestooltypes);
 
-	if ((icon_base = (struct Library *)OpenLibrary("icon.library", 0)))
+	if ((icon_base = (struct Library *)OpenLibrary((CONST_STRPTR)ICON_LIBRARY, 0)))
 	{
 		//scan the .info files in the current dir.
 		//one of them should be the game's project icon.
@@ -1245,8 +1246,7 @@ void game_properties()
 
 				if ((disk_obj = GetDiskObject((STRPTR)fullpath)))
 				{
-					if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "SLAVE"), (STRPTR)slave)
-						|| MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "slave"), (STRPTR)slave))
+					if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, (STRPTR)SLAVE_STRING), (STRPTR)slave))
 					{
 						for (char** tool_types = (char **)disk_obj->do_ToolTypes; (tool_type = *tool_types); ++
 						     tool_types)
@@ -1318,7 +1318,7 @@ void game_properties_ok()
 				//check dup for title
 				if (check_dup_title(game_title))
 				{
-					msg_box(GetMBString(MSG_TitleAlreadyExists));
+					msg_box((const char*)GetMBString(MSG_TitleAlreadyExists));
 					return;
 				}
 			}
@@ -1359,7 +1359,7 @@ void game_properties_ok()
 			strip_path(path, naked_path);
 		else
 		{
-			msg_box(GetMBString(MSG_NotEnoughMemory));
+			msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 			return;
 		}
 		strip_path(path, naked_path);
@@ -1368,16 +1368,16 @@ void game_properties_ok()
 			get_slave_from_path(slave, strlen(naked_path), path);
 		else
 		{
-			msg_box(GetMBString(MSG_NotEnoughMemory));
+			msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 			return;
 		}
 		string_to_lower(slave);
 
-		BPTR oldlock = Lock(PROGDIR, ACCESS_READ);
+		BPTR oldlock = Lock((CONST_STRPTR)PROGDIR, ACCESS_READ);
 		const BPTR lock = Lock((CONST_STRPTR)naked_path, ACCESS_READ);
 		CurrentDir(lock);
 
-		if ((icon_base = (struct Library *)OpenLibrary("icon.library", 0)))
+		if ((icon_base = (struct Library *)OpenLibrary((CONST_STRPTR)ICON_LIBRARY, 0)))
 		{
 			//scan the .info files in the current dir.
 			//one of them should be the game's project icon.
@@ -1409,8 +1409,7 @@ void game_properties_ok()
 
 					if ((disk_obj = GetDiskObject((STRPTR)fullpath)))
 					{
-						if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "SLAVE"), (STRPTR)slave)
-							|| MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "slave"), (STRPTR)slave))
+						if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, (STRPTR)SLAVE_STRING), (STRPTR)slave))
 						{
 							//check numbers for old and new tooltypes
 							for (i = 0; i <= strlen(tools); i++)
@@ -1706,7 +1705,7 @@ void followthread(BPTR lock, int tab_level)
 		if (m->fib_DirEntryType > 0)
 		{
 			/*  Since it is a directory, get a lock on it: */
-			const BPTR newlock = Lock(m->fib_FileName, ACCESS_READ);
+			const BPTR newlock = Lock((CONST_STRPTR)m->fib_FileName, ACCESS_READ);
 
 			/*  cd to this directory: */
 			const BPTR oldlock = CurrentDir(newlock);
@@ -1799,13 +1798,13 @@ BOOL get_filename(const char* title, const char* positive_text, const BOOL save_
 */
 void save_to_file(const char* filename, const int check_exists)
 {
-	const char* saving_message = GetMBString(MSG_SavingGamelist);
+	const char* saving_message = (const char*)GetMBString(MSG_SavingGamelist);
 	set(app->TX_Status, MUIA_Text_Contents, saving_message);
 
 	FILE* fpgames = fopen(filename, "w");
 	if (!fpgames)
 	{
-		msg_box(GetMBString(MSG_FailedOpeningGameslist));
+		msg_box((const char*)GetMBString(MSG_FailedOpeningGameslist));
 	}
 	else
 	{
@@ -1886,7 +1885,7 @@ int hex2dec(char* hexin)
 	int dec;
 	//lose the first $ character
 	hexin++;
-	sscanf(hexin, "%lx", &dec);
+	sscanf(hexin, "%x", &dec);
 	return dec;
 }
 
@@ -1904,7 +1903,7 @@ void game_duplicate()
 
 	if (str == NULL || strlen(str) == 0)
 	{
-		msg_box(GetMBString(MSG_SelectGameFromList));
+		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
 		return;
 	}
 
@@ -1920,7 +1919,7 @@ void game_duplicate()
 
 	if (!found)
 	{
-		msg_box(GetMBString(MSG_SelectGameFromList));
+		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
 		return;
 	}
 
@@ -1980,7 +1979,7 @@ void game_delete()
 	}
 	else
 	{
-		msg_box(GetMBString(MSG_SelectGameFromList));
+		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
 	}
 }
 
@@ -2038,9 +2037,9 @@ void msg_box(const char* msg)
 {
 	msgbox.es_StructSize = sizeof msgbox;
 	msgbox.es_Flags = 0;
-	msgbox.es_Title = "iGame";
+	msgbox.es_Title = (UBYTE*)GetMBString(MSG_WI_MainWindow);
 	msgbox.es_TextFormat = (unsigned char*)msg;
-	msgbox.es_GadgetFormat = "Ok";
+	msgbox.es_GadgetFormat = (UBYTE*)GetMBString(MSG_BT_AboutOK);
 
 	EasyRequest(NULL, &msgbox, NULL);
 }
@@ -2051,11 +2050,11 @@ void get_screen_size(int* width, int* height)
 	struct Library* intuition_base;
 	struct Library* gfx_base;
 
-	if ((intuition_base = (struct Library *)OpenLibrary("intuition.library", 36)))
+	if ((intuition_base = (struct Library *)OpenLibrary((CONST_STRPTR)INTUITION_LIBRARY, 36)))
 	{
-		if ((gfx_base = (struct Library *)OpenLibrary("graphics.library", 36)))
+		if ((gfx_base = (struct Library *)OpenLibrary((CONST_STRPTR)GRAPHICS_LIBRARY, 36)))
 		{
-			if ((wbscreen = LockPubScreen("Workbench")))
+			if ((wbscreen = LockPubScreen((CONST_STRPTR)WB_PUBSCREEN_NAME)))
 			{
 				/* Using intuition.library/GetScreenDrawInfo(), we get the pen
 				* array we'll use for the screen clone the easy way. */
@@ -2106,12 +2105,12 @@ void read_tool_types()
 	NOSMARTSPACES = 0;
 	NOSIDEPANEL = 0;
 
-	if ((icon_base = (struct Library *)OpenLibrary("icon.library", 0)))
+	if ((icon_base = (struct Library *)OpenLibrary((CONST_STRPTR)ICON_LIBRARY, 0)))
 	{
 		char* filename = strcat(PROGDIR, executable_name);
 		if ((disk_obj = GetDiskObject((STRPTR)filename)))
 		{
-			if (FindToolType(disk_obj->do_ToolTypes, "SCREENSHOT"))
+			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_SCREENSHOT))
 			{
 				char** tool_types = (char **)disk_obj->do_ToolTypes;
 				char* tool_type = *tool_types;
@@ -2122,7 +2121,7 @@ void read_tool_types()
 					|| !strcmp(temp_tbl[0], " ")
 					|| !strcmp(temp_tbl[0], ""))
 				{
-					msg_box(GetMBString(MSG_BadTooltype));
+					msg_box((const char*)GetMBString(MSG_BadTooltype));
 					exit(0);
 				}
 
@@ -2141,25 +2140,25 @@ void read_tool_types()
 				}
 			}
 
-			if (FindToolType(disk_obj->do_ToolTypes, "NOGUIGFX"))
+			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOGUIGFX))
 				NOGUIGFX = 1;
 
-			if (FindToolType(disk_obj->do_ToolTypes, "FILTERUSEENTER"))
+			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_FILTERUSEENTER))
 				FILTERUSEENTER = 1;
 
-			if (FindToolType(disk_obj->do_ToolTypes, "NOSCREENSHOT"))
+			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSCREENSHOT))
 				NOSCREENSHOT = 1;
 
-			if (FindToolType(disk_obj->do_ToolTypes, "SAVESTATSONEXIT"))
+			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_SAVESTATSONEXIT))
 				SAVESTATSONEXIT = 1;
 
-			if (FindToolType(disk_obj->do_ToolTypes, "TITLESFROMDIRS"))
+			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_TITLESFROMDIRS))
 				TITLESFROMDIRS = 1;
 
-			if (FindToolType(disk_obj->do_ToolTypes, "NOSMARTSPACES"))
+			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSMARTSPACES))
 				NOSMARTSPACES = 1;
 
-			if (FindToolType(disk_obj->do_ToolTypes, "NOSIDEPANEL"))
+			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSIDEPANEL))
 				NOSIDEPANEL = 1;
 		}
 
@@ -2214,12 +2213,12 @@ void non_whdload_ok()
 
 	if (strlen(str_title) == 0)
 	{
-		msg_box(GetMBString(MSG_NoTitleSpecified));
+		msg_box((const char*)GetMBString(MSG_NoTitleSpecified));
 		return;
 	}
 	if (strlen(str) == 0)
 	{
-		msg_box(GetMBString(MSG_NoExecutableSpecified));
+		msg_box((const char*)GetMBString(MSG_NoExecutableSpecified));
 		return;
 	}
 
@@ -2282,7 +2281,7 @@ int get_title_from_slave(char* slave, char* title)
 
 	struct slave_info sl;
 
-	FILE* fp = fopen(slave, "rb");
+	FILE* fp = fopen(slave, "rbe");
 	if (fp == NULL)
 	{
 		return 1;
@@ -2410,9 +2409,7 @@ const char* add_spaces_to_string(const char* input)
 {
 	char input_string[100];
 	strcpy(input_string, input);
-
 	char* output = (char*)malloc(sizeof input_string * 2);
-	const char mc[] = "Mc";
 
 	// Special case for the first character, we don't touch it
 	output[0] = input_string[0];

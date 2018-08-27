@@ -32,7 +32,7 @@ extern int FILTERUSEENTER;
 extern int NOSCREENSHOT;
 extern int NOSIDEPANEL;
 
-static CONST_STRPTR GetMBString(CONST_STRPTR ref)
+static const unsigned char* GetMBString(const unsigned char* ref)
 {
 	if (ref[1] == '\0')
 		return &ref[2];
