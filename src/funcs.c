@@ -150,7 +150,8 @@ void add_games_to_listview()
 
 void load_games_list(const char* filename)
 {
-	STRPTR file_line = malloc(500 * sizeof(char));
+	const int buffer_size = 512;
+	STRPTR file_line = malloc(buffer_size * sizeof(char));
 	if (file_line == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
@@ -168,7 +169,7 @@ void load_games_list(const char* filename)
 
 		do
 		{
-			if (FGets(fpgames, file_line, 500) == NULL)
+			if (FGets(fpgames, file_line, buffer_size) == NULL)
 				break;
 
 			file_line[strlen(file_line) - 1] = '\0';
@@ -237,7 +238,8 @@ void load_games_list(const char* filename)
 
 void load_repos(const char* filename)
 {
-	STRPTR file_line = malloc(500 * sizeof(char));
+	const int buffer_size = 512;
+	STRPTR file_line = malloc(buffer_size * sizeof(char));
 	if (file_line == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
@@ -247,7 +249,7 @@ void load_repos(const char* filename)
 	BPTR fprepos = Open((CONST_STRPTR)filename, MODE_OLDFILE);
 	if (fprepos)
 	{
-		while (FGets(fprepos, file_line, 500))
+		while (FGets(fprepos, file_line, buffer_size))
 		{
 			item_repos = (repos_list *)calloc(1, sizeof(repos_list));
 			item_repos->next = NULL;
@@ -274,7 +276,8 @@ void load_repos(const char* filename)
 
 void load_genres(const char* filename)
 {
-	STRPTR file_line = malloc(500 * sizeof(char));
+	const int buffer_size = 512;
+	STRPTR file_line = malloc(buffer_size * sizeof(char));
 	if (file_line == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
@@ -286,7 +289,7 @@ void load_genres(const char* filename)
 	if (fpgenres)
 	{
 		no_of_genres = 0;
-		while (FGets(fpgenres, file_line, 500))
+		while (FGets(fpgenres, file_line, buffer_size))
 		{
 			item_genres = (genres_list *)calloc(1, sizeof(genres_list));
 			item_genres->next = NULL;
@@ -1805,7 +1808,7 @@ BOOL get_filename(const char* title, const char* positive_text, const BOOL save_
 */
 void save_to_file(const char* filename, const int check_exists)
 {
-	const int buffer_size = 500;
+	const int buffer_size = 512;
 	char* file_line = malloc(buffer_size * sizeof(char));
 	if (file_line == NULL)
 	{
