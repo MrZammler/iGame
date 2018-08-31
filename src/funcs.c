@@ -53,7 +53,8 @@ int total_hidden = 0;
 int showing_hidden = 0;
 int total_games;
 int no_of_genres;
-char gamestooltypes[1024];
+char* game_tooltypes;
+char fname[255];
 int SS_WIDTH, SS_HEIGHT;
 int NOGUIGFX;
 int FILTERUSEENTER;
@@ -68,7 +69,7 @@ int IntroPic = 0;
 char** my_split(char* str, char* spl);
 int get_genre(char* title, char* genre);
 void get_path(char* title, char* path);
-void followthread(BPTR lock, int tab_level);
+void follow_thread(BPTR lock, int tab_level);
 void refresh_list(int check_exists);
 int hex2dec(char* hexin);
 void msg_box(const char* msg);
@@ -84,7 +85,6 @@ char* get_slave_from_path(char* slave, int start, char* path);
 /* structures */
 struct EasyStruct msgbox;
 struct FileRequester* request;
-char fname[255];
 
 typedef struct games
 {
@@ -855,7 +855,7 @@ void scan_repositories()
 			if (oldlock != 0)
 			{
 				CurrentDir(oldlock);
-				followthread(oldlock, 0);
+				follow_thread(oldlock, 0);
 				CurrentDir(currentlock);
 			}
 			else
@@ -1222,7 +1222,17 @@ void game_properties()
 		return;
 	}
 
-	memset(&gamestooltypes[0], 0, sizeof gamestooltypes);
+	// If it's already been allocated, let's just zero it out
+	if (game_tooltypes)
+		memset(&game_tooltypes[0], 0, 1024*sizeof(char));
+	else
+		game_tooltypes = AllocMem(1024 * sizeof(char), MEMF_CLEAR);
+	
+	if (game_tooltypes == 0)
+	{
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+		return;
+	}
 
 	if ((icon_base = (struct Library *)OpenLibrary((CONST_STRPTR)ICON_LIBRARY, 0)))
 	{
@@ -1264,7 +1274,7 @@ void game_properties()
 							if (!strncmp(tool_type, "IM", 2))
 								continue;
 
-							sprintf(gamestooltypes, "%s%s\n", gamestooltypes, tool_type);
+							sprintf(game_tooltypes, "%s%s\n", game_tooltypes, tool_type);
 							set(app->TX_PropertiesTooltypes, MUIA_TextEditor_ReadOnly, FALSE);
 						}
 
@@ -1287,13 +1297,13 @@ void game_properties()
 	if (naked_path)
 		free(naked_path);
 
-	if (strlen(gamestooltypes) == 0)
+	if (strlen(game_tooltypes) == 0)
 	{
-		sprintf(gamestooltypes, "No .info file");
+		sprintf(game_tooltypes, "No .info file");
 		set(app->TX_PropertiesTooltypes, MUIA_TextEditor_ReadOnly, TRUE);
 	}
 
-	set(app->TX_PropertiesTooltypes, MUIA_TextEditor_Contents, gamestooltypes);
+	set(app->TX_PropertiesTooltypes, MUIA_TextEditor_Contents, game_tooltypes);
 	CurrentDir(oldlock);
 	set(app->WI_Properties, MUIA_Window_Open, TRUE);
 }
@@ -1362,7 +1372,7 @@ void game_properties_ok()
 	STRPTR tools = (STRPTR)DoMethod(app->TX_PropertiesTooltypes, MUIM_TextEditor_ExportText);
 
 	//tooltypes changed
-	if (strcmp((char *)tools, gamestooltypes))
+	if (strcmp((char *)tools, game_tooltypes))
 	{
 		char* naked_path = malloc(256 * sizeof(char));
 		if (naked_path != NULL)
@@ -1428,8 +1438,8 @@ void game_properties_ok()
 							//add one for the last tooltype that doesnt end with \n
 							new_tool_type_count++;
 
-							for (i = 0; i <= strlen(gamestooltypes); i++)
-								if (gamestooltypes[i] == '\n') old_tool_type_count++;
+							for (i = 0; i <= strlen(game_tooltypes); i++)
+								if (game_tooltypes[i] == '\n') old_tool_type_count++;
 
 							for (char** tool_types = (char **)disk_obj->do_ToolTypes; (tool_type = *tool_types); ++
 							     tool_types)
@@ -1476,6 +1486,8 @@ void game_properties_ok()
 			free(path);
 		if (naked_path)
 			free(naked_path);
+		if (game_tooltypes)
+			FreeMem(game_tooltypes, 1024 * sizeof(char));
 	}
 	FreeVec(tools);
 
@@ -1525,7 +1537,6 @@ void app_stop()
 		save_list(0);
 
 	memset(&fname[0], 0, sizeof fname);
-	memset(&gamestooltypes[0], 0, sizeof gamestooltypes);
 
 	if (games)
 	{
@@ -1596,7 +1607,7 @@ char** my_split(char* str, char* spl)
 	return ret;
 }
 
-void followthread(BPTR lock, int tab_level)
+void follow_thread(BPTR lock, int tab_level)
 {
 	int exists = 0, j;
 	char str[512], fullpath[512], temptitle[256];
@@ -1721,7 +1732,7 @@ void followthread(BPTR lock, int tab_level)
 			const BPTR oldlock = CurrentDir(newlock);
 
 			/*  recursively follow the thread down to the bottom: */
-			followthread(newlock, tab_level + 1);
+			follow_thread(newlock, tab_level + 1);
 
 			/*  cd back to where we used to be: */
 			CurrentDir(oldlock);
