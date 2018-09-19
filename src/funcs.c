@@ -55,14 +55,7 @@ int total_games;
 int no_of_genres;
 char* game_tooltypes;
 char fname[255];
-int SS_WIDTH, SS_HEIGHT;
 int NOGUIGFX;
-int FILTERUSEENTER;
-int NOSCREENSHOT;
-int SAVESTATSONEXIT;
-int TITLESFROMDIRS;
-int NOSMARTSPACES;
-int NOSIDEPANEL;
 int IntroPic = 0;
 
 /* function definitions */
@@ -86,38 +79,10 @@ char* get_slave_from_path(char* slave, int start, char* path);
 struct EasyStruct msgbox;
 struct FileRequester* request;
 
-typedef struct games
-{
-	char title[200];
-	char genre[30];
-	int index;
-	char path[256];
-	int favorite;
-	int times_played;
-	int last_played; //indicates whether this one was the last game played
-	int exists; //indicates whether this game still exists after a scan
-	int hidden; //game is hidden from normal operation
-	int deleted; // indicates this entry should be deleted when the list is saved
-	struct games* next;
-} games_list;
-
 games_list *item_games = NULL, *games = NULL;
-
-typedef struct repos
-{
-	char repo[256];
-	struct repos* next;
-} repos_list;
-
 repos_list *item_repos = NULL, *repos = NULL;
-
-typedef struct genres
-{
-	char genre[256];
-	struct genres* next;
-} genres_list;
-
 genres_list *item_genres = NULL, *genres = NULL;
+igame_settings *current_settings = NULL;
 
 const unsigned char* GetMBString(const unsigned char* ref)
 {
@@ -146,6 +111,62 @@ void add_games_to_listview()
 		}
 	}
 	status_show_total();
+}
+
+void load_settings(const char* filename)
+{
+	const int buffer_size = 512;
+	STRPTR file_line = malloc(buffer_size * sizeof(char));
+	if (file_line == NULL)
+	{
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+		return;
+	}
+
+	BPTR fpsettings = Open((CONST_STRPTR)filename, MODE_OLDFILE);
+	if (fpsettings)
+	{
+		if (current_settings != NULL)
+		{
+			free(current_settings);
+			current_settings = NULL;
+		}
+
+		current_settings = (igame_settings *)calloc(1, sizeof(igame_settings));
+
+		do
+		{
+			if (FGets(fpsettings, file_line, buffer_size) == NULL)
+				break;
+
+			file_line[strlen(file_line) - 1] = '\0';
+
+			if (strlen(file_line) == 0)
+				continue;
+
+			if (!strncmp(file_line, "filter_use_enter=", 17))
+				current_settings->filter_use_enter = atoi((const char*)file_line + 17);
+			if (!strncmp(file_line, "hide_side_panel=", 16))
+				current_settings->hide_side_panel = atoi((const char*)file_line + 16);
+			if (!strncmp(file_line, "save_stats_on_exit=", 19))
+				current_settings->save_stats_on_exit = atoi((const char*)file_line + 19);
+			if (!strncmp(file_line, "no_smart_spaces=", 16))
+				current_settings->no_smart_spaces = atoi((const char*)file_line + 16);
+			if (!strncmp(file_line, "titles_from_dirs=", 17))
+				current_settings->titles_from_dirs = atoi((const char*)file_line + 17);
+			if (!strncmp(file_line, "hide_screenshots=", 17))
+				current_settings->hide_screenshots = atoi((const char*)file_line + 17);
+			if (!strncmp(file_line, "screenshot_width=", 17))
+				current_settings->screenshot_width = atoi((const char*)file_line + 17);
+			if (!strncmp(file_line, "screenshot_height=", 18))
+				current_settings->screenshot_height = atoi((const char*)file_line + 18);
+		}
+		while (1);
+
+		Close(fpsettings);
+	}
+	if (file_line)
+		free(file_line);
 }
 
 void load_games_list(const char* filename)
@@ -206,13 +227,13 @@ void load_games_list(const char* filename)
 					else if (!strncmp(file_line, "path=", 5))
 						strcpy(item_games->path, file_line + 5);
 					else if (!strncmp(file_line, "favorite=", 9))
-						item_games->favorite = atoi(file_line + 9);
+						item_games->favorite = atoi((const char*)file_line + 9);
 					else if (!strncmp(file_line, "timesplayed=", 12))
-						item_games->times_played = atoi(file_line + 12);
+						item_games->times_played = atoi((const char*)file_line + 12);
 					else if (!strncmp(file_line, "lastplayed=", 11))
-						item_games->last_played = atoi(file_line + 11);
+						item_games->last_played = atoi((const char*)file_line + 11);
 					else if (!strncmp(file_line, "hidden=", 7))
-						item_games->hidden = atoi(file_line + 7);
+						item_games->hidden = atoi((const char*)file_line + 7);
 				}
 				while (1);
 
@@ -335,7 +356,7 @@ void add_default_filters()
 
 void app_start()
 {
-	load_games_list(DEFAULT_GAMELIST_FILE);
+	load_games_list(DEFAULT_GAMESLIST_FILE);
 	load_repos(DEFAULT_REPOS_FILE);
 	add_default_filters();
 	load_genres(DEFAULT_GENRES_FILE);
@@ -812,7 +833,7 @@ void launch_game()
 		}
 	}
 
-	if (SAVESTATSONEXIT == 0)
+	if (!current_settings->save_stats_on_exit)
 		save_list(0);
 
 	success = Execute(exec, 0, 0);
@@ -899,7 +920,7 @@ void strip_path(const char* path, char* naked_path)
 
 void game_click()
 {
-	if (NOSIDEPANEL || NOSCREENSHOT)
+	if (current_settings->hide_side_panel || current_settings->hide_screenshots)
 		return;
 
 	char* game_title = NULL;
@@ -959,8 +980,8 @@ void game_click()
 					                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
 					                                  MUIA_Guigfx_Transparency, 0,
 					                                  MUIA_Frame, MUIV_Frame_ImageButton,
-					                                  MUIA_FixHeight, SS_HEIGHT,
-					                                  MUIA_FixWidth, SS_WIDTH,
+					                                  MUIA_FixHeight, current_settings->screenshot_height,
+					                                  MUIA_FixWidth, current_settings->screenshot_width,
 					End;
 				}
 
@@ -994,8 +1015,8 @@ void game_click()
 						                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
 						                                  MUIA_Guigfx_Transparency, 0,
 						                                  MUIA_Frame, MUIV_Frame_ImageButton,
-						                                  MUIA_FixHeight, SS_HEIGHT,
-						                                  MUIA_FixWidth, SS_WIDTH,
+						                                  MUIA_FixHeight, current_settings->screenshot_height,
+						                                  MUIA_FixWidth, current_settings->screenshot_width,
 						End;
 					}
 					if (app->IM_GameImage_1)
@@ -1533,7 +1554,7 @@ void list_show_hidden()
 
 void app_stop()
 {
-	if (SAVESTATSONEXIT == 1)
+	if (current_settings->save_stats_on_exit)
 		save_list(0);
 
 	memset(&fname[0], 0, sizeof fname);
@@ -1672,13 +1693,13 @@ void follow_thread(BPTR lock, int tab_level)
 					temptitle[n++] = str[k];
 				temptitle[n] = '\0';
 
-				if (TITLESFROMDIRS)
+				if (current_settings->titles_from_dirs)
 				{
 					// If the TITLESFROMDIRS tooltype is enabled, set Titles from Directory names
 					const char* title = get_directory_name(fullpath);
 					if (title != NULL)
 					{
-						if (NOSMARTSPACES)
+						if (!current_settings->no_smart_spaces)
 						{
 							strcpy(item_games->title, title);
 						}
@@ -1898,7 +1919,7 @@ void save_to_file(const char* filename, const int check_exists)
 
 void save_list(const int check_exists)
 {
-	save_to_file(DEFAULT_GAMELIST_FILE, check_exists);
+	save_to_file(DEFAULT_GAMESLIST_FILE, check_exists);
 }
 
 void save_list_as()
@@ -2067,9 +2088,11 @@ void settings_save()
 	//TODO
 }
 
-void setttings_use()
+void settings_use()
 {
 	//TODO
+	if (current_settings == NULL)
+		return;
 }
 
 void setting_hide_side_panel_changed()
@@ -2138,16 +2161,7 @@ void read_tool_types()
 	struct DiskObject* disk_obj;
 
 	int screen_width, screen_height;
-
-	SS_HEIGHT = -1;
-	SS_WIDTH = -1;
 	NOGUIGFX = 0;
-	FILTERUSEENTER = 0;
-	NOSCREENSHOT = 0;
-	SAVESTATSONEXIT = 0;
-	TITLESFROMDIRS = 0;
-	NOSMARTSPACES = 0;
-	NOSIDEPANEL = 0;
 
 	if ((icon_base = (struct Library *)OpenLibrary((CONST_STRPTR)ICON_LIBRARY, 0)))
 	{
@@ -2172,8 +2186,8 @@ void read_tool_types()
 				if (temp_tbl[1] != NULL)
 				{
 					char** temp_tbl2 = my_split((char *)temp_tbl[1], "x");
-					if (temp_tbl2[0]) SS_WIDTH = atoi((char *)temp_tbl2[0]);
-					if (temp_tbl2[1]) SS_HEIGHT = atoi((char *)temp_tbl2[1]);
+					if (temp_tbl2[0]) current_settings->screenshot_width = atoi((char *)temp_tbl2[0]);
+					if (temp_tbl2[1]) current_settings->screenshot_height = atoi((char *)temp_tbl2[1]);
 
 					free(temp_tbl2[0]);
 					free(temp_tbl2[1]);
@@ -2188,31 +2202,31 @@ void read_tool_types()
 				NOGUIGFX = 1;
 
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_FILTERUSEENTER))
-				FILTERUSEENTER = 1;
+				current_settings->filter_use_enter = 1;
 
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSCREENSHOT))
-				NOSCREENSHOT = 1;
+				current_settings->hide_screenshots = 1;
 
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_SAVESTATSONEXIT))
-				SAVESTATSONEXIT = 1;
+				current_settings->save_stats_on_exit = 1;
 
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_TITLESFROMDIRS))
-				TITLESFROMDIRS = 1;
+				current_settings->titles_from_dirs = 1;
 
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSMARTSPACES))
-				NOSMARTSPACES = 1;
+				current_settings->no_smart_spaces = 1;
 
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSIDEPANEL))
-				NOSIDEPANEL = 1;
+				current_settings->hide_side_panel = 1;
 		}
 
 		CloseLibrary(icon_base);
 	}
 
-	if (!NOSIDEPANEL)
+	if (!current_settings->hide_side_panel)
 	{
 		//check screen res and adjust image box accordingly
-		if (SS_HEIGHT == -1 && SS_WIDTH == -1)
+		if (current_settings->screenshot_height == -1 && current_settings->screenshot_width == -1)
 		{
 			get_screen_size(&screen_width, &screen_height);
 
@@ -2222,20 +2236,20 @@ void read_tool_types()
 				//for hi-res screens (800x600 or greater) we'll use 320x256
 				if (screen_width >= 800 && screen_height >= 600)
 				{
-					SS_WIDTH = 320;
-					SS_HEIGHT = 256;
+					current_settings->screenshot_width = 320;
+					current_settings->screenshot_height = 256;
 				}
 				else
 				{
 					// for anything less, we'll go with half that
-					SS_WIDTH = 160;
-					SS_HEIGHT = 128;
+					current_settings->screenshot_width = 160;
+					current_settings->screenshot_height = 128;
 				}
 			}
 			else
 			{
-				SS_WIDTH = 160;
-				SS_HEIGHT = 128;
+				current_settings->screenshot_width = 160;
+				current_settings->screenshot_height = 128;
 			}
 		}
 	}

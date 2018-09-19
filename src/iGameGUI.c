@@ -26,11 +26,8 @@
 #include "iGameExtern.h"
 #include "iGameStrings_cat.h"
 
-extern int SS_WIDTH, SS_HEIGHT;
 extern int NOGUIGFX;
-extern int FILTERUSEENTER;
-extern int NOSCREENSHOT;
-extern int NOSIDEPANEL;
+extern igame_settings *current_settings;
 
 struct ObjApp * CreateApp(void)
 {
@@ -207,7 +204,7 @@ struct ObjApp * CreateApp(void)
 #if defined(__amigaos4__)
 	static const struct Hook SetttingsUseHook = { { NULL,NULL }, (HOOKFUNC)setttings_use, NULL, NULL };
 #else
-	static const struct Hook SetttingsUseHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setttings_use, NULL };
+	static const struct Hook SetttingsUseHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)settings_use, NULL };
 #endif
 
 
@@ -260,11 +257,11 @@ struct ObjApp * CreateApp(void)
 		MUIA_Listview_List, object->LV_GamesList,
 		End;
 
-	if (!NOSIDEPANEL)
+	if (!current_settings->hide_side_panel)
 	{
 		Space_Gamelist = HSpace(1);
 
-		if (!NOSCREENSHOT) {
+		if (!current_settings->hide_screenshots) {
 
 			if (NOGUIGFX) {
 				object->IM_GameImage_0 = MUI_NewObject(Dtpic_Classname,
@@ -278,8 +275,8 @@ struct ObjApp * CreateApp(void)
 					MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
 					MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
 					MUIA_Frame, MUIV_Frame_ImageButton,
-					MUIA_FixHeight, SS_HEIGHT,
-					MUIA_FixWidth, SS_WIDTH,
+					MUIA_FixHeight, current_settings->screenshot_height,
+					MUIA_FixWidth, current_settings->screenshot_width,
 					End;
 			}
 		}
@@ -295,10 +292,10 @@ struct ObjApp * CreateApp(void)
 			MUIA_HelpNode, "LV_GenresList",
 			MUIA_FrameTitle, GetMBString(MSG_LV_GenresListTitle),
 			MUIA_Listview_List, object->LV_GenresList,
-			MUIA_MaxWidth, SS_WIDTH,	//keep the same width as if there was a screenshot area
+			MUIA_MaxWidth, current_settings->screenshot_width,	//keep the same width as if there was a screenshot area
 			End;
 
-		if (!NOSCREENSHOT) {
+		if (!current_settings->hide_screenshots) {
 
 			object->GR_sidepanel = GroupObject,
 				MUIA_HelpNode, "GR_sidepanel",
@@ -1225,7 +1222,7 @@ struct ObjApp * CreateApp(void)
 	);
 
 	//call whenever the string is changed
-	if (FILTERUSEENTER == 0) {
+	if (!current_settings->filter_use_enter) {
 
 		DoMethod(object->STR_Filter,
 			MUIM_Notify, MUIA_String_Contents, MUIV_EveryTime,

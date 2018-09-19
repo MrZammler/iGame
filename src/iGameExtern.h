@@ -4,11 +4,12 @@
 #define Dtpic_Classname "Dtpic.mui"
 #define MUIA_Dtpic_Name 0x80423d72
 #define TEMPLATE "SCREENSHOT/K"
-#define DEFAULT_GAMELIST_FILE "PROGDIR:gameslist"
+#define PROGDIR "PROGDIR:"
+#define DEFAULT_GAMESLIST_FILE "PROGDIR:gameslist"
 #define DEFAULT_REPOS_FILE "PROGDIR:repos.prefs"
 #define DEFAULT_GENRES_FILE "PROGDIR:genres"
 #define DEFAULT_SCREENSHOT_FILE "PROGDIR:igame.iff"
-#define PROGDIR "PROGDIR:"
+#define DEFAULT_SETTINGS_FILE "PROGDIR:igame.prefs"
 #define SLAVE_STRING "slave"
 #define ICON_LIBRARY "icon.library"
 #define INTUITION_LIBRARY "intuition.library"
@@ -43,6 +44,45 @@
 #define SCREENASPECT_HOTKEY 's'
 #define SCALEMODEMASK(u,d,p,s) (((u)?GGSMF_SCALEUP:0)|((d)?GGSMF_SCALEDOWN:0)|((p)?GGSMF_KEEPASPECT_PICTURE:0)|((s)?GGSMF_KEEPASPECT_SCREEN:0))
 
+typedef struct settings
+{
+	int filter_use_enter;
+	int save_stats_on_exit;
+	int no_smart_spaces;
+	int titles_from_dirs;
+	int hide_screenshots;
+	int screenshot_width;
+	int screenshot_height;
+	int hide_side_panel;
+} igame_settings;
+
+typedef struct genres
+{
+	char genre[256];
+	struct genres* next;
+} genres_list;
+
+typedef struct repos
+{
+	char repo[256];
+	struct repos* next;
+} repos_list;
+
+typedef struct games
+{
+	char title[200];
+	char genre[30];
+	int index;
+	char path[256];
+	int favorite;
+	int times_played;
+	int last_played; //indicates whether this one was the last game played
+	int exists; //indicates whether this game still exists after a scan
+	int hidden; //game is hidden from normal operation
+	int deleted; // indicates this entry should be deleted when the list is saved
+	struct games* next;
+} games_list;
+
 void scan_repositories();
 void open_list();
 void save_list(int check_exists);
@@ -72,7 +112,7 @@ void setting_use_gui_gfx_changed();
 void setting_screenshot_size_changed();
 void settings_save();
 void setting_hide_side_panel_changed();
-void setttings_use();
+void settings_use();
 const unsigned char* GetMBString(const unsigned char* ref);
 
 #endif

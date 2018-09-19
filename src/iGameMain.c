@@ -10,6 +10,7 @@
 #include <proto/intuition.h>
 #include <proto/dos.h>
 #include <stdlib.h>
+#include "iGameExtern.h"
 
 /* Increase stack size */
 LONG __stack = 32768;
@@ -21,9 +22,9 @@ LONG __stack = 32768;
 #include "iGameGUI.h"
 
 struct ObjApp* app = NULL; /* Object */
-extern void app_start();
 extern void app_stop();
-extern void read_tool_types();
+//extern void read_tool_types();
+extern void load_settings(const char* filename);
 extern char* get_executable_name(int argc, char** argv);
 
 struct Library* MUIMasterBase;
@@ -49,7 +50,11 @@ BOOL init_app(int argc, char** argv)
 	}
 
 	executable_name = get_executable_name(argc, argv);
-	read_tool_types();
+	
+	//read_tool_types();
+	load_settings(DEFAULT_SETTINGS_FILE);
+	settings_use();
+
 	app = CreateApp();
 
 	if (!app)
