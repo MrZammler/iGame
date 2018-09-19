@@ -26,7 +26,6 @@
 #include "iGameExtern.h"
 #include "iGameStrings_cat.h"
 
-extern int NOGUIGFX;
 extern igame_settings *current_settings;
 
 struct ObjApp * CreateApp(void)
@@ -263,7 +262,7 @@ struct ObjApp * CreateApp(void)
 
 		if (!current_settings->hide_screenshots) {
 
-			if (NOGUIGFX) {
+			if (current_settings->no_guigfx) {
 				object->IM_GameImage_0 = MUI_NewObject(Dtpic_Classname,
 					MUIA_Dtpic_Name, DEFAULT_SCREENSHOT_FILE,
 					MUIA_Frame, MUIV_Frame_ImageButton,
@@ -315,7 +314,6 @@ struct ObjApp * CreateApp(void)
 				Child, object->Space_Sidepanel,
 				Child, object->LV_GenresList,
 				End;
-
 		}
 
 		GR_main = GroupObject,

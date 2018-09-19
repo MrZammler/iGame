@@ -54,6 +54,7 @@ typedef struct settings
 	int screenshot_width;
 	int screenshot_height;
 	int hide_side_panel;
+	int no_guigfx;
 } igame_settings;
 
 typedef struct genres

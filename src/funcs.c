@@ -55,7 +55,6 @@ int total_games;
 int no_of_genres;
 char* game_tooltypes;
 char fname[255];
-int NOGUIGFX;
 int IntroPic = 0;
 
 /* function definitions */
@@ -144,6 +143,8 @@ void load_settings(const char* filename)
 			if (strlen(file_line) == 0)
 				continue;
 
+			if (!strncmp(file_line, "no_guigfx=", 10))
+				current_settings->no_guigfx = atoi((const char*)file_line + 10);
 			if (!strncmp(file_line, "filter_use_enter=", 17))
 				current_settings->filter_use_enter = atoi((const char*)file_line + 17);
 			if (!strncmp(file_line, "hide_side_panel=", 16))
@@ -966,7 +967,7 @@ void game_click()
 				// We don't need the file open anymore
 				Close(fp);
 
-				if (NOGUIGFX)
+				if (current_settings->no_guigfx)
 				{
 					app->IM_GameImage_1 = MUI_NewObject(Dtpic_Classname,
 					                                    MUIA_Dtpic_Name, naked_path,
@@ -1001,7 +1002,7 @@ void game_click()
 			loaddef:
 				if (IntroPic == 0)
 				{
-					if (NOGUIGFX)
+					if (current_settings->no_guigfx)
 					{
 						app->IM_GameImage_1 = (Object *)MUI_NewObject(Dtpic_Classname,
 						                                              MUIA_Dtpic_Name, DEFAULT_SCREENSHOT_FILE,
@@ -2085,7 +2086,43 @@ void setting_screenshot_size_changed()
 
 void settings_save()
 {
-	//TODO
+	const int buffer_size = 512;
+	char* file_line = malloc(buffer_size * sizeof(char));
+	if (file_line == NULL)
+	{
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+		return;
+	}
+
+	BPTR fpsettings = Open((CONST_STRPTR)DEFAULT_SETTINGS_FILE, MODE_NEWFILE);
+	if (!fpsettings)
+	{
+		msg_box((const char*)"Could not save Settings file!");
+		return;
+	}
+
+	snprintf(file_line, buffer_size, "no_guigfx=%d\n", current_settings->no_guigfx);
+	FPuts(fpsettings, (CONST_STRPTR)file_line);
+	snprintf(file_line, buffer_size, "filter_use_enter=%d\n", current_settings->filter_use_enter);
+	FPuts(fpsettings, (CONST_STRPTR)file_line);
+	snprintf(file_line, buffer_size, "hide_side_panel=%d\n", current_settings->hide_side_panel);
+	FPuts(fpsettings, (CONST_STRPTR)file_line);
+	snprintf(file_line, buffer_size, "save_stats_on_exit=%d\n", current_settings->save_stats_on_exit);
+	FPuts(fpsettings, (CONST_STRPTR)file_line);
+	snprintf(file_line, buffer_size, "no_smart_spaces=%d\n", current_settings->no_smart_spaces);
+	FPuts(fpsettings, (CONST_STRPTR)file_line);
+	snprintf(file_line, buffer_size, "titles_from_dirs=%d\n", current_settings->titles_from_dirs);
+	FPuts(fpsettings, (CONST_STRPTR)file_line);
+	snprintf(file_line, buffer_size, "hide_screenshots=%d\n", current_settings->hide_screenshots);
+	FPuts(fpsettings, (CONST_STRPTR)file_line);
+	snprintf(file_line, buffer_size, "screenshot_width=%d\n", current_settings->screenshot_width);
+	FPuts(fpsettings, (CONST_STRPTR)file_line);
+	snprintf(file_line, buffer_size, "screenshot_height=%d\n", current_settings->screenshot_height);
+	FPuts(fpsettings, (CONST_STRPTR)file_line);
+
+	Close(fpsettings);
+	if (file_line)
+		free(file_line);
 }
 
 void settings_use()
@@ -2161,7 +2198,6 @@ void read_tool_types()
 	struct DiskObject* disk_obj;
 
 	int screen_width, screen_height;
-	NOGUIGFX = 0;
 
 	if ((icon_base = (struct Library *)OpenLibrary((CONST_STRPTR)ICON_LIBRARY, 0)))
 	{
@@ -2199,7 +2235,7 @@ void read_tool_types()
 			}
 
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOGUIGFX))
-				NOGUIGFX = 1;
+				current_settings->no_guigfx = 1;
 
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_FILTERUSEENTER))
 				current_settings->filter_use_enter = 1;
