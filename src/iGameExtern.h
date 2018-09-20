@@ -109,7 +109,7 @@ void setting_save_stats_on_exit_changed();
 void setting_smart_spaces_changed();
 void setting_titles_from_changed();
 void setting_show_screenshot_changed();
-void setting_use_gui_gfx_changed();
+void setting_use_guigfx_changed();
 void setting_screenshot_size_changed();
 void settings_save();
 void setting_hide_side_panel_changed();

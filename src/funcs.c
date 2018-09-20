@@ -2074,7 +2074,7 @@ void setting_show_screenshot_changed()
 	//TODO
 }
 
-void setting_use_gui_gfx_changed()
+void setting_use_guigfx_changed()
 {
 	//TODO
 }

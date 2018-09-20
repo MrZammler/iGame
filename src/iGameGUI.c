@@ -183,7 +183,7 @@ struct ObjApp * CreateApp(void)
 #if defined(__amigaos4__)
 	static const struct Hook SettingUseGuiGfxChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingUseGuiGfxChanged, NULL, NULL };
 #else
-	static const struct Hook SettingUseGuiGfxChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_use_gui_gfx_changed, NULL };
+	static const struct Hook SettingUseGuiGfxChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_use_guigfx_changed, NULL };
 #endif
 #if defined(__amigaos4__)
 	static const struct Hook SettingScreenshotSizeChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingScreenshotSizeChanged, NULL, NULL };
