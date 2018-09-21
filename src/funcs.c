@@ -81,7 +81,7 @@ struct FileRequester* request;
 games_list *item_games = NULL, *games = NULL;
 repos_list *item_repos = NULL, *repos = NULL;
 genres_list *item_genres = NULL, *genres = NULL;
-igame_settings *current_settings = NULL;
+igame_settings* current_settings = NULL;
 
 const unsigned char* GetMBString(const unsigned char* ref)
 {
@@ -110,6 +110,52 @@ void add_games_to_listview()
 		}
 	}
 	status_show_total();
+}
+
+void apply_settings()
+{
+	if (current_settings == NULL)
+		return;
+
+	set(app->CH_Screenshots, MUIA_Selected, current_settings->hide_screenshots);
+	set(app->CH_NoGuiGfx, MUIA_Selected, current_settings->no_guigfx);
+
+	if (current_settings->screenshot_width == 160 && current_settings->screenshot_height == 128)
+	{
+		set(app->CY_ScreenshotSize, MUIA_Cycle_Active, 0);
+		set(app->STR_Width, MUIA_Disabled, TRUE);
+		set(app->STR_Height, MUIA_Disabled, TRUE);
+	}
+	else if (current_settings->screenshot_width == 320 && current_settings->screenshot_height == 256)
+	{
+		set(app->CY_ScreenshotSize, MUIA_Cycle_Active, 1);
+		set(app->STR_Width, MUIA_Disabled, TRUE);
+		set(app->STR_Height, MUIA_Disabled, TRUE);
+	}
+	else
+	{
+		set(app->CY_ScreenshotSize, MUIA_Cycle_Active, 2);
+		set(app->STR_Width, MUIA_Disabled, FALSE);
+		set(app->STR_Height, MUIA_Disabled, FALSE);
+		set(app->STR_Width, MUIA_String_Integer, current_settings->screenshot_width);
+		set(app->STR_Height, MUIA_String_Integer, current_settings->screenshot_height);
+	}
+
+	set(app->RA_TitlesFrom, MUIA_Radio_Active, current_settings->titles_from_dirs);
+	if (current_settings->titles_from_dirs)
+	{
+		set(app->CH_SmartSpaces, MUIA_Disabled, FALSE);
+		set(app->CH_SmartSpaces, MUIA_Selected, current_settings->no_smart_spaces);
+	}
+	else
+	{
+		set(app->CH_SmartSpaces, MUIA_Disabled, TRUE);
+		set(app->CH_SmartSpaces, MUIA_Disabled, TRUE);
+	}
+	
+	set(app->CH_SaveStatsOnExit, MUIA_Selected, current_settings->save_stats_on_exit);
+	set(app->CH_FilterUseEnter, MUIA_Selected, current_settings->filter_use_enter);
+	set(app->CH_HideSidepanel, MUIA_Selected, current_settings->hide_side_panel);
 }
 
 void load_settings(const char* filename)
@@ -361,6 +407,7 @@ void app_start()
 	load_repos(DEFAULT_REPOS_FILE);
 	add_default_filters();
 	load_genres(DEFAULT_GENRES_FILE);
+	apply_settings();
 
 	IntroPic = 1;
 
@@ -1249,7 +1296,7 @@ void game_properties()
 		memset(&game_tooltypes[0], 0, 1024*sizeof(char));
 	else
 		game_tooltypes = AllocMem(1024 * sizeof(char), MEMF_CLEAR);
-	
+
 	if (game_tooltypes == 0)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
@@ -2049,43 +2096,128 @@ void game_delete()
 	}
 }
 
+LONG xget(Object* obj, ULONG attribute)
+{
+	LONG x;
+	get(obj, attribute, &x);
+	return x;
+}
+
+char* getstr(Object* obj)
+{
+	return (char *)xget(obj, MUIA_String_Contents);
+}
+
+BOOL getbool(Object* obj)
+{
+	return (BOOL)xget(obj, MUIA_Selected);
+}
+
+int getcycleindex(Object* obj)
+{
+	int index = 0;
+	get(obj, MUIA_Cycle_Active, &index);
+	return index;
+}
+
+int getradioindex(Object* obj)
+{
+	int index = 0;
+	get(obj, MUIA_Radio_Active, &index);
+	return index;
+}
+
 void setting_filter_use_enter_changed()
 {
-	//TODO
+	current_settings->filter_use_enter = (BOOL)xget(app->CH_FilterUseEnter, MUIA_Selected);
 }
 
 void setting_save_stats_on_exit_changed()
 {
-	//TODO
+	current_settings->save_stats_on_exit = (BOOL)xget(app->CH_SaveStatsOnExit, MUIA_Selected);
 }
 
 void setting_smart_spaces_changed()
 {
-	//TODO
+	current_settings->no_smart_spaces = (BOOL)xget(app->CH_SmartSpaces, MUIA_Selected);
 }
 
 void setting_titles_from_changed()
 {
-	//TODO
+	const int index = getradioindex(app->RA_TitlesFrom);
+
+	// Index=0 -> Titles from Slaves
+	// Index=1 -> Titles from Dirs
+	current_settings->titles_from_dirs = index;
+
+	if (index == 1)
+		set(app->CH_SmartSpaces, MUIA_Disabled, FALSE);
+	else
+		set(app->CH_SmartSpaces, MUIA_Disabled, TRUE);
 }
 
-void setting_show_screenshot_changed()
+void setting_hide_screenshot_changed()
 {
-	//TODO
+	current_settings->hide_screenshots = (BOOL)xget(app->CH_Screenshots, MUIA_Selected);
 }
 
-void setting_use_guigfx_changed()
+void setting_no_guigfx_changed()
 {
-	//TODO
+	current_settings->no_guigfx = (BOOL)xget(app->CH_NoGuiGfx, MUIA_Selected);
 }
 
 void setting_screenshot_size_changed()
 {
-	//TODO
+	const int index = getcycleindex(app->CY_ScreenshotSize);
+
+	// Index=0 -> 160x128
+	// Index=1 -> 320x256
+	// Index=2 -> Custom size
+
+	if (index == 0)
+	{
+		set(app->STR_Width, MUIA_Disabled, TRUE);
+		set(app->STR_Height, MUIA_Disabled, TRUE);
+		current_settings->screenshot_width = 160;
+		current_settings->screenshot_height = 128;
+		return;
+	}
+
+	if (index == 1)
+	{
+		set(app->STR_Width, MUIA_Disabled, TRUE);
+		set(app->STR_Height, MUIA_Disabled, TRUE);
+		current_settings->screenshot_width = 320;
+		current_settings->screenshot_height = 256;
+		return;
+	}
+
+	if (index == 2)
+	{
+		set(app->STR_Width, MUIA_Disabled, FALSE);
+		set(app->STR_Height, MUIA_Disabled, FALSE);
+	}
+}
+
+void settings_use()
+{
+	if (current_settings == NULL)
+		return;
+
+	const int index = getcycleindex(app->CY_ScreenshotSize);
+	if (index == 2)
+	{
+		current_settings->screenshot_width = (int)getstr(app->STR_Width);
+		current_settings->screenshot_height = (int)getstr(app->STR_Height);
+	}
+
+	set(app->WI_Settings, MUIA_Window_Open, FALSE);
 }
 
 void settings_save()
 {
+	settings_use();
+
 	const int buffer_size = 512;
 	char* file_line = malloc(buffer_size * sizeof(char));
 	if (file_line == NULL)
@@ -2125,16 +2257,10 @@ void settings_save()
 		free(file_line);
 }
 
-void settings_use()
-{
-	//TODO
-	if (current_settings == NULL)
-		return;
-}
 
 void setting_hide_side_panel_changed()
 {
-	//TODO
+	current_settings->hide_side_panel = (BOOL)xget(app->CH_HideSidepanel, MUIA_Selected);
 }
 
 void msg_box(const char* msg)

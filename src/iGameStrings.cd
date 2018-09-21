@@ -173,14 +173,14 @@ OK
 MSG_WI_Settings (//)
 iGame Settings
 ;MUIB Label
-MSG_LA_ShowScreenshots (//)
-Show Screenshots
+MSG_LA_HideScreenshots (//)
+Hide Screenshots
 ;MUIB group
 MSG_GR_ScreenshotsTitle (//)
 Screenshots
 ;MUIB Label
-MSG_LA_UseGuiGfx (//)
-Use GuiGfx
+MSG_LA_NoGuiGfx (//)
+No GuiGfx
 ;MUIB Label
 MSG_LA_ScreenshotSize (//)
 Screenshot Size:
@@ -213,7 +213,7 @@ MSG_RA_TitlesFrom1 (//)
 Directories
 ;MUIB Label
 MSG_LA_SmartSpaces (//)
-Use Smart Spaces
+No Smart Spaces
 ;MUIB group
 MSG_GR_MiscTitle (//)
 Misc

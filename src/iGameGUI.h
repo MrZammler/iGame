@@ -46,7 +46,7 @@ struct ObjApp
 	APTR BT_AboutOK;
 	APTR WI_Settings;
 	APTR CH_Screenshots;
-	APTR CH_UseGuiGfx;
+	APTR CH_NoGuiGfx;
 	APTR CY_ScreenshotSize;
 	APTR STR_Width;
 	APTR STR_Height;
