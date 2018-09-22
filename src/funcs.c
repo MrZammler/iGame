@@ -2001,13 +2001,6 @@ int hex2dec(char* hexin)
 	return dec;
 }
 
-int get_list_index(Object* obj)
-{
-	int index = 0;
-	get(obj, MUIA_List_Active, &index);
-	return index;
-}
-
 void game_duplicate()
 {
 	char* str = NULL;
