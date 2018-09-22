@@ -1982,12 +1982,6 @@ void save_list_as()
 		save_to_file(fname, 0);
 }
 
-void export_list()
-{
-	//TODO implement this
-	msg_box("This feature is not yet implemented...");
-}
-
 void open_list()
 {
 	if (get_filename("Open List", "Open", FALSE))

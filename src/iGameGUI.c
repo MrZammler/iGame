@@ -34,7 +34,7 @@ struct ObjApp * CreateApp(void)
 
 	APTR	MNlabel2File, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainMenuShowHidehiddenentries;
 	APTR	MNMainBarLabel5, MNMainOpenList, MNMainSaveList, MNMainSaveListAs;
-	APTR	MNMainBarLabel3, MNMainExportListtoTextfile, MNMainBarLabel0, MNMainAbout;
+	APTR	MNMainBarLabel0, MNMainAbout;
 	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Edit, MNMainMenuDuplicate, MNMainProperties;
 	APTR	MNMainBarLabel4, MNMainDelete, MNlabel2Tools, MNMainiGameSettings;
 	APTR	MNlabel2GameRepositories, MNMainBarLabel2, MNMainMUISettings, GROUP_ROOT;
@@ -74,11 +74,6 @@ struct ObjApp * CreateApp(void)
 	static const struct Hook MenuSaveListAsHook = { { NULL,NULL }, (HOOKFUNC)save_list_as, NULL, NULL };
 #else
 	static const struct Hook MenuSaveListAsHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)save_list_as, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook MenuExportListHook = { { NULL,NULL }, (HOOKFUNC)export_list, NULL, NULL };
-#else
-	static const struct Hook MenuExportListHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)export_list, NULL };
 #endif
 #if defined(__amigaos4__)
 	static const struct Hook MenuDuplicateHook = { { NULL,NULL }, (HOOKFUNC)game_duplicate, NULL, NULL };
@@ -378,12 +373,6 @@ struct ObjApp * CreateApp(void)
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainSaveListAs),
 		End;
 
-	MNMainBarLabel3 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
-
-	MNMainExportListtoTextfile = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNMainExportListtoTextfile),
-		End;
-
 	MNMainBarLabel0 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
 
 	MNMainAbout = MenuitemObject,
@@ -406,8 +395,6 @@ struct ObjApp * CreateApp(void)
 		MUIA_Family_Child, MNMainOpenList,
 		MUIA_Family_Child, MNMainSaveList,
 		MUIA_Family_Child, MNMainSaveListAs,
-		MUIA_Family_Child, MNMainBarLabel3,
-		MUIA_Family_Child, MNMainExportListtoTextfile,
 		MUIA_Family_Child, MNMainBarLabel0,
 		MUIA_Family_Child, MNMainAbout,
 		MUIA_Family_Child, MNMainBarLabel1,
@@ -1139,13 +1126,6 @@ struct ObjApp * CreateApp(void)
 		object->App,
 		2,
 		MUIM_CallHook, &MenuSaveListAsHook
-	);
-
-	DoMethod(MNMainExportListtoTextfile,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->App,
-		2,
-		MUIM_CallHook, &MenuExportListHook
 	);
 
 	DoMethod(MNMainAbout,

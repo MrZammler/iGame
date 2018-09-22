@@ -88,7 +88,6 @@ void scan_repositories();
 void open_list();
 void save_list(int check_exists);
 void save_list_as();
-void export_list();
 void game_duplicate();
 void game_delete();
 void game_properties_ok();
