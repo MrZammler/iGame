@@ -208,7 +208,13 @@ struct ObjApp * CreateApp(void)
 	object->STR_TX_PropertiesTimesPlayed = NULL;
 	object->STR_TX_PropertiesSlavePath = NULL;
 	object->STR_TX_PropertiesTooltypes = NULL;
-	object->STR_TX_About = (CONST_STRPTR)GetMBString(MSG_TX_About);
+	
+	char about_text[512];
+	strcpy(about_text, VERSION);
+	strcat(about_text, "\n\n");
+	strcat(about_text, GetMBString(MSG_TX_About));
+
+	object->STR_TX_About = (CONST_STRPTR)about_text;
 
 	object->CY_PropertiesGenreContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_PropertiesGenre0);
 	object->CY_PropertiesGenreContent[1] = NULL;

@@ -41,8 +41,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-
 #include "iGameStrings_cat.h"
 
 
@@ -52,7 +50,7 @@
 
 struct FC_String iGameStrings_Strings[99] = {
     { (STRPTR) "A front-end to WHDLoad", 0 },
-    { (STRPTR) "Dimitris Panokostas 2018", 1 },
+    { (STRPTR) "Emmanuel Vasilakis, Dimitris Panokostas", 1 },
     { (STRPTR) "iGame", 2 },
     { (STRPTR) "File", 3 },
     { (STRPTR) "Scan Repositories", 4 },
@@ -104,7 +102,7 @@ struct FC_String iGameStrings_Strings[99] = {
     { (STRPTR) "OK", 50 },
     { (STRPTR) "Cancel", 51 },
     { (STRPTR) "About iGame", 52 },
-    { (STRPTR) "iGame version 2.0b\n\n(C) Emmanuel Vasilakis\nmrzammler@gmail.com\n\nUpdates by Dimitris Panokostas\nmidwan@gmail.com\n\n", 53 },
+    { (STRPTR) "(C) Emmanuel Vasilakis\nmrzammler@gmail.com\n\nDimitris Panokostas\nmidwan@gmail.com\n\n", 53 },
     { (STRPTR) "OK", 54 },
     { (STRPTR) "iGame Settings", 55 },
     { (STRPTR) "Hide Screenshots", 56 },
