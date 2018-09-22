@@ -42,7 +42,6 @@
 #include "iGameExtern.h"
 #include "iGameStrings_cat.h"
 #include <libraries/asl.h>
-#include "iGameExtern.h"
 
 extern char* strdup(const char* s);
 extern struct ObjApp* app;
@@ -152,7 +151,7 @@ void apply_settings()
 		set(app->CH_SmartSpaces, MUIA_Disabled, TRUE);
 		set(app->CH_SmartSpaces, MUIA_Disabled, TRUE);
 	}
-	
+
 	set(app->CH_SaveStatsOnExit, MUIA_Selected, current_settings->save_stats_on_exit);
 	set(app->CH_FilterUseEnter, MUIA_Selected, current_settings->filter_use_enter);
 	set(app->CH_HideSidepanel, MUIA_Selected, current_settings->hide_side_panel);
@@ -778,7 +777,7 @@ void launch_game()
 			/*  allocate space for a FileInfoBlock */
 			struct FileInfoBlock* m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
 
-			success = Examine(lock, m);
+			Examine(lock, m);
 			if (m->fib_DirEntryType <= 0)
 			{
 				/*  We don't allow "opta file", only "opta dir" */
@@ -789,7 +788,7 @@ void launch_game()
 			{
 				if (strstr(m->fib_FileName, ".info"))
 				{
-					NameFromLock(lock, str2, 512);
+					NameFromLock(lock, (unsigned char*)str2, 512);
 					sprintf(fullpath, "%s/%s", str2, m->fib_FileName);
 
 					//lose the .info
@@ -802,8 +801,8 @@ void launch_game()
 
 					if ((disk_obj = GetDiskObject((STRPTR)fullpath)))
 					{
-						if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "SLAVE"), (STRPTR)slave)
-							|| MatchToolValue(FindToolType(disk_obj->do_ToolTypes, "slave"), (STRPTR)slave))
+						if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, (unsigned char*)"SLAVE"), (STRPTR)slave)
+							|| MatchToolValue(FindToolType(disk_obj->do_ToolTypes, (unsigned char*)"slave"), (STRPTR)slave))
 						{
 							for (char** tool_types = (char **)disk_obj->do_ToolTypes; (tool_type = *tool_types); ++
 							     tool_types)
@@ -884,7 +883,7 @@ void launch_game()
 	if (!current_settings->save_stats_on_exit)
 		save_list(0);
 
-	success = Execute(exec, 0, 0);
+	success = Execute((unsigned char*)exec, 0, 0);
 
 	if (success == 0)
 		msg_box((const char*)GetMBString(MSG_ErrorExecutingWhdload));
@@ -919,7 +918,7 @@ void scan_repositories()
 			sprintf(repotemp, "%s", item_repos->repo);
 			sprintf(helperstr, (const char*)GetMBString(MSG_ScanningPleaseWait), repotemp);
 			set(app->TX_Status, MUIA_Text_Contents, helperstr);
-			const BPTR oldlock = Lock(repotemp, ACCESS_READ);
+			const BPTR oldlock = Lock((unsigned char*)repotemp, ACCESS_READ);
 
 			if (oldlock != 0)
 			{
@@ -1322,7 +1321,7 @@ void game_properties()
 		{
 			if (strstr(m->fib_FileName, ".info"))
 			{
-				NameFromLock(lock, str2, 512);
+				NameFromLock(lock, (unsigned char*)str2, 512);
 				sprintf(fullpath, "%s/%s", str2, m->fib_FileName);
 
 				//lose the .info
@@ -1485,7 +1484,7 @@ void game_properties_ok()
 			{
 				if (strstr(m->fib_FileName, ".info"))
 				{
-					NameFromLock(lock, str2, 512);
+					NameFromLock(lock, (unsigned char*)str2, 512);
 					sprintf(fullpath, "%s/%s", str2, m->fib_FileName);
 
 					//lose the .info
@@ -1710,7 +1709,7 @@ void follow_thread(BPTR lock, int tab_level)
 		for (int s = 0; s < kp; s++) m->fib_FileName[s] = tolower(m->fib_FileName[s]);
 		if (strstr(m->fib_FileName, ".slave"))
 		{
-			NameFromLock(lock, str, 511);
+			NameFromLock(lock, (unsigned char*)str, 511);
 			sprintf(fullpath, "%s/%s", str, m->fib_FileName);
 
 			/* add the slave to the gameslist (if it does not already exist) */
@@ -2002,7 +2001,7 @@ int hex2dec(char* hexin)
 	return dec;
 }
 
-int getlistindex(Object* obj)
+int get_list_index(Object* obj)
 {
 	int index = 0;
 	get(obj, MUIA_List_Active, &index);
@@ -2103,24 +2102,24 @@ LONG xget(Object* obj, ULONG attribute)
 	return x;
 }
 
-char* getstr(Object* obj)
+char* get_str(Object* obj)
 {
 	return (char *)xget(obj, MUIA_String_Contents);
 }
 
-BOOL getbool(Object* obj)
+BOOL get_bool(Object* obj)
 {
 	return (BOOL)xget(obj, MUIA_Selected);
 }
 
-int getcycleindex(Object* obj)
+int get_cycle_index(Object* obj)
 {
 	int index = 0;
 	get(obj, MUIA_Cycle_Active, &index);
 	return index;
 }
 
-int getradioindex(Object* obj)
+int get_radio_index(Object* obj)
 {
 	int index = 0;
 	get(obj, MUIA_Radio_Active, &index);
@@ -2144,7 +2143,7 @@ void setting_smart_spaces_changed()
 
 void setting_titles_from_changed()
 {
-	const int index = getradioindex(app->RA_TitlesFrom);
+	const int index = get_radio_index(app->RA_TitlesFrom);
 
 	// Index=0 -> Titles from Slaves
 	// Index=1 -> Titles from Dirs
@@ -2168,7 +2167,7 @@ void setting_no_guigfx_changed()
 
 void setting_screenshot_size_changed()
 {
-	const int index = getcycleindex(app->CY_ScreenshotSize);
+	const int index = get_cycle_index(app->CY_ScreenshotSize);
 
 	// Index=0 -> 160x128
 	// Index=1 -> 320x256
@@ -2204,11 +2203,11 @@ void settings_use()
 	if (current_settings == NULL)
 		return;
 
-	const int index = getcycleindex(app->CY_ScreenshotSize);
+	const int index = get_cycle_index(app->CY_ScreenshotSize);
 	if (index == 2)
 	{
-		current_settings->screenshot_width = (int)getstr(app->STR_Width);
-		current_settings->screenshot_height = (int)getstr(app->STR_Height);
+		current_settings->screenshot_width = (int)get_str(app->STR_Width);
+		current_settings->screenshot_height = (int)get_str(app->STR_Height);
 	}
 
 	set(app->WI_Settings, MUIA_Window_Open, FALSE);

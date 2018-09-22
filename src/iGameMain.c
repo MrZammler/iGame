@@ -6,7 +6,6 @@
 #include <clib/alib_protos.h>
 #include <proto/muimaster.h>
 #include <proto/exec.h>
-#include <proto/intuition.h>
 #include <proto/dos.h>
 #include <stdlib.h>
 #include "iGameExtern.h"
@@ -43,7 +42,7 @@ BOOL init_app(int argc, char** argv)
 {
 	if ((MUIMasterBase = OpenLibrary((CONST_STRPTR)MUIMASTER_LIBRARY, 19)) == NULL)
 	{
-		clean_exit("Can't open muimaster.library v19\n");
+		clean_exit((unsigned char*)"Can't open muimaster.library v19\n");
 		return FALSE;
 	}
 
@@ -52,7 +51,7 @@ BOOL init_app(int argc, char** argv)
 	app = CreateApp();
 
 	if (!app)
-		clean_exit("Can't initialize application\n");
+		clean_exit((unsigned char*)"Can't initialize application\n");
 	else
 	{
 		app_start();
@@ -81,7 +80,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		clean_exit("Can't create application\n");
+		clean_exit((unsigned char*)"Can't create application\n");
 	}
 
 	clean_exit(NULL);
