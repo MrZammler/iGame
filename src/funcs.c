@@ -72,6 +72,7 @@ const char* get_executable_name(int argc, char** argv);
 const char* add_spaces_to_string(const char* input);
 void strip_path(const char* path, char* naked_path);
 char* get_slave_from_path(char* slave, int start, char* path);
+void read_tool_types();
 
 /* structures */
 struct EasyStruct msgbox;
@@ -167,17 +168,16 @@ void load_settings(const char* filename)
 		return;
 	}
 
+	if (current_settings != NULL)
+	{
+		free(current_settings);
+		current_settings = NULL;
+	}
+	current_settings = (igame_settings *)calloc(1, sizeof(igame_settings));
+
 	BPTR fpsettings = Open((CONST_STRPTR)filename, MODE_OLDFILE);
 	if (fpsettings)
 	{
-		if (current_settings != NULL)
-		{
-			free(current_settings);
-			current_settings = NULL;
-		}
-
-		current_settings = (igame_settings *)calloc(1, sizeof(igame_settings));
-
 		do
 		{
 			if (FGets(fpsettings, file_line, buffer_size) == NULL)
@@ -210,6 +210,12 @@ void load_settings(const char* filename)
 		while (1);
 
 		Close(fpsettings);
+	}
+	else
+	{
+		msg_box("No settings file found, will attempt to read Tooltypes instead");
+		// No "igame.prefs" file found, fallback to reading Tooltypes
+		read_tool_types();
 	}
 	if (file_line)
 		free(file_line);
