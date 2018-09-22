@@ -72,7 +72,7 @@ typedef struct repos
 typedef struct games
 {
 	char title[200];
-	char genre[30];
+	char genre[100];
 	int index;
 	char path[256];
 	int favorite;

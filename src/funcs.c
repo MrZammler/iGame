@@ -184,7 +184,6 @@ void load_settings(const char* filename)
 				break;
 
 			file_line[strlen(file_line) - 1] = '\0';
-
 			if (strlen(file_line) == 0)
 				continue;
 
@@ -246,7 +245,6 @@ void load_games_list(const char* filename)
 				break;
 
 			file_line[strlen(file_line) - 1] = '\0';
-
 			if (strlen(file_line) == 0)
 				continue;
 
@@ -324,6 +322,10 @@ void load_repos(const char* filename)
 	{
 		while (FGets(fprepos, file_line, buffer_size))
 		{
+			file_line[strlen(file_line) - 1] = '\0';
+			if (strlen(file_line) == 0)
+				break;
+
 			item_repos = (repos_list *)calloc(1, sizeof(repos_list));
 			item_repos->next = NULL;
 			strcpy(item_repos->repo, file_line);
@@ -364,6 +366,10 @@ void load_genres(const char* filename)
 		no_of_genres = 0;
 		while (FGets(fpgenres, file_line, buffer_size))
 		{
+			file_line[strlen(file_line) - 1] = '\0';
+			if (strlen(file_line) == 0)
+				break;
+
 			item_genres = (genres_list *)calloc(1, sizeof(genres_list));
 			item_genres->next = NULL;
 			strcpy(item_genres->genre, file_line);
@@ -2030,7 +2036,7 @@ void game_duplicate()
 
 	char title_copy[200];
 	char path_copy[256];
-	char genre_copy[30];
+	char genre_copy[100];
 	strcpy(title_copy, item_games->title);
 	strcat(title_copy, " copy");
 	strcpy(path_copy, item_games->path);
