@@ -2072,9 +2072,13 @@ void game_duplicate()
 void game_delete()
 {
 	char* str = NULL;
-	if (getlistindex(app->LV_GamesList) >= 0)
+	LONG id = MUIV_List_NextSelected_Start;
+	for (;;)
 	{
-		DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str);
+		DoMethod(app->LV_GamesList, MUIM_List_NextSelected, &id);
+		if (id == MUIV_List_NextSelected_End) break;
+
+		DoMethod(app->LV_GamesList, MUIM_List_GetEntry, id, &str);
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
 			if (!strcmp(str, item_games->title))
@@ -2083,16 +2087,10 @@ void game_delete()
 				break;
 			}
 		}
-
-		DoMethod(app->LV_GamesList, MUIM_List_Remove, MUIV_List_Remove_Active);
-
+		DoMethod(app->LV_GamesList, MUIM_List_Remove, id);
 		total_games--;
-		status_show_total();
 	}
-	else
-	{
-		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
-	}
+	status_show_total();
 }
 
 LONG xget(Object* obj, ULONG attribute)
