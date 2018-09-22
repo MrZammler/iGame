@@ -1454,7 +1454,7 @@ struct ObjApp * CreateApp(void)
 	);
 
 	DoMethod(object->CH_NoGuiGfx,
-		MUIM_Notify, MUIA_ShowMe, FALSE,
+		MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
 		object->App,
 		2,
 		MUIM_CallHook, &SettingNoGuiGfxChangedHook
