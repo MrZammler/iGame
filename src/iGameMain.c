@@ -1,15 +1,17 @@
 #define MUI_OBSOLETE
+#define MUIMASTER_LIBRARY "muimaster.library"
 
 #include <libraries/mui.h>
 
 #include <clib/alib_protos.h>
 #include <proto/muimaster.h>
 #include <proto/exec.h>
-#include <proto/intuition.h>
 #include <proto/dos.h>
+#include <stdlib.h>
+#include "iGameExtern.h"
 
 /* Increase stack size */
-LONG __stack = 32000;
+LONG __stack = 32768;
 
 #ifndef MAKE_ID
 #define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
@@ -18,12 +20,11 @@ LONG __stack = 32000;
 #include "iGameGUI.h"
 
 struct ObjApp* app = NULL; /* Object */
-extern void app_start();
 extern void app_stop();
-extern void read_tool_types();
+extern void load_settings(const char* filename);
 extern char* get_executable_name(int argc, char** argv);
 
-struct Library *MUIMasterBase;
+struct Library* MUIMasterBase;
 char* executable_name;
 
 void clean_exit(CONST_STRPTR s)
@@ -33,24 +34,26 @@ void clean_exit(CONST_STRPTR s)
 		PutStr(s);
 	}
 	app_stop();
+	executable_name = NULL;
 	CloseLibrary(MUIMasterBase);
 }
 
 BOOL init_app(int argc, char** argv)
 {
-	if ((MUIMasterBase = OpenLibrary("muimaster.library", 19)) == NULL)
+	if ((MUIMasterBase = OpenLibrary((CONST_STRPTR)MUIMASTER_LIBRARY, 19)) == NULL)
 	{
-		clean_exit("Can't open muimaster.library v19\n");
+		clean_exit((unsigned char*)"Can't open muimaster.library v19\n");
 		return FALSE;
 	}
 
+	executable_name = get_executable_name(argc, argv);
+	load_settings(DEFAULT_SETTINGS_FILE);
 	app = CreateApp();
+
 	if (!app)
-		clean_exit("Can't initialize application\n");
+		clean_exit((unsigned char*)"Can't initialize application\n");
 	else
 	{
-		executable_name = get_executable_name(argc, argv);
-		read_tool_types();
 		app_start();
 	}
 	return TRUE;
@@ -64,7 +67,7 @@ int main(int argc, char** argv)
 	if (app)
 	{
 		while (DoMethod(app->App, MUIM_Application_NewInput, &sigs)
-			!= MUIV_Application_ReturnID_Quit)
+			!= (ULONG)MUIV_Application_ReturnID_Quit)
 		{
 			if (sigs)
 			{
@@ -77,7 +80,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		clean_exit("Can't create application\n");
+		clean_exit((unsigned char*)"Can't create application\n");
 	}
 
 	clean_exit(NULL);
