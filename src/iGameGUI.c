@@ -210,8 +210,10 @@ struct ObjApp * CreateApp(void)
 	object->STR_TX_PropertiesTooltypes = NULL;
 	
 	char about_text[512];
-	strcpy(about_text, VERSION);
+	strcpy(about_text, "iGame\n");
+	strcat(about_text, VERSION);
 	strcat(about_text, "\n\n");
+	strcat(about_text, "Copyright 2005-2018\n");
 	strcat(about_text, GetMBString(MSG_TX_About));
 
 	object->STR_TX_About = (CONST_STRPTR)about_text;

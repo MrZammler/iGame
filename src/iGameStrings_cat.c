@@ -102,7 +102,7 @@ struct FC_String iGameStrings_Strings[99] = {
     { (STRPTR) "OK", 50 },
     { (STRPTR) "Cancel", 51 },
     { (STRPTR) "About iGame", 52 },
-    { (STRPTR) "Emmanuel Vasilakis\nmrzammler@gmail.com\n\nDimitris Panokostas\nmidwan@gmail.com\n\n", 53 },
+    { (STRPTR) "Emmanuel Vasilakis\nmrzammler@gmail.com\n\nContributors:\nDimitris Panokostas\nmidwan@gmail.com\n\n", 53 },
     { (STRPTR) "OK", 54 },
     { (STRPTR) "iGame Settings", 55 },
     { (STRPTR) "Hide Screenshots", 56 },
