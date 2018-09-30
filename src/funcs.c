@@ -175,7 +175,7 @@ void load_settings(const char* filename)
 	}
 	current_settings = (igame_settings *)calloc(1, sizeof(igame_settings));
 
-	BPTR fpsettings = Open((CONST_STRPTR)filename, MODE_OLDFILE);
+	const BPTR fpsettings = Open((CONST_STRPTR)filename, MODE_OLDFILE);
 	if (fpsettings)
 	{
 		do
@@ -230,7 +230,7 @@ void load_games_list(const char* filename)
 		return;
 	}
 
-	BPTR fpgames = Open((CONST_STRPTR)filename, MODE_OLDFILE);
+	const BPTR fpgames = Open((CONST_STRPTR)filename, MODE_OLDFILE);
 	if (fpgames)
 	{
 		if (games != NULL)
@@ -317,7 +317,7 @@ void load_repos(const char* filename)
 		return;
 	}
 
-	BPTR fprepos = Open((CONST_STRPTR)filename, MODE_OLDFILE);
+	const BPTR fprepos = Open((CONST_STRPTR)filename, MODE_OLDFILE);
 	if (fprepos)
 	{
 		while (FGets(fprepos, file_line, buffer_size))
@@ -360,7 +360,7 @@ void load_genres(const char* filename)
 	}
 
 	int i;
-	BPTR fpgenres = Open((CONST_STRPTR)filename, MODE_OLDFILE);
+	const BPTR fpgenres = Open((CONST_STRPTR)filename, MODE_OLDFILE);
 	if (fpgenres)
 	{
 		no_of_genres = 0;
@@ -1164,7 +1164,7 @@ void repo_remove()
 */
 void repo_stop()
 {
-	BPTR fprepos = Open((CONST_STRPTR)DEFAULT_REPOS_FILE, MODE_NEWFILE);
+	const BPTR fprepos = Open((CONST_STRPTR)DEFAULT_REPOS_FILE, MODE_NEWFILE);
 	if (!fprepos)
 	{
 		msg_box((const char*)GetMBString(MSG_CouldNotCreateReposFile));
@@ -1909,7 +1909,7 @@ void save_to_file(const char* filename, const int check_exists)
 	const char* saving_message = (const char*)GetMBString(MSG_SavingGamelist);
 	set(app->TX_Status, MUIA_Text_Contents, saving_message);
 
-	BPTR fpgames = Open((CONST_STRPTR)filename, MODE_NEWFILE);
+	const BPTR fpgames = Open((CONST_STRPTR)filename, MODE_NEWFILE);
 	if (!fpgames)
 	{
 		msg_box((const char*)GetMBString(MSG_FailedOpeningGameslist));
@@ -2222,7 +2222,7 @@ void settings_save()
 		return;
 	}
 
-	BPTR fpsettings = Open((CONST_STRPTR)DEFAULT_SETTINGS_FILE, MODE_NEWFILE);
+	const BPTR fpsettings = Open((CONST_STRPTR)DEFAULT_SETTINGS_FILE, MODE_NEWFILE);
 	if (!fpsettings)
 	{
 		msg_box((const char*)"Could not save Settings file!");

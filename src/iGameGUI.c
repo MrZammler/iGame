@@ -5,7 +5,6 @@
 #include <clib/alib_protos.h>
 #include <proto/muimaster.h>
 #include <proto/exec.h>
-#include <proto/intuition.h>
 
 #include <MUI/Guigfx_mcc.h>
 #include <mui/TextEditor_mcc.h>
@@ -1563,6 +1562,5 @@ void DisposeApp(struct ObjApp * object)
 	{
 		MUI_DisposeObject(object->App);
 		FreeVec(object);
-		object = NULL;
 	}
 }

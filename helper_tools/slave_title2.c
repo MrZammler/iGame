@@ -1,10 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 int main(int argc, char* argv[])
 {
-	FILE* fp;
-	char Title[100], *title;
-	int i = -1;
+	char Title[100];
 
 	struct SlaveInfo
 	{
@@ -33,7 +32,7 @@ int main(int argc, char* argv[])
 		exit(0);
 	}
 
-	fp = fopen(argv[1], "rb");
+	FILE* fp = fopen(argv[1], "rbe");
 	if (fp == NULL)
 	{
 		printf("Could not open %s\n", argv[1]);
@@ -56,7 +55,7 @@ int main(int argc, char* argv[])
 	//title = calloc (1, 100);
 	//fread (title, 1, 100, fp);
 
-	for (i = 0; i <= 99; i++)
+	for (int i = 0; i <= 99; i++)
 	{
 		Title[i] = fgetc(fp);
 		if (Title[i] == '\n')
