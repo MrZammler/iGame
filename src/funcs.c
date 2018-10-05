@@ -1758,7 +1758,7 @@ void follow_thread(BPTR lock, int tab_level)
 					const char* title = get_directory_name(fullpath);
 					if (title != NULL)
 					{
-						if (!current_settings->no_smart_spaces)
+						if (current_settings->no_smart_spaces)
 						{
 							strcpy(item_games->title, title);
 						}
