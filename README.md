@@ -18,6 +18,7 @@ Just place the iGame folder anywhere you want on your drive. iGame also requires
 * TextEditor.mcc
 * render.library
 * guigfx.library
+* lowlevel.library (optional, for joystick navigation support)
 
 Make sure your installation contains MUI and the above libraries. You can find the latest versions in Aminet.
 
