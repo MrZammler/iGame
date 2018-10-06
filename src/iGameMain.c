@@ -98,7 +98,7 @@ BOOL init_app(int argc, char** argv)
 		return FALSE;
 	}
 
-	LowLevelBase = OpenLibrary("lowlevel.library", 0);
+	LowLevelBase = OpenLibrary((CONST_STRPTR)"lowlevel.library", 0);
 
 	executable_name = get_executable_name(argc, argv);
 	load_settings(DEFAULT_SETTINGS_FILE);
@@ -118,7 +118,7 @@ int main(int argc, char** argv)
 	init_app(argc, argv);
 	ULONG sigs = 0;
 	ULONG old = 0;
-	int unit = 1;
+	const int unit = 1;
 
 	if (app)
 	{
@@ -134,7 +134,7 @@ int main(int argc, char** argv)
 
 			if (LowLevelBase)
 			{
-				ULONG new = ReadJoyPort(unit);
+				const ULONG new = ReadJoyPort(unit);
 				if (new != old)
 				{
 					old = new;
