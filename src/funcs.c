@@ -1212,12 +1212,32 @@ char* get_slave_from_path(char* slave, int start, char* path)
 //shows and inits the GameProperties Window
 void game_properties()
 {
-	int open;
+	int open = 0;
 	//if window is already open
 	get(app->WI_Properties, MUIA_Window_Open, &open);
 	if (open) return;
 
+	// Allocate Memory for variables
 	char* game_title = NULL;
+	char* helperstr = AllocMem(512 * sizeof(char), MEMF_CLEAR);
+	char* fullpath = AllocMem(800 * sizeof(char), MEMF_CLEAR);
+	char* str2 = AllocMem(512 * sizeof(char), MEMF_CLEAR);
+	char* path = AllocMem(256 * sizeof(char), MEMF_CLEAR);
+	char* naked_path = AllocMem(256 * sizeof(char), MEMF_CLEAR);
+	char* slave = AllocMem(256 * sizeof(char), MEMF_CLEAR);
+
+	// Check if any of them failed
+	if (helperstr == NULL 
+		|| fullpath == NULL 
+		|| str2 == NULL 
+		|| path == NULL 
+		|| naked_path == NULL
+		|| slave == NULL)
+	{
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+		return;
+	}
+
 	//set the elements on the window
 	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
 	if (game_title == NULL || strlen(game_title) == 0)
@@ -1232,13 +1252,10 @@ void game_properties()
 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
 		return;
 	}
-
-	char helperstr[512];
+	
 	int i;
-	struct Library* icon_base;
 	struct DiskObject* disk_obj;
 	char* tool_type;
-	char str2[512], fullpath[800];
 
 	set(app->STR_PropertiesGameTitle, MUIA_String_Contents, game_title);
 	set(app->TX_PropertiesSlavePath, MUIA_Text_Contents, item_games->path);
@@ -1263,33 +1280,9 @@ void game_properties()
 		set(app->CH_PropertiesHidden, MUIA_Selected, FALSE);
 
 	//set up the tooltypes
-	char* path = malloc(256 * sizeof(char));
-	if (path != NULL)
-		get_path(game_title, path);
-	else
-	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
-	}
-
-	char* naked_path = malloc(256 * sizeof(char));
-	if (naked_path != NULL)
-		strip_path(path, naked_path);
-	else
-	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
-	}
-
-	char* slave = malloc(256 * sizeof(char));
-	if (slave != NULL)
-		slave = get_slave_from_path(slave, strlen(naked_path), path);
-	else
-	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
-	}
-
+	get_path(game_title, path);
+	strip_path(path, naked_path);
+	slave = get_slave_from_path(slave, strlen(naked_path), path);
 	string_to_lower(slave);
 
 	const BPTR oldlock = Lock((CONST_STRPTR)PROGDIR, ACCESS_READ);
@@ -1304,7 +1297,7 @@ void game_properties()
 
 	// If it's already been allocated, let's just zero it out
 	if (game_tooltypes)
-		memset(&game_tooltypes[0], 0, 1024*sizeof(char));
+		memset(&game_tooltypes[0], 0, 1024 * sizeof(char));
 	else
 		game_tooltypes = AllocMem(1024 * sizeof(char), MEMF_CLEAR);
 
@@ -1314,7 +1307,8 @@ void game_properties()
 		return;
 	}
 
-	if ((icon_base = (struct Library *)OpenLibrary((CONST_STRPTR)ICON_LIBRARY, 0)))
+	struct Library* icon_base = (struct Library *)OpenLibrary((CONST_STRPTR)ICON_LIBRARY, 0);
+	if (icon_base)
 	{
 		//scan the .info files in the current dir.
 		//one of them should be the game's project icon.
@@ -1365,24 +1359,28 @@ void game_properties()
 				}
 			}
 		}
-
 		CloseLibrary(icon_base);
 	}
 
 	// Cleanup the memory allocations
 	if (slave)
-		free(slave);
+		FreeMem(slave, 256 * sizeof(char));
 	if (path)
-		free(path);
+		FreeMem(path, 256 * sizeof(char));
 	if (naked_path)
-		free(naked_path);
+		FreeMem(naked_path, 256 * sizeof(char));
+	if (helperstr)
+		FreeMem(helperstr, 512 * sizeof(char));
+	if (fullpath)
+		FreeMem(fullpath, 800 * sizeof(char));
+	if (str2)
+		FreeMem(str2, 512 * sizeof(char));
 
 	if (strlen(game_tooltypes) == 0)
 	{
 		sprintf(game_tooltypes, "No .info file");
 		set(app->TX_PropertiesTooltypes, MUIA_TextEditor_ReadOnly, TRUE);
 	}
-
 	set(app->TX_PropertiesTooltypes, MUIA_TextEditor_Contents, game_tooltypes);
 	CurrentDir(oldlock);
 	set(app->WI_Properties, MUIA_Window_Open, TRUE);
@@ -1391,22 +1389,21 @@ void game_properties()
 //when ok is pressed in GameProperties
 void game_properties_ok()
 {
-	char* game_title = NULL;
-	char* path = NULL;
 	int fav = 0, genre = 0, hid = 0;
-	struct Library* icon_base;
-	struct DiskObject* disk_obj;
 	char* tool_type;
 	int i;
 	int new_tool_type_count = 1, old_tool_type_count = 0, old_real_tool_type_count = 0;
-	char str2[512], fullpath[800];
+
+	char* game_title = NULL;
+	char* path = NULL; //AllocMem(256 * sizeof(char), MEMF_CLEAR);
+	char* fullpath = AllocMem(800 * sizeof(char), MEMF_CLEAR);
+	char* str2 = AllocMem(512 * sizeof(char), MEMF_CLEAR);
 
 	get(app->STR_PropertiesGameTitle, MUIA_String_Contents, &game_title);
 	get(app->TX_PropertiesSlavePath, MUIA_Text_Contents, &path);
 	get(app->CY_PropertiesGenre, MUIA_Cycle_Active, &genre);
 	get(app->CH_PropertiesFavorite, MUIA_Selected, &fav);
 	get(app->CH_PropertiesHidden, MUIA_Selected, &hid);
-
 
 	//find the entry, and update it:
 	for (item_games = games; item_games != NULL; item_games = item_games->next)
@@ -1454,7 +1451,7 @@ void game_properties_ok()
 	//tooltypes changed
 	if (strcmp((char *)tools, game_tooltypes))
 	{
-		char* naked_path = malloc(256 * sizeof(char));
+		char* naked_path = AllocMem(256 * sizeof(char), MEMF_CLEAR);
 		if (naked_path != NULL)
 			strip_path(path, naked_path);
 		else
@@ -1462,8 +1459,8 @@ void game_properties_ok()
 			msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 			return;
 		}
-		strip_path(path, naked_path);
-		char* slave = malloc(256 * sizeof(char));
+
+		char* slave = AllocMem(256 * sizeof(char), MEMF_CLEAR);
 		if (slave != NULL)
 			get_slave_from_path(slave, strlen(naked_path), path);
 		else
@@ -1471,13 +1468,15 @@ void game_properties_ok()
 			msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 			return;
 		}
+
 		string_to_lower(slave);
 
-		BPTR oldlock = Lock((CONST_STRPTR)PROGDIR, ACCESS_READ);
+		const BPTR oldlock = Lock((CONST_STRPTR)PROGDIR, ACCESS_READ);
 		const BPTR lock = Lock((CONST_STRPTR)naked_path, ACCESS_READ);
 		CurrentDir(lock);
 
-		if ((icon_base = (struct Library *)OpenLibrary((CONST_STRPTR)ICON_LIBRARY, 0)))
+		struct Library* icon_base = (struct Library *)OpenLibrary((CONST_STRPTR)ICON_LIBRARY, 0);
+		if (icon_base)
 		{
 			//scan the .info files in the current dir.
 			//one of them should be the game's project icon.
@@ -1485,14 +1484,14 @@ void game_properties_ok()
 			/*  allocate space for a FileInfoBlock */
 			struct FileInfoBlock* m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
 
-			int success = Examine(lock, m);
+			Examine(lock, m);
 			if (m->fib_DirEntryType <= 0)
 			{
 				/*  We don't allow "opta file", only "opta dir" */
 				return;
 			}
 
-			while ((success = ExNext(lock, m)))
+			while (ExNext(lock, m))
 			{
 				if (strstr(m->fib_FileName, ".info"))
 				{
@@ -1507,7 +1506,8 @@ void game_properties_ok()
 					}
 					fullpath[i] = '\0';
 
-					if ((disk_obj = GetDiskObject((STRPTR)fullpath)))
+					struct DiskObject* disk_obj = GetDiskObject((STRPTR)fullpath);
+					if (disk_obj)
 					{
 						if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, (STRPTR)SLAVE_STRING), (STRPTR)slave))
 						{
@@ -1548,7 +1548,7 @@ void game_properties_ok()
 							if (temp_tbl)
 								free(temp_tbl);
 							if (new_tool_types)
-								free(new_tool_types);
+								FreeVec(new_tool_types);
 
 							break;
 						}
@@ -1556,18 +1556,24 @@ void game_properties_ok()
 					}
 				}
 			}
-
+			if (m)
+				FreeMem(m, sizeof(struct FileInfoBlock));
 			CloseLibrary(icon_base);
 		}
+		
+		CurrentDir(oldlock);
+
 		// Cleanup the memory allocations
 		if (slave)
-			free(slave);
-		if (path)
-			free(path);
+			FreeMem(slave, 256 * sizeof(char));
 		if (naked_path)
-			free(naked_path);
-		if (game_tooltypes)
-			FreeMem(game_tooltypes, 1024 * sizeof(char));
+			FreeMem(naked_path, 256 * sizeof(char));
+		//if (game_tooltypes)
+		//	FreeMem(game_tooltypes, 1024 * sizeof(char));
+		if (fullpath)
+			FreeMem(fullpath, 800 * sizeof(char));
+		if (str2)
+			FreeMem(str2, 512 * sizeof(char));
 	}
 	FreeVec(tools);
 
