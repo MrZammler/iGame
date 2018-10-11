@@ -2,7 +2,7 @@
   funcs.c
   Misc functions for iGame
   
-  Copyright (c) 2016, Emmanuel Vasilakis
+  Copyright (c) 2018, Emmanuel Vasilakis
   
   This file is part of iGame.
 
@@ -26,7 +26,7 @@
 #include <clib/icon_protos.h>
 #include <libraries/mui.h>
 #include <MUI/Guigfx_mcc.h>
-#include <mui/TextEditor_mcc.h>
+#include <MUI/TextEditor_mcc.h>
 #include <clib/muimaster_protos.h>
 #include <stdio.h>
 #include <string.h>
@@ -2390,15 +2390,15 @@ void read_tool_types()
 	if (!current_settings->hide_side_panel)
 	{
 		//check screen res and adjust image box accordingly
-		if (current_settings->screenshot_height == -1 && current_settings->screenshot_width == -1)
+		if (current_settings->screenshot_height <= 0 && current_settings->screenshot_width <= 0)
 		{
 			get_screen_size(&screen_width, &screen_height);
 
 			//if values are ok from the previous function, and user has not provided his own values, calculate a nice size
 			if (screen_width != -1 && screen_height != -1)
 			{
-				//for hi-res screens (800x600 or greater) we'll use 320x256
-				if (screen_width >= 800 && screen_height >= 600)
+				//for hi-res screens (1024x768 or greater) we'll use 320x256
+				if (screen_width >= 1024 && screen_height >= 768)
 				{
 					current_settings->screenshot_width = 320;
 					current_settings->screenshot_height = 256;
