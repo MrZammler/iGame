@@ -1,0 +1,1 @@
+vc +aos68k -lamiga -lauto lowlevel.c -o lowlevel.exe

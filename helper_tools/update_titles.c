@@ -4,6 +4,10 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+extern char* strdup(const char* s);
 
 typedef struct games
 {
@@ -27,9 +31,7 @@ games_list *item_games = NULL, *games = NULL;
 */
 int get_title_from_slave(char* slave, char* title)
 {
-	FILE* fp;
 	char Title[100];
-	int i = -1;
 
 	struct SlaveInfo
 	{
@@ -52,7 +54,7 @@ int get_title_from_slave(char* slave, char* title)
 
 	struct SlaveInfo sl;
 
-	fp = fopen(slave, "rb");
+	FILE* fp = fopen(slave, "rbe");
 	if (fp == NULL)
 	{
 		return 1;
@@ -79,7 +81,7 @@ int get_title_from_slave(char* slave, char* title)
 		return 1;
 	}
 
-	for (i = 0; i <= 99; i++)
+	for (int i = 0; i <= 99; i++)
 	{
 		Title[i] = fgetc(fp);
 		if (Title[i] == '\n')
@@ -104,9 +106,7 @@ int get_title_from_slave(char* slave, char* title)
 */
 int check_dup_title(char* title)
 {
-	games_list* check_games = NULL;
-
-	for (check_games = games; check_games != NULL; check_games = check_games->next)
+	for (games_list* check_games = games; check_games != NULL; check_games = check_games->next)
 	{
 		if (!strcmp(check_games->title, title))
 		{
@@ -123,10 +123,8 @@ int check_dup_title(char* title)
 */
 char** my_split(char* str, char* spl)
 {
-	char* fptr;
-	char* sptr;
 	char **ret, *buffer[256], buf[4096];
-	int count, i, spl_len;
+	int i;
 
 	if (!spl)
 	{
@@ -136,11 +134,11 @@ char** my_split(char* str, char* spl)
 		return (ret);
 	}
 
-	count = 0;
+	int count = 0;
 
-	fptr = str;
-	spl_len = strlen(spl);
-	sptr = strstr(fptr, spl);
+	char* fptr = str;
+	const int spl_len = strlen(spl);
+	char* sptr = strstr(fptr, spl);
 	while (sptr)
 	{
 		i = sptr - fptr;
@@ -172,9 +170,7 @@ char** my_split(char* str, char* spl)
 */
 void save_list(int CheckExists)
 {
-	FILE* fpgames = NULL;
-
-	fpgames = fopen("PROGDIR:gameslist", "w");
+	FILE* fpgames = fopen("PROGDIR:gameslist", "we");
 
 	if (!fpgames)
 	{
@@ -226,15 +222,13 @@ void save_list(int CheckExists)
 
 int main()
 {
-	FILE* fpgames = NULL;
 	char FileLine[1000];
-	char *str = NULL, helperstr[250];
-	char ***temp_tbl = NULL, resp;
+	char helperstr[250];
 
 	printf("This program will update your gameslist with game titles from the slave files\n");
 	printf("Do you wish to continue? (Y/N): ");
 
-	resp = fgetc(stdin);
+	const char resp = fgetc(stdin);
 
 	if (resp != 'Y' && resp != 'y')
 	{
@@ -242,7 +236,7 @@ int main()
 		exit(0);
 	}
 
-	fpgames = fopen("PROGDIR:gameslist", "r");
+	FILE* fpgames = fopen("PROGDIR:gameslist", "re");
 	if (!fpgames)
 	{
 		printf(
@@ -258,7 +252,7 @@ int main()
 
 			if (strlen(FileLine) == 0) continue;
 
-			temp_tbl = my_split((char *)(FileLine), "=");
+			char** temp_tbl = my_split((char *)FileLine, "=");
 			if (temp_tbl == NULL || temp_tbl[0] == NULL || !strcmp(temp_tbl, " ") || !strcmp(temp_tbl, ""))
 			{
 				continue;
@@ -330,7 +324,6 @@ int main()
 			free(temp_tbl[1]);
 			free(temp_tbl[0]);
 			free(temp_tbl);
-			temp_tbl = NULL;
 
 			//    fgets (FileLine, sizeof(FileLine), fpgames);
 			//    strcpy(item_games->Title, temp_tbl[1]
