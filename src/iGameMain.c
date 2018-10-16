@@ -73,8 +73,11 @@ void joystick_directions(ULONG val)
 	if (val & JPF_JOY_DOWN) 
 		set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Down);
 
-	//if (val & JPF_JOY_LEFT) printf("[LEFT]\n");
-	//if (val & JPF_JOY_RIGHT) printf("[RIGHT]\n");
+	if (val & JPF_JOY_LEFT)
+	  joy_left();
+
+	if (val & JPF_JOY_RIGHT)
+	  joy_right();
 }
 
 void joystick_input(ULONG val)

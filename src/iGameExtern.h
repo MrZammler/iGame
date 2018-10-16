@@ -136,5 +136,7 @@ void settings_save();
 void setting_hide_side_panel_changed();
 void settings_use();
 const unsigned char* GetMBString(const unsigned char* ref);
+void joy_left();
+void joy_right();
 
 #endif

@@ -2675,3 +2675,69 @@ const char* add_spaces_to_string(const char* input)
 
 	return output;
 }
+
+void joy_left()
+{
+  char *curr_game = NULL, *prev_game = NULL, *last_game = NULL;
+  int ind;
+
+  DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &curr_game);
+  get(app->LV_GamesList, MUIA_List_Active, &ind);
+  
+  if (curr_game == NULL || strlen(curr_game) == 0)
+    {
+      set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Top);
+      return;
+    }
+
+  DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
+  if (prev_game == NULL)
+	return;
+  
+  while (toupper(curr_game[0]) == toupper(prev_game[0]))
+    {
+      DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
+      if (prev_game == NULL)
+	return;
+    }
+
+  last_game = prev_game;
+  
+  while (toupper(last_game[0]) == toupper(prev_game[0]))
+    {
+      DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
+      if (prev_game == NULL)
+	return;
+    }
+
+  set(app->LV_GamesList, MUIA_List_Active, ind+2);
+}
+
+void joy_right()
+{
+  char *curr_game = NULL, *next_game = NULL;
+  int ind;
+
+  DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &curr_game);
+  get(app->LV_GamesList, MUIA_List_Active, &ind);
+  
+  if (curr_game == NULL || strlen(curr_game) == 0)
+    {
+      set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Top);
+      return;
+    }
+
+  DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind++, &next_game);
+  if (next_game == NULL)
+	return;
+  
+  while (toupper(curr_game[0]) == toupper(next_game[0]))
+    {
+      DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind++, &next_game);
+      if (next_game == NULL)
+	return;
+    }
+
+  set(app->LV_GamesList, MUIA_List_Active, ind-1);
+
+}
