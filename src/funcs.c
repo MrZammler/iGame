@@ -397,6 +397,17 @@ void load_genres(const char* filename)
 		app->CY_PropertiesGenreContent[i + 1] = NULL;
 		set(app->CY_PropertiesGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
 
+		for (i = 0; i < no_of_genres; i++)
+		{
+			DoMethod(app->LV_GenresList, MUIM_List_GetEntry, i + 5, &app->CY_AddGameGenreContent[i]);
+		}
+
+		app->CY_AddGameGenreContent[i] = (unsigned char*)GetMBString(MSG_UnknownGenre);
+		app->CY_AddGameGenreContent[i + 1] = NULL;
+		set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_AddGameGenreContent);
+
+		
+
 		Close(fpgenres);
 	}
 	if (file_line)
