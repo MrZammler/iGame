@@ -2440,9 +2440,11 @@ void add_non_whdload()
 void non_whdload_ok()
 {
 	char *str, *str_title;
+	int genre = 0;
 
 	get(app->PA_AddGame, MUIA_String_Contents, &str);
 	get(app->STR_AddTitle, MUIA_String_Contents, &str_title);
+	get(app->CY_AddGameGenre, MUIA_Cycle_Active, &genre);
 
 	if (strlen(str_title) == 0)
 	{
@@ -2460,7 +2462,7 @@ void non_whdload_ok()
 	item_games->next = NULL;
 	item_games->index = 0;
 	strcpy(item_games->title, (char *)str_title);
-	strcpy(item_games->genre, GetMBString(MSG_UnknownGenre));
+	strcpy(item_games->genre, app->CY_AddGameGenreContent[genre]);
 	strcpy(item_games->path, (char *)str);
 	item_games->favorite = 0;
 	item_games->times_played = 0;
@@ -2476,6 +2478,7 @@ void non_whdload_ok()
 		games = item_games;
 	}
 
+	//todo: Small bug. If the list is showing another genre, do not insert it.
 	DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
 	total_games++;
 	status_show_total();
