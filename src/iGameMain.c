@@ -1,3 +1,25 @@
+/*
+  iGameMain.c
+  Main source for iGame
+  
+  Copyright (c) 2018, Emmanuel Vasilakis
+  
+  This file is part of iGame.
+
+  iGame is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  iGame is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with iGame. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #define MUI_OBSOLETE
 #define MUIMASTER_LIBRARY "muimaster.library"
 
@@ -51,8 +73,11 @@ void joystick_directions(ULONG val)
 	if (val & JPF_JOY_DOWN) 
 		set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Down);
 
-	//if (val & JPF_JOY_LEFT) printf("[LEFT]\n");
-	//if (val & JPF_JOY_RIGHT) printf("[RIGHT]\n");
+	if (val & JPF_JOY_LEFT)
+	  joy_left();
+
+	if (val & JPF_JOY_RIGHT)
+	  joy_right();
 }
 
 void joystick_input(ULONG val)

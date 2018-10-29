@@ -2,7 +2,7 @@
   funcs.c
   Misc functions for iGame
   
-  Copyright (c) 2016, Emmanuel Vasilakis
+  Copyright (c) 2018, Emmanuel Vasilakis
   
   This file is part of iGame.
 
@@ -26,7 +26,7 @@
 #include <clib/icon_protos.h>
 #include <libraries/mui.h>
 #include <MUI/Guigfx_mcc.h>
-#include <mui/TextEditor_mcc.h>
+#include <MUI/TextEditor_mcc.h>
 #include <clib/muimaster_protos.h>
 #include <stdio.h>
 #include <string.h>
@@ -396,6 +396,17 @@ void load_genres(const char* filename)
 		app->CY_PropertiesGenreContent[i] = (unsigned char*)GetMBString(MSG_UnknownGenre);
 		app->CY_PropertiesGenreContent[i + 1] = NULL;
 		set(app->CY_PropertiesGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
+
+		for (i = 0; i < no_of_genres; i++)
+		{
+			DoMethod(app->LV_GenresList, MUIM_List_GetEntry, i + 5, &app->CY_AddGameGenreContent[i]);
+		}
+
+		app->CY_AddGameGenreContent[i] = (unsigned char*)GetMBString(MSG_UnknownGenre);
+		app->CY_AddGameGenreContent[i + 1] = NULL;
+		set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_AddGameGenreContent);
+
+		
 
 		Close(fpgenres);
 	}
@@ -2390,15 +2401,15 @@ void read_tool_types()
 	if (!current_settings->hide_side_panel)
 	{
 		//check screen res and adjust image box accordingly
-		if (current_settings->screenshot_height == -1 && current_settings->screenshot_width == -1)
+		if (current_settings->screenshot_height <= 0 && current_settings->screenshot_width <= 0)
 		{
 			get_screen_size(&screen_width, &screen_height);
 
 			//if values are ok from the previous function, and user has not provided his own values, calculate a nice size
 			if (screen_width != -1 && screen_height != -1)
 			{
-				//for hi-res screens (800x600 or greater) we'll use 320x256
-				if (screen_width >= 800 && screen_height >= 600)
+				//for hi-res screens (1024x768 or greater) we'll use 320x256
+				if (screen_width >= 1024 && screen_height >= 768)
 				{
 					current_settings->screenshot_width = 320;
 					current_settings->screenshot_height = 256;
@@ -2429,9 +2440,11 @@ void add_non_whdload()
 void non_whdload_ok()
 {
 	char *str, *str_title;
+	int genre = 0;
 
 	get(app->PA_AddGame, MUIA_String_Contents, &str);
 	get(app->STR_AddTitle, MUIA_String_Contents, &str_title);
+	get(app->CY_AddGameGenre, MUIA_Cycle_Active, &genre);
 
 	if (strlen(str_title) == 0)
 	{
@@ -2449,7 +2462,7 @@ void non_whdload_ok()
 	item_games->next = NULL;
 	item_games->index = 0;
 	strcpy(item_games->title, (char *)str_title);
-	strcpy(item_games->genre, GetMBString(MSG_UnknownGenre));
+	strcpy(item_games->genre, app->CY_AddGameGenreContent[genre]);
 	strcpy(item_games->path, (char *)str);
 	item_games->favorite = 0;
 	item_games->times_played = 0;
@@ -2465,6 +2478,7 @@ void non_whdload_ok()
 		games = item_games;
 	}
 
+	//todo: Small bug. If the list is showing another genre, do not insert it.
 	DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
 	total_games++;
 	status_show_total();
@@ -2674,4 +2688,70 @@ const char* add_spaces_to_string(const char* input)
 	output[output_index] = '\0';
 
 	return output;
+}
+
+void joy_left()
+{
+  char *curr_game = NULL, *prev_game = NULL, *last_game = NULL;
+  int ind;
+
+  DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &curr_game);
+  get(app->LV_GamesList, MUIA_List_Active, &ind);
+  
+  if (curr_game == NULL || strlen(curr_game) == 0)
+    {
+      set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Top);
+      return;
+    }
+
+  DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
+  if (prev_game == NULL)
+	return;
+  
+  while (toupper(curr_game[0]) == toupper(prev_game[0]))
+    {
+      DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
+      if (prev_game == NULL)
+	return;
+    }
+
+  last_game = prev_game;
+  
+  while (toupper(last_game[0]) == toupper(prev_game[0]))
+    {
+      DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
+      if (prev_game == NULL)
+	return;
+    }
+
+  set(app->LV_GamesList, MUIA_List_Active, ind+2);
+}
+
+void joy_right()
+{
+  char *curr_game = NULL, *next_game = NULL;
+  int ind;
+
+  DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &curr_game);
+  get(app->LV_GamesList, MUIA_List_Active, &ind);
+  
+  if (curr_game == NULL || strlen(curr_game) == 0)
+    {
+      set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Top);
+      return;
+    }
+
+  DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind++, &next_game);
+  if (next_game == NULL)
+	return;
+  
+  while (toupper(curr_game[0]) == toupper(next_game[0]))
+    {
+      DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind++, &next_game);
+      if (next_game == NULL)
+	return;
+    }
+
+  set(app->LV_GamesList, MUIA_List_Active, ind-1);
+
 }

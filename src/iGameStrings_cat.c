@@ -1,3 +1,24 @@
+/*
+  iGameStrings_cat.c
+  Translatable strings for iGame
+  
+  Copyright (c) 2018, Emmanuel Vasilakis
+  
+  This file is part of iGame.
+
+  iGame is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  iGame is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with iGame. If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /****************************************************************
 
@@ -62,7 +83,7 @@ struct FC_String iGameStrings_Strings[99] = {
     { (STRPTR) "About...", 15 },
     { (STRPTR) "Quit", 16 },
     { (STRPTR) "Q_", 17 },
-    { (STRPTR) "Edit", 18 },
+    { (STRPTR) "Game", 18 },
     { (STRPTR) "Duplicate...", 19 },
     { (STRPTR) "Properties...", 20 },
     { (STRPTR) "P_", 21 },
@@ -97,7 +118,7 @@ struct FC_String iGameStrings_Strings[99] = {
     { (STRPTR) "OK", 50 },
     { (STRPTR) "Cancel", 51 },
     { (STRPTR) "About iGame", 52 },
-    { (STRPTR) "Emmanuel Vasilakis\nmrzammler@gmail.com\n\nContributors:\nDimitris Panokostas\nmidwan@gmail.com\n\n", 53 },
+    { (STRPTR) "Emmanuel Vasilakis (mrzammler@gmail.com)\n\nContributors:\nDimitris Panokostas (midwan@gmail.com)\n\n", 53 },
     { (STRPTR) "OK", 54 },
     { (STRPTR) "iGame Settings", 55 },
     { (STRPTR) "Hide Screenshots", 56 },

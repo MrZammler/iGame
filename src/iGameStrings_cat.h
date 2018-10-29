@@ -1,3 +1,24 @@
+/*
+  iGameStrings_cat.h
+  Header strings file for iGame
+  
+  Copyright (c) 2018, Emmanuel Vasilakis
+  
+  This file is part of iGame.
+
+  iGame is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  iGame is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with iGame. If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /****************************************************************
 
@@ -73,8 +94,8 @@ extern struct FC_String iGameStrings_Strings[99];
 #define _MSG_MNMainQuit (iGameStrings_Strings+16)
 #define MSG_MNMainQuitChar (iGameStrings_Strings[17].msg)
 #define _MSG_MNMainQuitChar (iGameStrings_Strings+17)
-#define MSG_MNlabel2Edit (iGameStrings_Strings[18].msg)
-#define _MSG_MNlabel2Edit (iGameStrings_Strings+18)
+#define MSG_MNlabel2Game (iGameStrings_Strings[18].msg)
+#define _MSG_MNlabel2Game (iGameStrings_Strings+18)
 #define MSG_MNMainMenuDuplicate (iGameStrings_Strings[19].msg)
 #define _MSG_MNMainMenuDuplicate (iGameStrings_Strings+19)
 #define MSG_MNMainProperties (iGameStrings_Strings[20].msg)

@@ -1,3 +1,25 @@
+/*
+  iGameGUI.c
+  GUI source for iGame
+  
+  Copyright (c) 2018, Emmanuel Vasilakis
+  
+  This file is part of iGame.
+
+  iGame is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  iGame is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with iGame. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #define MUI_OBSOLETE
 
 #include <libraries/mui.h>
@@ -7,7 +29,7 @@
 #include <proto/exec.h>
 
 #include <MUI/Guigfx_mcc.h>
-#include <mui/TextEditor_mcc.h>
+#include <MUI/TextEditor_mcc.h>
 #include <libraries/gadtools.h> /* for Barlabel in MenuItem */
 #include <exec/memory.h>
 #include <proto/icon.h>
@@ -34,7 +56,7 @@ struct ObjApp * CreateApp(void)
 	APTR	MNlabel2File, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainMenuShowHidehiddenentries;
 	APTR	MNMainBarLabel5, MNMainOpenList, MNMainSaveList, MNMainSaveListAs;
 	APTR	MNMainBarLabel0, MNMainAbout;
-	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Edit, MNMainMenuDuplicate, MNMainProperties;
+	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Game, MNMainMenuDuplicate, MNMainProperties;
 	APTR	MNMainBarLabel4, MNMainDelete, MNlabel2Tools, MNMainiGameSettings;
 	APTR	MNlabel2GameRepositories, MNMainBarLabel2, MNMainMUISettings, GROUP_ROOT;
 	APTR	GR_Filter, LA_Filter, GR_main, Space_Gamelist;
@@ -285,7 +307,7 @@ struct ObjApp * CreateApp(void)
 
 		object->LV_GenresList = ListObject,
 			MUIA_Frame, MUIV_Frame_InputList,
-			MUIA_List_Active, MUIV_List_Active_Top,
+		        MUIA_List_Active, MUIV_List_Active_Top,
 			End;
 
 		object->LV_GenresList = ListviewObject,
@@ -299,7 +321,7 @@ struct ObjApp * CreateApp(void)
 
 			object->GR_sidepanel = GroupObject,
 				MUIA_HelpNode, "GR_sidepanel",
-				MUIA_Weight, 80,
+			        MUIA_Weight, 0,
 				MUIA_Group_Rows, 3,
 				Child, object->IM_GameImage_0,
 				Child, object->Space_Sidepanel,
@@ -310,7 +332,7 @@ struct ObjApp * CreateApp(void)
 
 			object->GR_sidepanel = GroupObject,
 				MUIA_HelpNode, "GR_sidepanel",
-				MUIA_Weight, 80,
+			        MUIA_Weight, 0,
 				MUIA_Group_Rows, 2,
 				Child, object->Space_Sidepanel,
 				Child, object->LV_GenresList,
@@ -424,12 +446,12 @@ struct ObjApp * CreateApp(void)
 		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainDeleteChar),
 		End;
 
-	MNlabel2Edit = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Edit),
-		MUIA_Family_Child, MNMainMenuDuplicate,
+	MNlabel2Game = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Game),
+	  /* MUIA_Family_Child, MNMainMenuDuplicate, */
 		MUIA_Family_Child, MNMainProperties,
-		MUIA_Family_Child, MNMainBarLabel4,
-		MUIA_Family_Child, MNMainDelete,
+	  /*	MUIA_Family_Child, MNMainBarLabel4,
+		MUIA_Family_Child, MNMainDelete, */
 		End;
 
 	MNMainiGameSettings = MenuitemObject,
@@ -456,7 +478,7 @@ struct ObjApp * CreateApp(void)
 
 	object->MN_MainMenu = MenustripObject,
 		MUIA_Family_Child, MNlabel2File,
-		MUIA_Family_Child, MNlabel2Edit,
+		MUIA_Family_Child, MNlabel2Game,
 		MUIA_Family_Child, MNlabel2Tools,
 		End;
 
