@@ -212,7 +212,6 @@ void load_settings(const char* filename)
 	}
 	else
 	{
-		msg_box("No settings file found, will attempt to read Tooltypes instead");
 		// No "igame.prefs" file found, fallback to reading Tooltypes
 		read_tool_types();
 	}
