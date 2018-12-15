@@ -212,7 +212,6 @@ void load_settings(const char* filename)
 	}
 	else
 	{
-		msg_box("No settings file found, will attempt to read Tooltypes instead");
 		// No "igame.prefs" file found, fallback to reading Tooltypes
 		read_tool_types();
 	}
@@ -311,6 +310,7 @@ void load_repos(const char* filename)
 {
 	const int buffer_size = 512;
 	STRPTR file_line = malloc(buffer_size * sizeof(char));
+
 	if (file_line == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
@@ -322,7 +322,7 @@ void load_repos(const char* filename)
 	{
 		while (FGets(fprepos, file_line, buffer_size))
 		{
-			file_line[strlen(file_line) - 1] = '\0';
+			if (file_line[strlen(file_line) - 1] == '\n') file_line[strlen(file_line) - 1] = '\0';
 			if (strlen(file_line) == 0)
 				break;
 
@@ -345,6 +345,7 @@ void load_repos(const char* filename)
 
 		Close(fprepos);
 	}
+
 	if (file_line)
 		free(file_line);
 }
@@ -1190,6 +1191,7 @@ void repo_stop()
 				break;
 
 			FPuts(fprepos, repo_path);
+			FPutC(fprepos, '\n');
 		}
 		Close(fprepos);
 	}
