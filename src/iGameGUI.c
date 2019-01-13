@@ -53,7 +53,7 @@ struct ObjApp * CreateApp(void)
 {
 	struct ObjApp * object;
 
-	APTR	MNlabel2File, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainMenuShowHidehiddenentries;
+	APTR	MNlabel2Actions, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainMenuShowHidehiddenentries;
 	APTR	MNMainBarLabel5, MNMainOpenList, MNMainSaveList, MNMainSaveListAs;
 	APTR	MNMainBarLabel0, MNMainAbout;
 	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Game, MNMainMenuDuplicate, MNMainProperties;
@@ -415,15 +415,15 @@ struct ObjApp * CreateApp(void)
 		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainQuitChar),
 		End;
 
-	MNlabel2File = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2File),
+	MNlabel2Actions = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Actions),
 		MUIA_Family_Child, MNlabelScan,
 		MUIA_Family_Child, MNMainAddnonWHDLoadgame,
 		MUIA_Family_Child, MNMainMenuShowHidehiddenentries,
-		MUIA_Family_Child, MNMainBarLabel5,
-		MUIA_Family_Child, MNMainOpenList,
-		MUIA_Family_Child, MNMainSaveList,
-		MUIA_Family_Child, MNMainSaveListAs,
+		/* MUIA_Family_Child, MNMainBarLabel5, */
+		/* MUIA_Family_Child, MNMainOpenList, */
+		/* MUIA_Family_Child, MNMainSaveList, */
+		/* MUIA_Family_Child, MNMainSaveListAs, */
 		MUIA_Family_Child, MNMainBarLabel0,
 		MUIA_Family_Child, MNMainAbout,
 		MUIA_Family_Child, MNMainBarLabel1,
@@ -477,7 +477,7 @@ struct ObjApp * CreateApp(void)
 		End;
 
 	object->MN_MainMenu = MenustripObject,
-		MUIA_Family_Child, MNlabel2File,
+		MUIA_Family_Child, MNlabel2Actions,
 		MUIA_Family_Child, MNlabel2Game,
 		MUIA_Family_Child, MNlabel2Tools,
 		End;

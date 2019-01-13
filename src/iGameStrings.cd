@@ -14,8 +14,8 @@ Emmanuel Vasilakis, Dimitris Panokostas
 MSG_WI_MainWindow (//)
 iGame
 ;MUIB Menu Title
-MSG_MNlabel2File (//)
-File
+MSG_MNlabel2Actions (//)
+Actions
 ;MUIB Menu Title
 MSG_MNlabelScan (//)
 Scan Repositories

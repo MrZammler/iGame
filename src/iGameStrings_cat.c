@@ -68,7 +68,7 @@ struct FC_String iGameStrings_Strings[99] = {
     { (STRPTR) "A front-end to WHDLoad", 0 },
     { (STRPTR) "Emmanuel Vasilakis, Dimitris Panokostas", 1 },
     { (STRPTR) "iGame", 2 },
-    { (STRPTR) "File", 3 },
+    { (STRPTR) "Actions", 3 },
     { (STRPTR) "Scan Repositories", 4 },
     { (STRPTR) "R_", 5 },
     { (STRPTR) "Add non-WHDLoad game...", 6 },
