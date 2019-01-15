@@ -169,11 +169,11 @@ int main(int argc, char** argv)
 				Delay(1);
 			}
 		}
+		clean_exit(NULL);
 		DisposeApp(app);
 	}
 	else
 		clean_exit((unsigned char*)"Can't create application\n");
 
-	clean_exit(NULL);
 	return 0;
 }
