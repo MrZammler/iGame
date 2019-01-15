@@ -1937,35 +1937,9 @@ void save_to_file(const char* filename, const int check_exists)
 
 	for (item_games = games; item_games != NULL; item_games = item_games->next)
 	{
-		if (item_games->deleted != 1)
+		if (check_exists == 1)
 		{
-			if (check_exists == 1)
-			{
-				if (item_games->exists == 1)
-				{
-					snprintf(file_line, buffer_size, "index=%d\n", item_games->index);
-					FPuts(fpgames, (CONST_STRPTR)file_line);
-					snprintf(file_line, buffer_size, "title=%s\n", item_games->title);
-					FPuts(fpgames, (CONST_STRPTR)file_line);
-					snprintf(file_line, buffer_size, "genre=%s\n", item_games->genre);
-					FPuts(fpgames, (CONST_STRPTR)file_line);
-					snprintf(file_line, buffer_size, "path=%s\n", item_games->path);
-					FPuts(fpgames, (CONST_STRPTR)file_line);
-					snprintf(file_line, buffer_size, "favorite=%d\n", item_games->favorite);
-					FPuts(fpgames, (CONST_STRPTR)file_line);
-					snprintf(file_line, buffer_size, "timesplayed=%d\n", item_games->times_played);
-					FPuts(fpgames, (CONST_STRPTR)file_line);
-					snprintf(file_line, buffer_size, "lastplayed=%d\n", item_games->last_played);
-					FPuts(fpgames, (CONST_STRPTR)file_line);
-					snprintf(file_line, buffer_size, "hidden=%d\n\n", item_games->hidden);
-					FPuts(fpgames, (CONST_STRPTR)file_line);
-				}
-				else
-				{
-					strcpy(item_games->path, "");
-				}
-			}
-			else
+			if (item_games->exists == 1)
 			{
 				snprintf(file_line, buffer_size, "index=%d\n", item_games->index);
 				FPuts(fpgames, (CONST_STRPTR)file_line);
@@ -1984,15 +1958,38 @@ void save_to_file(const char* filename, const int check_exists)
 				snprintf(file_line, buffer_size, "hidden=%d\n\n", item_games->hidden);
 				FPuts(fpgames, (CONST_STRPTR)file_line);
 			}
+			else
+			{
+				strcpy(item_games->path, "");
+			}
 		}
+		else
+		{
+			snprintf(file_line, buffer_size, "index=%d\n", item_games->index);
+			FPuts(fpgames, (CONST_STRPTR)file_line);
+			snprintf(file_line, buffer_size, "title=%s\n", item_games->title);
+			FPuts(fpgames, (CONST_STRPTR)file_line);
+			snprintf(file_line, buffer_size, "genre=%s\n", item_games->genre);
+			FPuts(fpgames, (CONST_STRPTR)file_line);
+			snprintf(file_line, buffer_size, "path=%s\n", item_games->path);
+			FPuts(fpgames, (CONST_STRPTR)file_line);
+			snprintf(file_line, buffer_size, "favorite=%d\n", item_games->favorite);
+			FPuts(fpgames, (CONST_STRPTR)file_line);
+			snprintf(file_line, buffer_size, "timesplayed=%d\n", item_games->times_played);
+			FPuts(fpgames, (CONST_STRPTR)file_line);
+			snprintf(file_line, buffer_size, "lastplayed=%d\n", item_games->last_played);
+			FPuts(fpgames, (CONST_STRPTR)file_line);
+			snprintf(file_line, buffer_size, "hidden=%d\n\n", item_games->hidden);
+			FPuts(fpgames, (CONST_STRPTR)file_line);
+		}
+
 	}
 	Close(fpgames);
 
 	if (file_line)
 		free(file_line);
 
-	saving_message = "Done.";
-	set(app->TX_Status, MUIA_Text_Contents, saving_message);
+	status_show_total();
 }
 
 void save_list(const int check_exists)
