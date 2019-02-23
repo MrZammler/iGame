@@ -28,8 +28,8 @@
 #include <proto/muimaster.h>
 #include <proto/exec.h>
 
-#include <MUI/Guigfx_mcc.h>
-#include <MUI/TextEditor_mcc.h>
+#include <mui/Guigfx_mcc.h>
+#include <mui/TextEditor_mcc.h>
 #include <libraries/gadtools.h> /* for Barlabel in MenuItem */
 #include <exec/memory.h>
 #include <proto/icon.h>
