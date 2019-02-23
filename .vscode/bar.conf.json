@@ -1,0 +1,6 @@
+{
+    "commands":{
+        "build":"make -f Makefile.linux iGame iGame.030 iGame.040 iGame.060",
+        "run":"./iGame"
+    }
+}

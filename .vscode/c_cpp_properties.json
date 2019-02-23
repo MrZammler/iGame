@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/opt/amiga/m68k-amigaos/include/",
+                "/opt/amiga/m68k-amigaos/ndk-include/",
+                "/opt/amiga/m68k-amigaos/include/mui"
+            ],
+            "defines": [],
+            "compilerPath": "/opt/amiga/bin/m68k-amigaos-gcc",
+            "cStandard": "c99",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}
