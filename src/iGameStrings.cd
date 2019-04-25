@@ -301,3 +301,6 @@ Could not allocate memory! Aborting...
 ;Game directory not found
 MSG_DirectoryNotFound (//)
 Game Directory not found!
+;Start with favorites
+MSG_LA_StartWithFavorites (//)
+Display favorites on start

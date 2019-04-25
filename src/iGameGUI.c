@@ -73,7 +73,7 @@ struct ObjApp * CreateApp(void)
 	APTR	Space_ScreenshotSize, GR_CustomSize, LA_Width, LA_Height, GR_Titles;
 	APTR	GR_TitlesFrom, Space_TitlesFrom, GR_SmartSpaces, Space_SmartSpaces;
 	APTR	LA_SmartSpaces, GR_Misc;
-	APTR	LA_SaveStatsOnExit, LA_FilterUseEnter;
+	APTR	LA_SaveStatsOnExit, LA_FilterUseEnter, LA_StartWithFavorites;
 	APTR    LA_HideSidepanel;
 	APTR	GR_SettingsButtons, Space_SettingsButtons1, Space_SettingsButtons2;
 #if defined(__amigaos4__)
@@ -215,6 +215,11 @@ struct ObjApp * CreateApp(void)
 	static const struct Hook SettingHideSidePanelChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_hide_side_panel_changed, NULL, NULL };
 #else
 	static const struct Hook SettingHideSidePanelChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_hide_side_panel_changed, NULL };
+#endif
+#if defined(__amigaos4__)
+	static const struct Hook SettingStartWithFavoritesChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_start_with_favorites_changed, NULL, NULL };
+#else
+	static const struct Hook SettingStartWithFavoritesChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_start_with_favorites_changed, NULL };
 #endif
 #if defined(__amigaos4__)
 	static const struct Hook SettingsUseHook = { { NULL,NULL }, (HOOKFUNC)settings_use, NULL, NULL };
@@ -965,6 +970,10 @@ struct ObjApp * CreateApp(void)
 
 	LA_HideSidepanel = Label(GetMBString(MSG_LA_HideSidepanel));
 
+	object->CH_StartWithFavorites = CheckMark(FALSE);
+
+	LA_StartWithFavorites = Label(GetMBString(MSG_LA_StartWithFavorites));
+
 	GR_Misc = GroupObject,
 		MUIA_HelpNode, "GR_Misc",
 		MUIA_Frame, MUIV_Frame_Group,
@@ -978,6 +987,8 @@ struct ObjApp * CreateApp(void)
 		Child, object->CH_FilterUseEnter,
 		Child, LA_HideSidepanel,
 		Child, object->CH_HideSidepanel,
+		Child, LA_StartWithFavorites,
+		Child, object->CH_StartWithFavorites,
 	End;
 
 	object->BT_SettingsSave = SimpleButton(GetMBString(MSG_BT_SettingsSave));
@@ -1468,6 +1479,13 @@ struct ObjApp * CreateApp(void)
 		object->App,
 		2,
 		MUIM_CallHook, &SettingHideSidePanelChangedHook
+	);
+
+	DoMethod(object->CH_StartWithFavorites,
+		MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &SettingStartWithFavoritesChangedHook
 	);
 
 	DoMethod(object->BT_SettingsSave,

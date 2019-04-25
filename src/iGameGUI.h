@@ -77,6 +77,7 @@ struct ObjApp
 	APTR CH_SaveStatsOnExit;
 	APTR CH_FilterUseEnter;
 	APTR CH_HideSidepanel;
+	APTR CH_StartWithFavorites;
 	APTR BT_SettingsSave;
 	APTR BT_SettingsUse;
 	APTR BT_SettingsCancel;
