@@ -54,10 +54,10 @@ struct ObjApp * CreateApp(void)
 	struct ObjApp * object;
 
 	APTR	MNlabel2Actions, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainMenuShowHidehiddenentries;
-	APTR	MNMainBarLabel5, MNMainOpenList, MNMainSaveList, MNMainSaveListAs;
+	APTR	MNMainOpenList, MNMainSaveList, MNMainSaveListAs;
 	APTR	MNMainBarLabel0, MNMainAbout;
 	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Game, MNMainMenuDuplicate, MNMainProperties;
-	APTR	MNMainBarLabel4, MNMainDelete, MNlabel2Tools, MNMainiGameSettings;
+	APTR	MNMainDelete, MNlabel2Tools, MNMainiGameSettings;
 	APTR	MNlabel2GameRepositories, MNMainBarLabel2, MNMainMUISettings, GROUP_ROOT;
 	APTR	GR_Filter, LA_Filter, GR_main, Space_Gamelist;
 	APTR	GROUP_ROOT_1, GR_Genre, LA_PropertiesGenre, Space_Genre;
@@ -67,14 +67,14 @@ struct ObjApp * CreateApp(void)
 	APTR	Space_Buttons, GROUP_ROOT_2, GR_Path, GR_ReposButtons, GROUP_ROOT_3;
 	APTR	GR_AddGameTitle, LA_AddGameTitle, GR_AddGamePath, LA_AddGamePath;
 	APTR	GR_AddGameGenre, LA_AddGameGenre, Space_AddGame, GR_AddGameButtons;
-	APTR	GROUP_ROOT_4, GROUP_ROOT_Settings, GR_Settings, GR_HideScreenshots;
-	APTR	Space_HideScreenshots, LA_HideScreenshots, GR_Screenshots, GR_NoGuiGfx;
-	APTR	Space_NoGuiGfx, LA_NoGuiGfx, GR_ScreenshotSize, LA_ScreenshotSize;
+	APTR	GROUP_ROOT_4, GROUP_ROOT_Settings, GR_Settings;
+	APTR	LA_HideScreenshots, GR_Screenshots, GR_NoGuiGfx;
+	APTR	LA_NoGuiGfx, GR_ScreenshotSize, LA_ScreenshotSize;
 	APTR	Space_ScreenshotSize, GR_CustomSize, LA_Width, LA_Height, GR_Titles;
 	APTR	GR_TitlesFrom, Space_TitlesFrom, GR_SmartSpaces, Space_SmartSpaces;
-	APTR	LA_SmartSpaces, GR_Misc, GR_SaveStatsOnExit, Space_SaveStatsOnExit;
-	APTR	LA_SaveStatsOnExit, GR_FilterUseEnter, Space_FilterUseEnter, LA_FilterUseEnter;
-	APTR	GR_HideSidepanel, Space_HideSidepanel, LA_HideSidepanel;
+	APTR	LA_SmartSpaces, GR_Misc;
+	APTR	LA_SaveStatsOnExit, LA_FilterUseEnter;
+	APTR    LA_HideSidepanel;
 	APTR	GR_SettingsButtons, Space_SettingsButtons1, Space_SettingsButtons2;
 #if defined(__amigaos4__)
 	static const struct Hook MenuScanHook = { { NULL,NULL }, (HOOKFUNC)scan_repositories, NULL, NULL };
@@ -386,8 +386,6 @@ struct ObjApp * CreateApp(void)
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainMenuShowHidehiddenentries),
 		End;
 
-	MNMainBarLabel5 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
-
 	MNMainOpenList = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainOpenList),
 		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainOpenListChar),
@@ -438,8 +436,6 @@ struct ObjApp * CreateApp(void)
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainProperties),
 		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainPropertiesChar),
 		End;
-
-	MNMainBarLabel4 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
 
 	MNMainDelete = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainDelete),
@@ -810,35 +806,11 @@ struct ObjApp * CreateApp(void)
 
 	object->CH_Screenshots = CheckMark(FALSE);
 
-	Space_HideScreenshots = HSpace(1);
-
 	LA_HideScreenshots = Label(GetMBString(MSG_LA_HideScreenshots));
-
-	GR_HideScreenshots = GroupObject,
-		MUIA_HelpNode, "GR_HideScreenshots",
-		MUIA_Group_Horiz, TRUE,
-		MUIA_Group_HorizSpacing, 5,
-		MUIA_Group_VertSpacing, 5,
-		Child, object->CH_Screenshots,
-		Child, Space_HideScreenshots,
-		Child, LA_HideScreenshots,
-		End;
 
 	object->CH_NoGuiGfx = CheckMark(FALSE);
 
-	Space_NoGuiGfx = HSpace(1);
-
 	LA_NoGuiGfx = Label(GetMBString(MSG_LA_NoGuiGfx));
-
-	GR_NoGuiGfx = GroupObject,
-		MUIA_HelpNode, "GR_NoGuiGfx",
-		MUIA_Group_Horiz, TRUE,
-		MUIA_Group_HorizSpacing, 5,
-		MUIA_Group_VertSpacing, 5,
-		Child, object->CH_NoGuiGfx,
-		Child, Space_NoGuiGfx,
-		Child, LA_NoGuiGfx,
-		End;
 
 	LA_ScreenshotSize = Label(GetMBString(MSG_LA_ScreenshotSize));
 
@@ -907,8 +879,13 @@ struct ObjApp * CreateApp(void)
 		MUIA_FrameTitle, GetMBString(MSG_GR_ScreenshotsTitle),
 		MUIA_Group_HorizSpacing, 5,
 		MUIA_Group_VertSpacing, 5,
-		Child, GR_HideScreenshots,
-		Child, GR_NoGuiGfx,
+		Child, VGroup,
+		       MUIA_Group_Columns, 2,
+		       Child, LA_HideScreenshots,
+		       Child, object->CH_Screenshots,
+		       Child, LA_NoGuiGfx,
+		       Child, object->CH_NoGuiGfx,
+		End,
 		Child, GR_ScreenshotSize,
 		Child, GR_CustomSize,
 		End;
@@ -978,61 +955,29 @@ struct ObjApp * CreateApp(void)
 
 	object->CH_SaveStatsOnExit = CheckMark(FALSE);
 
-	Space_SaveStatsOnExit = VSpace(1);
-
 	LA_SaveStatsOnExit = Label(GetMBString(MSG_LA_SaveStatsOnExit));
-
-	GR_SaveStatsOnExit = GroupObject,
-		MUIA_HelpNode, "GR_SaveStatsOnExit",
-		MUIA_Group_Horiz, TRUE,
-		MUIA_Group_HorizSpacing, 5,
-		MUIA_Group_VertSpacing, 5,
-		Child, object->CH_SaveStatsOnExit,
-		Child, Space_SaveStatsOnExit,
-		Child, LA_SaveStatsOnExit,
-		End;
 
 	object->CH_FilterUseEnter = CheckMark(FALSE);
 
-	Space_FilterUseEnter = VSpace(1);
-
 	LA_FilterUseEnter = Label(GetMBString(MSG_LA_FilterUseEnter));
-
-	GR_FilterUseEnter = GroupObject,
-		MUIA_HelpNode, "GR_FilterUseEnter",
-		MUIA_Group_Horiz, TRUE,
-		MUIA_Group_HorizSpacing, 5,
-		MUIA_Group_VertSpacing, 5,
-		Child, object->CH_FilterUseEnter,
-		Child, Space_FilterUseEnter,
-		Child, LA_FilterUseEnter,
-		End;
 
 	object->CH_HideSidepanel = CheckMark(FALSE);
 
-	Space_HideSidepanel = VSpace(1);
-
 	LA_HideSidepanel = Label(GetMBString(MSG_LA_HideSidepanel));
-
-	GR_HideSidepanel = GroupObject,
-		MUIA_HelpNode, "GR_HideSidepanel",
-		MUIA_Group_Horiz, TRUE,
-		MUIA_Group_HorizSpacing, 5,
-		MUIA_Group_VertSpacing, 5,
-		Child, object->CH_HideSidepanel,
-		Child, Space_HideSidepanel,
-		Child, LA_HideSidepanel,
-		End;
 
 	GR_Misc = GroupObject,
 		MUIA_HelpNode, "GR_Misc",
 		MUIA_Frame, MUIV_Frame_Group,
+		MUIA_Group_Columns, 2,
 		MUIA_FrameTitle, GetMBString(MSG_GR_MiscTitle),
 		MUIA_Group_HorizSpacing, 5,
 		MUIA_Group_VertSpacing, 5,
-		Child, GR_SaveStatsOnExit,
-		Child, GR_FilterUseEnter,
-		Child, GR_HideSidepanel,
+		Child, LA_SaveStatsOnExit,
+		Child, object->CH_SaveStatsOnExit,
+		Child, LA_FilterUseEnter,
+		Child, object->CH_FilterUseEnter,
+		Child, LA_HideSidepanel,
+		Child, object->CH_HideSidepanel,
 	End;
 
 	object->BT_SettingsSave = SimpleButton(GetMBString(MSG_BT_SettingsSave));

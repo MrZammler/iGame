@@ -17,7 +17,7 @@ all: iGame
 CC			= vc
 LINK		= vc
 INCLUDES	= -I/opt/vbcc/includes_and_libs/MUI/Developer/C/Include -I/opt/vbcc/includes_and_libs/MCC_Guigfx/Developer/C/Include -I/opt/vbcc/includes_and_libs/MCC_TextEditor/Developer/C/include/ -I/opt/vbcc/includes_and_libs/NDK_3.9/Include/include_h
-CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99
+CFLAGS		= -c +aos68k -warn=-1 -dontwarn=307 -dontwarn=163 -dontwarn=306 -O2 -c99
 CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99
 CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99
 CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99

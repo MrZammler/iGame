@@ -219,13 +219,13 @@ MSG_GR_MiscTitle (//)
 Misc
 ;MUIB Label
 MSG_LA_SaveStatsOnExit (//)
-Save Stats on Exit
+Save stats on exit
 ;MUIB Label
 MSG_LA_FilterUseEnter (//)
-Use Enter to Filter
+Use enter to filter
 ;MUIB Label
 MSG_LA_HideSidepanel (//)
-Hide Side panel
+Hide side panel
 ;MUIB button text
 MSG_BT_SettingsSave (//)
 Save

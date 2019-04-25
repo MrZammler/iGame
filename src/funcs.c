@@ -2,7 +2,7 @@
   funcs.c
   Misc functions for iGame
   
-  Copyright (c) 2018, Emmanuel Vasilakis
+  Copyright (c) 2019, Emmanuel Vasilakis and contributors
   
   This file is part of iGame.
 
