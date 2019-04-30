@@ -2,7 +2,7 @@
   iGameExtern.h
   Header file for iGame
   
-  Copyright (c) 2018, Emmanuel Vasilakis
+  Copyright (c) 2019, Emmanuel Vasilakis and contributors
   
   This file is part of iGame.
 
@@ -77,6 +77,7 @@ typedef struct settings
 	int screenshot_height;
 	int hide_side_panel;
 	int no_guigfx;
+	int start_with_favorites;
 } igame_settings;
 
 typedef struct genres
@@ -130,6 +131,7 @@ void setting_save_stats_on_exit_changed();
 void setting_smart_spaces_changed();
 void setting_titles_from_changed();
 void setting_hide_screenshot_changed();
+void setting_start_with_favorites_changed();
 void setting_no_guigfx_changed();
 void setting_screenshot_size_changed();
 void settings_save();

@@ -2,7 +2,7 @@
   funcs.c
   Misc functions for iGame
   
-  Copyright (c) 2018, Emmanuel Vasilakis
+  Copyright (c) 2019, Emmanuel Vasilakis and contributors
   
   This file is part of iGame.
 
@@ -156,6 +156,7 @@ void apply_settings()
 	set(app->CH_SaveStatsOnExit, MUIA_Selected, current_settings->save_stats_on_exit);
 	set(app->CH_FilterUseEnter, MUIA_Selected, current_settings->filter_use_enter);
 	set(app->CH_HideSidepanel, MUIA_Selected, current_settings->hide_side_panel);
+	set(app->CH_StartWithFavorites, MUIA_Selected, current_settings->start_with_favorites);
 }
 
 void load_settings(const char* filename)
@@ -205,6 +206,8 @@ void load_settings(const char* filename)
 				current_settings->screenshot_width = atoi((const char*)file_line + 17);
 			if (!strncmp(file_line, "screenshot_height=", 18))
 				current_settings->screenshot_height = atoi((const char*)file_line + 18);
+			if (!strncmp(file_line, "start_with_favorites=", 21))
+				current_settings->start_with_favorites = atoi((const char*)file_line + 21);
 		}
 		while (1);
 
@@ -434,6 +437,11 @@ void app_start()
 
 	IntroPic = 1;
 
+	if (current_settings->start_with_favorites == 1)
+	{
+		list_show_favorites(NULL);
+	}
+
 	set(app->WI_MainWindow, MUIA_Window_Open, TRUE);
 	set(app->WI_MainWindow, MUIA_Window_ActiveObject, app->LV_GamesList);
 }
@@ -502,17 +510,14 @@ void list_show_favorites(char* str)
 	{
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
-			if (item_games->deleted != 1)
-			{
-				strcpy(helper, item_games->title);
-				const int length = strlen(helper);
-				for (int i = 0; i <= length - 1; i++) helper[i] = tolower(helper[i]);
+			strcpy(helper, item_games->title);
+			const int length = strlen(helper);
+			for (int i = 0; i <= length - 1; i++) helper[i] = tolower(helper[i]);
 
-				if (item_games->favorite == 1 && item_games->hidden != 1 && strstr(helper, (char *)str))
-				{
-					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-					total_games++;
-				}
+			if (item_games->favorite == 1 && item_games->hidden != 1 && strstr(helper, (char *)str))
+			{
+				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+				total_games++;
 			}
 		}
 	}
@@ -2251,6 +2256,8 @@ void settings_save()
 	FPuts(fpsettings, (CONST_STRPTR)file_line);
 	snprintf(file_line, buffer_size, "hide_side_panel=%d\n", current_settings->hide_side_panel);
 	FPuts(fpsettings, (CONST_STRPTR)file_line);
+	snprintf(file_line, buffer_size, "start_with_favorites=%d\n", current_settings->start_with_favorites);
+	FPuts(fpsettings, (CONST_STRPTR)file_line);
 	snprintf(file_line, buffer_size, "save_stats_on_exit=%d\n", current_settings->save_stats_on_exit);
 	FPuts(fpsettings, (CONST_STRPTR)file_line);
 	snprintf(file_line, buffer_size, "no_smart_spaces=%d\n", current_settings->no_smart_spaces);
@@ -2273,6 +2280,11 @@ void settings_save()
 void setting_hide_side_panel_changed()
 {
 	current_settings->hide_side_panel = (BOOL)xget(app->CH_HideSidepanel, MUIA_Selected);
+}
+
+void setting_start_with_favorites_changed()
+{
+	current_settings->start_with_favorites = (BOOL)xget(app->CH_StartWithFavorites, MUIA_Selected);
 }
 
 void msg_box(const char* msg)

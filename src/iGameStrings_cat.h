@@ -56,7 +56,7 @@ struct FC_String {
     LONG id;
 };
 
-extern struct FC_String iGameStrings_Strings[99];
+extern struct FC_String iGameStrings_Strings[100];
 
 #define MSG_AppDescription (iGameStrings_Strings[0].msg)
 #define _MSG_AppDescription (iGameStrings_Strings+0)
@@ -256,5 +256,7 @@ extern struct FC_String iGameStrings_Strings[99];
 #define _MSG_NotEnoughMemory (iGameStrings_Strings+97)
 #define MSG_DirectoryNotFound (iGameStrings_Strings[98].msg)
 #define _MSG_DirectoryNotFound (iGameStrings_Strings+98)
+#define MSG_LA_StartWithFavorites (iGameStrings_Strings[99].msg)
+#define _MSG_LA_StartWithFavorites (iGameStrings_Strings+99)
 
 #endif
