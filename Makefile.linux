@@ -188,10 +188,10 @@ clean:
 # pack everything in a nice lha file
 release:
 	rm -rf iGame_rel/iGame/
-	rm iGame_rel/iGame.info
+	#rm iGame_rel/iGame.info
 	mkdir iGame_rel/iGame-$(DATE)
 	echo "#ifndef VERSION" > src/version.h
-	echo "#define VERSION \"\$$VER:version 2.0b4 ("$(DATE)")"\" >> src/version.h
+	echo "#define VERSION \"\$$VER:version 2.0b5 ("$(DATE)")"\" >> src/version.h
 	echo "#endif" >> src/version.h
 	make iGame -f Makefile.linux
 	make iGame.030 -f Makefile.linux
