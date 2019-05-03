@@ -1,5 +1,5 @@
 @DATABASE iGame.guide
-@$VER: iGame.guide 1.8 (18.09.2014)
+@$VER: iGame.guide 2.0b5 (03.05.2019)
 @INDEX "Index"
 
 @NODE "Main" "iGame documentation"
@@ -7,10 +7,11 @@
 
 			   iGame
 	=============================================
-		© 2005-2015 Emmanuel Vasilakis
+		© 2005-2019 Emmanuel Vasilakis
 
 
      @{" Introduction     " LINK "INTR" 0} - About iGame
+     @{" Building iGame   " LINK "BUIL" 0} - Building iGame
      @{" Requirements     " LINK "REQS" 0} - System requirements
 
      @{" Installation     " LINK "INST" 0} - Installing iGame
@@ -24,7 +25,7 @@
 @ENDNODE
 @NODE "INTR" "Introduction"
 
-iGame is a program that provides a front-end to whdload'ed games installed
+iGame is a program that provides a front-end to games installed with whdload
 on your machine.
 
 It can "discover" your games on pre-defined repositories and create a small
@@ -35,12 +36,31 @@ one you're looking for using the Filter gadget.
 But not just whdload games. You can add and launch any type of executable, though
 it mostly makes sense if it's a game ;-)
 
-iGame was developed on an Amiga 3000 with a CSMKII 68060 with 128MB RAM.
-Tested on an Amiga 1200 68030/50 64MB RAM and WB3.1
-Developed on Cubic IDE (gcc).
+iGame was initialy developed on an Amiga 3000 with a CSMKII 68060 with 128MB RAM,
+using the Cubic IDE (gcc). Nowdays, I'm using Emacs on linux and vbcc as a cross
+compiler.
+
+iGame is open source and free software, licenced under the GPL.
 
 https://github.com/MrZammler/iGame
 http://winterland.no-ip.org/igame/index.html
+
+And a bit of history:
+
+iGame started in ~2004/5 as a way to learn a bit of MUI and general Amiga system
+coding. Through the years it's been updated with various new small features and
+bug fixes. After version 1.5, iGame was updated with internal version 1.6 which
+was never really officialy released. Sorry; I wasn't very good at releasing
+versions or keeping a changelog.
+
+Since then Dimitris Panokostas did a lot of re-writing and new features (such as
+the settings window to replace tooltypes). These versions are now tagged as 2.0
+betas.
+
+@ENDNODE
+@NODE "BUIL" "Building iGame"
+
+To be completed.
 
 @ENDNODE
 @NODE "REQS" "Requirements"
@@ -190,14 +210,15 @@ Most of the other parts of iGame should be easy to figure. ;-)
 - Fix bugs!
 
 Many people have contacted me with lots of suggestions and feature requests.
-These will be starting to be implemented in next releases.
+Best way now, is to open an issue on github.
 
 @ENDNODE
 @NODE "BUGS" "Known bugs/limitations"
 
 - Some Muforce hits have been reported, trying to fix those.
 
-- If you find anything, please let me know ;-)
+- If you find anything, please let me know, either with an email, or better
+yet with an issue on github.
 
 @ENDNODE
 @NODE "INFO" "Author info"
@@ -212,7 +233,9 @@ or, pop to #amigahellas channel in gr.net (nana.irc.gr).
 There is also a thread on eab that you could post suggestions/bugs:
 http://eab.abime.net/showthread.php?t=28771
 
-Icons and pics by Animagic and Emmanouela Panterh
+or, just use the issue tracker on github.
+
+Icons and pics by Animagic and Emmanouela Panterh.
 
 Many thanks to all those people who contacted me about iGame!
 
