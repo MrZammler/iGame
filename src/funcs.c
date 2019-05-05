@@ -55,6 +55,7 @@ int no_of_genres;
 char* game_tooltypes;
 char fname[255];
 int IntroPic = 0;
+int wbrun = 0;
 
 /* function definitions */
 char** my_split(char* str, char* spl);
@@ -73,6 +74,7 @@ const char* add_spaces_to_string(const char* input);
 void strip_path(const char* path, char* naked_path);
 char* get_slave_from_path(char* slave, int start, char* path);
 void read_tool_types();
+void check_for_wbrun();
 
 /* structures */
 struct EasyStruct msgbox;
@@ -434,6 +436,7 @@ void app_start()
 	add_default_filters();
 	load_genres(DEFAULT_GENRES_FILE);
 	apply_settings();
+	check_for_wbrun();
 
 	IntroPic = 1;
 
@@ -726,6 +729,26 @@ void string_to_lower(char* slave)
 }
 
 /*
+ * Checks if WBRun exists in C:
+ */
+void check_for_wbrun()
+{
+	const BPTR oldlock = Lock((CONST_STRPTR)PROGDIR, ACCESS_READ);
+	const BPTR lock = Lock("C:WBRun", ACCESS_READ);
+
+	if (lock)
+	{
+		wbrun=1;
+	}
+	else
+	{
+		wbrun=0;
+	}
+
+	CurrentDir(oldlock);
+}
+
+/*
 *   Executes whdload with the slave
 */
 void launch_game()
@@ -793,7 +816,12 @@ void launch_game()
 	if (whdload == 1)
 		sprintf(exec, "whdload ");
 	else
-		strcpy(exec, path);
+	{
+		if (wbrun)
+			sprintf(exec, "C:WBRun %s", path);
+		else
+			strcpy(exec, path);
+	}
 
 	//tooltypes only for whdload games
 	if (whdload == 1)
