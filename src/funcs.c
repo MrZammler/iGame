@@ -25,8 +25,8 @@
 #include <clib/alib_protos.h>
 #include <clib/icon_protos.h>
 #include <libraries/mui.h>
-#include <MUI/Guigfx_mcc.h>
-#include <MUI/TextEditor_mcc.h>
+#include <mui/Guigfx_mcc.h>
+#include <mui/TextEditor_mcc.h>
 #include <clib/muimaster_protos.h>
 #include <stdio.h>
 #include <string.h>
@@ -2792,5 +2792,46 @@ void joy_right()
     }
 
   set(app->LV_GamesList, MUIA_List_Active, ind-1);
+
+}
+
+void open_current_dir()
+{
+	// Allocate Memory for variables
+	char* game_title = NULL;
+
+	//set the elements on the window
+	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
+	if (game_title == NULL || strlen(game_title) == 0)
+	{
+		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
+		return;
+	}
+
+	const int found = title_exists(game_title);
+	if (!found)
+	{
+		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
+		return;
+	}
+	
+	int full_path_length;
+	int name_length;
+	int path_length;
+	full_path_length = strlen(item_games->path);
+	name_length = strlen(PathPart(item_games->path));
+	path_length = (full_path_length - name_length)+1;
+	
+	char *path_only = AllocVec(path_length, MEMF_ANY);		//reserve memory for path
+	if(!path_only) Printf("no memory?\n");
+	strncpy(path_only,item_games->path, path_length-1);		//Copy only the path w/o filename
+	path_only[path_length-1] = '\0';						//add NULL terminator
+	
+	
+	//Open path directory
+	OpenWorkbenchObjectA(path_only);
+	printf("nombre: %s\n longitud total: %i\n longitud nombre: %i\n",item_games->path, path_length, name_length);
+	printf("Path: %s\n",path_only);
+	FreeVec(path_only);
 
 }

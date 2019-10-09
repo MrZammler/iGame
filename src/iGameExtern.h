@@ -140,5 +140,6 @@ void settings_use();
 const unsigned char* GetMBString(const unsigned char* ref);
 void joy_left();
 void joy_right();
+void open_current_dir();
 
 #endif

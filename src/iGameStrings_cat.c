@@ -64,7 +64,7 @@
     Variables
 */
 
-struct FC_String iGameStrings_Strings[100] = {
+struct FC_String iGameStrings_Strings[120] = {
     { (STRPTR) "A front-end to WHDLoad", 0 },
     { (STRPTR) "Emmanuel Vasilakis, Dimitris Panokostas", 1 },
     { (STRPTR) "iGame", 2 },
@@ -118,7 +118,7 @@ struct FC_String iGameStrings_Strings[100] = {
     { (STRPTR) "OK", 50 },
     { (STRPTR) "Cancel", 51 },
     { (STRPTR) "About iGame", 52 },
-    { (STRPTR) "Emmanuel Vasilakis (mrzammler@mm.st)\n\nContributors:\nDimitris Panokostas (midwan@gmail.com)\n\n", 53 },
+    { (STRPTR) "Emmanuel Vasilakis (mrzammler@mm.st)\n\nContributors:\nDimitris Panokostas (midwan@gmail.com)\nJavier R. Santurde (tolkien)\n\n", 53 },
     { (STRPTR) "OK", 54 },
     { (STRPTR) "iGame Settings", 55 },
     { (STRPTR) "Hide Screenshots", 56 },
@@ -164,7 +164,9 @@ struct FC_String iGameStrings_Strings[100] = {
     { (STRPTR) "Please pick the game executable...", 96},
     { (STRPTR) "Could not allocate memory! Aborting...", 97},
     { (STRPTR) "Game Directory not found!", 98},
-    { (STRPTR) "Display favorites on start", 99}
+    { (STRPTR) "Display favorites on start", 99},
+	{ (STRPTR) "Open Current Dir",100},
+	{ (STRPTR) "W_", 101}
 };
 
 STATIC struct Catalog *iGameStringsCatalog = NULL;

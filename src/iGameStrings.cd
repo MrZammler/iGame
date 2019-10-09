@@ -71,6 +71,12 @@ Properties...
 MSG_MNMainPropertiesChar (//)
 P_
 ;MUIB Menu Title
+MSG_MNMainOpenCurrentDir (//)
+Open Game Dir
+;MUIB Menu ShortCut
+MSG_MNMainOpenCurrentDirChar (//)
+C_
+;MUIB Menu Title
 MSG_MNMainDelete (//)
 Delete
 ;MUIB Menu ShortCut

@@ -30,6 +30,7 @@
 #include <proto/exec.h>
 #include <proto/dos.h>
 #include <proto/lowlevel.h>
+#include <proto/wb.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "iGameExtern.h"
