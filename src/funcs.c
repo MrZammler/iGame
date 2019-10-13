@@ -2830,8 +2830,6 @@ void open_current_dir()
 	
 	//Open path directory
 	OpenWorkbenchObjectA(path_only);
-	printf("nombre: %s\n longitud total: %i\n longitud nombre: %i\n",item_games->path, path_length, name_length);
-	printf("Path: %s\n",path_only);
 	FreeVec(path_only);
 
 }
