@@ -4,16 +4,67 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build",
+            "label": "Build for 68000",
             "type": "shell",
             "windows": {
-                "command": "vc +aos68k -ID:/vbcc/MUI/Developer/C/Include -ID:/vbcc/MCC_Guigfx/Developer/C/Include -ID:/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+aos68k",
+                    "-ID:/vbcc/MUI/Developer/C/Include",
+                    "-ID:/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-ID:/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "osx": {
-                "command": "vc +aos68k -I/opt/vbcc/MUI/Developer/C/Include -I/opt/vbcc/MCC_Guigfx/Developer/C/Include -I/opt/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+aos68k",
+                    "-I/opt/vbcc/MUI/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "linux": {
-                "command": "vc +aos68k -I/opt/vbcc/MUI/Developer/C/Include -I/opt/vbcc/MCC_Guigfx/Developer/C/Include -I/opt/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+aos68k",
+                    "-I/opt/vbcc/MUI/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "group": {
                 "kind": "build",
@@ -21,16 +72,70 @@
             }
         },
         {
-            "label": "Build 030",
+            "label": "Build for 68030",
             "type": "shell",
             "windows": {
-                "command": "vc +aos68k -cpu=68030 -ID:/vbcc/MUI/Developer/C/Include -ID:/vbcc/MCC_Guigfx/Developer/C/Include -ID:/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame.030 src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+aos68k",
+                    "-cpu=68030",
+                    "-ID:/vbcc/MUI/Developer/C/Include",
+                    "-ID:/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-ID:/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame.030",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "osx": {
-                "command": "vc +aos68k -cpu=68030 -I/opt/vbcc/MUI/Developer/C/Include -I/opt/vbcc/MCC_Guigfx/Developer/C/Include -I/opt/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame.030 src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+aos68k",
+                    "-cpu=68030",
+                    "-I/opt/vbcc/MUI/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame.030",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "linux": {
-                "command": "vc +aos68k -cpu=68030 -I/opt/vbcc/MUI/Developer/C/Include -I/opt/vbcc/MCC_Guigfx/Developer/C/Include -I/opt/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame.030 src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+aos68k",
+                    "-cpu=68030",
+                    "-I/opt/vbcc/MUI/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame.030",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "group": {
                 "kind": "build",
@@ -38,16 +143,70 @@
             }
         },
         {
-            "label": "Build 040",
+            "label": "Build for 68040",
             "type": "shell",
             "windows": {
-                "command": "vc +aos68k -cpu=68040 -ID:/vbcc/MUI/Developer/C/Include -ID:/vbcc/MCC_Guigfx/Developer/C/Include -ID:/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame.040 src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+aos68k",
+                    "-cpu=68040",
+                    "-ID:/vbcc/MUI/Developer/C/Include",
+                    "-ID:/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-ID:/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame.040",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "osx": {
-                "command": "vc +aos68k -cpu=68040 -I/opt/vbcc/MUI/Developer/C/Include -I/opt/vbcc/MCC_Guigfx/Developer/C/Include -I/opt/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame.040 src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+aos68k",
+                    "-cpu=68040",
+                    "-I/opt/vbcc/MUI/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame.040",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "linux": {
-                "command": "vc +aos68k -cpu=68040 -I/opt/vbcc/MUI/Developer/C/Include -I/opt/vbcc/MCC_Guigfx/Developer/C/Include -I/opt/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame.040 src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+aos68k",
+                    "-cpu=68040",
+                    "-I/opt/vbcc/MUI/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame.040",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "group": {
                 "kind": "build",
@@ -55,16 +214,70 @@
             }
         },
         {
-            "label": "Build 060",
+            "label": "Build for 68060",
             "type": "shell",
             "windows": {
-                "command": "vc +aos68k -cpu=68060 -ID:/vbcc/MUI/Developer/C/Include -ID:/vbcc/MCC_Guigfx/Developer/C/Include -ID:/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame.060 src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+aos68k",
+                    "-cpu=68060",
+                    "-ID:/vbcc/MUI/Developer/C/Include",
+                    "-ID:/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-ID:/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame.060",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "osx": {
-                "command": "vc +aos68k -cpu=68060 -I/opt/vbcc/MUI/Developer/C/Include -I/opt/vbcc/MCC_Guigfx/Developer/C/Include -I/opt/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame.060 src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+aos68k",
+                    "-cpu=68060",
+                    "-I/opt/vbcc/MUI/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame.060",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "linux": {
-                "command": "vc +aos68k -cpu=68060 -I/opt/vbcc/MUI/Developer/C/Include -I/opt/vbcc/MCC_Guigfx/Developer/C/Include -I/opt/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame.060 src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+aos68k",
+                    "-cpu=68060",
+                    "-I/opt/vbcc/MUI/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame.060",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "group": {
                 "kind": "build",
@@ -75,13 +288,64 @@
             "label": "Build MorphOS",
             "type": "shell",
             "windows": {
-                "command": "vc +morphos -ID:/vbcc/MUI/Developer/C/Include -ID:/vbcc/MCC_Guigfx/Developer/C/Include -ID:/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame.MOS src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+morphos",
+                    "-ID:/vbcc/MUI/Developer/C/Include",
+                    "-ID:/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-ID:/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame.MOS",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "osx": {
-                "command": "vc +morphos -I/opt/vbcc/MUI/Developer/C/Include -I/opt/vbcc/MCC_Guigfx/Developer/C/Include -I/opt/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame.MOS src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+morphos",
+                    "-I/opt/vbcc/MUI/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame.MOS",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "linux": {
-                "command": "vc +morphos -I/opt/vbcc/MUI/Developer/C/Include -I/opt/vbcc/MCC_Guigfx/Developer/C/Include -I/opt/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame.MOS src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+morphos",
+                    "-I/opt/vbcc/MUI/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame.MOS",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "group": {
                 "kind": "build",
@@ -92,13 +356,64 @@
             "label": "Build AmigaOS4",
             "type": "shell",
             "windows": {
-                "command": "vc +aosppc -ID:/vbcc/MUI/Developer/C/Include -ID:/vbcc/MCC_Guigfx/Developer/C/Include -ID:/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame.AOS4 src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+aosppc",
+                    "-ID:/vbcc/MUI/Developer/C/Include",
+                    "-ID:/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-ID:/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame.AOS4",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "osx": {
-                "command": "vc +aosppc -I/opt/vbcc/MUI/Developer/C/Include -I/opt/vbcc/MCC_Guigfx/Developer/C/Include -I/opt/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame.AOS4 src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+aosppc",
+                    "-I/opt/vbcc/MUI/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame.AOS4",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "linux": {
-                "command": "vc +aosppc -I/opt/vbcc/MUI/Developer/C/Include -I/opt/vbcc/MCC_Guigfx/Developer/C/Include -I/opt/vbcc/MCC_TextEditor/Developer/C/include -c99 -O2 -lamiga -lauto -o iGame.AOS4 src/funcs.c src/iGameGUI.c src/iGameMain.c src/strdup.c src/iGameStrings_cat.c"
+                "command": "vc",
+                "args": [
+                    "+aosppc",
+                    "-I/opt/vbcc/MUI/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
+                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
+                    "-c99",
+                    "-O2",
+                    "-lamiga",
+                    "-lauto",
+                    "-o",
+                    "iGame.AOS4",
+                    "src/funcs.c",
+                    "src/iGameGUI.c",
+                    "src/iGameMain.c",
+                    "src/strdup.c",
+                    "src/iGameStrings_cat.c"
+                ]
             },
             "group": {
                 "kind": "build",
@@ -109,26 +424,72 @@
             "label": "LHA Pack",
             "type": "shell",
             "windows": {
-                "command": "lha a iGame.lha iGame iGame.030 iGame.040 iGame.060 iGame.MOS iGame.AOS4"
+                "command": "lha",
+                "args": [
+                    "a",
+                    "iGame.lha",
+                    "iGame",
+                    "iGame.030",
+                    "iGame.040",
+                    "iGame.060",
+                    "iGame.MOS",
+                    "iGame.AOS4"
+                ]
             },
             "osx": {
-                "command": "lha a iGame.lha iGame iGame.030 iGame.040 iGame.060 iGame.MOS iGame.AOS4"
+                "command": "lha",
+                "args": [
+                    "a",
+                    "iGame.lha",
+                    "iGame",
+                    "iGame.030",
+                    "iGame.040",
+                    "iGame.060",
+                    "iGame.MOS",
+                    "iGame.AOS4"
+                ]
             },
             "linux": {
-                "command": "lha a iGame.lha iGame iGame.030 iGame.040 iGame.060 iGame.MOS iGame.AOS4"
+                "command": "lha",
+                "args": [
+                    "a",
+                    "iGame.lha",
+                    "iGame",
+                    "iGame.030",
+                    "iGame.040",
+                    "iGame.060",
+                    "iGame.MOS",
+                    "iGame.AOS4"
+                ]
             }
         },
         {
             "label": "Clean",
             "type": "shell",
             "windows": {
-                "command": "rm -Path ./iGame, ./iGame.*, ./src/*.o"
+                "command": "rm",
+                "args": [
+                    "-Path",
+                    "./iGame,",
+                    "./iGame.*,",
+                    "./src/*.o" 
+                ]
             },
             "osx": {
-                "command": "rm ./iGame ./iGame.* src/*.o"
+                "command": "rm",
+                "args": [
+                    "./iGame",
+                    "./iGame.*",
+                    "./src/*.o"
+                ]
             },
             "linux": {
-                "command": "rm ./iGame ./iGame.* src/*.o"
+                "command": "rm",
+                "args": [
+                    "./iGame",
+                    "./iGame.*",
+                    "./src/*.o"
+                ]
             }
         }
     ]
