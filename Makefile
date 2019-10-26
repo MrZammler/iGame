@@ -1,8 +1,8 @@
 ##########################################################################
-# Makefile for iGame on Linux using VBCC.
+# Makefile for iGame on Linux using GCC.
 #-------------------------------------------------------------------------
 # To compile an iGame flat executable  using this makefile, run:
-#  make -f Makefile.linux
+#  make
 #-------------------------------------------------------------------------
 ##########################################################################
 
@@ -14,13 +14,13 @@ all: iGame
 ##########################################################################
 # Compiler settings
 ##########################################################################
-CC			= vc
-LINK		= vc
-INCLUDES	= -I/opt/vbcc/targets/m68k-amigaos/ndk-include/ -I/opt/vbcc/targets/m68k-amigaos/include/mui/
-CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99
-CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99
-CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99
-CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99
+CC			= m68k-amigaos-gcc
+LINK		= m68k-amigaos-gcc
+INCLUDES	= -I/opt/amiga/m68k-amigaos/include -I/opt/amiga/m68k-amigaos/ndk-include -I/opt/amiga/m68k-amigaos/include/mui
+CFLAGS		= -c -noixemul -Os -fomit-frame-pointer -std=c99
+CFLAGS_030	= -c -mcpu=68030 -noixemul -Os -fomit-frame-pointer -std=c99
+CFLAGS_040	= -c -mcpu=68040 -noixemul -Os -fomit-frame-pointer -std=c99
+CFLAGS_060	= -c -mcpu=68060 -noixemul -Os -fomit-frame-pointer -std=c99
 CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99
 CFLAGS_AOS4	= -c +aosppc -dontwarn=-1 -O2 -c99
 
@@ -29,15 +29,15 @@ DATE = $(shell date --iso=date)
 ##########################################################################
 # Builder settings
 ##########################################################################
-#MKLIB			= join
-LIBFLAGS		= +aos68k -lamiga -lauto -o
+#MKLIB		= join
+LIBFLAGS	= -v -lamiga -lstubs -o
 LIBFLAGS_MOS	= +morphos -lamiga -lauto -o
 LIBFLAGS_AOS4	= +aosppc -lamiga -lauto -o
 
 ##########################################################################
 # Object files which are part of iGame
 ##########################################################################
-OBJS		= src/funcs.o src/iGameGUI.o src/iGameMain.o src/strdup.o src/iGameStrings_cat.o
+OBJS		= src/iGameGUI.o src/iGameMain.o src/funcs.o  src/strdup.o src/iGameStrings_cat.o
 OBJS_030	= src/funcs_030.o src/iGameGUI_030.o src/iGameMain_030.o src/strdup_030.o src/iGameStrings_cat_030.o
 OBJS_040	= src/funcs_040.o src/iGameGUI_040.o src/iGameMain_040.o src/strdup_040.o src/iGameStrings_cat_040.o
 OBJS_060	= src/funcs_060.o src/iGameGUI_060.o src/iGameMain_060.o src/strdup_060.o src/iGameStrings_cat_060.o
@@ -188,10 +188,10 @@ clean:
 # pack everything in a nice lha file
 release:
 	rm -rf iGame_rel/iGame/
-	#rm iGame_rel/iGame.info
+	rm iGame_rel/iGame.info
 	mkdir iGame_rel/iGame-$(DATE)
 	echo "#ifndef VERSION" > src/version.h
-	echo "#define VERSION \"\$$VER:version 2.0b5 ("$(DATE)")"\" >> src/version.h
+	echo "#define VERSION \"\$$VER:version 2.0b4 ("$(DATE)")"\" >> src/version.h
 	echo "#endif" >> src/version.h
 	make iGame -f Makefile.linux
 	make iGame.030 -f Makefile.linux
