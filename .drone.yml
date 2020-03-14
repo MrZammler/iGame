@@ -17,7 +17,7 @@ steps:
 trigger:
   branch:
     include:
-      - master
+      - drone-CI
   event:
     include:
       - push
