@@ -4,14 +4,28 @@ type: docker
 name: compile-iGame
 
 steps:
-- name: compile-m68k
+- name: compile-m68k-000
   image: walkero/docker4amigavbcc:latest-m68k
   commands:
-    - ls -la /drone/src
     - cd /drone/src
     - make -f Makefile.linux
+    - ls -la /drone/src
+- name: compile-m68k-030
+  image: walkero/docker4amigavbcc:latest-m68k
+  commands:
+    - cd /drone/src
     - make -f Makefile.linux iGame.030
+    - ls -la /drone/src
+- name: compile-m68k-040
+  image: walkero/docker4amigavbcc:latest-m68k
+  commands:
+    - cd /drone/src
     - make -f Makefile.linux iGame.040
+    - ls -la /drone/src
+- name: compile-m68k-060
+  image: walkero/docker4amigavbcc:latest-m68k
+  commands:
+    - cd /drone/src
     - make -f Makefile.linux iGame.060
     - ls -la /drone/src
 - name: compile-os4
@@ -19,7 +33,7 @@ steps:
   commands:
     - ls -la /drone/src
     - cd /drone/src
-    # - make -f Makefile.linux iGame.AOS4
+    - make -f Makefile.linux iGame.AOS4
     - ls -la /drone/src
 
 
