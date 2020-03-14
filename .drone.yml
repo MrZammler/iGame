@@ -1,0 +1,19 @@
+---
+kind: pipeline
+type: kubernetes
+name: compile-for-m68k
+
+steps:
+  - name: compile-m68000
+    image: walkero/docker4amigavbcc:latest-m68k
+    commands:
+      - cd /opt/code/iGame
+      - make -f Makefile.linux
+
+trigger:
+  branch:
+    include:
+      - master
+  event:
+    include:
+      - push
