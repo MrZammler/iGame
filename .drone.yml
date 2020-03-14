@@ -7,8 +7,8 @@ steps:
   - name: compile-m68k-000
     image: walkero/docker4amigavbcc:latest-m68k
     commands:
-      - ls -la /drone
-      - cd /opt/code/iGame
+      - ls -la /drone/src
+      - cd /drone/src
       - make -f Makefile.linux
     # volumes:
     #   - './code:/opt/code'
