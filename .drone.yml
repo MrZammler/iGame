@@ -1,10 +1,10 @@
 ---
 kind: pipeline
-type: kubernetes
+type: docker
 name: compile-for-m68k
 
 steps:
-  - name: compile-m68000
+  - name: compile-m68k-000
     image: walkero/docker4amigavbcc:latest-m68k
     commands:
       - cd /opt/code/iGame
