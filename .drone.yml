@@ -4,22 +4,22 @@ type: docker
 name: compile-for-m68k
 
 steps:
-  - name: compile-m68k-000
-      image: walkero/docker4amigavbcc:latest-m68k
-      commands:
-        - ls -la /drone/src
-        - cd /drone/src
-        - make -f Makefile.linux
-        - ls -la /drone/src
-      # volumes:
-      #   - './code:/opt/code'
-  - name: compile-m68k-030
+- name: compile-m68k-000
     image: walkero/docker4amigavbcc:latest-m68k
     commands:
       - ls -la /drone/src
       - cd /drone/src
-      - make -f Makefile.linux iGame.030
+      - make -f Makefile.linux
       - ls -la /drone/src
+    # volumes:
+    #   - './code:/opt/code'
+- name: compile-m68k-030
+  image: walkero/docker4amigavbcc:latest-m68k
+  commands:
+    - ls -la /drone/src
+    - cd /drone/src
+    - make -f Makefile.linux iGame.030
+    - ls -la /drone/src
 
 
 trigger:
