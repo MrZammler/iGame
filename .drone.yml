@@ -8,7 +8,7 @@ steps:
     image: walkero/docker4amigavbcc:latest-m68k
     commands:
       - cd /opt/code/iGame
-      - make -f Makefile.linux
+      - make -f Makefile.drone
 
 trigger:
   branch:
