@@ -8,32 +8,32 @@ steps:
   image: walkero/docker4amigavbcc:latest-m68k
   commands:
     - cd /drone/src
-    - make -f Makefile.drone
+    - make -f Makefile.docker
     - ls -la /drone/src
 - name: compile-m68k-030
   image: walkero/docker4amigavbcc:latest-m68k
   commands:
     - cd /drone/src
-    - make -f Makefile.drone iGame.030
+    - make -f Makefile.docker iGame.030
     - ls -la /drone/src
 - name: compile-m68k-040
   image: walkero/docker4amigavbcc:latest-m68k
   commands:
     - cd /drone/src
-    - make -f Makefile.drone iGame.040
+    - make -f Makefile.docker iGame.040
     - ls -la /drone/src
 - name: compile-m68k-060
   image: walkero/docker4amigavbcc:latest-m68k
   commands:
     - cd /drone/src
-    - make -f Makefile.drone iGame.060
+    - make -f Makefile.docker iGame.060
     - ls -la /drone/src
 - name: compile-os4
   image: walkero/docker4amigavbcc:latest-ppc
   commands:
     - ls -la /drone/src
     - cd /drone/src
-    - make -f Makefile.drone iGame.AOS4
+    - make -f Makefile.docker iGame.AOS4
     - ls -la /drone/src
 
 
