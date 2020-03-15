@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "exec.h": "c",
+        "asl.h": "c",
+        "icon.h": "c",
+        "memory.h": "c",
+        "mui.h": "c",
+        "muimaster.h": "c"
+    }
+}

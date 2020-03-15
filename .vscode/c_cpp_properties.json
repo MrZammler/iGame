@@ -5,10 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${VBCC}/targets/m68k-amigaos/include/",
-                "${VBCC}/NDK39/Include/include_h",
-                "${VBCC}/MUI/Developer/C/Include",
-                "${VBCC}/MCC_Guigfx/Developer/C/Include",
-                "${VBCC}/MCC_TextEditor/Developer/C/include"
+                "${NDK_INC}",
+                "${MUI38_INC}"
             ],
             "defines": [],
             "compilerPath": "${VBCC}/bin/vc",
