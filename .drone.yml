@@ -4,16 +4,16 @@ type: docker
 name: compile-for-m68k
 
 steps:
-  - name: compile-m68k-000
-    image: walkero/docker4amigavbcc:latest-m68k
-    commands:
-      - cd /opt/code/iGame
-      - make -f Makefile.drone
+	- name: compile-m68k-000
+		image: walkero/docker4amigavbcc:latest-m68k
+		commands:
+			- cd /opt/code/iGame
+			- make -f Makefile.drone
 
 trigger:
-  branch:
-    include:
-      - master
-  event:
-    include:
-      - push
+	branch:
+		include:
+			- master
+	event:
+		include:
+			- push
