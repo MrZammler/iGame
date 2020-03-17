@@ -28,13 +28,13 @@ steps:
     - cd /drone/src
     - make -f Makefile.docker iGame.060
     - ls -la /drone/src
-- name: compile-os4
-  image: walkero/docker4amigavbcc:latest-ppc
-  commands:
-    - ls -la /drone/src
-    - cd /drone/src
-    - make -f Makefile.docker iGame.AOS4
-    - ls -la /drone/src
+# - name: compile-os4
+#   image: walkero/docker4amigavbcc:latest-ppc
+#   commands:
+#     - ls -la /drone/src
+#     - cd /drone/src
+#     - make -f Makefile.docker iGame.AOS4
+#     - ls -la /drone/src
 
 
 trigger:
