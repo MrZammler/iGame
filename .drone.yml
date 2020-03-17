@@ -40,7 +40,7 @@ steps:
 trigger:
   branch:
     include:
-      - drone-CI
+      - develop
   event:
     include:
       - push
