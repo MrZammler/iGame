@@ -1399,23 +1399,9 @@ struct ObjApp * CreateApp(void)
 
 	DoMethod(object->CH_Screenshots,
 		MUIM_Notify, MUIA_Selected, TRUE,
-		GR_NoGuiGfx,
-		3,
-		MUIM_Set, MUIA_Disabled, TRUE
-	);
-
-	DoMethod(object->CH_Screenshots,
-		MUIM_Notify, MUIA_Selected, TRUE,
 		GR_ScreenshotSize,
 		3,
 		MUIM_Set, MUIA_Disabled, TRUE
-	);
-
-	DoMethod(object->CH_Screenshots,
-		MUIM_Notify, MUIA_Selected, FALSE,
-		GR_NoGuiGfx,
-		3,
-		MUIM_Set, MUIA_Disabled, FALSE
 	);
 
 	DoMethod(object->CH_Screenshots,
