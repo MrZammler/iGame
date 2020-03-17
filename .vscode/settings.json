@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "exec.h": "c",
+        "asl.h": "c",
+        "icon.h": "c",
+        "memory.h": "c",
+        "mui.h": "c",
+        "muimaster.h": "c",
+        "icon_protos.h": "c",
+        "dos_protos.h": "c",
+        "exec_protos.h": "c",
+        "dos.h": "c"
+    }
+}
