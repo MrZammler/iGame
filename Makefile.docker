@@ -17,13 +17,13 @@ all: iGame
 CC			= vc
 LINK		= vc
 INCLUDES	= -I$(NDK_INC) -I$(MUI38_INC)
-INCLUDES_OS4= -I$(AOS4_SDK_INC) -I$(MUI50_INC)
+INCLUDES_OS4= -I$(AOS4_SDK_INC) -I$(AOS4_CLIB_INC) -I$(MUI50_INC)
 CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99
 CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99
 CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99
 CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99
 CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99
-CFLAGS_AOS4	= +aosppc -c99
+CFLAGS_AOS4	= +aosppc -dontwarn=-1 -O2 -c99
 
 DATE = $(shell date --iso=date)
 
