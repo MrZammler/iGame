@@ -20,41 +20,48 @@
   along with iGame. If not, see <http://www.gnu.org/licenses/>.
 */
 
+/* MUI */
+#include <libraries/mui.h>
+#include <mui/Guigfx_mcc.h>
+#include <mui/TextEditor_mcc.h>
 
+/* Prototypes */
+#include <clib/alib_protos.h>
 
 #if defined(__amigaos4__)
 #include <proto/exec.h>
 #include <proto/dos.h>
 #include <proto/icon.h>
+#include <proto/graphics.h>
+#include <proto/muimaster.h>
 #else
 #include <clib/exec_protos.h>
 #include <clib/dos_protos.h>
 #include <clib/icon_protos.h>
+#include <clib/muimaster_protos.h>
+#include <clib/graphics_protos.h>
 #endif
 
-#include <clib/alib_protos.h>
-#include <libraries/mui.h>
-#include <mui/Guigfx_mcc.h>
-#include <mui/TextEditor_mcc.h>
-#include <clib/muimaster_protos.h>
+/* System */
+#include <exec/memory.h>
+#include <exec/types.h>
+#include <libraries/asl.h>
+#include <workbench/startup.h>
+#include <workbench/workbench.h>
+
+/* ANSI C */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <exec/memory.h>
-#include <workbench/startup.h>
-#include <exec/types.h>
-#include <workbench/workbench.h>
+
 #if defined(__amigaos4__)
-#include <proto/graphics.h>
-#else
-#include <clib/graphics_protos.h>
+struct MUIMasterIFace *IMUIMaster;
 #endif
 
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGameStrings_cat.h"
-#include <libraries/asl.h>
 
 extern char* strdup(const char* s);
 extern struct ObjApp* app;
@@ -88,6 +95,15 @@ void strip_path(const char* path, char* naked_path);
 char* get_slave_from_path(char* slave, int start, char* path);
 void read_tool_types();
 void check_for_wbrun();
+void list_show_favorites(char* str);
+
+/*
+ * TODO: Maybe this should change to SetCurrentDir() as CurrentDir() is obsolete
+ * but needs more tests
+ */
+#if defined(__amigaos4__)
+#define CurrentDir(lock) SetCurrentDir((lock))
+#endif
 
 /* structures */
 struct EasyStruct msgbox;
@@ -758,7 +774,11 @@ void check_for_wbrun()
 		wbrun=0;
 	}
 
+// #if defined(__amigaos4__)
+// 	SetCurrentDir(oldlock);
+// #else
 	CurrentDir(oldlock);
+// #endif
 }
 
 /*
@@ -1944,10 +1964,10 @@ BOOL get_filename(const char* title, const char* positive_text, const BOOL save_
 		                       TAG_DONE))
 		{
 			memset(&fname[0], 0, sizeof fname);
-			strcat(fname, request->rf_Dir);
+			strcat(fname, request->fr_Drawer);
 			if (fname[strlen(fname) - 1] != (UBYTE)58) /* Check for : */
 				strcat(fname, "/");
-			strcat(fname, request->rf_File);
+			strcat(fname, request->fr_File);
 
 			result = TRUE;
 		}
