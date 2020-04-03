@@ -429,26 +429,6 @@ void add_default_filters()
 	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, GetMBString(MSG_FilterNeverPlayed), MUIV_List_Insert_Bottom);
 }
 
-void app_start()
-{
-	load_games_list(DEFAULT_GAMESLIST_FILE);
-	load_repos(DEFAULT_REPOS_FILE);
-	add_default_filters();
-	load_genres(DEFAULT_GENRES_FILE);
-	apply_settings();
-	check_for_wbrun();
-
-	IntroPic = 1;
-
-	if (current_settings->start_with_favorites == 1)
-	{
-		list_show_favorites(NULL);
-	}
-
-	set(app->WI_MainWindow, MUIA_Window_Open, TRUE);
-	set(app->WI_MainWindow, MUIA_Window_ActiveObject, app->LV_GamesList);
-}
-
 void clear_gameslist()
 {
 	// Erase list
@@ -689,6 +669,26 @@ void list_show_filtered(char* str, char* str_gen)
 
 	if (helper)
 		free(helper);
+}
+
+void app_start()
+{
+	load_games_list(DEFAULT_GAMESLIST_FILE);
+	load_repos(DEFAULT_REPOS_FILE);
+	add_default_filters();
+	load_genres(DEFAULT_GENRES_FILE);
+	apply_settings();
+	check_for_wbrun();
+
+	IntroPic = 1;
+
+	if (current_settings->start_with_favorites == 1)
+	{
+		list_show_favorites(NULL);
+	}
+
+	set(app->WI_MainWindow, MUIA_Window_Open, TRUE);
+	set(app->WI_MainWindow, MUIA_Window_ActiveObject, app->LV_GamesList);
 }
 
 void filter_change()
