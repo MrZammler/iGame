@@ -212,4 +212,3 @@ release:
 	cp alt_icons/* iGame_rel/iGame-$(DATE)/Icons/
 	cp required_files/igame_drawer.info iGame_rel/iGame-$(DATE)/Icons.info
 	cd iGame_rel && mv iGame-$(DATE) iGame && lha -a iGame-$(DATE).lha iGame/ && lha -a iGame-$(DATE).lha iGame.info
-
