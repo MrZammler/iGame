@@ -1,9 +1,9 @@
 /*
   iGameMain.c
   Main source for iGame
-  
+
   Copyright (c) 2018, Emmanuel Vasilakis
-  
+
   This file is part of iGame.
 
   iGame is free software: you can redistribute it and/or modify
@@ -35,7 +35,12 @@
 #include "iGameExtern.h"
 
 /* Increase stack size */
+#if defined(__amigaos4__)
+static const char USED min_stack[] = "$STACK:102400";
+#else
 LONG __stack = 32768;
+#endif
+
 
 #ifndef MAKE_ID
 #define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
@@ -50,7 +55,7 @@ extern char* get_executable_name(int argc, char** argv);
 
 struct Library* MUIMasterBase;
 struct Library* LowLevelBase;
-char* executable_name;
+char *executable_name;
 
 void joystick_buttons(ULONG val)
 {
@@ -58,7 +63,7 @@ void joystick_buttons(ULONG val)
 	//if (val & JPF_BUTTON_REVERSE) printf("[REVERSE]\n");
 	//if (val & JPF_BUTTON_FORWARD) printf("[FORWARD]\n");
 	//if (val & JPF_BUTTON_GREEN) printf("[SHUFFLE]\n");
-	if (val & JPF_BUTTON_RED) 
+	if (val & JPF_BUTTON_RED)
 	{
 		launch_game();
 	}
@@ -70,7 +75,7 @@ void joystick_directions(ULONG val)
 	if (val & JPF_JOY_UP)
 		set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Up);
 
-	if (val & JPF_JOY_DOWN) 
+	if (val & JPF_JOY_DOWN)
 		set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Down);
 
 	if (val & JPF_JOY_LEFT)
@@ -114,36 +119,45 @@ void clean_exit(CONST_STRPTR s)
 		CloseLibrary(LowLevelBase);
 }
 
-BOOL init_app(int argc, char** argv)
+BOOL init_app(int argc, char **argv)
 {
+	printf("Before open MUIMasterBase\n");
 	MUIMasterBase = OpenLibrary((CONST_STRPTR)MUIMASTER_LIBRARY, 19);
 	if (MUIMasterBase == NULL)
 	{
 		clean_exit((unsigned char*)"Can't open muimaster.library v19\n");
 		return FALSE;
 	}
+	printf("Succesful open MUIMasterBase\n");
 
+	printf("Before open lowlevel.library\n");
 	LowLevelBase = OpenLibrary((CONST_STRPTR)"lowlevel.library", 0);
+	printf("Succesful open lowlevel.library\n");
 
 	executable_name = get_executable_name(argc, argv);
+	printf("Before load_settings\n");
 	load_settings(DEFAULT_SETTINGS_FILE);
+	printf("After load_settings\n");
 
-	app = CreateApp();
+	printf("Before CreateApp\n");
+	// app = CreateApp();
+	// printf("After CreateApp");
 
-	if (!app)
-		clean_exit((unsigned char*)"Can't initialize application\n");
-	else
-		app_start();
+	// if (!app)
+	// 	clean_exit((unsigned char*)"Can't initialize application\n");
+	// else
+	// 	app_start();
 
 	return TRUE;
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
+	printf("Just started\n");
 	init_app(argc, argv);
 	ULONG sigs = 0;
-	ULONG old = 0;
-	const int unit = 1;
+	// ULONG old = 0;
+	// const int unit = 1;
 
 	if (app)
 	{
@@ -157,17 +171,17 @@ int main(int argc, char** argv)
 					break;
 			}
 
-			if (LowLevelBase)
-			{
-				const ULONG new = ReadJoyPort(unit);
-				if (new != old)
-				{
-					old = new;
-					joystick_input(new);
-				}
+			// if (LowLevelBase)
+			// {
+			// 	const ULONG new = ReadJoyPort(unit);
+			// 	if (new != old)
+			// 	{
+			// 		old = new;
+			// 		joystick_input(new);
+			// 	}
 
-				Delay(1);
-			}
+			// 	Delay(1);
+			// }
 		}
 		clean_exit(NULL);
 		DisposeApp(app);
