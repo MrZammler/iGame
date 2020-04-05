@@ -1,9 +1,9 @@
 /*
   funcs.c
   Misc functions for iGame
-  
+
   Copyright (c) 2019, Emmanuel Vasilakis and contributors
-  
+
   This file is part of iGame.
 
   iGame is free software: you can redistribute it and/or modify
@@ -25,8 +25,8 @@
 #include <clib/alib_protos.h>
 #include <clib/icon_protos.h>
 #include <libraries/mui.h>
-#include <MUI/Guigfx_mcc.h>
-#include <MUI/TextEditor_mcc.h>
+#include <mui/Guigfx_mcc.h>
+#include <mui/TextEditor_mcc.h>
 #include <clib/muimaster_protos.h>
 #include <stdio.h>
 #include <string.h>
@@ -412,7 +412,7 @@ void load_genres(const char* filename)
 		app->CY_AddGameGenreContent[i + 1] = NULL;
 		set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_AddGameGenreContent);
 
-		
+
 
 		Close(fpgenres);
 	}
@@ -1273,10 +1273,10 @@ void game_properties()
 	char* slave = AllocMem(256 * sizeof(char), MEMF_CLEAR);
 
 	// Check if any of them failed
-	if (helperstr == NULL 
-		|| fullpath == NULL 
-		|| str2 == NULL 
-		|| path == NULL 
+	if (helperstr == NULL
+		|| fullpath == NULL
+		|| str2 == NULL
+		|| path == NULL
 		|| naked_path == NULL
 		|| slave == NULL)
 	{
@@ -1298,7 +1298,7 @@ void game_properties()
 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
 		return;
 	}
-	
+
 	int i;
 	struct DiskObject* disk_obj;
 	char* tool_type;
@@ -1606,7 +1606,7 @@ void game_properties_ok()
 				FreeMem(m, sizeof(struct FileInfoBlock));
 			CloseLibrary(icon_base);
 		}
-		
+
 		CurrentDir(oldlock);
 
 		// Cleanup the memory allocations
@@ -2736,7 +2736,7 @@ void joy_left()
 
   DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &curr_game);
   get(app->LV_GamesList, MUIA_List_Active, &ind);
-  
+
   if (curr_game == NULL || strlen(curr_game) == 0)
     {
       set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Top);
@@ -2746,7 +2746,7 @@ void joy_left()
   DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
   if (prev_game == NULL)
 	return;
-  
+
   while (toupper(curr_game[0]) == toupper(prev_game[0]))
     {
       DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
@@ -2755,7 +2755,7 @@ void joy_left()
     }
 
   last_game = prev_game;
-  
+
   while (toupper(last_game[0]) == toupper(prev_game[0]))
     {
       DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
@@ -2773,7 +2773,7 @@ void joy_right()
 
   DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &curr_game);
   get(app->LV_GamesList, MUIA_List_Active, &ind);
-  
+
   if (curr_game == NULL || strlen(curr_game) == 0)
     {
       set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Top);
@@ -2783,7 +2783,7 @@ void joy_right()
   DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind++, &next_game);
   if (next_game == NULL)
 	return;
-  
+
   while (toupper(curr_game[0]) == toupper(next_game[0]))
     {
       DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind++, &next_game);
