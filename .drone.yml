@@ -1,19 +1,46 @@
 ---
 kind: pipeline
 type: docker
-name: compile-for-m68k
+name: compile-iGame
 
 steps:
-	- name: compile-m68k-000
-		image: walkero/docker4amigavbcc:latest-m68k
-		commands:
-			- cd /opt/code/iGame
-			- make -f Makefile.drone
+- name: compile-m68k-000
+  image: walkero/docker4amigavbcc:latest-m68k
+  commands:
+    - cd /drone/src
+    - make -f Makefile.docker
+    - ls -la /drone/src
+- name: compile-m68k-030
+  image: walkero/docker4amigavbcc:latest-m68k
+  commands:
+    - cd /drone/src
+    - make -f Makefile.docker iGame.030
+    - ls -la /drone/src
+- name: compile-m68k-040
+  image: walkero/docker4amigavbcc:latest-m68k
+  commands:
+    - cd /drone/src
+    - make -f Makefile.docker iGame.040
+    - ls -la /drone/src
+- name: compile-m68k-060
+  image: walkero/docker4amigavbcc:latest-m68k
+  commands:
+    - cd /drone/src
+    - make -f Makefile.docker iGame.060
+    - ls -la /drone/src
+# - name: compile-os4
+#   image: walkero/docker4amigavbcc:latest-ppc
+#   commands:
+#     - ls -la /drone/src
+#     - cd /drone/src
+#     - make -f Makefile.docker iGame.AOS4
+#     - ls -la /drone/src
+
 
 trigger:
-	branch:
-		include:
-			- master
-	event:
-		include:
-			- push
+  branch:
+    include:
+      - develop
+  event:
+    include:
+      - push

@@ -379,12 +379,12 @@ struct ObjApp * CreateApp(void)
 
 	MNlabelScan = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNlabelScan),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNlabelScanChar),
+		MUIA_Menuitem_Shortcut, "R",
 		End;
 
 	MNMainAddnonWHDLoadgame = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainAddnonWHDLoadgame),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainAddnonWHDLoadgameChar),
+		MUIA_Menuitem_Shortcut, "A",
 		End;
 
 	MNMainMenuShowHidehiddenentries = MenuitemObject,
@@ -393,12 +393,12 @@ struct ObjApp * CreateApp(void)
 
 	MNMainOpenList = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainOpenList),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainOpenListChar),
+		MUIA_Menuitem_Shortcut, "O",
 		End;
 
 	MNMainSaveList = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainSaveList),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainSaveListChar),
+		MUIA_Menuitem_Shortcut, "S",
 		End;
 
 	MNMainSaveListAs = MenuitemObject,
@@ -415,7 +415,7 @@ struct ObjApp * CreateApp(void)
 
 	MNMainQuit = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainQuit),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainQuitChar),
+		MUIA_Menuitem_Shortcut, "Q",
 		End;
 
 	MNlabel2Actions = MenuitemObject,
@@ -439,12 +439,12 @@ struct ObjApp * CreateApp(void)
 
 	MNMainProperties = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainProperties),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainPropertiesChar),
+		MUIA_Menuitem_Shortcut, "P",
 		End;
 
 	MNMainDelete = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainDelete),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainDeleteChar),
+		MUIA_Menuitem_Shortcut, "D",
 		End;
 
 	MNlabel2Game = MenuitemObject,
@@ -1399,23 +1399,9 @@ struct ObjApp * CreateApp(void)
 
 	DoMethod(object->CH_Screenshots,
 		MUIM_Notify, MUIA_Selected, TRUE,
-		GR_NoGuiGfx,
-		3,
-		MUIM_Set, MUIA_Disabled, TRUE
-	);
-
-	DoMethod(object->CH_Screenshots,
-		MUIM_Notify, MUIA_Selected, TRUE,
 		GR_ScreenshotSize,
 		3,
 		MUIM_Set, MUIA_Disabled, TRUE
-	);
-
-	DoMethod(object->CH_Screenshots,
-		MUIM_Notify, MUIA_Selected, FALSE,
-		GR_NoGuiGfx,
-		3,
-		MUIM_Set, MUIA_Disabled, FALSE
 	);
 
 	DoMethod(object->CH_Screenshots,

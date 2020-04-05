@@ -1,0 +1,365 @@
+;******************************************************************************
+;
+;  _  _____
+; (_)/ ____|
+;  _| |  __  __ _ _ __ ___   ___
+; | | | |_ |/ _` | '_ ` _ \ / _ \
+; | | |__| | (_| | | | | | |  __/
+; |_|\_____|\__,_|_| |_| |_|\___|
+;
+; $VER: Install-iGame 1.0 (20.3.2020)
+;
+; History:
+;   1.0   20.03.2020: initial release
+;******************************************************************************
+
+;=============================================================================
+; Set languages
+
+(set #lang_english             0)
+(set #lang_greek               1)
+(set #lang_maximum             2)
+
+;=============================================================================
+; Set defaults
+
+(set #appName "iGame")
+(set #defaultDest "RAM:")
+
+;=============================================================================
+; default language detection
+
+(set #i 0)
+(while (<> @language (select #i "deutsch" @language))
+    (set #i (+ #i 1))
+)
+(if (= #i 1) ; LANGUAGE
+    (set #language "english")
+    (set #language @language)
+)
+
+(set #i 0)
+(set #defaultLanguages %10000000000000000)
+(while (<> #language (select #i "greek" #language))
+    (
+        (set #i (+ #i 1))
+        (set #defaultLanguages (shiftright #defaultLanguages 1))
+    )
+)
+; always add english as default language
+(set #defaultLanguages (bitor #defaultLanguages (shiftleft 1 #lang_english)))
+
+; scan the Locale/Catalogs directory for supported languages
+(set #supportedLanguages %00000000000000000)
+(foreach "Locale/Catalogs" "#?"
+    (set #i 0)
+    (while (<> @each-name (select #i "english" "greek" @each-name))
+        (set #i (+ #i 1))
+    )
+    (if (<> #lang_maximum #i)
+        (set #supportedLanguages (bitor #supportedLanguages (shiftleft 1 #i)))
+    )
+)
+; always add english as default supported language
+(set #supportedLanguages (bitor #supportedLanguages (shiftleft 1 #lang_english)))
+
+;=============================================================================
+; English
+
+(if (= #language "english")
+    (
+        (set #acknowledgeOS (cat "Please acknowledge the automatic\n"
+                                 "detection of your operating system:"))
+        (set #acknowledgeCPU (cat "Please acknowledge the automatic\n"
+                                 "detection of your system CPU:"))
+        (set #lang_catalog  (cat "Which catalog file do you want to install?\n"
+                                 "(English language is built-in)"))
+        (set #done          (cat "\n"
+                                 #appName " has been successfully installed.\n"
+                                 "\n"
+                                 "Have fun!"))
+
+				(set #destexists_1      "\nThe directory\n\n")
+				(set #destexists_2      "\n\nalready contains an iGame drawer. If you continue, the iGame in this drawer will be updated. No backups will be created. The games, genre and repositories files will remain intact.")
+    )
+)
+
+;=============================================================================
+; Checking environment
+(set #detectedCPU (database "cpu"))
+
+(set EXEC_ver (getversion "exec.library" (resident)))
+(set NEWLIB_ver (getversion "newlib.library" (resident)))
+(set AROS_ver (getversion "aros.library" (resident)))
+
+; we use newlib.library to check whether we are running on AmigaOS 4.x
+(if (>= NEWLIB_ver (* 4 65536))
+		(set #detectedSystem 1)
+		(
+			; we are not running on AROS
+			; now check if we are running on MorphOS (exec.library V50+) or on AmigaOS 3.x
+			(if (>= EXEC_ver (* 50 65536))
+					(set #detectedSystem 2)
+					(set #detectedSystem 0)
+			)
+		)
+)
+
+(set #detectedSystem
+    (askchoice
+        (prompt #acknowledgeOS)
+        (help @askchoice-help)
+        (choices "AmigaOS 3.x"
+                 "AmigaOS 4.x"
+                 "MorphOS 1.x/2.x/3.x"
+        )
+        (default #detectedSystem)
+    )
+)
+; finally convert the system number into a string for easier understanding
+(set #detectedSystem
+    (select #detectedSystem "os3" "os4" "mos")
+)
+
+(if (= #detectedSystem "os4")
+    ; AmigaOS 4.x uses english locale names only
+    (
+        (set #cat_name_english               "english")
+        (set #cat_name_greek                 "greek")
+    )
+    ; all other systems use localized locale names
+    (
+        (set #cat_name_english               "english")
+        (set #cat_name_greek                 "greek")
+    )
+)
+
+
+;=============================================================================
+; Select cpu version
+(complete 10)
+
+(if (= #detectedSystem "os3")
+	(
+		(if (= #detectedCPU "68010")
+			(set #selectedCPU 0)
+		)
+		(if (= #detectedCPU "68020")
+			(set #selectedCPU 0)
+		)
+		(if (= #detectedCPU "68030")
+			(set #selectedCPU 1)
+		)
+		(if (= #detectedCPU "68040")
+			(set #selectedCPU 2)
+		)
+		(if (= #detectedCPU "68060")
+			(set #selectedCPU 3)
+		)
+
+		(set #selectedCPU
+				(askchoice
+						(prompt #acknowledgeCPU)
+						(help @askchoice-help)
+						(choices 	"68000"
+											"68030"
+											"68040"
+											"68060"
+						)
+						(default #selectedCPU)
+				)
+		)
+
+
+		; finally convert the system number into a string for easier understanding
+		(set #selectedVersion
+				(select #selectedCPU "iGame" "iGame.030" "iGame.040" "iGame.060")
+		)
+	)
+)
+
+(if (= #detectedSystem "os4")
+    (
+        (set #selectedVersion "iGame")
+    )
+)
+(if (= #detectedSystem "mos")
+    (
+        (set #selectedVersion "iGame.MOS")
+    )
+)
+
+;=============================================================================
+; Select destination directory
+(complete 20)
+
+(set seldir 1)
+
+(if (<> seldir 0)
+	(set #selectedDest
+		(askdir
+			(prompt #destdir)
+			(help @askdir-help)
+			(default (pathonly #defaultDest))
+		)
+	)
+	(set #selectedDest
+		(expandpath #selectedDest)
+	)
+)
+
+(set #destination (tackon #selectedDest "iGame"))
+
+(if (<> seldir 0)
+	(
+		(if (<> (exists #destination) 0)
+		(
+			(message (cat #destexists_1 #selectedDest #destexists_2))
+		)
+		)
+	)
+)
+
+;=============================================================================
+; Select language
+(complete 30)
+
+(set #catalog_lang
+	(askoptions
+		(prompt #lang_catalog)
+		(help @askoptions-help)
+		(choices
+			(if (in #supportedLanguages #lang_english)
+				(cat #prop "English")
+				("")
+			)
+			(if (in #supportedLanguages #lang_greek)
+				(cat #prop "Greek")
+				("")
+			)
+		)
+		(default #defaultLanguages)
+	)
+)
+
+;=============================================================================
+; Create the destination folder
+(complete 40)
+
+(if (= (exists #destination) 0)
+	(
+		(makedir #destination
+			(help @makedir-help)
+			(confirm "expert")
+		)
+	)
+)
+
+;=============================================================================
+; Create and copy Icons folder
+(complete 50)
+
+(makedir (tackon #destination "Icons")
+	(help @makedir-help)
+	(confirm "expert")
+)
+(foreach "Icons" "#?.info"
+	(copyfiles
+		(source (tackon "Icons" @each-name))
+		(dest (tackon #destination "Icons"))
+		(help @copyfiles-help)
+		(confirm "expert")
+	)
+)
+
+;=============================================================================
+; Copy Guide files
+(complete 60)
+
+(copyfiles
+	(source "iGame.guide")
+	(dest #destination)
+	(help @copyfiles-help)
+	(confirm "expert")
+)
+(copyfiles
+	(source "iGame.guide.info")
+	(dest #destination)
+	(help @copyfiles-help)
+	(confirm "expert")
+)
+
+;=============================================================================
+; Copy default iff image
+(complete 70)
+
+(copyfiles
+	(source "igame.iff")
+	(dest #destination)
+	(help @copyfiles-help)
+	(confirm "expert")
+)
+
+;=============================================================================
+; Copy locale catalog files
+(complete 80)
+
+; check if there were any catalogs selected
+(if (<> 0 #catalog_lang)
+	(
+		(makedir (tackon #destination "Locale")
+			(help @makedir-help)
+			(confirm "expert")
+		)
+
+		; copy the .cd files
+		(foreach "Locale" "#?.cd"
+			(copyfiles
+				(source (tackon "Locale" @each-name))
+				(dest (tackon #destination "Locale"))
+				(help @copyfiles-help)
+			)
+		)
+
+		; greek catalog file
+		(if (in #catalog_lang #lang_greek)
+			(
+				(makedir (tackon #destination (tackon "Locale/Catalogs" #cat_name_greek)))
+
+				(foreach "Locale/Catalogs/greek" "#?.catalog"
+					(copyfiles
+						(source (tackon "Locale/Catalogs/greek" @each-name))
+						(dest (tackon #destination (tackon "Locale/Catalogs" #cat_name_greek)))
+						(help @copyfiles-help)
+					)
+				)
+			)
+		)
+	)
+)
+
+;=============================================================================
+; Copy main executable
+(complete 90)
+
+(copyfiles
+	(source #selectedVersion)
+	(dest #destination)
+	(newname "iGame")
+	(help @copyfiles-help)
+	(confirm "expert")
+)
+(copyfiles
+	(source "iGame.info")
+	(dest #destination)
+	(help @copyfiles-help)
+	(confirm "expert")
+)
+
+;=============================================================================
+; Final message
+(complete 100)
+
+(message #done)
+
+(exit (QUIET))
