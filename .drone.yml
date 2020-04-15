@@ -4,13 +4,8 @@ type: docker
 name: compile-iGame
 
 steps:
-- name: pull-vbcc-68k-image
-  pull: always
-  image: walkero/docker4amigavbcc:latest-m68k
-- name: pull-vbcc-ppc-image
-  pull: always
-  image: walkero/docker4amigavbcc:latest-m68k
 - name: compile-m68k-000
+  pull: always
   image: walkero/docker4amigavbcc:latest-m68k
   commands:
     - cd /drone/src
@@ -31,6 +26,7 @@ steps:
     - cd /drone/src
     - make -f Makefile.docker iGame.060
 - name: compile-os4
+  pull: always
   image: walkero/docker4amigavbcc:latest-ppc
   commands:
     - cd /drone/src
