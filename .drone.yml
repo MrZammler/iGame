@@ -4,6 +4,12 @@ type: docker
 name: compile-iGame
 
 steps:
+- name: pull-vbcc-68k-image
+  pull: always
+  image: walkero/docker4amigavbcc:latest-m68k
+- name: pull-vbcc-ppc-image
+  pull: always
+  image: walkero/docker4amigavbcc:latest-m68k
 - name: compile-m68k-000
   image: walkero/docker4amigavbcc:latest-m68k
   commands:
