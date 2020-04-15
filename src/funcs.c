@@ -43,6 +43,10 @@
 #endif
 
 /* System */
+#include <dos/dos.h>
+#if defined(__amigaos4__)
+#include <dos/obsolete.h>
+#endif
 #include <exec/memory.h>
 #include <exec/types.h>
 #include <libraries/asl.h>
@@ -55,9 +59,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#if defined(__amigaos4__)
-struct MUIMasterIFace *IMUIMaster;
-#endif
 
 #include "iGameGUI.h"
 #include "iGameExtern.h"
@@ -96,14 +97,6 @@ char* get_slave_from_path(char* slave, int start, char* path);
 void read_tool_types();
 void check_for_wbrun();
 void list_show_favorites(char* str);
-
-/*
- * TODO: Maybe this should change to SetCurrentDir() as CurrentDir() is obsolete
- * but needs more tests
- */
-#if defined(__amigaos4__)
-#define CurrentDir(lock) SetCurrentDir((lock))
-#endif
 
 /* structures */
 struct EasyStruct msgbox;
@@ -194,14 +187,12 @@ void load_settings(const char* filename)
 {
 	const int buffer_size = 512;
 	STRPTR file_line = malloc(buffer_size * sizeof(char));
-	printf("load_settings 1\n");
 	if (file_line == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return;
 	}
 
-	printf("load_settings 2\n");
 	if (current_settings != NULL)
 	{
 		free(current_settings);
@@ -209,19 +200,16 @@ void load_settings(const char* filename)
 	}
 	current_settings = (igame_settings *)calloc(1, sizeof(igame_settings));
 
-	printf("load_settings 3\n");
 	// TODO: Maybe it would be a good idea to lock the file before open it
 	const BPTR fpsettings = Open((CONST_STRPTR)filename, MODE_OLDFILE);
 	if (fpsettings)
 	{
-		printf("load_settings 4\n");
 		do
 		{
 			if (FGets(fpsettings, file_line, buffer_size) == NULL)
 				break;
 
 			file_line[strlen(file_line) - 1] = '\0';
-			printf("load_settings 5\n");
 			if (strlen(file_line) == 0)
 				continue;
 
@@ -248,18 +236,15 @@ void load_settings(const char* filename)
 		}
 		while (1);
 
-		printf("load_settings 6\n");
 		Close(fpsettings);
 	}
 	else
 	{
 		// No "igame.prefs" file found, fallback to reading Tooltypes
-		printf("load_settings 7\n");
 		read_tool_types();
 	}
-	printf("load_settings 8\n");
+
 	if (file_line)
-		printf("load_settings 9\n");
 		free(file_line);
 }
 
@@ -784,11 +769,7 @@ void check_for_wbrun()
 		wbrun=0;
 	}
 
-// #if defined(__amigaos4__)
-// 	SetCurrentDir(oldlock);
-// #else
 	CurrentDir(oldlock);
-// #endif
 }
 
 /*
@@ -2415,31 +2396,21 @@ void get_screen_size(int* width, int* height)
 
 void read_tool_types()
 {
-
-	printf("read_tool_types 1\n");
 	struct Library *icon_base;
 	struct DiskObject *disk_obj;
 
 	int screen_width, screen_height;
-	unsigned char filename[] = PROGDIR;
+	unsigned char filename[32];
 
-	printf("read_tool_types 2\n");
 	if ((icon_base = (struct Library *)OpenLibrary((CONST_STRPTR)ICON_LIBRARY, 0)))
 	{
-		printf("read_tool_types 3 -> %s\n", executable_name);
-		// char *filename = strcat(PROGDIR, executable_name);
-		// strcat(filename, PROGDIR);
-		// printf("read_tool_types 3b -> %s\n", filename);
+		strcpy(filename, PROGDIR);
 		strcat(filename, executable_name);
-		// printf("read_tool_types 3c -> %s\n", filename);
 
 		if ((disk_obj = GetDiskObject((STRPTR)filename)))
-		// if ((disk_obj = GetDiskObject("PROGDIR:iGame.OS4")))
 		{
-			printf("read_tool_types 4\n");
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_SCREENSHOT))
 			{
-				printf("read_tool_types 5\n");
 				char** tool_types = (char **)disk_obj->do_ToolTypes;
 				char* tool_type = *tool_types;
 
@@ -2453,10 +2424,8 @@ void read_tool_types()
 					exit(0);
 				}
 
-				printf("read_tool_types 6\n");
 				if (temp_tbl[1] != NULL)
 				{
-					printf("read_tool_types 7\n");
 					char** temp_tbl2 = my_split((char *)temp_tbl[1], "x");
 					if (temp_tbl2[0]) current_settings->screenshot_width = atoi((char *)temp_tbl2[0]);
 					if (temp_tbl2[1]) current_settings->screenshot_height = atoi((char *)temp_tbl2[1]);
@@ -2470,7 +2439,6 @@ void read_tool_types()
 				}
 			}
 
-			printf("read_tool_types 8\n");
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOGUIGFX))
 				current_settings->no_guigfx = 1;
 
@@ -2491,11 +2459,7 @@ void read_tool_types()
 
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSIDEPANEL))
 				current_settings->hide_side_panel = 1;
-
-			printf("read_tool_types 9\n");
 		}
-
-		printf("read_tool_types 10\n");
 		CloseLibrary(icon_base);
 	}
 
@@ -2720,31 +2684,23 @@ const char* get_directory_name(const char* str)
 // Get the application's executable name
 const char *get_executable_name(int argc, char **argv)
 {
-	printf("get_executable_name 1\n");
 	// argc is zero when run from the Workbench,
 	// positive when run from the CLI
 	if (argc == 0)
 	{
-		printf("get_executable_name 2\n");
 		// in AmigaOS, argv is a pointer to the WBStartup message
 		// when argc is zero (run under the Workbench)
 		struct WBStartup* argmsg = (struct WBStartup *)argv;
 		struct WBArg* wb_arg = argmsg->sm_ArgList; /* head of the arg list */
 
-		printf("get_executable_name 3\n");
 		executable_name = wb_arg->wa_Name;
-		printf("get_executable_name 4\n");
 	}
 	else
 	{
-		printf("get_executable_name 5 -> %s\n", argv[0]);
 		// Run from the CLI
 		executable_name = argv[0];
-
-		printf("get_executable_name 6\n");
 	}
 
-	printf("get_executable_name 7 -> %s\n", executable_name);
 	return executable_name;
 }
 

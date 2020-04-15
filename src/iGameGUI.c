@@ -22,27 +22,34 @@
 
 #define MUI_OBSOLETE
 
+/* MUI */
 #include <libraries/mui.h>
-
-#include <clib/alib_protos.h>
-#include <proto/muimaster.h>
-#include <proto/exec.h>
-
 #include <mui/Guigfx_mcc.h>
 #include <mui/TextEditor_mcc.h>
-#include <libraries/gadtools.h> /* for Barlabel in MenuItem */
-#include <exec/memory.h>
+
+/* Prototypes */
+#include <clib/alib_protos.h>
+#include <proto/exec.h>
 #include <proto/icon.h>
 #include <proto/asl.h>
-#include <dos/dos.h>
+#include <proto/muimaster.h>
 
-#include "version.h"
+/* System */
+#include <libraries/gadtools.h> /* for Barlabel in MenuItem */
+#include <exec/memory.h>
+#include <dos/dos.h>
+#if defined(__amigaos4__)
+#include <dos/obsolete.h>
+#endif
+
+/* ANSI C */
 #include <string.h>
 
 #ifndef MAKE_ID
 #define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
 #endif
 
+#include "version.h"
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGameStrings_cat.h"
@@ -74,7 +81,7 @@ struct ObjApp * CreateApp(void)
 	APTR	GR_TitlesFrom, Space_TitlesFrom, GR_SmartSpaces, Space_SmartSpaces;
 	APTR	LA_SmartSpaces, GR_Misc;
 	APTR	LA_SaveStatsOnExit, LA_FilterUseEnter, LA_StartWithFavorites;
-	APTR    LA_HideSidepanel;
+	APTR	LA_HideSidepanel;
 	APTR	GR_SettingsButtons, Space_SettingsButtons1, Space_SettingsButtons2;
 #if defined(__amigaos4__)
 	static const struct Hook MenuScanHook = { { NULL,NULL }, (HOOKFUNC)scan_repositories, NULL, NULL };

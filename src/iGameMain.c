@@ -54,6 +54,9 @@ extern void load_settings(const char* filename);
 extern char* get_executable_name(int argc, char** argv);
 
 struct Library* MUIMasterBase;
+#if defined(__amigaos4__)
+struct MUIMasterIFace *IMUIMaster;
+#endif
 struct Library* LowLevelBase;
 char *executable_name;
 
@@ -114,50 +117,57 @@ void clean_exit(CONST_STRPTR s)
 
 	app_stop();
 	executable_name = NULL;
-	CloseLibrary(MUIMasterBase);
+	#if defined(__amigaos4__)
+	if (IMUIMaster)
+		DropInterface((struct Interface *)IMUIMaster);
+	#endif
+	if (MUIMasterBase)
+		CloseLibrary(MUIMasterBase);
 	if (LowLevelBase)
 		CloseLibrary(LowLevelBase);
 }
 
 BOOL init_app(int argc, char **argv)
 {
-	printf("Before open MUIMasterBase\n");
 	MUIMasterBase = OpenLibrary((CONST_STRPTR)MUIMASTER_LIBRARY, 19);
 	if (MUIMasterBase == NULL)
 	{
 		clean_exit((unsigned char*)"Can't open muimaster.library v19\n");
 		return FALSE;
 	}
-	printf("Succesful open MUIMasterBase\n");
 
-	printf("Before open lowlevel.library\n");
+	#if defined(__amigaos4__)
+	if (!(IMUIMaster = (struct MUIMasterIFace *)GetInterface(MUIMasterBase, "main", 1, NULL))) {
+		clean_exit((unsigned char*)"Failed to open "MUIMASTER_NAME".");
+		return FALSE;
+	}
+	#endif
+
 	LowLevelBase = OpenLibrary((CONST_STRPTR)"lowlevel.library", 0);
-	printf("Succesful open lowlevel.library\n");
+	if (LowLevelBase == NULL)
+	{
+		clean_exit((unsigned char*)"Can't open lowlevel.library\n");
+		return FALSE;
+	}
 
 	executable_name = get_executable_name(argc, argv);
-	printf("Before load_settings\n");
 	load_settings(DEFAULT_SETTINGS_FILE);
-	printf("After load_settings\n");
 
-	printf("Before CreateApp\n");
-	// app = CreateApp();
-	// printf("After CreateApp");
-
-	// if (!app)
-	// 	clean_exit((unsigned char*)"Can't initialize application\n");
-	// else
-	// 	app_start();
+	app = CreateApp();
+	if (!app)
+		clean_exit((unsigned char*)"Can't initialize application\n");
+	else
+		app_start();
 
 	return TRUE;
 }
 
 int main(int argc, char **argv)
 {
-	printf("Just started\n");
 	init_app(argc, argv);
 	ULONG sigs = 0;
-	// ULONG old = 0;
-	// const int unit = 1;
+	ULONG old = 0;
+	const int unit = 1;
 
 	if (app)
 	{
@@ -171,17 +181,20 @@ int main(int argc, char **argv)
 					break;
 			}
 
-			// if (LowLevelBase)
-			// {
-			// 	const ULONG new = ReadJoyPort(unit);
-			// 	if (new != old)
-			// 	{
-			// 		old = new;
-			// 		joystick_input(new);
-			// 	}
+			// TODO: This doesn't work on AmigaOS 4. Needs to be updated with compatible code
+			#if !defined(__amigaos4__)
+			if (LowLevelBase)
+			{
+				const ULONG new = ReadJoyPort(unit);
+				if (new != old)
+				{
+					old = new;
+					joystick_input(new);
+				}
 
-			// 	Delay(1);
-			// }
+				Delay(1);
+			}
+			#endif
 		}
 		clean_exit(NULL);
 		DisposeApp(app);
