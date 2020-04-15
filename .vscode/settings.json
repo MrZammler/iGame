@@ -6,12 +6,15 @@
         "memory.h": "c",
         "mui.h": "c",
         "muimaster.h": "c",
-        "icon_protos.h": "c",
-        "dos_protos.h": "c",
-        "exec_protos.h": "c",
-        "dos.h": "c",
-        "locale.h": "c",
-        "igamestrings_cat.h": "c",
-        "intuition.h": "c"
+        "stdio.h": "c",
+        "stdarg.h": "c",
+        "guigfx_mcc.h": "c",
+        "startup.h": "c",
+        "string.h": "c",
+        "obsolete.h": "c",
+        "graphics.h": "c",
+        "alib_protos.h": "c",
+        "types.h": "c",
+        "dos.h": "c"
     }
 }

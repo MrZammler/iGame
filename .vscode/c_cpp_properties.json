@@ -1,79 +1,51 @@
 {
-    "configurations": [
-        {
-            "name": "iGame on AmigaOS 3 - MUI 3.8",
-            "includePath": [
-                "${workspaceFolder}/**",
-                "${VBCC}/targets/m68k-amigaos/include/",
-                "${NDK_INC}",
-                "${MUI38_INC}"
-            ],
-            "defines": [],
-            "compilerPath": "${VBCC}/bin/vc",
-            "cStandard": "c99",
-            "cppStandard": "c++98",
-            "intelliSenseMode": "${default}"
-        },
-        {
-            "name": "iGame on AmigaOS 3 - MUI 5.0",
-            "includePath": [
-                "${workspaceFolder}/**",
-                "${VBCC}/targets/m68k-amigaos/include/",
-                "${NDK_INC}",
-                "${MUI50_INC}"
-            ],
-            "defines": [],
-            "compilerPath": "${VBCC}/bin/vc",
-            "cStandard": "c99",
-            "cppStandard": "c++98",
-            "intelliSenseMode": "${default}"
-        },
-        {
-            "name": "iGame on AmigaOS 4",
-            "includePath": [
-                "${workspaceFolder}/**",
-                "${VBCC}/targets/ppc-amigaos/include/",
-                "${AOS4_SDK_INC}",
-                "${MUI50_INC}"
-            ],
-            "defines": [],
-            "compilerPath": "${VBCC}/bin/vc",
-            "cStandard": "c99",
-            "cppStandard": "c++98",
-            "intelliSenseMode": "${default}"
-        },
-        {
-            "name": "AmigaOS4.x",
-            "includePath": [
-                "${workspaceFolder}/**",
-                "${VBCC}/targets/ppc-amigaos/include/",
-                "${VBCC}/NDK39/Include/include_h",
-                "${VBCC}/MUI/Developer/C/Include",
-                "${VBCC}/MCC_Guigfx/Developer/C/Include",
-                "${VBCC}/MCC_TextEditor/Developer/C/include"
-            ],
-            "defines": [],
-            "compilerPath": "${VBCC}/bin/vc",
-            "cStandard": "c99",
-            "cppStandard": "c++98",
-            "intelliSenseMode": "${default}"
-        },
-        {
-            "name": "MorphOS",
-            "includePath": [
-                "${workspaceFolder}/**",
-                "${VBCC}/targets/ppc-morphos/include/",
-                "${VBCC}/NDK39/Include/include_h",
-                "${VBCC}/MUI/Developer/C/Include",
-                "${VBCC}/MCC_Guigfx/Developer/C/Include",
-                "${VBCC}/MCC_TextEditor/Developer/C/include"
-            ],
-            "defines": [],
-            "compilerPath": "${VBCC}/bin/vc",
-            "cStandard": "c99",
-            "cppStandard": "c++98",
-            "intelliSenseMode": "${default}"
-        }
-    ],
-    "version": 4
+	"configurations": [
+			{
+					"name": "iGame on AmigaOS 3 - MUI 3.8",
+					"includePath": [
+							"${workspaceFolder}/**",
+							"${VBCC}/targets/m68k-amigaos/include/",
+							"${NDK_INC}",
+							"${MUI38_INC}"
+					],
+					"defines": [],
+					"compilerPath": "${VBCC}/bin/vc",
+					"cStandard": "c99",
+					"cppStandard": "c++98",
+					"intelliSenseMode": "${default}"
+			},
+			{
+					"name": "iGame on AmigaOS 3 - MUI 5.0",
+					"includePath": [
+							"${workspaceFolder}/**",
+							"${VBCC}/targets/m68k-amigaos/include/",
+							"${NDK_INC}",
+							"${MUI50_INC}"
+					],
+					"defines": [],
+					"compilerPath": "${VBCC}/bin/vc",
+					"cStandard": "c99",
+					"cppStandard": "c++98",
+					"intelliSenseMode": "${default}"
+			},
+			{
+					"name": "iGame on AmigaOS 4",
+					"includePath": [
+							"${workspaceFolder}/**",
+							"${VBCC}/targets/ppc-amigaos/include/",
+							"${AOS4_SDK_INC}",
+							"${AOS4_NLIB_INC}",
+							"${MUI50_INC}"
+					],
+					"defines": [
+						"__amigaos4__",
+						"__USE_INLINE__"
+					],
+					"compilerPath": "${VBCC}/bin/vc",
+					"cStandard": "c99",
+					"cppStandard": "c++98",
+					"intelliSenseMode": "${default}"
+			}
+	],
+	"version": 4
 }

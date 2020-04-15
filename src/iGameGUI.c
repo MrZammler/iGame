@@ -22,27 +22,34 @@
 
 #define MUI_OBSOLETE
 
+/* MUI */
 #include <libraries/mui.h>
-
-#include <clib/alib_protos.h>
-#include <proto/muimaster.h>
-#include <proto/exec.h>
-
 #include <mui/Guigfx_mcc.h>
 #include <mui/TextEditor_mcc.h>
-#include <libraries/gadtools.h> /* for Barlabel in MenuItem */
-#include <exec/memory.h>
+
+/* Prototypes */
+#include <clib/alib_protos.h>
+#include <proto/exec.h>
 #include <proto/icon.h>
 #include <proto/asl.h>
-#include <dos/dos.h>
+#include <proto/muimaster.h>
 
-#include "version.h"
+/* System */
+#include <libraries/gadtools.h> /* for Barlabel in MenuItem */
+#include <exec/memory.h>
+#include <dos/dos.h>
+#if defined(__amigaos4__)
+#include <dos/obsolete.h>
+#endif
+
+/* ANSI C */
 #include <string.h>
 
 #ifndef MAKE_ID
 #define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
 #endif
 
+#include "version.h"
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGameStrings_cat.h"
@@ -74,7 +81,7 @@ struct ObjApp * CreateApp(void)
 	APTR	GR_TitlesFrom, Space_TitlesFrom, GR_SmartSpaces, Space_SmartSpaces;
 	APTR	LA_SmartSpaces, GR_Misc;
 	APTR	LA_SaveStatsOnExit, LA_FilterUseEnter, LA_StartWithFavorites;
-	APTR    LA_HideSidepanel;
+	APTR	LA_HideSidepanel;
 	APTR	GR_SettingsButtons, Space_SettingsButtons1, Space_SettingsButtons2;
 #if defined(__amigaos4__)
 	static const struct Hook MenuScanHook = { { NULL,NULL }, (HOOKFUNC)scan_repositories, NULL, NULL };
@@ -82,7 +89,7 @@ struct ObjApp * CreateApp(void)
 	static const struct Hook MenuScanHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)scan_repositories, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook MenuOpenListHook = { { NULL,NULL }, (HOOKFUNC)MenuOpenList, NULL, NULL };
+	static const struct Hook MenuOpenListHook = { { NULL,NULL }, (HOOKFUNC)open_list, NULL, NULL };
 #else
 	static const struct Hook MenuOpenListHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)open_list, NULL };
 #endif
@@ -172,42 +179,42 @@ struct ObjApp * CreateApp(void)
 	static const struct Hook RepoRemoveHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)repo_remove, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook SettingFilterUseEnterChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingFilterUseEnterChanged, NULL, NULL };
+	static const struct Hook SettingFilterUseEnterChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_filter_use_enter_changed, NULL, NULL };
 #else
 	static const struct Hook SettingFilterUseEnterChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_filter_use_enter_changed, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook SettingSaveStatsOnExitChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingSaveStatsOnExitChanged, NULL, NULL };
+	static const struct Hook SettingSaveStatsOnExitChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_save_stats_on_exit_changed, NULL, NULL };
 #else
 	static const struct Hook SettingSaveStatsOnExitChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_save_stats_on_exit_changed, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook SettingSmartSpacesChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingSmartSpacesChanged, NULL, NULL };
+	static const struct Hook SettingSmartSpacesChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_smart_spaces_changed, NULL, NULL };
 #else
 	static const struct Hook SettingSmartSpacesChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_smart_spaces_changed, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook SettingTitlesFromChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingTitlesFromChanged, NULL, NULL };
+	static const struct Hook SettingTitlesFromChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_titles_from_changed, NULL, NULL };
 #else
 	static const struct Hook SettingTitlesFromChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_titles_from_changed, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook SettingHideScreenshotChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingHideScreenshotChanged, NULL, NULL };
+	static const struct Hook SettingHideScreenshotChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_hide_screenshot_changed, NULL, NULL };
 #else
 	static const struct Hook SettingHideScreenshotChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_hide_screenshot_changed, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook SettingNoGuiGfxChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingNoGuiGfxChanged, NULL, NULL };
+	static const struct Hook SettingNoGuiGfxChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_no_guigfx_changed, NULL, NULL };
 #else
 	static const struct Hook SettingNoGuiGfxChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_no_guigfx_changed, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook SettingScreenshotSizeChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingScreenshotSizeChanged, NULL, NULL };
+	static const struct Hook SettingScreenshotSizeChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_screenshot_size_changed, NULL, NULL };
 #else
 	static const struct Hook SettingScreenshotSizeChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_screenshot_size_changed, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook SettingsSaveHook = { { NULL,NULL }, (HOOKFUNC)SettingsSave, NULL, NULL };
+	static const struct Hook SettingsSaveHook = { { NULL,NULL }, (HOOKFUNC)settings_save, NULL, NULL };
 #else
 	static const struct Hook SettingsSaveHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)settings_save, NULL };
 #endif

@@ -1,9 +1,9 @@
 /*
   iGameMain.c
   Main source for iGame
-  
+
   Copyright (c) 2018, Emmanuel Vasilakis
-  
+
   This file is part of iGame.
 
   iGame is free software: you can redistribute it and/or modify
@@ -35,7 +35,12 @@
 #include "iGameExtern.h"
 
 /* Increase stack size */
+#if defined(__amigaos4__)
+static const char USED min_stack[] = "$STACK:102400";
+#else
 LONG __stack = 32768;
+#endif
+
 
 #ifndef MAKE_ID
 #define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
@@ -49,8 +54,11 @@ extern void load_settings(const char* filename);
 extern char* get_executable_name(int argc, char** argv);
 
 struct Library* MUIMasterBase;
+#if defined(__amigaos4__)
+struct MUIMasterIFace *IMUIMaster;
+#endif
 struct Library* LowLevelBase;
-char* executable_name;
+char *executable_name;
 
 void joystick_buttons(ULONG val)
 {
@@ -58,7 +66,7 @@ void joystick_buttons(ULONG val)
 	//if (val & JPF_BUTTON_REVERSE) printf("[REVERSE]\n");
 	//if (val & JPF_BUTTON_FORWARD) printf("[FORWARD]\n");
 	//if (val & JPF_BUTTON_GREEN) printf("[SHUFFLE]\n");
-	if (val & JPF_BUTTON_RED) 
+	if (val & JPF_BUTTON_RED)
 	{
 		launch_game();
 	}
@@ -70,7 +78,7 @@ void joystick_directions(ULONG val)
 	if (val & JPF_JOY_UP)
 		set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Up);
 
-	if (val & JPF_JOY_DOWN) 
+	if (val & JPF_JOY_DOWN)
 		set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Down);
 
 	if (val & JPF_JOY_LEFT)
@@ -109,12 +117,17 @@ void clean_exit(CONST_STRPTR s)
 
 	app_stop();
 	executable_name = NULL;
-	CloseLibrary(MUIMasterBase);
+	#if defined(__amigaos4__)
+	if (IMUIMaster)
+		DropInterface((struct Interface *)IMUIMaster);
+	#endif
+	if (MUIMasterBase)
+		CloseLibrary(MUIMasterBase);
 	if (LowLevelBase)
 		CloseLibrary(LowLevelBase);
 }
 
-BOOL init_app(int argc, char** argv)
+BOOL init_app(int argc, char **argv)
 {
 	MUIMasterBase = OpenLibrary((CONST_STRPTR)MUIMASTER_LIBRARY, 19);
 	if (MUIMasterBase == NULL)
@@ -123,13 +136,24 @@ BOOL init_app(int argc, char** argv)
 		return FALSE;
 	}
 
+	#if defined(__amigaos4__)
+	if (!(IMUIMaster = (struct MUIMasterIFace *)GetInterface(MUIMasterBase, "main", 1, NULL))) {
+		clean_exit((unsigned char*)"Failed to open "MUIMASTER_NAME".");
+		return FALSE;
+	}
+	#endif
+
 	LowLevelBase = OpenLibrary((CONST_STRPTR)"lowlevel.library", 0);
+	if (LowLevelBase == NULL)
+	{
+		clean_exit((unsigned char*)"Can't open lowlevel.library\n");
+		return FALSE;
+	}
 
 	executable_name = get_executable_name(argc, argv);
 	load_settings(DEFAULT_SETTINGS_FILE);
 
 	app = CreateApp();
-
 	if (!app)
 		clean_exit((unsigned char*)"Can't initialize application\n");
 	else
@@ -138,7 +162,7 @@ BOOL init_app(int argc, char** argv)
 	return TRUE;
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
 	init_app(argc, argv);
 	ULONG sigs = 0;
@@ -157,6 +181,8 @@ int main(int argc, char** argv)
 					break;
 			}
 
+			// TODO: This doesn't work on AmigaOS 4. Needs to be updated with compatible code
+			#if !defined(__amigaos4__)
 			if (LowLevelBase)
 			{
 				const ULONG new = ReadJoyPort(unit);
@@ -168,6 +194,7 @@ int main(int argc, char** argv)
 
 				Delay(1);
 			}
+			#endif
 		}
 		clean_exit(NULL);
 		DisposeApp(app);
