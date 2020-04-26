@@ -17,12 +17,12 @@ all: iGame
 CC			= vc
 LINK		= vc
 INCLUDES	= -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
-CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99
-CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99
-CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99
-CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99
-CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99
-CFLAGS_AOS4	= -c +aosppc -dontwarn=-1 -O2 -c99
+CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99 -DCPU_VERS=68000
+CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68030
+CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68040
+CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68060
+CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99 -DCPU_VERS=MorphOS
+CFLAGS_AOS4	= -c +aosppc -dontwarn=-1 -O2 -c99 -DCPU_VERS=AmigaOS4
 
 DATE = $(shell date --iso=date)
 
