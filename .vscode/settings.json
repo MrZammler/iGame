@@ -1,20 +1,24 @@
 {
-    "files.associations": {
-        "exec.h": "c",
-        "asl.h": "c",
-        "icon.h": "c",
-        "memory.h": "c",
-        "mui.h": "c",
-        "muimaster.h": "c",
-        "stdio.h": "c",
-        "stdarg.h": "c",
-        "guigfx_mcc.h": "c",
-        "startup.h": "c",
-        "string.h": "c",
-        "obsolete.h": "c",
-        "graphics.h": "c",
-        "alib_protos.h": "c",
-        "types.h": "c",
-        "dos.h": "c"
-    }
+	"files.associations": {
+			"exec.h": "c",
+			"asl.h": "c",
+			"icon.h": "c",
+			"memory.h": "c",
+			"mui.h": "c",
+			"muimaster.h": "c",
+			"stdio.h": "c",
+			"stdarg.h": "c",
+			"guigfx_mcc.h": "c",
+			"startup.h": "c",
+			"string.h": "c",
+			"obsolete.h": "c",
+			"graphics.h": "c",
+			"alib_protos.h": "c",
+			"types.h": "c",
+			"dos.h": "c",
+			"igamegui.h": "c",
+			"igameextern.h": "c",
+			"version.h": "c",
+			"igamestrings_cat.h": "c"
+	}
 }
