@@ -39,6 +39,10 @@
 #include "version.h"
 #include <string.h>
 
+#ifndef CPU_VERS
+#define CPU_VERS 68000
+#endif
+
 #ifndef MAKE_ID
 #define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
 #endif
@@ -46,6 +50,7 @@
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGameStrings_cat.h"
+#include "version.h"
 
 extern igame_settings *current_settings;
 
@@ -234,12 +239,20 @@ struct ObjApp * CreateApp(void)
 	object->STR_TX_PropertiesTimesPlayed = NULL;
 	object->STR_TX_PropertiesSlavePath = NULL;
 	object->STR_TX_PropertiesTooltypes = NULL;
-	
-	char about_text[512];
-	strcpy(about_text, "iGame\n");
-	strcat(about_text, VERSION);
+
+	unsigned char about_text[512];
+	strcpy(about_text, "iGame v");
+	strcat(about_text, STR(MAJOR_VERS));
+	strcat(about_text, ".");
+	strcat(about_text, STR(MINOR_VERS));
+	#ifdef BETA_VERS
+	strcat(about_text, "b");
+	strcat(about_text, STR(BETA_VERS));
+	#endif
+	strcat(about_text, " compiled for ");
+	strcat(about_text, STR(CPU_VERS));
 	strcat(about_text, "\n\n");
-	strcat(about_text, "Copyright 2005-2019\n");
+	strcat(about_text, "Copyright 2005-2020\n");
 	strcat(about_text, GetMBString(MSG_TX_About));
 
 	object->STR_TX_About = (CONST_STRPTR)about_text;
