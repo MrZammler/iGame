@@ -49,6 +49,9 @@
 #endif
 #include <exec/memory.h>
 #include <exec/types.h>
+#if defined(__amigaos4__)
+#define ASL_PRE_V38_NAMES
+#endif
 #include <libraries/asl.h>
 #include <workbench/startup.h>
 #include <workbench/workbench.h>
