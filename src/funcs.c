@@ -37,6 +37,7 @@
 #include <exec/types.h>
 #include <workbench/workbench.h>
 #include <clib/graphics_protos.h>
+#include <clib/wb_protos.h>
 
 #include "iGameGUI.h"
 #include "iGameExtern.h"
@@ -2829,7 +2830,7 @@ void open_current_dir()
 	
 	
 	//Open path directory
-	OpenWorkbenchObjectA(path_only);
+	OpenWorkbenchObject(path_only);
 	FreeVec(path_only);
 
 }
