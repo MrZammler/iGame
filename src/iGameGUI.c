@@ -458,6 +458,9 @@ struct ObjApp * CreateApp(void)
 		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainDeleteChar),
 		End;
 
+	// Only include the open dir menu item if we have a supportive workbench
+	if (get_wb_version() >= 44)
+	{
 	MNlabel2Game = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Game),
 	  /* MUIA_Family_Child, MNMainMenuDuplicate, */
@@ -466,6 +469,17 @@ struct ObjApp * CreateApp(void)
 	  /*	MUIA_Family_Child, MNMainBarLabel4,
 		MUIA_Family_Child, MNMainDelete, */
 		End;
+	}
+	else
+	{
+	MNlabel2Game = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Game),
+	  /* MUIA_Family_Child, MNMainMenuDuplicate, */
+		MUIA_Family_Child, MNMainProperties,
+	  /*	MUIA_Family_Child, MNMainBarLabel4,
+		MUIA_Family_Child, MNMainDelete, */
+		End;
+	}
 
 	MNMainiGameSettings = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainiGameSettings),
@@ -1555,3 +1569,4 @@ void DisposeApp(struct ObjApp * object)
 		FreeVec(object);
 	}
 }
+
