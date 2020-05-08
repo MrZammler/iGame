@@ -2822,6 +2822,12 @@ ULONG get_wb_version()
 
 void open_current_dir()
 {
+	if (get_wb_version() < 44)
+	{
+		// workbench.library doesn't support OpenWorkbenchObjectA yet
+		return;
+	}
+
 	// Allocate Memory for variables
 	char* game_title = NULL;
 
