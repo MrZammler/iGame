@@ -57,6 +57,7 @@ char* game_tooltypes;
 char fname[255];
 int IntroPic = 0;
 int wbrun = 0;
+ULONG wbLibraryVer = 0UL;
 
 /* function definitions */
 char** my_split(char* str, char* spl);
@@ -2794,6 +2795,29 @@ void joy_right()
 
   set(app->LV_GamesList, MUIA_List_Active, ind-1);
 
+}
+
+ULONG get_wb_version()
+{
+	if (wbLibraryVer != 0UL)
+	{
+		return wbLibraryVer;
+	}
+
+	struct Library *wb = NULL;
+
+	if (!OpenLibrary("workbench.library", 0UL))
+	{
+		// Somehow we're running without Workbench.
+		// Nothing to do since the version variable inits with 0.
+		return wbLibraryVer;
+	}
+
+	// Save workbench.library version for later calls
+	wbLibraryVer = wb->lib_Version;
+	CloseLibrary(wb);
+
+	return wbLibraryVer;
 }
 
 void open_current_dir()
