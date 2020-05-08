@@ -57,7 +57,6 @@ char* game_tooltypes;
 char fname[255];
 int IntroPic = 0;
 int wbrun = 0;
-ULONG wbLibraryVer = 0UL;
 
 /* function definitions */
 char** my_split(char* str, char* spl);
@@ -2799,9 +2798,11 @@ void joy_right()
 
 ULONG get_wb_version()
 {
-	if (wbLibraryVer != 0UL)
+	static ULONG ver = 0UL;
+
+	if (ver != 0UL)
 	{
-		return wbLibraryVer;
+		return ver;
 	}
 
 	struct Library *wb = NULL;
@@ -2810,14 +2811,14 @@ ULONG get_wb_version()
 	{
 		// Somehow we're running without Workbench.
 		// Nothing to do since the version variable inits with 0.
-		return wbLibraryVer;
+		return ver;
 	}
 
 	// Save workbench.library version for later calls
-	wbLibraryVer = wb->lib_Version;
+	ver = wb->lib_Version;
 	CloseLibrary(wb);
 
-	return wbLibraryVer;
+	return ver;
 }
 
 void open_current_dir()
