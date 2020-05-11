@@ -199,11 +199,13 @@ release:
 	make iGame.040 -f Makefile.linux
 	make iGame.060 -f Makefile.linux
 	make iGame.MOS -f Makefile.linux
+	make iGame.AOS4 -f Makefile.linux
 	cp iGame iGame_rel/iGame-$(DATE)/
 	cp iGame.030 iGame_rel/iGame-$(DATE)/
 	cp iGame.040 iGame_rel/iGame-$(DATE)/
 	cp iGame.060 iGame_rel/iGame-$(DATE)/
 	cp iGame.MOS iGame_rel/iGame-$(DATE)/
+	cp iGame.AOS4 iGame_rel/iGame=$(DATE)/
 	cp required_files/genres iGame_rel/iGame-$(DATE)/
 	cp required_files/igame.iff iGame_rel/iGame-$(DATE)/
 	cp required_files/iGame.info iGame_rel/iGame-$(DATE)/
