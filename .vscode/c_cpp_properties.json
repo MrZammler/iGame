@@ -21,12 +21,14 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${VBCC}/targets/ppc-amigaos/include/",
-                "${VBCC}/NDK39/Include/include_h",
-                "${VBCC}/MUI/Developer/C/Include",
+                "${VBCC}/SDK/include/include_h",
+                "${VBCC}/SDK/MUI/C/include",
                 "${VBCC}/MCC_Guigfx/Developer/C/Include",
                 "${VBCC}/MCC_TextEditor/Developer/C/include"
             ],
-            "defines": [],
+            "defines": [
+                "__amigaos4__"
+            ],
             "compilerPath": "${VBCC}/bin/vc",
             "cStandard": "c99",
             "cppStandard": "c++98",

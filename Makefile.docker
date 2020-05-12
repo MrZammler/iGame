@@ -17,12 +17,13 @@ all: iGame
 CC			= vc
 LINK		= vc
 INCLUDES	= -I$(NDK_INC) -I$(MUI38_INC)
+INCLUDES_AOS4 = -I$(SDK_INC) -I$(MUI50_INC)
 CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99
 CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99
 CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99
 CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99
 CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99
-CFLAGS_OS4	= -c +aosppc -dontwarn=-1 -O2
+CFLAGS_OS4	= -c +aosppc -dontwarn=-1 -O2 -D__USE_INLINE__
 
 DATE = $(shell date --iso=date)
 
@@ -117,7 +118,7 @@ src/iGameMain_040.o: src/iGameMain.c
 
 src/strdup_040.o: src/strdup.c
 	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/strdup.c
-	
+
 src/iGameStrings_cat_040.o: src/iGameStrings_cat.c
 	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/iGameStrings_cat.c
 
@@ -164,19 +165,19 @@ src/iGameStrings_cat_MOS.o: src/iGameStrings_cat.c
 ##########################################################################
 
 src/funcs_AOS4.o: src/funcs.c
-	$(CC) $(CFLAGS_AOS4) $(INCLUDES) -o $@ src/funcs.c
+	$(CC) $(CFLAGS_AOS4) $(INCLUDES_AOS4) -o $@ src/funcs.c
 
 src/iGameGUI_AOS4.o: src/iGameGUI.c src/iGameGUI.h
-	$(CC) $(CFLAGS_AOS4) $(INCLUDES) -o $@ src/iGameGUI.c
+	$(CC) $(CFLAGS_AOS4) $(INCLUDES_AOS4) -o $@ src/iGameGUI.c
 
 src/iGameMain_AOS4.o: src/iGameMain.c
-	$(CC) $(CFLAGS_AOS4) $(INCLUDES) -o $@ src/iGameMain.c
+	$(CC) $(CFLAGS_AOS4) $(INCLUDES_AOS4) -o $@ src/iGameMain.c
 
 src/strdup_AOS4.o: src/strdup.c
-	$(CC) $(CFLAGS_AOS4) $(INCLUDES) -o $@ src/strdup.c
+	$(CC) $(CFLAGS_AOS4) $(INCLUDES_AOS4) -o $@ src/strdup.c
 
 src/iGameStrings_cat_AOS4.o: src/iGameStrings_cat.c
-	$(CC) $(CFLAGS_AOS4) $(INCLUDES) -o $@ src/iGameStrings_cat.c
+	$(CC) $(CFLAGS_AOS4) $(INCLUDES_AOS4) -o $@ src/iGameStrings_cat.c
 
 ##########################################################################
 # generic build options
@@ -198,11 +199,13 @@ release:
 	make iGame.040 -f Makefile.linux
 	make iGame.060 -f Makefile.linux
 	make iGame.MOS -f Makefile.linux
+	make iGame.AOS4 -f Makefile.linux
 	cp iGame iGame_rel/iGame-$(DATE)/
 	cp iGame.030 iGame_rel/iGame-$(DATE)/
 	cp iGame.040 iGame_rel/iGame-$(DATE)/
 	cp iGame.060 iGame_rel/iGame-$(DATE)/
 	cp iGame.MOS iGame_rel/iGame-$(DATE)/
+	cp iGame.AOS4 iGame_rel/iGame=$(DATE)/
 	cp required_files/genres iGame_rel/iGame-$(DATE)/
 	cp required_files/igame.iff iGame_rel/iGame-$(DATE)/
 	cp required_files/iGame.info iGame_rel/iGame-$(DATE)/
