@@ -38,6 +38,7 @@
 #include <workbench/workbench.h>
 #include <clib/graphics_protos.h>
 #include <clib/wb_protos.h>
+#include <proto/wb.h>
 
 #include "iGameGUI.h"
 #include "iGameExtern.h"
@@ -2805,18 +2806,16 @@ ULONG get_wb_version()
 		return ver;
 	}
 
-	struct Library *wb = NULL;
-
-	if (!OpenLibrary("workbench.library", 0UL))
+	if (WorkbenchBase == NULL)
 	{
+		//Really Workbench library should be already opened
 		// Somehow we're running without Workbench.
 		// Nothing to do since the version variable inits with 0.
 		return ver;
 	}
 
 	// Save workbench.library version for later calls
-	ver = wb->lib_Version;
-	CloseLibrary(wb);
+	ver = WorkbenchBase->lib_Version;
 
 	return ver;
 }
