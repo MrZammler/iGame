@@ -379,12 +379,12 @@ struct ObjApp * CreateApp(void)
 
 	MNlabelScan = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNlabelScan),
-		MUIA_Menuitem_Shortcut, "R",
+		MUIA_Menuitem_Shortcut, MENU_SCANREPOS_HOTKEY,
 		End;
 
 	MNMainAddnonWHDLoadgame = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainAddnonWHDLoadgame),
-		MUIA_Menuitem_Shortcut, "A",
+		MUIA_Menuitem_Shortcut, MENU_ADDNONWHDLOADGAME_HOTKEY,
 		End;
 
 	MNMainMenuShowHidehiddenentries = MenuitemObject,
@@ -393,12 +393,12 @@ struct ObjApp * CreateApp(void)
 
 	MNMainOpenList = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainOpenList),
-		MUIA_Menuitem_Shortcut, "O",
+		MUIA_Menuitem_Shortcut, MENU_OPENLIST_HOTKEY,
 		End;
 
 	MNMainSaveList = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainSaveList),
-		MUIA_Menuitem_Shortcut, "S",
+		MUIA_Menuitem_Shortcut, MENU_SAVELIST_HOTKEY,
 		End;
 
 	MNMainSaveListAs = MenuitemObject,
@@ -409,13 +409,14 @@ struct ObjApp * CreateApp(void)
 
 	MNMainAbout = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainAbout),
+		MUIA_Menuitem_Shortcut, MENU_ABOUT_HOTKEY,
 		End;
 
 	MNMainBarLabel1 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
 
 	MNMainQuit = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainQuit),
-		MUIA_Menuitem_Shortcut, "Q",
+		MUIA_Menuitem_Shortcut, MENU_QUIT_HOTKEY,
 		End;
 
 	MNlabel2Actions = MenuitemObject,
@@ -439,12 +440,12 @@ struct ObjApp * CreateApp(void)
 
 	MNMainProperties = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainProperties),
-		MUIA_Menuitem_Shortcut, "P",
+		MUIA_Menuitem_Shortcut, MENU_PROPERTIES_HOTKEY,
 		End;
 
 	MNMainDelete = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainDelete),
-		MUIA_Menuitem_Shortcut, "D",
+		MUIA_Menuitem_Shortcut, MENU_DELETE_HOTKEY,
 		End;
 
 	MNlabel2Game = MenuitemObject,
