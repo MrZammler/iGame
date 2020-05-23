@@ -63,6 +63,7 @@ extern igame_settings *current_settings;
 struct ObjApp * CreateApp(void)
 {
 	struct ObjApp * object;
+	struct DiskObject *appIcon;
 
 	APTR	MNlabel2Actions, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainMenuShowHidehiddenentries;
 	APTR	MNMainOpenList, MNMainSaveList, MNMainSaveListAs;
@@ -1055,6 +1056,7 @@ struct ObjApp * CreateApp(void)
 		MUIA_Application_Copyright, GetMBString(MSG_AppCopyright),
 		MUIA_Application_Description, GetMBString(MSG_AppDescription),
 		MUIA_Application_HelpFile, "iGame.guide",
+		MUIA_Application_DiskObject, appIcon=GetDiskObject("PROGDIR:iGame"),
 		SubWindow, object->WI_MainWindow,
 		SubWindow, object->WI_Properties,
 		SubWindow, object->WI_GameRepositories,
