@@ -22,7 +22,7 @@ CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99
 CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99
 CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99
 CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99
-CFLAGS_AOS4	= -c +aosppc -dontwarn=-1 -O2 -c99
+CFLAGS_AOS4	= -c +aosppc -dontwarn=-1 -O2 -c99 -D__USE_INLINE__
 
 ##########################################################################
 # Library builder settings
@@ -181,5 +181,5 @@ src/iGameStrings_cat_AOS4.o: src/iGameStrings_cat.c
 ##########################################################################
 
 clean:
-	delete iGame iGame.030 iGame.040 iGame.060 iGame.MOS src/funcs.o src/funcs_030.o src/funcs_040.o src/funcs_060.o src/funcs_MOS.o src/iGameGui.o src/iGameGui_030.o src/iGameGui_040.o src/iGameGui_060.o src/iGameGui_MOS.o src/iGameMain.o src/iGameMain_030.o src/iGameMain_040.o src/iGameMain_060.o src/iGameMain_MOS.o src/strdup.o src/strdup_030.o src/strdup_040.o src/strdup_060.o src/strdup_MOS.o src/iGameStrings_cat.o src/iGameStrings_cat_030.o src/iGameStrings_cat_040.o src/iGameStrings_cat_060.o src/iGameStrings_cat_MOS.o
+	delete iGame iGame.030 iGame.040 iGame.060 iGame.MOS iGame.AOS4 $(OBJS) $(OBJS_030) $(OBJS_040) $(OBJS_060) $(OBJS_MOS) $(OBJS_AOS4)
 

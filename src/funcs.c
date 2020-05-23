@@ -1,9 +1,9 @@
 /*
   funcs.c
   Misc functions for iGame
-  
+
   Copyright (c) 2019, Emmanuel Vasilakis and contributors
-  
+
   This file is part of iGame.
 
   iGame is free software: you can redistribute it and/or modify
@@ -20,28 +20,52 @@
   along with iGame. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <clib/exec_protos.h>
-#include <clib/dos_protos.h>
-#include <clib/alib_protos.h>
-#include <clib/icon_protos.h>
+/* MUI */
 #include <libraries/mui.h>
 #include <MUI/Guigfx_mcc.h>
 #include <MUI/TextEditor_mcc.h>
+
+/* Prototypes */
+#include <clib/alib_protos.h>
+
+#if defined(__amigaos4__)
+#include <proto/exec.h>
+#include <proto/dos.h>
+#include <proto/icon.h>
+#include <proto/graphics.h>
+#include <proto/muimaster.h>
+#else
+#include <clib/exec_protos.h>
+#include <clib/dos_protos.h>
+#include <clib/icon_protos.h>
 #include <clib/muimaster_protos.h>
+#include <clib/graphics_protos.h>
+#endif
+
+/* System */
+#include <dos/dos.h>
+#if defined(__amigaos4__)
+#include <dos/obsolete.h>
+#endif
+#include <exec/memory.h>
+#include <exec/types.h>
+#if defined(__amigaos4__)
+#define ASL_PRE_V38_NAMES
+#endif
+#include <libraries/asl.h>
+#include <workbench/startup.h>
+#include <workbench/workbench.h>
+
+/* ANSI C */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <exec/memory.h>
-#include <workbench/startup.h>
-#include <exec/types.h>
-#include <workbench/workbench.h>
-#include <clib/graphics_protos.h>
+
 
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGameStrings_cat.h"
-#include <libraries/asl.h>
 
 extern char* strdup(const char* s);
 extern struct ObjApp* app;
@@ -75,6 +99,7 @@ void strip_path(const char* path, char* naked_path);
 char* get_slave_from_path(char* slave, int start, char* path);
 void read_tool_types();
 void check_for_wbrun();
+void list_show_favorites(char* str);
 
 /* structures */
 struct EasyStruct msgbox;
@@ -178,6 +203,7 @@ void load_settings(const char* filename)
 	}
 	current_settings = (igame_settings *)calloc(1, sizeof(igame_settings));
 
+	// TODO: Maybe it would be a good idea to lock the file before open it
 	const BPTR fpsettings = Open((CONST_STRPTR)filename, MODE_OLDFILE);
 	if (fpsettings)
 	{
@@ -220,6 +246,7 @@ void load_settings(const char* filename)
 		// No "igame.prefs" file found, fallback to reading Tooltypes
 		read_tool_types();
 	}
+
 	if (file_line)
 		free(file_line);
 }
@@ -414,7 +441,7 @@ void load_genres(const char* filename)
 		app->CY_AddGameGenreContent[i + 1] = NULL;
 		set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_AddGameGenreContent);
 
-		
+
 
 		Close(fpgenres);
 	}
@@ -1275,10 +1302,10 @@ void game_properties()
 	char* slave = AllocMem(256 * sizeof(char), MEMF_CLEAR);
 
 	// Check if any of them failed
-	if (helperstr == NULL 
-		|| fullpath == NULL 
-		|| str2 == NULL 
-		|| path == NULL 
+	if (helperstr == NULL
+		|| fullpath == NULL
+		|| str2 == NULL
+		|| path == NULL
 		|| naked_path == NULL
 		|| slave == NULL)
 	{
@@ -1300,7 +1327,7 @@ void game_properties()
 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
 		return;
 	}
-	
+
 	int i;
 	struct DiskObject* disk_obj;
 	char* tool_type;
@@ -1608,7 +1635,7 @@ void game_properties_ok()
 				FreeMem(m, sizeof(struct FileInfoBlock));
 			CloseLibrary(icon_base);
 		}
-		
+
 		CurrentDir(oldlock);
 
 		// Cleanup the memory allocations
@@ -2374,14 +2401,17 @@ void get_screen_size(int* width, int* height)
 
 void read_tool_types()
 {
-	struct Library* icon_base;
-	struct DiskObject* disk_obj;
+	struct Library *icon_base;
+	struct DiskObject *disk_obj;
 
 	int screen_width, screen_height;
+	unsigned char filename[32];
 
 	if ((icon_base = (struct Library *)OpenLibrary((CONST_STRPTR)ICON_LIBRARY, 0)))
 	{
-		char* filename = strcat(PROGDIR, executable_name);
+		strcpy(filename, PROGDIR);
+		strcat(filename, executable_name);
+
 		if ((disk_obj = GetDiskObject((STRPTR)filename)))
 		{
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_SCREENSHOT))
@@ -2435,7 +2465,6 @@ void read_tool_types()
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSIDEPANEL))
 				current_settings->hide_side_panel = 1;
 		}
-
 		CloseLibrary(icon_base);
 	}
 
@@ -2658,7 +2687,7 @@ const char* get_directory_name(const char* str)
 }
 
 // Get the application's executable name
-const char* get_executable_name(int argc, char** argv)
+const char *get_executable_name(int argc, char **argv)
 {
 	// argc is zero when run from the Workbench,
 	// positive when run from the CLI
@@ -2738,7 +2767,7 @@ void joy_left()
 
   DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &curr_game);
   get(app->LV_GamesList, MUIA_List_Active, &ind);
-  
+
   if (curr_game == NULL || strlen(curr_game) == 0)
     {
       set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Top);
@@ -2748,7 +2777,7 @@ void joy_left()
   DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
   if (prev_game == NULL)
 	return;
-  
+
   while (toupper(curr_game[0]) == toupper(prev_game[0]))
     {
       DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
@@ -2757,7 +2786,7 @@ void joy_left()
     }
 
   last_game = prev_game;
-  
+
   while (toupper(last_game[0]) == toupper(prev_game[0]))
     {
       DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
@@ -2775,7 +2804,7 @@ void joy_right()
 
   DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &curr_game);
   get(app->LV_GamesList, MUIA_List_Active, &ind);
-  
+
   if (curr_game == NULL || strlen(curr_game) == 0)
     {
       set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Top);
@@ -2785,7 +2814,7 @@ void joy_right()
   DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind++, &next_game);
   if (next_game == NULL)
 	return;
-  
+
   while (toupper(curr_game[0]) == toupper(next_game[0]))
     {
       DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind++, &next_game);
