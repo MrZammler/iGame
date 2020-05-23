@@ -20,5 +20,6 @@
 			"igameextern.h": "c",
 			"version.h": "c",
 			"igamestrings_cat.h": "c"
-	}
+	},
+	"vsnotes.defaultNotePath": "/opt/code/iGame/.vscode/vsnotes"
 }
