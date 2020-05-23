@@ -31,12 +31,32 @@ steps:
   commands:
     - cd /drone/src
     - make -f Makefile.docker iGame.OS4
-
+- name: create-nightly-package
+	pull: always
+	image: walkero/docker4amigavbcc:latest-m68k
+	commands:
+		- cd /drone/src
+		- make -f Makefile.docker nightly
+- name: deploy-all-binary
+	pull: always
+	image: plugins/github-release
+	settings:
+		api_key:
+			from_secret: GITHUB_RELEASE_API_KEY
+		files:
+			- "iGame-nightly-*.lha"
+		title: "iGame-nighty ${DATE}"
+- name: clean-nightly-package
+	pull: always
+	image: walkero/docker4amigavbcc:latest-m68k
+	commands:
+		- cd /drone/src
+		- make -f Makefile.docker clean-nightly
 
 trigger:
   branch:
     include:
-      - develop
+      - nightly-release
   event:
     include:
       - push

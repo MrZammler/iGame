@@ -26,6 +26,7 @@ CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99 -DCPU_VERS=MorphOS
 CFLAGS_OS4	= -c +aosppc -dontwarn=-1 -O2 -D__USE_INLINE__ -DCPU_VERS=AmigaOS4
 
 DATE = $(shell date --iso=date)
+DATESTR = $(shell date "+%Y%m%d")
 
 ##########################################################################
 # Builder settings
@@ -186,33 +187,48 @@ src/iGameStrings_cat_OS4.o: src/iGameStrings_cat.c
 clean:
 	rm iGame iGame.* src/funcs*.o src/iGameGUI*.o src/iGameMain*.o src/strdup*.o src/iGameStrings_cat*.o
 
+nightly:
+	cp required_files iGame-nightly -r
+	cp alt_icons iGame-nightly/icons -r
+	if [ -f "iGame" ]; then cp iGame iGame-nightly/; fi
+	if [ -f "iGame.030" ]; then cp iGame.030 iGame-nightly/; fi
+	if [ -f "iGame.040" ]; then cp iGame.040 iGame-nightly/; fi
+	if [ -f "iGame.060" ]; then cp iGame.060 iGame-nightly/; fi
+	if [ -f "iGame.MOS" ]; then cp iGame.MOS iGame-nightly/; fi
+	if [ -f "iGame.OS4" ]; then cp iGame.OS4 iGame-nightly/; fi
+	lha -c iGame-nightly-$(DATESTR).lha iGame-nightly/
+
+clean-nightly:
+	rm -rf iGame-nightly
+	rm iGame-nightly-$(DATESTR).lha
+
 # pack everything in a nice lha file
 release:
-	rm -rf iGame_rel/iGame/
-	#rm iGame_rel/iGame.info
-	mkdir iGame_rel/iGame-$(DATE)
-	echo "#ifndef VERSION" > src/version.h
-	echo "#define VERSION \"\$$VER:version 2.0b5 ("$(DATE)")"\" >> src/version.h
-	echo "#endif" >> src/version.h
-	make iGame -f Makefile.linux
-	make iGame.030 -f Makefile.linux
-	make iGame.040 -f Makefile.linux
-	make iGame.060 -f Makefile.linux
-	make iGame.MOS -f Makefile.linux
-	make iGame.AOS4 -f Makefile.linux
-	cp iGame iGame_rel/iGame-$(DATE)/
-	cp iGame.030 iGame_rel/iGame-$(DATE)/
-	cp iGame.040 iGame_rel/iGame-$(DATE)/
-	cp iGame.060 iGame_rel/iGame-$(DATE)/
-	cp iGame.MOS iGame_rel/iGame-$(DATE)/
-	cp iGame.AOS4 iGame_rel/iGame=$(DATE)/
-	cp required_files/genres iGame_rel/iGame-$(DATE)/
-	cp required_files/igame.iff iGame_rel/iGame-$(DATE)/
-	cp required_files/iGame.info iGame_rel/iGame-$(DATE)/
-	cp required_files/igame_drawer_3.0.info iGame_rel/iGame.info
-	cp guide/* iGame_rel/iGame-$(DATE)/
-	mkdir iGame_rel/iGame-$(DATE)/Icons/
-	cp alt_icons/* iGame_rel/iGame-$(DATE)/Icons/
-	cp required_files/igame_drawer.info iGame_rel/iGame-$(DATE)/Icons.info
-	cd iGame_rel && mv iGame-$(DATE) iGame && lha -a iGame-$(DATE).lha iGame/ && lha -a iGame-$(DATE).lha iGame.info
+	# rm -rf iGame_rel/iGame/
+	# #rm iGame_rel/iGame.info
+	# mkdir iGame_rel/iGame-$(DATE)
+	# echo "#ifndef VERSION" > src/version.h
+	# echo "#define VERSION \"\$$VER:version 2.0b5 ("$(DATE)")"\" >> src/version.h
+	# echo "#endif" >> src/version.h
+	# make iGame -f Makefile.linux
+	# make iGame.030 -f Makefile.linux
+	# make iGame.040 -f Makefile.linux
+	# make iGame.060 -f Makefile.linux
+	# make iGame.MOS -f Makefile.linux
+	# make iGame.AOS4 -f Makefile.linux
+	# cp iGame iGame_rel/iGame-$(DATE)/
+	# cp iGame.030 iGame_rel/iGame-$(DATE)/
+	# cp iGame.040 iGame_rel/iGame-$(DATE)/
+	# cp iGame.060 iGame_rel/iGame-$(DATE)/
+	# cp iGame.MOS iGame_rel/iGame-$(DATE)/
+	# cp iGame.AOS4 iGame_rel/iGame=$(DATE)/
+	# cp required_files/genres iGame_rel/iGame-$(DATE)/
+	# cp required_files/igame.iff iGame_rel/iGame-$(DATE)/
+	# cp required_files/iGame.info iGame_rel/iGame-$(DATE)/
+	# cp required_files/igame_drawer_3.0.info iGame_rel/iGame.info
+	# cp guide/* iGame_rel/iGame-$(DATE)/
+	# mkdir iGame_rel/iGame-$(DATE)/Icons/
+	# cp alt_icons/* iGame_rel/iGame-$(DATE)/Icons/
+	# cp required_files/igame_drawer.info iGame_rel/iGame-$(DATE)/Icons.info
+	# cd iGame_rel && mv iGame-$(DATE) iGame && $(date '+%Y%m%d') && lha -a iGame-$(DATE).lha iGame.info
 
