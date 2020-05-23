@@ -96,9 +96,6 @@ trigger:
       - make -f Makefile.docker clean-release
 
   trigger:
-    branch:
-      include:
-        - develop
     event:
       include:
         - tag
