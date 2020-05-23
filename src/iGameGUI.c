@@ -1,9 +1,9 @@
 /*
   iGameGUI.c
   GUI source for iGame
-  
+
   Copyright (c) 2019, Emmanuel Vasilakis and contributors
-  
+
   This file is part of iGame.
 
   iGame is free software: you can redistribute it and/or modify
@@ -234,7 +234,7 @@ struct ObjApp * CreateApp(void)
 	object->STR_TX_PropertiesTimesPlayed = NULL;
 	object->STR_TX_PropertiesSlavePath = NULL;
 	object->STR_TX_PropertiesTooltypes = NULL;
-	
+
 	char about_text[512];
 	strcpy(about_text, "iGame\n");
 	strcat(about_text, VERSION);
@@ -360,7 +360,7 @@ struct ObjApp * CreateApp(void)
 			Child, object->LV_GamesList,
 			End;
 	}
-	
+
 	object->TX_Status = TextObject,
 		MUIA_Background, MUII_TextBack,
 		MUIA_Frame, MUIV_Frame_Text,
@@ -379,12 +379,12 @@ struct ObjApp * CreateApp(void)
 
 	MNlabelScan = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNlabelScan),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNlabelScanChar),
+		MUIA_Menuitem_Shortcut, MENU_SCANREPOS_HOTKEY,
 		End;
 
 	MNMainAddnonWHDLoadgame = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainAddnonWHDLoadgame),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainAddnonWHDLoadgameChar),
+		MUIA_Menuitem_Shortcut, MENU_ADDNONWHDLOADGAME_HOTKEY,
 		End;
 
 	MNMainMenuShowHidehiddenentries = MenuitemObject,
@@ -393,12 +393,12 @@ struct ObjApp * CreateApp(void)
 
 	MNMainOpenList = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainOpenList),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainOpenListChar),
+		MUIA_Menuitem_Shortcut, MENU_OPENLIST_HOTKEY,
 		End;
 
 	MNMainSaveList = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainSaveList),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainSaveListChar),
+		MUIA_Menuitem_Shortcut, MENU_SAVELIST_HOTKEY,
 		End;
 
 	MNMainSaveListAs = MenuitemObject,
@@ -409,13 +409,14 @@ struct ObjApp * CreateApp(void)
 
 	MNMainAbout = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainAbout),
+		MUIA_Menuitem_Shortcut, MENU_ABOUT_HOTKEY,
 		End;
 
 	MNMainBarLabel1 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
 
 	MNMainQuit = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainQuit),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainQuitChar),
+		MUIA_Menuitem_Shortcut, MENU_QUIT_HOTKEY,
 		End;
 
 	MNlabel2Actions = MenuitemObject,
@@ -439,12 +440,12 @@ struct ObjApp * CreateApp(void)
 
 	MNMainProperties = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainProperties),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainPropertiesChar),
+		MUIA_Menuitem_Shortcut, MENU_PROPERTIES_HOTKEY,
 		End;
 
 	MNMainDelete = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainDelete),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainDeleteChar),
+		MUIA_Menuitem_Shortcut, MENU_DELETE_HOTKEY,
 		End;
 
 	MNlabel2Game = MenuitemObject,
