@@ -196,7 +196,7 @@ release:
 	if [ -f "iGame.060" ]; then cp iGame.060 iGame-nightly/; fi
 	if [ -f "iGame.MOS" ]; then cp iGame.MOS iGame-nightly/; fi
 	if [ -f "iGame.OS4" ]; then cp iGame.OS4 iGame-nightly/; fi
-	lha -c iGame-nightly-$(DATESTR).lha iGame-nightly/
+	lha -c iGame-$(DRONE_TAG)-$(DATESTR).lha iGame-nightly/
 
 clean-release:
 	rm -rf iGame-nightly
