@@ -256,7 +256,10 @@ struct ObjApp * CreateApp(void)
 	strcat(about_text, "b");
 	strcat(about_text, STR(BETA_VERS));
 	#endif
-	strcat(about_text, " compiled for ");
+	strcat(about_text, " (");
+	strcat(about_text, STR(RELEASE_DATE));
+	strcat(about_text, ") ");
+	strcat(about_text, "\ncompiled for ");
 	strcat(about_text, STR(CPU_VERS));
 	strcat(about_text, "\n\n");
 	strcat(about_text, "Copyright 2005-2020\n");
