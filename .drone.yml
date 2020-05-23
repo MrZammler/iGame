@@ -52,27 +52,27 @@ trigger:
     commands:
       - cd /drone/src
       - make -f Makefile.docker
-  - name: compile-m68k-030
-    image: walkero/docker4amigavbcc:latest-m68k
-    commands:
-      - cd /drone/src
-      - make -f Makefile.docker iGame.030
-  - name: compile-m68k-040
-    image: walkero/docker4amigavbcc:latest-m68k
-    commands:
-      - cd /drone/src
-      - make -f Makefile.docker iGame.040
-  - name: compile-m68k-060
-    image: walkero/docker4amigavbcc:latest-m68k
-    commands:
-      - cd /drone/src
-      - make -f Makefile.docker iGame.060
-  - name: compile-os4
-    pull: always
-    image: walkero/docker4amigavbcc:latest-ppc
-    commands:
-      - cd /drone/src
-      - make -f Makefile.docker iGame.OS4
+  # - name: compile-m68k-030
+  #   image: walkero/docker4amigavbcc:latest-m68k
+  #   commands:
+  #     - cd /drone/src
+  #     - make -f Makefile.docker iGame.030
+  # - name: compile-m68k-040
+  #   image: walkero/docker4amigavbcc:latest-m68k
+  #   commands:
+  #     - cd /drone/src
+  #     - make -f Makefile.docker iGame.040
+  # - name: compile-m68k-060
+  #   image: walkero/docker4amigavbcc:latest-m68k
+  #   commands:
+  #     - cd /drone/src
+  #     - make -f Makefile.docker iGame.060
+  # - name: compile-os4
+  #   pull: always
+  #   image: walkero/docker4amigavbcc:latest-ppc
+  #   commands:
+  #     - cd /drone/src
+  #     - make -f Makefile.docker iGame.OS4
   - name: create-release-files
     pull: always
     image: walkero/docker4amigavbcc:latest-m68k
@@ -86,7 +86,7 @@ trigger:
       api_key:
         from_secret: GITHUB_RELEASE_API_KEY
       files:
-        - "iGame-nightly-*.lha"
+        - "iGame-*.lha"
       title: "iGame release ${DRONE_TAG}"
   - name: clean-release-files
     pull: always
