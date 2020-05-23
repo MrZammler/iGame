@@ -7,20 +7,20 @@
 
 			   iGame
 	=============================================
-		ï¿½ 2005-2019 Emmanuel Vasilakis
+		© 2005-2019 Emmanuel Vasilakis
 
 
-     @{"ï¿½Introductionï¿½ï¿½ï¿½ï¿½ " LINK "INTR" 0} - About iGame
-     @{"ï¿½Building iGameï¿½ï¿½ " LINK "BUIL" 0} - Building iGame
-     @{"ï¿½Requirementsï¿½ï¿½ï¿½ï¿½ " LINK "REQS" 0} - System requirements
+     @{" Introduction     " LINK "INTR" 0} - About iGame
+     @{" Building iGame   " LINK "BUIL" 0} - Building iGame
+     @{" Requirements     " LINK "REQS" 0} - System requirements
 
-     @{"ï¿½Installationï¿½ï¿½ï¿½ï¿½ " LINK "INST" 0} - Installing iGame
+     @{" Installation     " LINK "INST" 0} - Installing iGame
      @{" Usage            " LINK "USAG" 0} - Using iGame
 
-     @{"ï¿½Todo      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ " LINK "TODO" 0} - Todo stuff
+     @{" Todo             " LINK "TODO" 0} - Todo stuff
      @{" Known bugs       " LINK "BUGS" 0} - Known bugs
-     @{"ï¿½Authorï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ " LINK "INFO" 0} - Author contact info
-     @{"ï¿½History  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ " LINK "HIST" 0} - Version history
+     @{" Author           " LINK "INFO" 0} - Author contact info
+     @{" History          " LINK "HIST" 0} - Version history
 
 @ENDNODE
 @NODE "INTR" "Introduction"
@@ -69,12 +69,15 @@ REQUIREMENTS
 
 Hardware
 
- - Amiga Computer with at least 68020 processor
+ - Amiga Computer with at least 68000 processor
  - 2 MB RAM min.
 
 To be perfectly honest, iGame requirements depend on the amount of installed games.
-I'd say a healthy ok would be an 68030 and 16MB of fast ram, but it is run okay on a 020
-system. (Havent tried on 00, let me know about it).
+I'd say a healthy ok would be an 68030 and 16MB of fast ram, but it is running fine
+on a 020 system. (Havent tried on 00, let me know about it).
+
+On a 68000 processor you need to be sure the MUI libraries, like the MCC_TextEditor
+to support it.
 
 On a 030 processor, it takes a while to scan and list the games. Typical
 numbers are about 2 mins for a complete scan of an SFS formated 5G partition
@@ -97,7 +100,16 @@ Software
 @ENDNODE
 @NODE "INST" "Installation"
 
-No supplied installer yet, so you must do the following by hand:
+@{b}Installer@{ub}
+
+In the package there is an installer, which you can use to install iGame in your
+hard disk. The installer recognises the OS version and used CPU, and proposes the
+best binary for you, but at the end you can choose what you want to use.
+
+@{b}Manual Installation@{ub}
+
+You can install iGame manually if you prefer. To do that, just follow the
+following steps:
 
   1. Unpack the archive.
 
@@ -245,15 +257,15 @@ Many thanks to all those people who contacted me about iGame!
 Here's a list of changes:
 
   Work in progress builds (iGame-2015-11-07.lha):
-            
+
         Fix a GR when selecting Game Properties without having selected a game. (Thanks @AllanU74)
 
   Work in progress builds (iGame-2015-02-13.lha):
-            
+
         Adjusts screenshot box according to workbench resolution.
 
   Work in progress builds (iGame-2014-08-13.lha):
-            
+
         Now compiled with vbcc. Should produce a slightly faster build.
         Builds for 030 and 060.
         Fixed OS4 crashes (mainly during search).
@@ -276,7 +288,7 @@ Here's a list of changes:
 	Editable tooltypes.
 	Speed increase while listing games.
 	Misc bug fixes.
-  
+
   1.3 (28/04/07):
 
 	Added the NOGUIGFX tooltype.
