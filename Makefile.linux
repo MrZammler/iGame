@@ -16,7 +16,7 @@ all: iGame
 ##########################################################################
 CC			= vc
 LINK		= vc
-INCLUDES	= -I/opt/vbcc/targets/m68k-amigaos/ndk-include/ -I/opt/vbcc/targets/m68k-amigaos/include/mui/
+INCLUDES	= -I/opt/vbcc/targets/m68k-amigaos/ndk-include/ -I/opt/vbcc/targets/m68k-amigaos/include/mui/ -I/opt/vbcc/includes_and_libs/MCC_Guigfx/Developer/C/Include/ -I/opt/vbcc/includes_and_libs/MCC_TextEditor/Developer/C/include/
 CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99
 CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99
 CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99
