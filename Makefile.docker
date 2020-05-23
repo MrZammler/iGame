@@ -18,15 +18,40 @@ CC			= vc
 LINK		= vc
 INCLUDES	= -I$(NDK_INC) -I$(MUI38_INC)
 INCLUDES_OS4= -I$(AOS4_SDK_INC) -I$(MUI50_INC)
-CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99 -DCPU_VERS=68000
-CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68030
-CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68040
-CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68060
-CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99 -DCPU_VERS=MorphOS
-CFLAGS_OS4	= -c +aosppc -dontwarn=-1 -O2 -D__USE_INLINE__ -DCPU_VERS=AmigaOS4
 
-DATE = $(shell date --iso=date)
+DATEISO = $(shell date --iso=date)
 DATESTR = $(shell date "+%Y%m%d")
+
+# DRONE_TAG is set by Drone CI/CD
+# Parse the repo tag to different defines, that will be used while
+# compiling iGame
+#
+# The tags should be like v(MAJOR).(MINOR) or v(MAJOR).(MINOR)b(BETA)
+# in example v2.1 or v2.0b5
+#
+ifneq ($(origin DRONE_TAG),undefined)
+	MAJOR = $(patsubst v%,%,$(firstword $(subst ., ,$(DRONE_TAG))))
+
+	ifeq ($(findstring b,$(DRONE_TAG)), b)
+		MINOR = $(lastword $(subst ., , $(firstword $(subst b, ,$(DRONE_TAG)))))
+		BETA = $(lastword $(subst b, ,$(DRONE_TAG)))
+
+		VERS_FLAGS = -DMAJOR_VERS=$(MAJOR) -DMINOR_VERS=$(MINOR) -DBETA_VERS=$(BETA) -DRELEASE_DATE=$(DATEISO)
+	else
+		MINOR = $(lastword $(subst ., ,$(DRONE_TAG)))
+
+		VERS_FLAGS = -DMAJOR_VERS=$(MAJOR) -DMINOR_VERS=$(MINOR) -DRELEASE_DATE=$(DATEISO)
+	endif
+else
+	VERS_FLAGS = -DRELEASE_DATE=$(DATEISO)
+endif
+
+CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99 -DCPU_VERS=68000 $(VERS_FLAGS)
+CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68030 $(VERS_FLAGS)
+CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68040 $(VERS_FLAGS)
+CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68060 $(VERS_FLAGS)
+CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99 -DCPU_VERS=MorphOS $(VERS_FLAGS)
+CFLAGS_OS4	= -c +aosppc -dontwarn=-1 -O2 -D__USE_INLINE__ -DCPU_VERS=AmigaOS4 $(VERS_FLAGS)
 
 ##########################################################################
 # Builder settings
