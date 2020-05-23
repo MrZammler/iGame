@@ -345,8 +345,6 @@ struct ObjApp * CreateApp(void)
 
 			object->GR_sidepanel = GroupObject,
 				MUIA_HelpNode, "GR_sidepanel",
-			        MUIA_Weight, 0,
-				MUIA_Group_Rows, 3,
 				Child, object->IM_GameImage_0,
 				Child, object->Space_Sidepanel,
 				Child, object->LV_GenresList,
@@ -356,8 +354,6 @@ struct ObjApp * CreateApp(void)
 
 			object->GR_sidepanel = GroupObject,
 				MUIA_HelpNode, "GR_sidepanel",
-			        MUIA_Weight, 0,
-				MUIA_Group_Rows, 2,
 				Child, object->Space_Sidepanel,
 				Child, object->LV_GenresList,
 				End;
@@ -365,9 +361,9 @@ struct ObjApp * CreateApp(void)
 
 		GR_main = GroupObject,
 			MUIA_HelpNode, "GR_main",
-			MUIA_Group_Columns, 3,
-			Child, object->LV_GamesList,
-			Child, Space_Gamelist,
+			MUIA_Group_Horiz, TRUE,
+			Child, object->LV_GamesList, MUIA_Weight, 60,
+			Child, BalanceObject, MUIA_CycleChain, 1, End,
 			Child, object->GR_sidepanel,
 			End;
 	}
@@ -375,7 +371,6 @@ struct ObjApp * CreateApp(void)
 	{
 		GR_main = GroupObject,
 			MUIA_HelpNode, "GR_main",
-			MUIA_Group_Columns, 1,
 			Child, object->LV_GamesList,
 			End;
 	}
@@ -388,7 +383,6 @@ struct ObjApp * CreateApp(void)
 		End;
 
 	GROUP_ROOT = GroupObject,
-		MUIA_Group_Rows, 3,
 		MUIA_Group_HorizSpacing, 5,
 		MUIA_Group_VertSpacing, 5,
 		Child, GR_Filter,
