@@ -213,16 +213,16 @@ clean:
 	rm iGame iGame.* src/funcs*.o src/iGameGUI*.o src/iGameMain*.o src/strdup*.o src/iGameStrings_cat*.o
 
 release:
-	cp required_files iGame-nightly -r
-	cp alt_icons iGame-nightly/icons -r
-	if [ -f "iGame" ]; then cp iGame iGame-nightly/; fi
-	if [ -f "iGame.030" ]; then cp iGame.030 iGame-nightly/; fi
-	if [ -f "iGame.040" ]; then cp iGame.040 iGame-nightly/; fi
-	if [ -f "iGame.060" ]; then cp iGame.060 iGame-nightly/; fi
-	if [ -f "iGame.MOS" ]; then cp iGame.MOS iGame-nightly/; fi
-	if [ -f "iGame.OS4" ]; then cp iGame.OS4 iGame-nightly/; fi
-	lha -c iGame-$(DRONE_TAG)-$(DATESTR).lha iGame-nightly/
+	cp required_files iGame-$(DRONE_TAG) -r
+	cp alt_icons iGame-$(DRONE_TAG)/icons -r
+	if [ -f "iGame" ]; then cp iGame iGame-$(DRONE_TAG)/; fi
+	if [ -f "iGame.030" ]; then cp iGame.030 iGame-$(DRONE_TAG)/; fi
+	if [ -f "iGame.040" ]; then cp iGame.040 iGame-$(DRONE_TAG)/; fi
+	if [ -f "iGame.060" ]; then cp iGame.060 iGame-$(DRONE_TAG)/; fi
+	if [ -f "iGame.MOS" ]; then cp iGame.MOS iGame-$(DRONE_TAG)/; fi
+	if [ -f "iGame.OS4" ]; then cp iGame.OS4 iGame-$(DRONE_TAG)/; fi
+	lha -aq2o6 iGame-$(DRONE_TAG)-$(DATESTR).lha iGame-$(DRONE_TAG)/
 
 clean-release:
-	rm -rf iGame-nightly
+	rm -rf iGame-$(DRONE_TAG)
 	rm iGame-$(DRONE_TAG)-$(DATESTR).lha
