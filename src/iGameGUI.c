@@ -53,6 +53,7 @@
 #define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
 #endif
 
+#include "version.h"
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGameStrings_cat.h"

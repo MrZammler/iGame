@@ -165,7 +165,7 @@ MSG_WI_About (//)
 About iGame
 ;MUIB text content
 MSG_TX_About (//)
-Emmanuel Vasilakis (mrzammler@mm.st)\n\nDimitris Panokostas (midwan@gmail.com)\n\n
+Emmanuel Vasilakis (mrzammler@mm.st)\n\nContributors:\nDimitris Panokostas (midwan@gmail.com)\nGeorge Sokianos (walkero@gmail.com)\nChris Charabaruk (chris+igame@charabaruk.com)\n\n
 ;MUIB button text
 MSG_BT_AboutOK (//)
 OK

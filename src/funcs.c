@@ -49,6 +49,9 @@
 #endif
 #include <exec/memory.h>
 #include <exec/types.h>
+#if defined(__amigaos4__)
+#define ASL_PRE_V38_NAMES
+#endif
 #include <libraries/asl.h>
 #include <workbench/startup.h>
 #include <workbench/workbench.h>
@@ -417,6 +420,8 @@ void load_genres(const char* filename)
 			no_of_genres++;
 			DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, item_genres->genre, MUIV_List_Insert_Sorted);
 		}
+
+		DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, GetMBString(MSG_UnknownGenre), MUIV_List_Insert_Bottom);
 
 		for (i = 0; i < no_of_genres; i++)
 		{
