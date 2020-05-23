@@ -200,4 +200,4 @@ release:
 
 clean-release:
 	rm -rf iGame-nightly
-	rm iGame-nightly-$(DATESTR).lha
+	rm iGame-$(DRONE_TAG)-$(DATESTR).lha
