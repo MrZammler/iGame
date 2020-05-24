@@ -307,7 +307,7 @@ struct ObjApp * CreateApp(void)
 				object->IM_GameImage_0 = GuigfxObject,
 					MUIA_Guigfx_FileName, DEFAULT_SCREENSHOT_FILE,
 					MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
-					MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
+					MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE | NISMF_KEEPASPECT_PICTURE,
 					MUIA_Frame, MUIV_Frame_ImageButton,
 					MUIA_FixHeight, current_settings->screenshot_height,
 					MUIA_FixWidth, current_settings->screenshot_width,
