@@ -2851,14 +2851,18 @@ ULONG get_wb_version()
 
 void open_current_dir()
 {
+	// Allocate Memory for variables
+	char *game_title = NULL;
+	char *path_only = NULL;
+	int full_path_length;
+	int name_length;
+	int path_length;
+
 	if (get_wb_version() < 44)
 	{
 		// workbench.library doesn't support OpenWorkbenchObjectA yet
 		return;
 	}
-
-	// Allocate Memory for variables
-	char* game_title = NULL;
 
 	//set the elements on the window
 	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
@@ -2875,14 +2879,11 @@ void open_current_dir()
 		return;
 	}
 	
-	int full_path_length;
-	int name_length;
-	int path_length;
 	full_path_length = strlen(item_games->path);
 	name_length = strlen(PathPart(item_games->path));
 	path_length = (full_path_length - name_length)+1;
 	
-	char *path_only = AllocVec(path_length, MEMF_ANY);		//reserve memory for path
+	path_only = AllocVec(path_length, MEMF_ANY);			//reserve memory for path
 	if(!path_only) Printf("no memory?\n");
 	strncpy(path_only,item_games->path, path_length-1);		//Copy only the path w/o filename
 	path_only[path_length-1] = '\0';						//add NULL terminator
