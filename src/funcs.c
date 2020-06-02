@@ -2825,3 +2825,109 @@ void joy_right()
   set(app->LV_GamesList, MUIA_List_Active, ind-1);
 
 }
+
+
+void add_single_whdload()
+{
+	int exists = 0, j;
+	char str[512], fullpath[512], temptitle[128];
+	struct FileRequester *request;
+
+	if ((request =  (struct FileRequester *)MUI_AllocAslRequest(ASL_FileRequest, NULL)) != NULL)
+	{
+		if (MUI_AslRequestTags(request,
+		                       ASLFR_TitleText, MSG_MNMainAddWHDLoadgame,
+		                       ASLFR_InitialDrawer, PROGDIR,
+							   ASLFR_InitialPattern,"#?.slave",
+							   ASLFR_DoPatterns,TRUE,
+		                       TAG_DONE))
+		{
+			memset(&fname[0], 0, sizeof fname);
+			memset(&fullpath[0], 0, sizeof fullpath);
+			memset(&temptitle[0], 0, sizeof temptitle);
+			strcat(fullpath, request->rf_Dir);
+			strcat(temptitle, request->rf_File);
+		}
+		else
+		{
+			return;
+		}
+		MUI_FreeAslRequest(request);
+
+		//make FileName to lower
+		const int kp = strlen(temptitle);
+		for (int s = 0; s < kp; s++) temptitle[s] = tolower(temptitle[s]);
+
+		if (strstr(temptitle, ".slave"))
+		{
+			AddPart(fullpath,temptitle,512);
+
+			/* add the slave to the gameslist (if it does not already exist) */
+			for (item_games = games; item_games != NULL; item_games = item_games->next)
+			{
+				if (!strcmp(item_games->path, fullpath))
+				{
+					msg_box((const char*)GetMBString(MSG_WHDLOADGameExists));
+					exists = 1;
+					item_games->exists = 1;
+					break;
+				}
+			}
+			if (exists == 0)
+			{
+				item_games = (games_list *)calloc(1, sizeof(games_list));
+				item_games->next = NULL;
+
+				if (current_settings->titles_from_dirs)
+				{
+					// If the TITLESFROMDIRS tooltype is enabled, set Titles from Directory names
+					const char* title = get_directory_name(fullpath);
+					if (title != NULL)
+					{
+						if (current_settings->no_smart_spaces)
+						{
+							strcpy(item_games->title, title);
+						}
+						else
+						{
+							const char* title_with_spaces = add_spaces_to_string(title);
+							strcpy(item_games->title, title_with_spaces);
+						}
+					}
+				}
+				else
+				{
+					// Default behavior: set Titles by the .slave contents
+					if (get_title_from_slave(fullpath, item_games->title)) strcpy(item_games->title, temptitle);
+				}
+
+				while (check_dup_title(item_games->title))
+				{
+					strcat(item_games->title, " Alt");
+				}
+
+				strcpy(item_games->genre, GetMBString(MSG_UnknownGenre));
+				strcpy(item_games->path, fullpath);
+				item_games->favorite = 0;
+				item_games->times_played = 0;
+				item_games->last_played = 0;
+				item_games->exists = 1;
+				item_games->hidden = 0;
+
+				if (games == NULL)
+				{
+					games = item_games;
+				}
+				else
+				{
+					item_games->next = games;
+					games = item_games;
+				}
+			}
+			exists = 0;
+		}
+		save_list(0);
+		refresh_list(0);
+	}
+
+}

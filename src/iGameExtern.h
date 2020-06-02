@@ -149,5 +149,6 @@ void settings_use();
 const unsigned char* GetMBString(const unsigned char* ref);
 void joy_left();
 void joy_right();
+void add_single_whdload();
 
 #endif

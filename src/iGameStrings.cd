@@ -304,3 +304,9 @@ Game Directory not found!
 ;Start with favorites
 MSG_LA_StartWithFavorites (//)
 Display favorites on start
+;MUIB Menu Title
+MSG_MNMainAddWHDLoadgame (//)
+Add WHDLOAD...
+;MSG for whdload already in list
+MSG_WHDLOADGameExists (//)
+WHDLOAD game already exists!

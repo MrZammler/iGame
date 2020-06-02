@@ -60,7 +60,7 @@ struct ObjApp * CreateApp(void)
 {
 	struct ObjApp * object;
 
-	APTR	MNlabel2Actions, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainMenuShowHidehiddenentries;
+	APTR	MNlabel2Actions, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainAddWHDLoadgame, MNMainMenuShowHidehiddenentries;
 	APTR	MNMainOpenList, MNMainSaveList, MNMainSaveListAs;
 	APTR	MNMainBarLabel0, MNMainAbout;
 	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Game, MNMainMenuDuplicate, MNMainProperties;
@@ -147,6 +147,11 @@ struct ObjApp * CreateApp(void)
 	static const struct Hook MenuAddNonWhdloadHook = { { NULL,NULL }, (HOOKFUNC)add_non_whdload, NULL, NULL };
 #else
 	static const struct Hook MenuAddNonWhdloadHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)add_non_whdload, NULL };
+#endif
+#if defined(__amigaos4__)
+	static const struct Hook MenuAddWhdloadHook = { { NULL,NULL }, (HOOKFUNC)add_single_whdload, NULL, NULL };
+#else
+	static const struct Hook MenuAddWhdloadHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)add_single_whdload, NULL };
 #endif
 #if defined(__amigaos4__)
 	static const struct Hook GameClickHook = { { NULL,NULL }, (HOOKFUNC)game_click, NULL, NULL };
@@ -393,6 +398,11 @@ struct ObjApp * CreateApp(void)
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainAddnonWHDLoadgame),
 		MUIA_Menuitem_Shortcut, MENU_ADDNONWHDLOADGAME_HOTKEY,
 		End;
+		
+	MNMainAddWHDLoadgame = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNMainAddWHDLoadgame),
+		//MUIA_Menuitem_Shortcut, MENU_ADDNONWHDLOADGAME_HOTKEY,
+		End;
 
 	MNMainMenuShowHidehiddenentries = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainMenuShowHidehiddenentries),
@@ -430,6 +440,7 @@ struct ObjApp * CreateApp(void)
 		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Actions),
 		MUIA_Family_Child, MNlabelScan,
 		MUIA_Family_Child, MNMainAddnonWHDLoadgame,
+		MUIA_Family_Child, MNMainAddWHDLoadgame,
 		MUIA_Family_Child, MNMainMenuShowHidehiddenentries,
 		/* MUIA_Family_Child, MNMainBarLabel5, */
 		/* MUIA_Family_Child, MNMainOpenList, */
@@ -1092,6 +1103,13 @@ struct ObjApp * CreateApp(void)
 		object->App,
 		2,
 		MUIM_CallHook, &MenuAddNonWhdloadHook
+	);
+
+    DoMethod(MNMainAddWHDLoadgame,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &MenuAddWhdloadHook
 	);
 
 	DoMethod(MNMainMenuShowHidehiddenentries,
