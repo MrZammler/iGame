@@ -153,6 +153,11 @@ on the right. If the slave file has an .info file associated with it, it will
 use whatever tooltypes there are in the .info file, else it will launch it with
 whdload default parameters.
 
+It is possible that you have created your list of games and later you want to add some
+more games to the list.
+The "Add WHDLOAD game ..." menu allows you to add a WHDLOAD game without the need to
+re-scan the entire repository.
+
 You can edit some game's properties from the "Game properties" menu. You can change
 the title, the genre so it will be filtered accordingly, whether it's one of your
 favorites, and the games tooltypes, as you would do in it's info file.
