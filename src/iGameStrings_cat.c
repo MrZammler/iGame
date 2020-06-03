@@ -56,8 +56,6 @@
 #include <proto/exec.h>
 #include <proto/dos.h>
 #include <proto/locale.h>
-#include <proto/utility.h>
-#include <proto/iffparse.h>
 
 #include <stdlib.h>
 #include <string.h>
