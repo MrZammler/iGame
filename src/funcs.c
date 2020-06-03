@@ -93,6 +93,7 @@ int get_title_from_slave(char* slave, char* title);
 int check_dup_title(char* title);
 int get_delimiter_position(const char* str);
 const char* get_directory_name(const char* str);
+const char* get_directory_path(const char* str);
 const char* get_executable_name(int argc, char** argv);
 const char* add_spaces_to_string(const char* input);
 void strip_path(const char* path, char* naked_path);
@@ -2686,6 +2687,20 @@ const char* get_directory_name(const char* str)
 	return dir_name;
 }
 
+// Get the complete directory path from a full path containing a file
+const char *get_directory_path(const char *str)
+{
+	int pos1 = get_delimiter_position(str);
+	if (!pos1)
+		return NULL;
+
+	char *dir_name = malloc(pos1 + 1);
+	strncpy(dir_name, str, pos1);
+	dir_name[pos1] = '\0';
+
+	return dir_name;
+}
+
 // Get the application's executable name
 const char *get_executable_name(int argc, char **argv)
 {
@@ -2853,10 +2868,7 @@ void open_current_dir()
 {
 	// Allocate Memory for variables
 	char *game_title = NULL;
-	char *path_only = NULL;
-	int full_path_length;
-	int name_length;
-	int path_length;
+	const char *path_only = NULL;
 
 	if (get_wb_version() < 44)
 	{
@@ -2879,18 +2891,15 @@ void open_current_dir()
 		return;
 	}
 	
-	full_path_length = strlen(item_games->path);
-	name_length = strlen(PathPart(item_games->path));
-	path_length = (full_path_length - name_length)+1;
-	
-	path_only = AllocVec(path_length, MEMF_ANY);			//reserve memory for path
-	if(!path_only) Printf("no memory?\n");
-	strncpy(path_only,item_games->path, path_length-1);		//Copy only the path w/o filename
-	path_only[path_length-1] = '\0';						//add NULL terminator
-	
+	path_only = get_directory_path(item_games->path);
+	if(!path_only)
+	{
+		msg_box((const char*)GetMBString(MSG_DirectoryNotFound));
+		return;
+	}
 	
 	//Open path directory
 	OpenWorkbenchObject(path_only);
-	FreeVec(path_only);
+	free(path_only); // get_directory_path uses malloc()
 
 }
