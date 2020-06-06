@@ -53,6 +53,7 @@
 #define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
 #endif
 
+#include "version.h"
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGameStrings_cat.h"
@@ -255,7 +256,10 @@ struct ObjApp * CreateApp(void)
 	strcat(about_text, "b");
 	strcat(about_text, STR(BETA_VERS));
 	#endif
-	strcat(about_text, " compiled for ");
+	strcat(about_text, " (");
+	strcat(about_text, STR(RELEASE_DATE));
+	strcat(about_text, ") ");
+	strcat(about_text, "\ncompiled for ");
 	strcat(about_text, STR(CPU_VERS));
 	strcat(about_text, "\n\n");
 	strcat(about_text, "Copyright 2005-2020\n");
@@ -345,8 +349,6 @@ struct ObjApp * CreateApp(void)
 
 			object->GR_sidepanel = GroupObject,
 				MUIA_HelpNode, "GR_sidepanel",
-			        MUIA_Weight, 0,
-				MUIA_Group_Rows, 3,
 				Child, object->IM_GameImage_0,
 				Child, object->Space_Sidepanel,
 				Child, object->LV_GenresList,
@@ -356,8 +358,6 @@ struct ObjApp * CreateApp(void)
 
 			object->GR_sidepanel = GroupObject,
 				MUIA_HelpNode, "GR_sidepanel",
-			        MUIA_Weight, 0,
-				MUIA_Group_Rows, 2,
 				Child, object->Space_Sidepanel,
 				Child, object->LV_GenresList,
 				End;
@@ -365,9 +365,9 @@ struct ObjApp * CreateApp(void)
 
 		GR_main = GroupObject,
 			MUIA_HelpNode, "GR_main",
-			MUIA_Group_Columns, 3,
-			Child, object->LV_GamesList,
-			Child, Space_Gamelist,
+			MUIA_Group_Horiz, TRUE,
+			Child, object->LV_GamesList, MUIA_Weight, 60,
+			Child, BalanceObject, MUIA_CycleChain, 1, End,
 			Child, object->GR_sidepanel,
 			End;
 	}
@@ -375,7 +375,6 @@ struct ObjApp * CreateApp(void)
 	{
 		GR_main = GroupObject,
 			MUIA_HelpNode, "GR_main",
-			MUIA_Group_Columns, 1,
 			Child, object->LV_GamesList,
 			End;
 	}
@@ -388,7 +387,6 @@ struct ObjApp * CreateApp(void)
 		End;
 
 	GROUP_ROOT = GroupObject,
-		MUIA_Group_Rows, 3,
 		MUIA_Group_HorizSpacing, 5,
 		MUIA_Group_VertSpacing, 5,
 		Child, GR_Filter,
@@ -398,12 +396,12 @@ struct ObjApp * CreateApp(void)
 
 	MNlabelScan = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNlabelScan),
-		MUIA_Menuitem_Shortcut, "R",
+		MUIA_Menuitem_Shortcut, MENU_SCANREPOS_HOTKEY,
 		End;
 
 	MNMainAddnonWHDLoadgame = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainAddnonWHDLoadgame),
-		MUIA_Menuitem_Shortcut, "A",
+		MUIA_Menuitem_Shortcut, MENU_ADDNONWHDLOADGAME_HOTKEY,
 		End;
 
 	MNMainMenuShowHidehiddenentries = MenuitemObject,
@@ -412,12 +410,12 @@ struct ObjApp * CreateApp(void)
 
 	MNMainOpenList = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainOpenList),
-		MUIA_Menuitem_Shortcut, "O",
+		MUIA_Menuitem_Shortcut, MENU_OPENLIST_HOTKEY,
 		End;
 
 	MNMainSaveList = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainSaveList),
-		MUIA_Menuitem_Shortcut, "S",
+		MUIA_Menuitem_Shortcut, MENU_SAVELIST_HOTKEY,
 		End;
 
 	MNMainSaveListAs = MenuitemObject,
@@ -428,13 +426,14 @@ struct ObjApp * CreateApp(void)
 
 	MNMainAbout = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainAbout),
+		MUIA_Menuitem_Shortcut, MENU_ABOUT_HOTKEY,
 		End;
 
 	MNMainBarLabel1 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
 
 	MNMainQuit = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainQuit),
-		MUIA_Menuitem_Shortcut, "Q",
+		MUIA_Menuitem_Shortcut, MENU_QUIT_HOTKEY,
 		End;
 
 	MNlabel2Actions = MenuitemObject,
@@ -458,12 +457,12 @@ struct ObjApp * CreateApp(void)
 
 	MNMainProperties = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainProperties),
-		MUIA_Menuitem_Shortcut, "P",
+		MUIA_Menuitem_Shortcut, MENU_PROPERTIES_HOTKEY,
 		End;
 
 	MNMainDelete = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainDelete),
-		MUIA_Menuitem_Shortcut, "D",
+		MUIA_Menuitem_Shortcut, MENU_DELETE_HOTKEY,
 		End;
 
 	MNlabel2Game = MenuitemObject,
@@ -1054,6 +1053,7 @@ struct ObjApp * CreateApp(void)
 		MUIA_Application_Copyright, GetMBString(MSG_AppCopyright),
 		MUIA_Application_Description, GetMBString(MSG_AppDescription),
 		MUIA_Application_HelpFile, "iGame.guide",
+		MUIA_Application_DiskObject, GetDiskObject("PROGDIR:iGame"),
 		SubWindow, object->WI_MainWindow,
 		SubWindow, object->WI_Properties,
 		SubWindow, object->WI_GameRepositories,

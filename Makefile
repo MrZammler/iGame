@@ -22,7 +22,7 @@ CFLAGS_030	= -c -mcpu=68030 -noixemul -Os -fomit-frame-pointer -std=c99
 CFLAGS_040	= -c -mcpu=68040 -noixemul -Os -fomit-frame-pointer -std=c99
 CFLAGS_060	= -c -mcpu=68060 -noixemul -Os -fomit-frame-pointer -std=c99
 CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99
-CFLAGS_AOS4	= -c +aosppc -dontwarn=-1 -O2 -c99
+CFLAGS_AOS4	= -c +aosppc -dontwarn=-1 -O2 -c99 -D__USE_INLINE__
 
 DATE = $(shell date --iso=date)
 

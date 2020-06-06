@@ -23,5 +23,6 @@
 		"texteditor_mcc.h": "c",
 		"cdefs.h": "c",
 		"macros.h": "c"
-	}
+	},
+	"vsnotes.defaultNotePath": "/opt/code/iGame/.vscode/vsnotes"
 }
