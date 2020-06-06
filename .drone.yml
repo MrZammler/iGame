@@ -31,6 +31,12 @@ steps:
   commands:
     - cd /drone/src
     - make -f Makefile.docker iGame.OS4
+- name: compile-mos
+  pull: always
+  image: walkero/docker4amigavbcc:latest-mos
+  commands:
+    - cd /drone/src
+    - make -f Makefile.docker iGame.MOS
 
 trigger:
   branch:
