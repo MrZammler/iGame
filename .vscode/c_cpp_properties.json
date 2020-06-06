@@ -51,9 +51,8 @@
 					"includePath": [
 							"${workspaceFolder}/**",
 							"${VBCC}/targets/ppc-morphos/include/",
-							"${MOS_SDK_INC}",
-							"${MOS_OS_INC}",
-							"${MOS_EXTRA_INC}"
+							"${NDK_INC}",
+							"${MUI50_INC}"
 					],
 					"defines": [
 						"__MORPHOS__",
