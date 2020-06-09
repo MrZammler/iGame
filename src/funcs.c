@@ -338,6 +338,80 @@ void load_games_list(const char* filename)
 		free(file_line);
 }
 
+void load_games_csv_list(const char* filename)
+{
+	char csvFilename[32];
+	char *buf = malloc(256 * sizeof(char));
+	char *tmp;
+
+	strcpy(csvFilename, (CONST_STRPTR)filename);
+	strcat(csvFilename, ".csv");
+
+	const BPTR fpgames = Open((CONST_STRPTR) csvFilename, MODE_OLDFILE);
+	if (fpgames)
+	{
+		if (games != NULL)
+		{
+			free(games);
+			games = NULL;
+		}
+
+		while (FGets(fpgames, buf, 255) != NULL)
+		{
+				item_games = (games_list *)calloc(1, sizeof(games_list));
+				item_games->next = NULL;
+
+			if (strlen(buf) > 1)
+			{
+				item_games->index = 0;
+				item_games->exists = 0;
+				item_games->deleted = 0;
+				item_games->hidden = 0;
+
+				tmp = strtok(buf, ";");
+				// item_games->index = atoi(tmp);
+
+				tmp = strtok(NULL, ";");
+				strcpy(item_games->title, tmp);
+
+				tmp = strtok(NULL, ";");
+				strcpy(item_games->genre, tmp);
+
+				tmp = strtok(NULL, ";");
+				strcpy(item_games->path, tmp);
+
+				tmp = strtok(NULL, ";");
+				item_games->favorite = atoi(tmp);
+
+				tmp = strtok(NULL, ";");
+				item_games->times_played = atoi(tmp);
+
+				tmp = strtok(NULL, ";");
+				item_games->last_played = atoi(tmp);
+
+				tmp = strtok(NULL, ";");
+				item_games->hidden = atoi(tmp);
+			}
+
+			if (games)
+			{
+				item_games->next = games;
+				games = item_games;
+			}
+			else
+			{
+				games = item_games;
+			}
+		}
+
+		add_games_to_listview();
+		Close(fpgames);
+	}
+
+	if (buf)
+		free(buf);
+}
+
 void load_repos(const char* filename)
 {
 	const int buffer_size = 512;
@@ -702,7 +776,7 @@ void list_show_filtered(char* str, char* str_gen)
 
 void app_start()
 {
-	load_games_list(DEFAULT_GAMESLIST_FILE);
+	load_games_csv_list(DEFAULT_GAMESLIST_FILE);
 	load_repos(DEFAULT_REPOS_FILE);
 	add_default_filters();
 	load_genres(DEFAULT_GENRES_FILE);
@@ -2054,9 +2128,60 @@ void save_to_file(const char* filename, const int check_exists)
 	status_show_total();
 }
 
+void save_to_csv(const char* filename, const int check_exists)
+{
+	char csvFilename[32];
+	FILE *fpgames;
+
+	const char* saving_message = (const char*)GetMBString(MSG_SavingGamelist);
+	set(app->TX_Status, MUIA_Text_Contents, saving_message);
+
+	strcpy(csvFilename, (CONST_STRPTR)filename);
+	strcat(csvFilename, ".csv");
+
+	fpgames = fopen(csvFilename,"w+");
+	if (!fpgames)
+	{
+		msg_box((const char*)GetMBString(MSG_FailedOpeningGameslist));
+		return;
+	}
+
+	for (item_games = games; item_games != NULL; item_games = item_games->next)
+	{
+			if (check_exists == 1)
+			{
+				if (item_games->exists == 1)
+				{
+					fprintf(
+						fpgames,
+						"%d;%s;%s;%s;%d;%d;%d;%d\n",
+						item_games->index, item_games->title, item_games->genre, item_games->path,
+						item_games->favorite, item_games->times_played, item_games->last_played, item_games->hidden
+					);
+				}
+				else
+				{
+					strcpy(item_games->path, "");
+				}
+			}
+			else
+			{
+				fprintf(
+					fpgames,
+					"%d;%s;%s;%s;%d;%d;%d;%d\n",
+					item_games->index, item_games->title, item_games->genre, item_games->path,
+					item_games->favorite, item_games->times_played, item_games->last_played, item_games->hidden
+				);
+			}
+	}
+	fclose(fpgames);
+
+	status_show_total();
+}
+
 void save_list(const int check_exists)
 {
-	save_to_file(DEFAULT_GAMESLIST_FILE, check_exists);
+	save_to_csv(DEFAULT_GAMESLIST_FILE, check_exists);
 }
 
 void save_list_as()
