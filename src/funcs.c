@@ -188,7 +188,7 @@ void apply_settings()
 
 void load_settings(const char* filename)
 {
-	const int buffer_size = 512;
+	const int buffer_size = 768;
 	STRPTR file_line = malloc(buffer_size * sizeof(char));
 	if (file_line == NULL)
 	{
@@ -340,14 +340,10 @@ void load_games_list(const char* filename)
 
 void load_games_csv_list(const char* filename)
 {
-	char csvFilename[32];
 	char *buf = malloc(256 * sizeof(char));
 	char *tmp;
 
-	strcpy(csvFilename, (CONST_STRPTR)filename);
-	strcat(csvFilename, ".csv");
-
-	const BPTR fpgames = Open((CONST_STRPTR) csvFilename, MODE_OLDFILE);
+	const BPTR fpgames = Open((CONST_STRPTR) filename, MODE_OLDFILE);
 	if (fpgames)
 	{
 		if (games != NULL)
@@ -369,7 +365,6 @@ void load_games_csv_list(const char* filename)
 				item_games->hidden = 0;
 
 				tmp = strtok(buf, ";");
-				// item_games->index = atoi(tmp);
 
 				tmp = strtok(NULL, ";");
 				strcpy(item_games->title, tmp);
@@ -514,8 +509,6 @@ void load_genres(const char* filename)
 		app->CY_AddGameGenreContent[i] = (unsigned char*)GetMBString(MSG_UnknownGenre);
 		app->CY_AddGameGenreContent[i + 1] = NULL;
 		set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_AddGameGenreContent);
-
-
 
 		Close(fpgenres);
 	}
@@ -776,7 +769,19 @@ void list_show_filtered(char* str, char* str_gen)
 
 void app_start()
 {
-	load_games_csv_list(DEFAULT_GAMESLIST_FILE);
+	// check if the gamelist csv file exists. If not, try to load the old one
+	char csvFilename[32];
+	strcpy(csvFilename, (CONST_STRPTR)DEFAULT_GAMESLIST_FILE);
+	strcat(csvFilename, ".csv");
+
+	const BPTR gamesListLock = Lock(csvFilename, ACCESS_READ);
+	if (gamesListLock) {
+		load_games_csv_list(csvFilename);
+	} else {
+		load_games_list(DEFAULT_GAMESLIST_FILE);
+	}
+	UnLock(gamesListLock);
+
 	load_repos(DEFAULT_REPOS_FILE);
 	add_default_filters();
 	load_genres(DEFAULT_GENRES_FILE);
@@ -862,7 +867,7 @@ void launch_game()
 	int success, i, whdload = 0;
 	char str2[512], fullpath[800], helperstr[250], to_check[256];
 
-	//clear vars:
+	// clear vars:
 	str2[0] = '\0';
 	fullpath[0] = '\0';
 
@@ -2049,85 +2054,6 @@ BOOL get_filename(const char* title, const char* positive_text, const BOOL save_
 	return result;
 }
 
-/*
-* Saves the current Games struct to disk
-*/
-void save_to_file(const char* filename, const int check_exists)
-{
-	const int buffer_size = 512;
-	char* file_line = malloc(buffer_size * sizeof(char));
-	if (file_line == NULL)
-	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
-	}
-	const char* saving_message = (const char*)GetMBString(MSG_SavingGamelist);
-	set(app->TX_Status, MUIA_Text_Contents, saving_message);
-
-	const BPTR fpgames = Open((CONST_STRPTR)filename, MODE_NEWFILE);
-	if (!fpgames)
-	{
-		msg_box((const char*)GetMBString(MSG_FailedOpeningGameslist));
-		return;
-	}
-
-	for (item_games = games; item_games != NULL; item_games = item_games->next)
-	{
-		if (check_exists == 1)
-		{
-			if (item_games->exists == 1)
-			{
-				snprintf(file_line, buffer_size, "index=%d\n", item_games->index);
-				FPuts(fpgames, (CONST_STRPTR)file_line);
-				snprintf(file_line, buffer_size, "title=%s\n", item_games->title);
-				FPuts(fpgames, (CONST_STRPTR)file_line);
-				snprintf(file_line, buffer_size, "genre=%s\n", item_games->genre);
-				FPuts(fpgames, (CONST_STRPTR)file_line);
-				snprintf(file_line, buffer_size, "path=%s\n", item_games->path);
-				FPuts(fpgames, (CONST_STRPTR)file_line);
-				snprintf(file_line, buffer_size, "favorite=%d\n", item_games->favorite);
-				FPuts(fpgames, (CONST_STRPTR)file_line);
-				snprintf(file_line, buffer_size, "timesplayed=%d\n", item_games->times_played);
-				FPuts(fpgames, (CONST_STRPTR)file_line);
-				snprintf(file_line, buffer_size, "lastplayed=%d\n", item_games->last_played);
-				FPuts(fpgames, (CONST_STRPTR)file_line);
-				snprintf(file_line, buffer_size, "hidden=%d\n\n", item_games->hidden);
-				FPuts(fpgames, (CONST_STRPTR)file_line);
-			}
-			else
-			{
-				strcpy(item_games->path, "");
-			}
-		}
-		else
-		{
-			snprintf(file_line, buffer_size, "index=%d\n", item_games->index);
-			FPuts(fpgames, (CONST_STRPTR)file_line);
-			snprintf(file_line, buffer_size, "title=%s\n", item_games->title);
-			FPuts(fpgames, (CONST_STRPTR)file_line);
-			snprintf(file_line, buffer_size, "genre=%s\n", item_games->genre);
-			FPuts(fpgames, (CONST_STRPTR)file_line);
-			snprintf(file_line, buffer_size, "path=%s\n", item_games->path);
-			FPuts(fpgames, (CONST_STRPTR)file_line);
-			snprintf(file_line, buffer_size, "favorite=%d\n", item_games->favorite);
-			FPuts(fpgames, (CONST_STRPTR)file_line);
-			snprintf(file_line, buffer_size, "timesplayed=%d\n", item_games->times_played);
-			FPuts(fpgames, (CONST_STRPTR)file_line);
-			snprintf(file_line, buffer_size, "lastplayed=%d\n", item_games->last_played);
-			FPuts(fpgames, (CONST_STRPTR)file_line);
-			snprintf(file_line, buffer_size, "hidden=%d\n\n", item_games->hidden);
-			FPuts(fpgames, (CONST_STRPTR)file_line);
-		}
-
-	}
-	Close(fpgames);
-
-	if (file_line)
-		free(file_line);
-
-	status_show_total();
-}
-
 void save_to_csv(const char* filename, const int check_exists)
 {
 	char csvFilename[32];
@@ -2186,9 +2112,9 @@ void save_list(const int check_exists)
 
 void save_list_as()
 {
-	//TODO Check if file exists, warn the user about overwriting it
+	//TODO: Check if file exists, warn the user about overwriting it
 	if (get_filename("Save List As...", "Save", TRUE))
-		save_to_file(fname, 0);
+		save_to_csv(fname, 0);
 }
 
 void open_list()
