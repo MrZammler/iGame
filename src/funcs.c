@@ -188,7 +188,7 @@ void apply_settings()
 
 void load_settings(const char* filename)
 {
-	const int buffer_size = 768;
+	const int buffer_size = 512;
 	STRPTR file_line = malloc(buffer_size * sizeof(char));
 	if (file_line == NULL)
 	{
