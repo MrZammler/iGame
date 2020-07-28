@@ -1,9 +1,9 @@
 /*
   iGameExtern.h
   Header file for iGame
-  
+
   Copyright (c) 2019, Emmanuel Vasilakis and contributors
-  
+
   This file is part of iGame.
 
   iGame is free software: you can redistribute it and/or modify
@@ -65,6 +65,15 @@
 #define SCREENASPECT_DEFAULT TRUE
 #define SCREENASPECT_HOTKEY 's'
 #define SCALEMODEMASK(u,d,p,s) (((u)?GGSMF_SCALEUP:0)|((d)?GGSMF_SCALEDOWN:0)|((p)?GGSMF_KEEPASPECT_PICTURE:0)|((s)?GGSMF_KEEPASPECT_SCREEN:0))
+
+#define MENU_SCANREPOS_HOTKEY "R"
+#define MENU_ADDNONWHDLOADGAME_HOTKEY "A"
+#define MENU_OPENLIST_HOTKEY "O"
+#define MENU_SAVELIST_HOTKEY "S"
+#define MENU_ABOUT_HOTKEY "?"
+#define MENU_QUIT_HOTKEY "Q"
+#define MENU_PROPERTIES_HOTKEY "P"
+#define MENU_DELETE_HOTKEY "D"
 
 typedef struct settings
 {

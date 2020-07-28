@@ -49,6 +49,9 @@ extern void load_settings(const char* filename);
 extern char* get_executable_name(int argc, char** argv);
 
 struct Library* MUIMasterBase;
+#if defined(__amigaos4__)
+struct MUIMasterIFace *IMUIMaster;
+#endif
 struct Library* LowLevelBase;
 char* executable_name;
 
@@ -109,7 +112,12 @@ void clean_exit(CONST_STRPTR s)
 
 	app_stop();
 	executable_name = NULL;
-	CloseLibrary(MUIMasterBase);
+	#if defined(__amigaos4__)
+	if (IMUIMaster)
+		DropInterface((struct Interface *)IMUIMaster);
+	#endif
+	if (MUIMasterBase)
+		CloseLibrary(MUIMasterBase);
 	if (LowLevelBase)
 		CloseLibrary(LowLevelBase);
 }
@@ -123,13 +131,24 @@ BOOL init_app(int argc, char** argv)
 		return FALSE;
 	}
 
+	#if defined(__amigaos4__)
+	if (!(IMUIMaster = (struct MUIMasterIFace *)GetInterface(MUIMasterBase, "main", 1, NULL))) {
+		clean_exit((unsigned char*)"Failed to open "MUIMASTER_NAME".");
+		return FALSE;
+	}
+	#endif
+
 	LowLevelBase = OpenLibrary((CONST_STRPTR)"lowlevel.library", 0);
+	if (LowLevelBase == NULL)
+	{
+		clean_exit((unsigned char*)"Can't open lowlevel.library\n");
+		return FALSE;
+	}
 
 	executable_name = get_executable_name(argc, argv);
 	load_settings(DEFAULT_SETTINGS_FILE);
 
 	app = CreateApp();
-
 	if (!app)
 		clean_exit((unsigned char*)"Can't initialize application\n");
 	else
@@ -157,6 +176,8 @@ int main(int argc, char** argv)
 					break;
 			}
 
+			// TODO: This doesn't work on AmigaOS 4. Needs to be updated with compatible code
+			#if !defined(__amigaos4__)
 			if (LowLevelBase)
 			{
 				const ULONG new = ReadJoyPort(unit);
@@ -168,6 +189,7 @@ int main(int argc, char** argv)
 
 				Delay(1);
 			}
+			#endif
 		}
 		clean_exit(NULL);
 		DisposeApp(app);
