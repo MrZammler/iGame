@@ -711,6 +711,11 @@ void app_start()
 		list_show_favorites(NULL);
 	}
 
+	DoMethod(app->App,
+		MUIM_Application_Load,
+		MUIV_Application_Load_ENV
+	);
+
 	set(app->WI_MainWindow, MUIA_Window_Open, TRUE);
 	set(app->WI_MainWindow, MUIA_Window_ActiveObject, app->LV_GamesList);
 }
