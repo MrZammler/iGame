@@ -182,7 +182,7 @@ BOOL init_app(int argc, char **argv)
 	executable_name = get_executable_name(argc, argv);
 	iGameSettings = load_settings(DEFAULT_SETTINGS_FILE);
 
-	if (!iGameSettings->no_guigfx)
+	if (!iGameSettings->no_guigfx && !iGameSettings->hide_screenshots)
 	{
 		RenderLibBase = OpenLibrary((CONST_STRPTR)"render.library", 30);
 		if (RenderLibBase == NULL)
