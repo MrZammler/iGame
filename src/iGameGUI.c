@@ -344,7 +344,10 @@ struct ObjApp * CreateApp(void)
 			MUIA_HelpNode, "GR_main",
 			MUIA_Group_Horiz, TRUE,
 			Child, object->LV_GamesList, MUIA_Weight, 60,
-			Child, BalanceObject, MUIA_CycleChain, 1, End,
+			Child, BalanceObject,
+				MUIA_CycleChain, 1,
+				MUIA_ObjectID, MAKE_ID('B', 'A', 'L', 0),
+				End,
 			Child, object->GR_sidepanel,
 			End;
 	}
@@ -1525,6 +1528,11 @@ void DisposeApp(struct ObjApp * object)
 {
 	if (object)
 	{
+		DoMethod(object->App,
+			MUIM_Application_Save,
+			MUIV_Application_Save_ENVARC
+		);
+
 		MUI_DisposeObject(object->App);
 		FreeVec(object);
 	}
