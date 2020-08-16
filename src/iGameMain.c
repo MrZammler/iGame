@@ -23,15 +23,20 @@
 #define MUI_OBSOLETE
 #define MUIMASTER_LIBRARY "muimaster.library"
 
+/* MUI */
 #include <libraries/mui.h>
 
+/* Prototypes */
 #include <clib/alib_protos.h>
-#include <proto/muimaster.h>
 #include <proto/exec.h>
 #include <proto/dos.h>
 #include <proto/lowlevel.h>
+#include <proto/muimaster.h>
+
+/* ANSI C */
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "iGameExtern.h"
 
 /* Increase stack size */
@@ -45,15 +50,21 @@ LONG __stack = 32768;
 
 struct ObjApp* app = NULL; /* Object */
 extern void app_stop();
-extern void load_settings(const char* filename);
+extern igame_settings* load_settings(const char* filename);
 extern char* get_executable_name(int argc, char** argv);
 
 struct Library* MUIMasterBase;
 #if defined(__amigaos4__)
 struct MUIMasterIFace *IMUIMaster;
 #endif
+struct Library* TextEditorMCC;
+struct Library* GuiGfxMCC;
+struct Library* GuiGfxBase;
+struct Library* RenderLibBase;
 struct Library* LowLevelBase;
 char* executable_name;
+
+igame_settings* iGameSettings = NULL;
 
 void joystick_buttons(ULONG val)
 {
@@ -105,13 +116,13 @@ void joystick_input(ULONG val)
 	}
 }
 
-void clean_exit(CONST_STRPTR s)
+void clean_exit(CONST_STRPTR msg)
 {
-	if (s)
-		PutStr(s);
+	if (app)
+		app_stop();
 
-	app_stop();
 	executable_name = NULL;
+
 	#if defined(__amigaos4__)
 	if (IMUIMaster)
 		DropInterface((struct Interface *)IMUIMaster);
@@ -120,6 +131,16 @@ void clean_exit(CONST_STRPTR s)
 		CloseLibrary(MUIMasterBase);
 	if (LowLevelBase)
 		CloseLibrary(LowLevelBase);
+
+	if(app)
+		DisposeApp(app);
+
+	if (msg)
+	{
+		PutStr(msg);
+		exit(20);
+	}
+  exit(0);
 }
 
 BOOL init_app(int argc, char** argv)
@@ -138,6 +159,14 @@ BOOL init_app(int argc, char** argv)
 	}
 	#endif
 
+	TextEditorMCC = OpenLibrary((CONST_STRPTR)"mui/TextEditor.mcc", 15);
+	if (TextEditorMCC == NULL)
+	{
+		clean_exit((unsigned char*)"Can't open TextEditor.mcc v15 or greater\n");
+		return FALSE;
+	}
+	CloseLibrary(TextEditorMCC);
+
 	LowLevelBase = OpenLibrary((CONST_STRPTR)"lowlevel.library", 0);
 	if (LowLevelBase == NULL)
 	{
@@ -146,7 +175,34 @@ BOOL init_app(int argc, char** argv)
 	}
 
 	executable_name = get_executable_name(argc, argv);
-	load_settings(DEFAULT_SETTINGS_FILE);
+	iGameSettings = load_settings(DEFAULT_SETTINGS_FILE);
+
+	if (!iGameSettings->no_guigfx)
+	{
+		RenderLibBase = OpenLibrary((CONST_STRPTR)"render.library", 30);
+		if (RenderLibBase == NULL)
+		{
+			clean_exit((unsigned char*)"Can't open render.library v30 or greater\n");
+			return FALSE;
+		}
+		CloseLibrary(RenderLibBase);
+
+		GuiGfxBase = OpenLibrary((CONST_STRPTR)"guigfx.library", 17);
+		if (GuiGfxBase == NULL)
+		{
+			clean_exit((unsigned char*)"Can't open guigfx.library v17 or greater\n");
+			return FALSE;
+		}
+		CloseLibrary(GuiGfxBase);
+
+		GuiGfxMCC = OpenLibrary((CONST_STRPTR)"mui/Guigfx.mcc", 19);
+		if (GuiGfxMCC == NULL)
+		{
+			clean_exit((unsigned char*)"Can't open Guigfx.mcc v19 or greater\n");
+			return FALSE;
+		}
+		CloseLibrary(GuiGfxMCC);
+	}
 
 	app = CreateApp();
 	if (!app)
@@ -192,7 +248,6 @@ int main(int argc, char** argv)
 			#endif
 		}
 		clean_exit(NULL);
-		DisposeApp(app);
 	}
 	else
 		clean_exit((unsigned char*)"Can't create application\n");
