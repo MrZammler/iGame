@@ -40,7 +40,7 @@ LIBFLAGS_OS4	= -v -lamiga -lstubs -o
 ##########################################################################
 # Object files which are part of iGame
 ##########################################################################
-OBJS		= src/iGameGUI.o src/iGameMain.o src/funcs.o src/strcasestr.o src/strdup.o src/iGame_cat.o
+OBJS		= src/funcs.o src/iGameGUI.o src/iGameMain.o src/strcasestr.o src/strdup.o src/iGame_cat.o
 OBJS_030	= src/funcs_030.o src/iGameGUI_030.o src/iGameMain_030.o src/strcasestr_030.o src/strdup_030.o src/iGame_cat_030.o
 OBJS_040	= src/funcs_040.o src/iGameGUI_040.o src/iGameMain_040.o src/strcasestr_040.o src/strdup_040.o src/iGame_cat_040.o
 OBJS_060	= src/funcs_060.o src/iGameGUI_060.o src/iGameMain_060.o src/strcasestr_060.o src/strdup_060.o src/iGame_cat_060.o
