@@ -16,13 +16,15 @@ all: iGame
 ##########################################################################
 CC			= m68k-amigaos-gcc
 LINK		= m68k-amigaos-gcc
+CC_PPC		= ppc-amigaos-gcc
+LINK_PPC	= ppc-amigaos-gcc
 INCLUDES	= -I/opt/amiga/m68k-amigaos/include -I/opt/amiga/m68k-amigaos/ndk-include -I/opt/amiga/m68k-amigaos/include/mui
-CFLAGS		= -c -noixemul -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68000
-CFLAGS_030	= -c -mcpu=68030 -noixemul -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68030
-CFLAGS_040	= -c -mcpu=68040 -noixemul -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68040
-CFLAGS_060	= -c -mcpu=68060 -noixemul -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68060
-CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99 -DCPU_VERS=MorphOS
-CFLAGS_OS4	= -c +aosppc -dontwarn=-1 -O2 -c99 -D__USE_INLINE__ -DCPU_VERS=AmigaOS4
+CFLAGS		= -c -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68000
+CFLAGS_030	= -c -mcpu=68030 -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68030
+CFLAGS_040	= -c -mcpu=68040 -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68040
+CFLAGS_060	= -c -mcpu=68060 -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68060
+CFLAGS_MOS	= -c -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=MorphOS
+CFLAGS_OS4	= -c -Os -fomit-frame-pointer -std=c99 -D__USE_INLINE__ -DCPU_VERS=AmigaOS4
 
 DATE = $(shell date --iso=date)
 
@@ -31,8 +33,8 @@ DATE = $(shell date --iso=date)
 ##########################################################################
 #MKLIB		= join
 LIBFLAGS	= -v -lamiga -lstubs -o
-LIBFLAGS_MOS	= +morphos -lamiga -lauto -o
-LIBFLAGS_OS4	= +aosppc -lamiga -lauto -o
+LIBFLAGS_MOS	= -v -lamiga -lstubs -o
+LIBFLAGS_OS4	= -v -lamiga -lstubs -o
 
 ##########################################################################
 # Object files which are part of iGame
@@ -60,10 +62,10 @@ iGame.060: $(OBJS_060)
 	$(LINK) $(OBJS_060) $(LIBFLAGS) $@
 
 iGame.MOS: $(OBJS_MOS)
-	$(LINK) $(OBJS_MOS) $(LIBFLAGS_MOS) $@
+	$(LINK_PPC) $(OBJS_MOS) $(LIBFLAGS_MOS) $@
 
 iGame.OS4: $(OBJS_OS4)
-	$(LINK) $(OBJS_OS4) $(LIBFLAGS_OS4) $@
+	$(LINK_PPC) $(OBJS_OS4) $(LIBFLAGS_OS4) $@
 
 ##########################################################################
 # generated source files
@@ -166,44 +168,44 @@ src/iGame_cat_060.o: src/iGame_cat.c
 ##########################################################################
 
 src/funcs_MOS.o: src/funcs.c src/iGame_cat.h
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/funcs.c
+	$(CC_PPC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/funcs.c
 
 src/iGameGUI_MOS.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/iGameGUI.c
+	$(CC_PPC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/iGameGUI.c
 
 src/iGameMain_MOS.o: src/iGameMain.c
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/iGameMain.c
+	$(CC_PPC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/iGameMain.c
 
 src/strcasestr_MOS.o: src/strcasestr.c
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/strcasestr.c
+	$(CC_PPC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/strcasestr.c
 
 src/strdup_MOS.o: src/strdup.c
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/strdup.c
+	$(CC_PPC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/strdup.c
 
 src/iGame_cat_MOS.o: src/iGame_cat.c
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/iGame_cat.c
+	$(CC_PPC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/iGame_cat.c
 
 ##########################################################################
 # object files (AOS4)
 ##########################################################################
 
 src/funcs_OS4.o: src/funcs.c src/iGame_cat.h
-	$(CC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/funcs.c
+	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/funcs.c
 
 src/iGameGUI_OS4.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
-	$(CC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/iGameGUI.c
+	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/iGameGUI.c
 
 src/iGameMain_OS4.o: src/iGameMain.c
-	$(CC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/iGameMain.c
+	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/iGameMain.c
 
 src/strcasestr_OS4.o: src/strcasestr.c
-	$(CC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/strcasestr.c
+	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/strcasestr.c
 
 src/strdup_OS4.o: src/strdup.c
-	$(CC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/strdup.c
+	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/strdup.c
 
 src/iGame_cat_OS4.o: src/iGame_cat.c
-	$(CC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/iGame_cat.c
+	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/iGame_cat.c
 
 ##########################################################################
 # generic build options
