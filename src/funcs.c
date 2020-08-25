@@ -187,14 +187,14 @@ void apply_settings()
 	set(app->CH_StartWithFavorites, MUIA_Selected, current_settings->start_with_favorites);
 }
 
-void load_settings(const char* filename)
+igame_settings* load_settings(const char* filename)
 {
 	const int buffer_size = 512;
 	STRPTR file_line = malloc(buffer_size * sizeof(char));
 	if (file_line == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
+		return NULL;
 	}
 
 	if (current_settings != NULL)
@@ -250,6 +250,8 @@ void load_settings(const char* filename)
 
 	if (file_line)
 		free(file_line);
+
+	return current_settings;
 }
 
 void load_games_list(const char* filename)
