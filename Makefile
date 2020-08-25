@@ -217,30 +217,21 @@ clean:
 
 # pack everything in a nice lha file
 release:
-	rm -rf iGame_rel/iGame/
-	rm iGame_rel/iGame.info
-	mkdir iGame_rel/iGame-$(DATE)
-	echo "#ifndef VERSION" > src/version.h
-	echo "#define VERSION \"\$$VER:version 2.0b4 ("$(DATE)")"\" >> src/version.h
-	echo "#endif" >> src/version.h
-	make iGame -f Makefile.linux
-	make iGame.030 -f Makefile.linux
-	make iGame.040 -f Makefile.linux
-	make iGame.060 -f Makefile.linux
-	make iGame.MOS -f Makefile.linux
-	cp iGame iGame_rel/iGame-$(DATE)/
-	cp iGame.030 iGame_rel/iGame-$(DATE)/
-	cp iGame.040 iGame_rel/iGame-$(DATE)/
-	cp iGame.060 iGame_rel/iGame-$(DATE)/
-	cp iGame.MOS iGame_rel/iGame-$(DATE)/
-	cp required_files/genres iGame_rel/iGame-$(DATE)/
-	cp required_files/igame.iff iGame_rel/iGame-$(DATE)/
-	cp required_files/iGame.info iGame_rel/iGame-$(DATE)/
-	cp required_files/igame_drawer_3.0.info iGame_rel/iGame.info
-	cp guide/* iGame_rel/iGame-$(DATE)/
+	cp required_files iGame_rel/iGame-$(DATE) -r
+	cp alt_icons iGame_rel/iGame-$(DATE)/Icons -r
+	cp iGame_rel/iGame-$(DATE)/igame_drawer_3.0.info iGame_rel/iGame-$(DATE).info
+	mv iGame_rel/iGame-$(DATE)/igame_drawer_3.0.info iGame_rel/iGame-$(DATE)/Icons
+	mv iGame_rel/iGame-$(DATE)/igame_drawer.info iGame_rel/iGame-$(DATE)/Icons
+	if [ -f "iGame" ]; then cp iGame iGame_rel/iGame-$(DATE); fi
+	if [ -f "iGame.030" ]; then cp iGame.030 iGame_rel/iGame-$(DATE); fi
+	if [ -f "iGame.040" ]; then cp iGame.040 iGame_rel/iGame-$(DATE); fi
+	if [ -f "iGame.060" ]; then cp iGame.060 iGame_rel/iGame-$(DATE); fi
+	if [ -f "iGame.MOS" ]; then cp iGame.MOS iGame_rel/iGame-$(DATE); fi
+	if [ -f "iGame.OS4" ]; then cp iGame.OS4 iGame_rel/iGame-$(DATE); fi
 	cp CHANGELOG.md iGame_rel/iGame=$(DATE)/
-	mkdir iGame_rel/iGame-$(DATE)/Icons/
-	cp alt_icons/* iGame_rel/iGame-$(DATE)/Icons/
-	cp required_files/igame_drawer.info iGame_rel/iGame-$(DATE)/Icons.info
-	cd iGame_rel && mv iGame-$(DATE) iGame && lha -a iGame-$(DATE).lha iGame/ && lha -a iGame-$(DATE).lha iGame.info
+	cd iGame_rel && lha -aq2o6 iGame-$(DATE).lha iGame-$(DATE)/ iGame-$(DATE).info
 
+clean-release:
+	rm -rf iGame_rel/iGame-$(DATE)
+	rm iGame_rel/iGame-$(DATE).lha
+	rm iGame_rel/iGame-$(DATE).info
