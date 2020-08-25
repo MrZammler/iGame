@@ -18,7 +18,8 @@ CC			= m68k-amigaos-gcc
 LINK		= m68k-amigaos-gcc
 CC_PPC		= ppc-amigaos-gcc
 LINK_PPC	= ppc-amigaos-gcc
-INCLUDES	= -I/opt/amiga/m68k-amigaos/include -I/opt/amiga/m68k-amigaos/ndk-include -I/opt/amiga/m68k-amigaos/include/mui
+INCLUDES	= -I$(NDK_INC) -I$(MUI38_INC)
+INCLUDES_OS4	= -I$(SDK_INC) -I$(MUI50_INC)
 CFLAGS		= -c -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68000
 CFLAGS_030	= -c -mcpu=68030 -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68030
 CFLAGS_040	= -c -mcpu=68040 -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68040
@@ -190,22 +191,22 @@ src/iGame_cat_MOS.o: src/iGame_cat.c
 ##########################################################################
 
 src/funcs_OS4.o: src/funcs.c src/iGame_cat.h
-	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/funcs.c
+	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/funcs.c
 
 src/iGameGUI_OS4.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
-	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/iGameGUI.c
+	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/iGameGUI.c
 
 src/iGameMain_OS4.o: src/iGameMain.c
-	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/iGameMain.c
+	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/iGameMain.c
 
 src/strcasestr_OS4.o: src/strcasestr.c
-	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/strcasestr.c
+	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/strcasestr.c
 
 src/strdup_OS4.o: src/strdup.c
-	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/strdup.c
+	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/strdup.c
 
 src/iGame_cat_OS4.o: src/iGame_cat.c
-	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/iGame_cat.c
+	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/iGame_cat.c
 
 ##########################################################################
 # generic build options

@@ -16,7 +16,7 @@ all: iGame
 ##########################################################################
 CC			= vc
 LINK		= vc
-INCLUDES	= -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
+INCLUDES	= -I$(MUI38_INC) -I$(MCC_Guigfx_INC) -I$(MCC_TextEditor_INC)
 CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99 -DCPU_VERS=68000
 CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68030
 CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68040
