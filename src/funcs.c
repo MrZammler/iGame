@@ -1189,7 +1189,7 @@ void game_click()
 				{
 					app->IM_GameImage_1 = GuigfxObject, MUIA_Guigfx_FileName, naked_path,
 					                                  MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
-					                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
+					                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE | NISMF_KEEPASPECT_PICTURE,
 					                                  MUIA_Guigfx_Transparency, 0,
 					                                  MUIA_Frame, MUIV_Frame_ImageButton,
 					                                  MUIA_FixHeight, current_settings->screenshot_height,
@@ -1224,7 +1224,7 @@ void game_click()
 					{
 						app->IM_GameImage_1 = GuigfxObject, MUIA_Guigfx_FileName, DEFAULT_SCREENSHOT_FILE,
 						                                  MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
-						                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
+						                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE | NISMF_KEEPASPECT_PICTURE,
 						                                  MUIA_Guigfx_Transparency, 0,
 						                                  MUIA_Frame, MUIV_Frame_ImageButton,
 						                                  MUIA_FixHeight, current_settings->screenshot_height,
