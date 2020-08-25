@@ -27,6 +27,7 @@
 
 /* Prototypes */
 #include <clib/alib_protos.h>
+#include <proto/wb.h>
 
 #if defined(__amigaos4__)
 #include <proto/exec.h>
@@ -62,7 +63,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGameStrings_cat.h"
@@ -93,6 +93,7 @@ int get_title_from_slave(char* slave, char* title);
 int check_dup_title(char* title);
 int get_delimiter_position(const char* str);
 const char* get_directory_name(const char* str);
+const char* get_directory_path(const char* str);
 const char* get_executable_name(int argc, char** argv);
 const char* add_spaces_to_string(const char* input);
 void strip_path(const char* path, char* naked_path);
@@ -2737,6 +2738,20 @@ const char* get_directory_name(const char* str)
 	return dir_name;
 }
 
+// Get the complete directory path from a full path containing a file
+const char *get_directory_path(const char *str)
+{
+	int pos1 = get_delimiter_position(str);
+	if (!pos1)
+		return NULL;
+
+	char *dir_name = malloc(pos1 + 1);
+	strncpy(dir_name, str, pos1);
+	dir_name[pos1] = '\0';
+
+	return dir_name;
+}
+
 // Get the application's executable name
 const char *get_executable_name(int argc, char **argv)
 {
@@ -2874,5 +2889,68 @@ void joy_right()
     }
 
   set(app->LV_GamesList, MUIA_List_Active, ind-1);
+
+}
+
+ULONG get_wb_version()
+{
+	static ULONG ver = 0UL;
+
+	if (ver != 0UL)
+	{
+		return ver;
+	}
+
+	if (WorkbenchBase == NULL)
+	{
+		//Really Workbench library should be already opened
+		// Somehow we're running without Workbench.
+		// Nothing to do since the version variable inits with 0.
+		return ver;
+	}
+
+	// Save workbench.library version for later calls
+	ver = WorkbenchBase->lib_Version;
+
+	return ver;
+}
+
+void open_current_dir()
+{
+	// Allocate Memory for variables
+	char *game_title = NULL;
+	const char *path_only = NULL;
+
+	if (get_wb_version() < 44)
+	{
+		// workbench.library doesn't support OpenWorkbenchObjectA yet
+		return;
+	}
+
+	//set the elements on the window
+	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
+	if (game_title == NULL || strlen(game_title) == 0)
+	{
+		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
+		return;
+	}
+
+	const int found = title_exists(game_title);
+	if (!found)
+	{
+		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
+		return;
+	}
+	
+	path_only = get_directory_path(item_games->path);
+	if(!path_only)
+	{
+		msg_box((const char*)GetMBString(MSG_DirectoryNotFound));
+		return;
+	}
+	
+	//Open path directory
+	OpenWorkbenchObject(path_only);
+	free(path_only); // get_directory_path uses malloc()
 
 }
