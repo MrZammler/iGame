@@ -1,5 +1,5 @@
 @DATABASE iGame.guide
-@$VER: iGame.guide 2.0b5 (03.05.2019)
+@$VER: iGame.guide 2.0b6 (04.09.2020)
 @INDEX "Index"
 
 @NODE "Main" "iGame documentation"
@@ -52,9 +52,9 @@ bug fixes. After version 1.5, iGame was updated with internal version 1.6 which
 was never really officialy released. Sorry; I wasn't very good at releasing
 versions or keeping a changelog.
 
-Since then Dimitris Panokostas did a lot of re-writing and new features (such as
-the settings window to replace tooltypes). These versions are now tagged as 2.0
-betas.
+Since then Dimitris Panokostas, George Sokianos, Chris Charabaruk and T0lk13n did
+a lot of re-writing and new features (such as the settings window to replace tooltypes).
+These versions are now tagged as 2.0 betas. 
 
 @ENDNODE
 @NODE "BUIL" "Building iGame"
