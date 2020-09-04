@@ -1,9 +1,9 @@
 /*
   iGameGUI.c
   GUI source for iGame
-  
+
   Copyright (c) 2019, Emmanuel Vasilakis and contributors
-  
+
   This file is part of iGame.
 
   iGame is free software: you can redistribute it and/or modify
@@ -22,27 +22,34 @@
 
 #define MUI_OBSOLETE
 
+/* MUI */
 #include <libraries/mui.h>
-
-#include <clib/alib_protos.h>
-#include <proto/muimaster.h>
-#include <proto/exec.h>
-
 #include <MUI/Guigfx_mcc.h>
 #include <MUI/TextEditor_mcc.h>
-#include <libraries/gadtools.h> /* for Barlabel in MenuItem */
-#include <exec/memory.h>
+
+/* Prototypes */
+#include <clib/alib_protos.h>
+#include <proto/exec.h>
 #include <proto/icon.h>
 #include <proto/asl.h>
-#include <dos/dos.h>
+#include <proto/muimaster.h>
 
-#include "version.h"
+/* System */
+#include <libraries/gadtools.h> /* for Barlabel in MenuItem */
+#include <exec/memory.h>
+#include <dos/dos.h>
+#if defined(__amigaos4__)
+#include <dos/obsolete.h>
+#endif
+
+/* ANSI C */
 #include <string.h>
 
 #ifndef MAKE_ID
 #define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
 #endif
 
+#include "version.h"
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGameStrings_cat.h"
@@ -56,7 +63,7 @@ struct ObjApp * CreateApp(void)
 	APTR	MNlabel2Actions, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainMenuShowHidehiddenentries;
 	APTR	MNMainOpenList, MNMainSaveList, MNMainSaveListAs;
 	APTR	MNMainBarLabel0, MNMainAbout;
-	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Game, MNMainMenuDuplicate, MNMainProperties;
+	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Game, MNMainMenuDuplicate, MNMainProperties, MNMainOpenCurrentDir;
 	APTR	MNMainDelete, MNlabel2Tools, MNMainiGameSettings;
 	APTR	MNlabel2GameRepositories, MNMainBarLabel2, MNMainMUISettings, GROUP_ROOT;
 	APTR	GR_Filter, LA_Filter, GR_main, Space_Gamelist;
@@ -74,7 +81,7 @@ struct ObjApp * CreateApp(void)
 	APTR	GR_TitlesFrom, Space_TitlesFrom, GR_SmartSpaces, Space_SmartSpaces;
 	APTR	LA_SmartSpaces, GR_Misc;
 	APTR	LA_SaveStatsOnExit, LA_FilterUseEnter, LA_StartWithFavorites;
-	APTR    LA_HideSidepanel;
+	APTR	LA_HideSidepanel;
 	APTR	GR_SettingsButtons, Space_SettingsButtons1, Space_SettingsButtons2;
 #if defined(__amigaos4__)
 	static const struct Hook MenuScanHook = { { NULL,NULL }, (HOOKFUNC)scan_repositories, NULL, NULL };
@@ -82,7 +89,7 @@ struct ObjApp * CreateApp(void)
 	static const struct Hook MenuScanHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)scan_repositories, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook MenuOpenListHook = { { NULL,NULL }, (HOOKFUNC)MenuOpenList, NULL, NULL };
+	static const struct Hook MenuOpenListHook = { { NULL,NULL }, (HOOKFUNC)open_list, NULL, NULL };
 #else
 	static const struct Hook MenuOpenListHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)open_list, NULL };
 #endif
@@ -172,42 +179,42 @@ struct ObjApp * CreateApp(void)
 	static const struct Hook RepoRemoveHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)repo_remove, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook SettingFilterUseEnterChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingFilterUseEnterChanged, NULL, NULL };
+	static const struct Hook SettingFilterUseEnterChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_filter_use_enter_changed, NULL, NULL };
 #else
 	static const struct Hook SettingFilterUseEnterChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_filter_use_enter_changed, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook SettingSaveStatsOnExitChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingSaveStatsOnExitChanged, NULL, NULL };
+	static const struct Hook SettingSaveStatsOnExitChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_save_stats_on_exit_changed, NULL, NULL };
 #else
 	static const struct Hook SettingSaveStatsOnExitChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_save_stats_on_exit_changed, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook SettingSmartSpacesChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingSmartSpacesChanged, NULL, NULL };
+	static const struct Hook SettingSmartSpacesChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_smart_spaces_changed, NULL, NULL };
 #else
 	static const struct Hook SettingSmartSpacesChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_smart_spaces_changed, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook SettingTitlesFromChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingTitlesFromChanged, NULL, NULL };
+	static const struct Hook SettingTitlesFromChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_titles_from_changed, NULL, NULL };
 #else
 	static const struct Hook SettingTitlesFromChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_titles_from_changed, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook SettingHideScreenshotChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingHideScreenshotChanged, NULL, NULL };
+	static const struct Hook SettingHideScreenshotChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_hide_screenshot_changed, NULL, NULL };
 #else
 	static const struct Hook SettingHideScreenshotChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_hide_screenshot_changed, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook SettingNoGuiGfxChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingNoGuiGfxChanged, NULL, NULL };
+	static const struct Hook SettingNoGuiGfxChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_no_guigfx_changed, NULL, NULL };
 #else
 	static const struct Hook SettingNoGuiGfxChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_no_guigfx_changed, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook SettingScreenshotSizeChangedHook = { { NULL,NULL }, (HOOKFUNC)SettingScreenshotSizeChanged, NULL, NULL };
+	static const struct Hook SettingScreenshotSizeChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_screenshot_size_changed, NULL, NULL };
 #else
 	static const struct Hook SettingScreenshotSizeChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_screenshot_size_changed, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook SettingsSaveHook = { { NULL,NULL }, (HOOKFUNC)SettingsSave, NULL, NULL };
+	static const struct Hook SettingsSaveHook = { { NULL,NULL }, (HOOKFUNC)settings_save, NULL, NULL };
 #else
 	static const struct Hook SettingsSaveHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)settings_save, NULL };
 #endif
@@ -226,7 +233,13 @@ struct ObjApp * CreateApp(void)
 #else
 	static const struct Hook SettingsUseHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)settings_use, NULL };
 #endif
-
+#if defined(__amigaos4__)
+	static const struct Hook OpenCurrentDirHook = { { NULL,NULL }, (HOOKFUNC)open_current_dir, NULL, NULL };
+#else
+	static const struct Hook OpenCurrentDirHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)open_current_dir, NULL };
+#endif
+	
+	
 	if (!((object = AllocVec(sizeof(struct ObjApp), MEMF_PUBLIC | MEMF_CLEAR))))
 		return NULL;
 
@@ -234,7 +247,7 @@ struct ObjApp * CreateApp(void)
 	object->STR_TX_PropertiesTimesPlayed = NULL;
 	object->STR_TX_PropertiesSlavePath = NULL;
 	object->STR_TX_PropertiesTooltypes = NULL;
-	
+
 	char about_text[512];
 	strcpy(about_text, "iGame\n");
 	strcat(about_text, VERSION);
@@ -300,7 +313,7 @@ struct ObjApp * CreateApp(void)
 				object->IM_GameImage_0 = GuigfxObject,
 					MUIA_Guigfx_FileName, DEFAULT_SCREENSHOT_FILE,
 					MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
-					MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
+					MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE | NISMF_KEEPASPECT_PICTURE,
 					MUIA_Frame, MUIV_Frame_ImageButton,
 					MUIA_FixHeight, current_settings->screenshot_height,
 					MUIA_FixWidth, current_settings->screenshot_width,
@@ -358,7 +371,7 @@ struct ObjApp * CreateApp(void)
 			Child, object->LV_GamesList,
 			End;
 	}
-	
+
 	object->TX_Status = TextObject,
 		MUIA_Background, MUII_TextBack,
 		MUIA_Frame, MUIV_Frame_Text,
@@ -376,12 +389,12 @@ struct ObjApp * CreateApp(void)
 
 	MNlabelScan = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNlabelScan),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNlabelScanChar),
+		MUIA_Menuitem_Shortcut, MENU_SCANREPOS_HOTKEY,
 		End;
 
 	MNMainAddnonWHDLoadgame = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainAddnonWHDLoadgame),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainAddnonWHDLoadgameChar),
+		MUIA_Menuitem_Shortcut, MENU_ADDNONWHDLOADGAME_HOTKEY,
 		End;
 
 	MNMainMenuShowHidehiddenentries = MenuitemObject,
@@ -390,12 +403,12 @@ struct ObjApp * CreateApp(void)
 
 	MNMainOpenList = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainOpenList),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainOpenListChar),
+		MUIA_Menuitem_Shortcut, MENU_OPENLIST_HOTKEY,
 		End;
 
 	MNMainSaveList = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainSaveList),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainSaveListChar),
+		MUIA_Menuitem_Shortcut, MENU_SAVELIST_HOTKEY,
 		End;
 
 	MNMainSaveListAs = MenuitemObject,
@@ -406,13 +419,14 @@ struct ObjApp * CreateApp(void)
 
 	MNMainAbout = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainAbout),
+		MUIA_Menuitem_Shortcut, MENU_ABOUT_HOTKEY,
 		End;
 
 	MNMainBarLabel1 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
 
 	MNMainQuit = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainQuit),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainQuitChar),
+		MUIA_Menuitem_Shortcut, MENU_QUIT_HOTKEY,
 		End;
 
 	MNlabel2Actions = MenuitemObject,
@@ -436,14 +450,33 @@ struct ObjApp * CreateApp(void)
 
 	MNMainProperties = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainProperties),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainPropertiesChar),
+		MUIA_Menuitem_Shortcut, MENU_PROPERTIES_HOTKEY,
 		End;
-
+	
+	MNMainOpenCurrentDir = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNMainOpenCurrentDir),
+		//MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainOpenCurrentDirChar),
+		End;
+		
 	MNMainDelete = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainDelete),
-		MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainDeleteChar),
+		MUIA_Menuitem_Shortcut, MENU_DELETE_HOTKEY,
 		End;
 
+	// Only include the open dir menu item if we have a supportive workbench
+	if (get_wb_version() >= 44)
+	{
+	MNlabel2Game = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Game),
+	  /* MUIA_Family_Child, MNMainMenuDuplicate, */
+		MUIA_Family_Child, MNMainProperties,
+		MUIA_Family_Child, MNMainOpenCurrentDir,
+	  /*	MUIA_Family_Child, MNMainBarLabel4,
+		MUIA_Family_Child, MNMainDelete, */
+		End;
+	}
+	else
+	{
 	MNlabel2Game = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Game),
 	  /* MUIA_Family_Child, MNMainMenuDuplicate, */
@@ -451,6 +484,7 @@ struct ObjApp * CreateApp(void)
 	  /*	MUIA_Family_Child, MNMainBarLabel4,
 		MUIA_Family_Child, MNMainDelete, */
 		End;
+	}
 
 	MNMainiGameSettings = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainiGameSettings),
@@ -1032,6 +1066,7 @@ struct ObjApp * CreateApp(void)
 		MUIA_Application_Copyright, GetMBString(MSG_AppCopyright),
 		MUIA_Application_Description, GetMBString(MSG_AppDescription),
 		MUIA_Application_HelpFile, "iGame.guide",
+		MUIA_Application_DiskObject, GetDiskObject("PROGDIR:iGame"),
 		SubWindow, object->WI_MainWindow,
 		SubWindow, object->WI_Properties,
 		SubWindow, object->WI_GameRepositories,
@@ -1136,6 +1171,14 @@ struct ObjApp * CreateApp(void)
 		object->App,
 		2,
 		MUIM_CallHook, &MenuPropertiesHook
+	);
+
+	//OPEN CURRENT DIR
+	DoMethod(MNMainOpenCurrentDir,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &OpenCurrentDirHook
 	);
 
 	DoMethod(MNMainDelete,
@@ -1537,3 +1580,4 @@ void DisposeApp(struct ObjApp * object)
 		FreeVec(object);
 	}
 }
+
