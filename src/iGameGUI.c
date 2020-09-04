@@ -68,7 +68,7 @@ struct ObjApp * CreateApp(void)
 	APTR	MNlabel2Actions, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainMenuShowHidehiddenentries;
 	APTR	MNMainOpenList, MNMainSaveList, MNMainSaveListAs;
 	APTR	MNMainBarLabel0, MNMainAbout;
-	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Game, MNMainMenuDuplicate, MNMainProperties;
+	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Game, MNMainMenuDuplicate, MNMainProperties, MNMainOpenCurrentDir;
 	APTR	MNMainDelete, MNlabel2Tools, MNMainiGameSettings;
 	APTR	MNlabel2GameRepositories, MNMainBarLabel2, MNMainMUISettings, GROUP_ROOT;
 	APTR	GR_Filter, LA_Filter, GR_main, Space_Gamelist;
@@ -238,6 +238,12 @@ struct ObjApp * CreateApp(void)
 #else
 	static const struct Hook SettingsUseHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)settings_use, NULL };
 #endif
+#if defined(__amigaos4__)
+	static const struct Hook OpenCurrentDirHook = { { NULL,NULL }, (HOOKFUNC)open_current_dir, NULL, NULL };
+#else
+	static const struct Hook OpenCurrentDirHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)open_current_dir, NULL };
+#endif
+
 
 	if (!((object = AllocVec(sizeof(struct ObjApp), MEMF_PUBLIC | MEMF_CLEAR))))
 		return NULL;
@@ -323,7 +329,7 @@ struct ObjApp * CreateApp(void)
 				object->IM_GameImage_0 = GuigfxObject,
 					MUIA_Guigfx_FileName, DEFAULT_SCREENSHOT_FILE,
 					MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
-					MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
+					MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE | NISMF_KEEPASPECT_PICTURE,
 					MUIA_Frame, MUIV_Frame_ImageButton,
 					MUIA_FixHeight, current_settings->screenshot_height,
 					MUIA_FixWidth, current_settings->screenshot_width,
@@ -463,11 +469,30 @@ struct ObjApp * CreateApp(void)
 		MUIA_Menuitem_Shortcut, MENU_PROPERTIES_HOTKEY,
 		End;
 
+	MNMainOpenCurrentDir = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNMainOpenCurrentDir),
+		//MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainOpenCurrentDirChar),
+		End;
+
 	MNMainDelete = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainDelete),
 		MUIA_Menuitem_Shortcut, MENU_DELETE_HOTKEY,
 		End;
 
+	// Only include the open dir menu item if we have a supportive workbench
+	if (get_wb_version() >= 44)
+	{
+	MNlabel2Game = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Game),
+	  /* MUIA_Family_Child, MNMainMenuDuplicate, */
+		MUIA_Family_Child, MNMainProperties,
+		MUIA_Family_Child, MNMainOpenCurrentDir,
+	  /*	MUIA_Family_Child, MNMainBarLabel4,
+		MUIA_Family_Child, MNMainDelete, */
+		End;
+	}
+	else
+	{
 	MNlabel2Game = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Game),
 	  /* MUIA_Family_Child, MNMainMenuDuplicate, */
@@ -475,6 +500,7 @@ struct ObjApp * CreateApp(void)
 	  /*	MUIA_Family_Child, MNMainBarLabel4,
 		MUIA_Family_Child, MNMainDelete, */
 		End;
+	}
 
 	MNMainiGameSettings = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainiGameSettings),
@@ -1161,6 +1187,14 @@ struct ObjApp * CreateApp(void)
 		object->App,
 		2,
 		MUIM_CallHook, &MenuPropertiesHook
+	);
+
+	//OPEN CURRENT DIR
+	DoMethod(MNMainOpenCurrentDir,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &OpenCurrentDirHook
 	);
 
 	DoMethod(MNMainDelete,
