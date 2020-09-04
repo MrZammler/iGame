@@ -1,9 +1,9 @@
 /*
   funcs.c
   Misc functions for iGame
-  
+
   Copyright (c) 2019, Emmanuel Vasilakis and contributors
-  
+
   This file is part of iGame.
 
   iGame is free software: you can redistribute it and/or modify
@@ -20,28 +20,52 @@
   along with iGame. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <clib/exec_protos.h>
-#include <clib/dos_protos.h>
-#include <clib/alib_protos.h>
-#include <clib/icon_protos.h>
+/* MUI */
 #include <libraries/mui.h>
 #include <MUI/Guigfx_mcc.h>
 #include <MUI/TextEditor_mcc.h>
+
+/* Prototypes */
+#include <clib/alib_protos.h>
+#include <proto/wb.h>
+
+#if defined(__amigaos4__)
+#include <proto/exec.h>
+#include <proto/dos.h>
+#include <proto/icon.h>
+#include <proto/graphics.h>
+#include <proto/muimaster.h>
+#else
+#include <clib/exec_protos.h>
+#include <clib/dos_protos.h>
+#include <clib/icon_protos.h>
 #include <clib/muimaster_protos.h>
+#include <clib/graphics_protos.h>
+#endif
+
+/* System */
+#include <dos/dos.h>
+#if defined(__amigaos4__)
+#include <dos/obsolete.h>
+#endif
+#include <exec/memory.h>
+#include <exec/types.h>
+#if defined(__amigaos4__)
+#define ASL_PRE_V38_NAMES
+#endif
+#include <libraries/asl.h>
+#include <workbench/startup.h>
+#include <workbench/workbench.h>
+
+/* ANSI C */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <exec/memory.h>
-#include <workbench/startup.h>
-#include <exec/types.h>
-#include <workbench/workbench.h>
-#include <clib/graphics_protos.h>
 
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGameStrings_cat.h"
-#include <libraries/asl.h>
 
 extern char* strdup(const char* s);
 extern struct ObjApp* app;
@@ -69,12 +93,14 @@ int get_title_from_slave(char* slave, char* title);
 int check_dup_title(char* title);
 int get_delimiter_position(const char* str);
 const char* get_directory_name(const char* str);
+const char* get_directory_path(const char* str);
 const char* get_executable_name(int argc, char** argv);
 const char* add_spaces_to_string(const char* input);
 void strip_path(const char* path, char* naked_path);
 char* get_slave_from_path(char* slave, int start, char* path);
 void read_tool_types();
 void check_for_wbrun();
+void list_show_favorites(char* str);
 
 /* structures */
 struct EasyStruct msgbox;
@@ -161,14 +187,14 @@ void apply_settings()
 	set(app->CH_StartWithFavorites, MUIA_Selected, current_settings->start_with_favorites);
 }
 
-void load_settings(const char* filename)
+igame_settings* load_settings(const char* filename)
 {
 	const int buffer_size = 512;
 	STRPTR file_line = malloc(buffer_size * sizeof(char));
 	if (file_line == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
+		return NULL;
 	}
 
 	if (current_settings != NULL)
@@ -178,6 +204,7 @@ void load_settings(const char* filename)
 	}
 	current_settings = (igame_settings *)calloc(1, sizeof(igame_settings));
 
+	// TODO: Maybe it would be a good idea to lock the file before open it
 	const BPTR fpsettings = Open((CONST_STRPTR)filename, MODE_OLDFILE);
 	if (fpsettings)
 	{
@@ -220,8 +247,11 @@ void load_settings(const char* filename)
 		// No "igame.prefs" file found, fallback to reading Tooltypes
 		read_tool_types();
 	}
+
 	if (file_line)
 		free(file_line);
+
+	return current_settings;
 }
 
 void load_games_list(const char* filename)
@@ -311,6 +341,75 @@ void load_games_list(const char* filename)
 		free(file_line);
 }
 
+void load_games_csv_list(const char* filename)
+{
+	char *buf = malloc(256 * sizeof(char));
+	char *tmp;
+
+	const BPTR fpgames = Open((CONST_STRPTR) filename, MODE_OLDFILE);
+	if (fpgames)
+	{
+		if (games != NULL)
+		{
+			free(games);
+			games = NULL;
+		}
+
+		while (FGets(fpgames, buf, 255) != NULL)
+		{
+				item_games = (games_list *)calloc(1, sizeof(games_list));
+				item_games->next = NULL;
+
+			if (strlen(buf) > 1)
+			{
+				item_games->index = 0;
+				item_games->exists = 0;
+				item_games->deleted = 0;
+				item_games->hidden = 0;
+
+				tmp = strtok(buf, ";");
+
+				tmp = strtok(NULL, ";");
+				strcpy(item_games->title, tmp);
+
+				tmp = strtok(NULL, ";");
+				strcpy(item_games->genre, tmp);
+
+				tmp = strtok(NULL, ";");
+				strcpy(item_games->path, tmp);
+
+				tmp = strtok(NULL, ";");
+				item_games->favorite = atoi(tmp);
+
+				tmp = strtok(NULL, ";");
+				item_games->times_played = atoi(tmp);
+
+				tmp = strtok(NULL, ";");
+				item_games->last_played = atoi(tmp);
+
+				tmp = strtok(NULL, ";");
+				item_games->hidden = atoi(tmp);
+			}
+
+			if (games)
+			{
+				item_games->next = games;
+				games = item_games;
+			}
+			else
+			{
+				games = item_games;
+			}
+		}
+
+		add_games_to_listview();
+		Close(fpgames);
+	}
+
+	if (buf)
+		free(buf);
+}
+
 void load_repos(const char* filename)
 {
 	const int buffer_size = 512;
@@ -394,6 +493,8 @@ void load_genres(const char* filename)
 			DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, item_genres->genre, MUIV_List_Insert_Sorted);
 		}
 
+		DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, GetMBString(MSG_UnknownGenre), MUIV_List_Insert_Bottom);
+
 		for (i = 0; i < no_of_genres; i++)
 		{
 			DoMethod(app->LV_GenresList, MUIM_List_GetEntry, i + 5, &app->CY_PropertiesGenreContent[i]);
@@ -411,8 +512,6 @@ void load_genres(const char* filename)
 		app->CY_AddGameGenreContent[i] = (unsigned char*)GetMBString(MSG_UnknownGenre);
 		app->CY_AddGameGenreContent[i + 1] = NULL;
 		set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_AddGameGenreContent);
-
-		
 
 		Close(fpgenres);
 	}
@@ -673,7 +772,19 @@ void list_show_filtered(char* str, char* str_gen)
 
 void app_start()
 {
-	load_games_list(DEFAULT_GAMESLIST_FILE);
+	// check if the gamelist csv file exists. If not, try to load the old one
+	char csvFilename[32];
+	strcpy(csvFilename, (CONST_STRPTR)DEFAULT_GAMESLIST_FILE);
+	strcat(csvFilename, ".csv");
+
+	const BPTR gamesListLock = Lock(csvFilename, ACCESS_READ);
+	if (gamesListLock) {
+		load_games_csv_list(csvFilename);
+	} else {
+		load_games_list(DEFAULT_GAMESLIST_FILE);
+	}
+	UnLock(gamesListLock);
+
 	load_repos(DEFAULT_REPOS_FILE);
 	add_default_filters();
 	load_genres(DEFAULT_GENRES_FILE);
@@ -686,6 +797,11 @@ void app_start()
 	{
 		list_show_favorites(NULL);
 	}
+
+	DoMethod(app->App,
+		MUIM_Application_Load,
+		MUIV_Application_Load_ENV
+	);
 
 	set(app->WI_MainWindow, MUIA_Window_Open, TRUE);
 	set(app->WI_MainWindow, MUIA_Window_ActiveObject, app->LV_GamesList);
@@ -759,7 +875,7 @@ void launch_game()
 	int success, i, whdload = 0;
 	char str2[512], fullpath[800], helperstr[250], to_check[256];
 
-	//clear vars:
+	// clear vars:
 	str2[0] = '\0';
 	fullpath[0] = '\0';
 
@@ -1081,7 +1197,7 @@ void game_click()
 				{
 					app->IM_GameImage_1 = GuigfxObject, MUIA_Guigfx_FileName, naked_path,
 					                                  MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
-					                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
+					                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE | NISMF_KEEPASPECT_PICTURE,
 					                                  MUIA_Guigfx_Transparency, 0,
 					                                  MUIA_Frame, MUIV_Frame_ImageButton,
 					                                  MUIA_FixHeight, current_settings->screenshot_height,
@@ -1116,7 +1232,7 @@ void game_click()
 					{
 						app->IM_GameImage_1 = GuigfxObject, MUIA_Guigfx_FileName, DEFAULT_SCREENSHOT_FILE,
 						                                  MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
-						                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE,
+						                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE | NISMF_KEEPASPECT_PICTURE,
 						                                  MUIA_Guigfx_Transparency, 0,
 						                                  MUIA_Frame, MUIV_Frame_ImageButton,
 						                                  MUIA_FixHeight, current_settings->screenshot_height,
@@ -1273,10 +1389,10 @@ void game_properties()
 	char* slave = AllocMem(256 * sizeof(char), MEMF_CLEAR);
 
 	// Check if any of them failed
-	if (helperstr == NULL 
-		|| fullpath == NULL 
-		|| str2 == NULL 
-		|| path == NULL 
+	if (helperstr == NULL
+		|| fullpath == NULL
+		|| str2 == NULL
+		|| path == NULL
 		|| naked_path == NULL
 		|| slave == NULL)
 	{
@@ -1298,7 +1414,7 @@ void game_properties()
 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
 		return;
 	}
-	
+
 	int i;
 	struct DiskObject* disk_obj;
 	char* tool_type;
@@ -1606,7 +1722,7 @@ void game_properties_ok()
 				FreeMem(m, sizeof(struct FileInfoBlock));
 			CloseLibrary(icon_base);
 		}
-		
+
 		CurrentDir(oldlock);
 
 		// Cleanup the memory allocations
@@ -1946,22 +2062,18 @@ BOOL get_filename(const char* title, const char* positive_text, const BOOL save_
 	return result;
 }
 
-/*
-* Saves the current Games struct to disk
-*/
-void save_to_file(const char* filename, const int check_exists)
+void save_to_csv(const char* filename, const int check_exists)
 {
-	const int buffer_size = 512;
-	char* file_line = malloc(buffer_size * sizeof(char));
-	if (file_line == NULL)
-	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
-	}
+	char csvFilename[32];
+	FILE *fpgames;
+
 	const char* saving_message = (const char*)GetMBString(MSG_SavingGamelist);
 	set(app->TX_Status, MUIA_Text_Contents, saving_message);
 
-	const BPTR fpgames = Open((CONST_STRPTR)filename, MODE_NEWFILE);
+	strcpy(csvFilename, (CONST_STRPTR)filename);
+	strcat(csvFilename, ".csv");
+
+	fpgames = fopen(csvFilename,"w+");
 	if (!fpgames)
 	{
 		msg_box((const char*)GetMBString(MSG_FailedOpeningGameslist));
@@ -1970,71 +2082,47 @@ void save_to_file(const char* filename, const int check_exists)
 
 	for (item_games = games; item_games != NULL; item_games = item_games->next)
 	{
-		if (check_exists == 1)
-		{
-			if (item_games->exists == 1)
+			if (check_exists == 1)
 			{
-				snprintf(file_line, buffer_size, "index=%d\n", item_games->index);
-				FPuts(fpgames, (CONST_STRPTR)file_line);
-				snprintf(file_line, buffer_size, "title=%s\n", item_games->title);
-				FPuts(fpgames, (CONST_STRPTR)file_line);
-				snprintf(file_line, buffer_size, "genre=%s\n", item_games->genre);
-				FPuts(fpgames, (CONST_STRPTR)file_line);
-				snprintf(file_line, buffer_size, "path=%s\n", item_games->path);
-				FPuts(fpgames, (CONST_STRPTR)file_line);
-				snprintf(file_line, buffer_size, "favorite=%d\n", item_games->favorite);
-				FPuts(fpgames, (CONST_STRPTR)file_line);
-				snprintf(file_line, buffer_size, "timesplayed=%d\n", item_games->times_played);
-				FPuts(fpgames, (CONST_STRPTR)file_line);
-				snprintf(file_line, buffer_size, "lastplayed=%d\n", item_games->last_played);
-				FPuts(fpgames, (CONST_STRPTR)file_line);
-				snprintf(file_line, buffer_size, "hidden=%d\n\n", item_games->hidden);
-				FPuts(fpgames, (CONST_STRPTR)file_line);
+				if (item_games->exists == 1)
+				{
+					fprintf(
+						fpgames,
+						"%d;%s;%s;%s;%d;%d;%d;%d\n",
+						item_games->index, item_games->title, item_games->genre, item_games->path,
+						item_games->favorite, item_games->times_played, item_games->last_played, item_games->hidden
+					);
+				}
+				else
+				{
+					strcpy(item_games->path, "");
+				}
 			}
 			else
 			{
-				strcpy(item_games->path, "");
+				fprintf(
+					fpgames,
+					"%d;%s;%s;%s;%d;%d;%d;%d\n",
+					item_games->index, item_games->title, item_games->genre, item_games->path,
+					item_games->favorite, item_games->times_played, item_games->last_played, item_games->hidden
+				);
 			}
-		}
-		else
-		{
-			snprintf(file_line, buffer_size, "index=%d\n", item_games->index);
-			FPuts(fpgames, (CONST_STRPTR)file_line);
-			snprintf(file_line, buffer_size, "title=%s\n", item_games->title);
-			FPuts(fpgames, (CONST_STRPTR)file_line);
-			snprintf(file_line, buffer_size, "genre=%s\n", item_games->genre);
-			FPuts(fpgames, (CONST_STRPTR)file_line);
-			snprintf(file_line, buffer_size, "path=%s\n", item_games->path);
-			FPuts(fpgames, (CONST_STRPTR)file_line);
-			snprintf(file_line, buffer_size, "favorite=%d\n", item_games->favorite);
-			FPuts(fpgames, (CONST_STRPTR)file_line);
-			snprintf(file_line, buffer_size, "timesplayed=%d\n", item_games->times_played);
-			FPuts(fpgames, (CONST_STRPTR)file_line);
-			snprintf(file_line, buffer_size, "lastplayed=%d\n", item_games->last_played);
-			FPuts(fpgames, (CONST_STRPTR)file_line);
-			snprintf(file_line, buffer_size, "hidden=%d\n\n", item_games->hidden);
-			FPuts(fpgames, (CONST_STRPTR)file_line);
-		}
-
 	}
-	Close(fpgames);
-
-	if (file_line)
-		free(file_line);
+	fclose(fpgames);
 
 	status_show_total();
 }
 
 void save_list(const int check_exists)
 {
-	save_to_file(DEFAULT_GAMESLIST_FILE, check_exists);
+	save_to_csv(DEFAULT_GAMESLIST_FILE, check_exists);
 }
 
 void save_list_as()
 {
-	//TODO Check if file exists, warn the user about overwriting it
+	//TODO: Check if file exists, warn the user about overwriting it
 	if (get_filename("Save List As...", "Save", TRUE))
-		save_to_file(fname, 0);
+		save_to_csv(fname, 0);
 }
 
 void open_list()
@@ -2372,14 +2460,17 @@ void get_screen_size(int* width, int* height)
 
 void read_tool_types()
 {
-	struct Library* icon_base;
-	struct DiskObject* disk_obj;
+	struct Library *icon_base;
+	struct DiskObject *disk_obj;
 
 	int screen_width, screen_height;
+	unsigned char filename[32];
 
 	if ((icon_base = (struct Library *)OpenLibrary((CONST_STRPTR)ICON_LIBRARY, 0)))
 	{
-		char* filename = strcat(PROGDIR, executable_name);
+		strcpy(filename, PROGDIR);
+		strcat(filename, executable_name);
+
 		if ((disk_obj = GetDiskObject((STRPTR)filename)))
 		{
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_SCREENSHOT))
@@ -2433,7 +2524,6 @@ void read_tool_types()
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSIDEPANEL))
 				current_settings->hide_side_panel = 1;
 		}
-
 		CloseLibrary(icon_base);
 	}
 
@@ -2655,8 +2745,22 @@ const char* get_directory_name(const char* str)
 	return dir_name;
 }
 
+// Get the complete directory path from a full path containing a file
+const char *get_directory_path(const char *str)
+{
+	int pos1 = get_delimiter_position(str);
+	if (!pos1)
+		return NULL;
+
+	char *dir_name = malloc(pos1 + 1);
+	strncpy(dir_name, str, pos1);
+	dir_name[pos1] = '\0';
+
+	return dir_name;
+}
+
 // Get the application's executable name
-const char* get_executable_name(int argc, char** argv)
+const char *get_executable_name(int argc, char **argv)
 {
 	// argc is zero when run from the Workbench,
 	// positive when run from the CLI
@@ -2736,7 +2840,7 @@ void joy_left()
 
   DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &curr_game);
   get(app->LV_GamesList, MUIA_List_Active, &ind);
-  
+
   if (curr_game == NULL || strlen(curr_game) == 0)
     {
       set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Top);
@@ -2746,7 +2850,7 @@ void joy_left()
   DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
   if (prev_game == NULL)
 	return;
-  
+
   while (toupper(curr_game[0]) == toupper(prev_game[0]))
     {
       DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
@@ -2755,7 +2859,7 @@ void joy_left()
     }
 
   last_game = prev_game;
-  
+
   while (toupper(last_game[0]) == toupper(prev_game[0]))
     {
       DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
@@ -2773,7 +2877,7 @@ void joy_right()
 
   DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &curr_game);
   get(app->LV_GamesList, MUIA_List_Active, &ind);
-  
+
   if (curr_game == NULL || strlen(curr_game) == 0)
     {
       set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Top);
@@ -2783,7 +2887,7 @@ void joy_right()
   DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind++, &next_game);
   if (next_game == NULL)
 	return;
-  
+
   while (toupper(curr_game[0]) == toupper(next_game[0]))
     {
       DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind++, &next_game);
@@ -2792,5 +2896,68 @@ void joy_right()
     }
 
   set(app->LV_GamesList, MUIA_List_Active, ind-1);
+
+}
+
+ULONG get_wb_version()
+{
+	static ULONG ver = 0UL;
+
+	if (ver != 0UL)
+	{
+		return ver;
+	}
+
+	if (WorkbenchBase == NULL)
+	{
+		//Really Workbench library should be already opened
+		// Somehow we're running without Workbench.
+		// Nothing to do since the version variable inits with 0.
+		return ver;
+	}
+
+	// Save workbench.library version for later calls
+	ver = WorkbenchBase->lib_Version;
+
+	return ver;
+}
+
+void open_current_dir()
+{
+	// Allocate Memory for variables
+	char *game_title = NULL;
+	const char *path_only = NULL;
+
+	if (get_wb_version() < 44)
+	{
+		// workbench.library doesn't support OpenWorkbenchObjectA yet
+		return;
+	}
+
+	//set the elements on the window
+	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
+	if (game_title == NULL || strlen(game_title) == 0)
+	{
+		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
+		return;
+	}
+
+	const int found = title_exists(game_title);
+	if (!found)
+	{
+		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
+		return;
+	}
+	
+	path_only = get_directory_path(item_games->path);
+	if(!path_only)
+	{
+		msg_box((const char*)GetMBString(MSG_DirectoryNotFound));
+		return;
+	}
+	
+	//Open path directory
+	OpenWorkbenchObject(path_only);
+	free(path_only); // get_directory_path uses malloc()
 
 }

@@ -1,5 +1,5 @@
 @DATABASE iGame.guide
-@$VER: iGame.guide 2.0b5 (03.05.2019)
+@$VER: iGame.guide 2.0b6 (04.09.2020)
 @INDEX "Index"
 
 @NODE "Main" "iGame documentation"
@@ -7,20 +7,19 @@
 
 			   iGame
 	=============================================
-		© 2005-2019 Emmanuel Vasilakis
+		ï¿½ 2005-2020 Emmanuel Vasilakis
 
+     @{"ï¿½Introductionï¿½ï¿½ï¿½ï¿½ " LINK "INTR" 0} - About iGame
+     @{"ï¿½Building iGameï¿½ï¿½ " LINK "BUIL" 0} - Building iGame
+     @{"ï¿½Requirementsï¿½ï¿½ï¿½ï¿½ " LINK "REQS" 0} - System requirements
 
-     @{" Introduction     " LINK "INTR" 0} - About iGame
-     @{" Building iGame   " LINK "BUIL" 0} - Building iGame
-     @{" Requirements     " LINK "REQS" 0} - System requirements
-
-     @{" Installation     " LINK "INST" 0} - Installing iGame
+     @{"ï¿½Installationï¿½ï¿½ï¿½ï¿½ " LINK "INST" 0} - Installing iGame
      @{" Usage            " LINK "USAG" 0} - Using iGame
 
-     @{" Todo             " LINK "TODO" 0} - Todo stuff
+     @{"ï¿½Todo      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ " LINK "TODO" 0} - Todo stuff
      @{" Known bugs       " LINK "BUGS" 0} - Known bugs
-     @{" Author           " LINK "INFO" 0} - Author contact info
-     @{" History          " LINK "HIST" 0} - Version history
+     @{"ï¿½Authorï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ " LINK "INFO" 0} - Author contact info
+     @{"ï¿½History  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ " LINK "HIST" 0} - Version history
 
 @ENDNODE
 @NODE "INTR" "Introduction"
@@ -53,9 +52,9 @@ bug fixes. After version 1.5, iGame was updated with internal version 1.6 which
 was never really officialy released. Sorry; I wasn't very good at releasing
 versions or keeping a changelog.
 
-Since then Dimitris Panokostas did a lot of re-writing and new features (such as
-the settings window to replace tooltypes). These versions are now tagged as 2.0
-betas.
+Since then Dimitris Panokostas, George Sokianos, Chris Charabaruk and T0lk13n did
+a lot of re-writing and new features (such as the settings window to replace tooltypes).
+These versions are now tagged as 2.0 betas. 
 
 @ENDNODE
 @NODE "BUIL" "Building iGame"
@@ -160,6 +159,8 @@ favorites, and the games tooltypes, as you would do in it's info file.
 You can also choose to hide the game from the list. It will not appear in any searching
 or genre filtering. Choose "Show/Hide hidden slaves" from the menu, to list those slaves.
 To go back to normal games listing, click on the same menu item again.
+
+From the menu, you can also open up the drawer containing the game.
 
 To add a screenshot to appear when a game is selected, simply save an image in
 the game's folder with the name igame.iff. Note, the image can be of any type

@@ -17,7 +17,7 @@ all: iGame
 CC			= m68k-amigaos-gcc
 LINK		= m68k-amigaos-gcc
 INCLUDES	= -I/opt/amiga/m68k-amigaos/include -I/opt/amiga/m68k-amigaos/ndk-include -I/opt/amiga/m68k-amigaos/include/mui
-CFLAGS		= -c -noixemul -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68000
+CFLAGS			= -c -noixemul -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68000
 CFLAGS_030	= -c -mcpu=68030 -noixemul -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68030
 CFLAGS_040	= -c -mcpu=68040 -noixemul -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68040
 CFLAGS_060	= -c -mcpu=68060 -noixemul -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68060
@@ -117,7 +117,7 @@ src/iGameMain_040.o: src/iGameMain.c
 
 src/strdup_040.o: src/strdup.c
 	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/strdup.c
-	
+
 src/iGameStrings_cat_040.o: src/iGameStrings_cat.c
 	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/iGameStrings_cat.c
 

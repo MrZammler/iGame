@@ -17,7 +17,7 @@ all: iGame
 CC			= vc
 LINK		= vc
 INCLUDES	= -I"D:\vbcc\MUI\Developer\C\Include" -I"D:\vbcc\MCC_Guigfx\Developer\C\Include" -I"D:\vbcc\MCC_TextEditor\Developer\C\include"
-CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99 -DCPU_VERS=68000
+CFLAGS			= -c +aos68k -dontwarn=-1 -O2 -c99 -DCPU_VERS=68000
 CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68030
 CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68040
 CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68060
@@ -55,7 +55,7 @@ iGame.030: $(OBJS_030)
 
 iGame.040: $(OBJS_040)
 	$(LINK) $(OBJS_040) $(LIBFLAGS) $@
-	
+
 iGame.060: $(OBJS_060)
 	$(LINK) $(OBJS_060) $(LIBFLAGS) $@
 
@@ -177,7 +177,7 @@ src/strdup_AOS4.o: src/strdup.c
 
 src/iGameStrings_cat_AOS4.o: src/iGameStrings_cat.c
 	$(CC) $(CFLAGS_AOS4) $(INCLUDES) -o $@ src/iGameStrings_cat.c
-	
+
 ##########################################################################
 # generic build options
 ##########################################################################
