@@ -71,8 +71,6 @@ char *executable_name;
 
 igame_settings* iGameSettings = NULL;
 
-igame_settings* iGameSettings = NULL;
-
 void joystick_buttons(ULONG val)
 {
 	//if (val & JPF_BUTTON_PLAY) printf("[PLAY/MMB]\n");
