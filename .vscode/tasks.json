@@ -66,6 +66,17 @@
                     "src/iGameStrings_cat.c"
                 ]
             },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(warning|error) ([0-9]*) in line ([0-9]*) of \"(.*)\": (.*)$",
+                    "severity": 1,
+                    "line": 3,
+                    "file": 4,
+                    "message": 5
+                }
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -136,6 +147,17 @@
                     "src/strdup.c",
                     "src/iGameStrings_cat.c"
                 ]
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(warning|error) ([0-9]*) in line ([0-9]*) of \"(.*)\": (.*)$",
+                    "severity": 1,
+                    "line": 3,
+                    "file": 4,
+                    "message": 5
+                }
             },
             "group": {
                 "kind": "build",
@@ -208,6 +230,17 @@
                     "src/iGameStrings_cat.c"
                 ]
             },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(warning|error) ([0-9]*) in line ([0-9]*) of \"(.*)\": (.*)$",
+                    "severity": 1,
+                    "line": 3,
+                    "file": 4,
+                    "message": 5
+                }
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -279,6 +312,17 @@
                     "src/iGameStrings_cat.c"
                 ]
             },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(warning|error) ([0-9]*) in line ([0-9]*) of \"(.*)\": (.*)$",
+                    "severity": 1,
+                    "line": 3,
+                    "file": 4,
+                    "message": 5
+                }
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -346,6 +390,17 @@
                     "src/strdup.c",
                     "src/iGameStrings_cat.c"
                 ]
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(warning|error) ([0-9]*) in line ([0-9]*) of \"(.*)\": (.*)$",
+                    "severity": 1,
+                    "line": 3,
+                    "file": 4,
+                    "message": 5
+                }
             },
             "group": {
                 "kind": "build",
@@ -415,6 +470,17 @@
                     "src/iGameStrings_cat.c"
                 ]
             },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(warning|error) ([0-9]*) in line ([0-9]*) of \"(.*)\": (.*)$",
+                    "severity": 1,
+                    "line": 3,
+                    "file": 4,
+                    "message": 5
+                }
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -472,7 +538,7 @@
                     "-Path",
                     "./iGame,",
                     "./iGame.*,",
-                    "./src/*.o" 
+                    "./src/*.o"
                 ]
             },
             "osx": {
