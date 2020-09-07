@@ -963,7 +963,7 @@ void launch_game()
 
 			while ((success = ExNext(lock, m)))
 			{
-				if (strstr(m->fib_FileName, ".info"))
+				if (strcasestr(m->fib_FileName, ".info"))
 				{
 					NameFromLock(lock, (unsigned char*)str2, 512);
 					sprintf(fullpath, "%s/%s", str2, m->fib_FileName);
@@ -1491,7 +1491,7 @@ void game_properties()
 
 		while ((success = ExNext(lock, m)))
 		{
-			if (strstr(m->fib_FileName, ".info"))
+			if (strcasestr(m->fib_FileName, ".info"))
 			{
 				NameFromLock(lock, (unsigned char*)str2, 512);
 				sprintf(fullpath, "%s/%s", str2, m->fib_FileName);
@@ -1659,7 +1659,7 @@ void game_properties_ok()
 
 			while (ExNext(lock, m))
 			{
-				if (strstr(m->fib_FileName, ".info"))
+				if (strcasestr(m->fib_FileName, ".info"))
 				{
 					NameFromLock(lock, (unsigned char*)str2, 512);
 					sprintf(fullpath, "%s/%s", str2, m->fib_FileName);
