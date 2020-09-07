@@ -2948,16 +2948,16 @@ void open_current_dir()
 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
 		return;
 	}
-	
+
 	path_only = get_directory_path(item_games->path);
 	if(!path_only)
 	{
 		msg_box((const char*)GetMBString(MSG_DirectoryNotFound));
 		return;
 	}
-	
+
 	//Open path directory
-	OpenWorkbenchObject(path_only);
+	OpenWorkbenchObject((char *)path_only);
 	free(path_only); // get_directory_path uses malloc()
 
 }
