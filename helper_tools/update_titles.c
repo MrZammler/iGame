@@ -8,6 +8,7 @@
 #include <string.h>
 
 extern char* strdup(const char* s);
+extern char* strcasestr(const char *haystack, const char *needle);
 
 typedef struct games
 {
@@ -348,7 +349,7 @@ int main()
 	for (item_games = games; item_games != NULL; item_games = item_games->next)
 	{
 		//only if it is a slave file ;-)
-		if (strstr(item_games->path, ".slave") || strstr(item_games->path, ".Slave"))
+		if (strcasestr(item_games->path, ".slave"))
 		{
 			if (!get_title_from_slave(item_games->path, helperstr))
 			{
