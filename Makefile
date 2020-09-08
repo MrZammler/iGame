@@ -66,12 +66,18 @@ iGame.AOS4: $(OBJS_AOS4)
 	$(LINK) $(OBJS_AOS4) $(LIBFLAGS_AOS4) $@
 
 ##########################################################################
+# generated source files
+##########################################################################
+src/iGameStrings_cat.c src/iGameStrings_cat.h: src/iGameStrings.cd
+	cd src && flexcat iGameStrings.cd iGameStrings_cat.c=C_c.sd iGameStrings_cat.h=C_h.sd
+
+##########################################################################
 # object files (generic 00)
 ##########################################################################
-src/funcs.o: src/funcs.c
+src/funcs.o: src/funcs.c src/iGameStrings_cat.h
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/funcs.c
 
-src/iGameGUI.o: src/iGameGUI.c src/iGameGUI.h src/version.h
+src/iGameGUI.o: src/iGameGUI.c src/iGameGUI.h src/version.h src/iGameStrings_cat.h
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/iGameGUI.c
 
 src/iGameMain.o: src/iGameMain.c

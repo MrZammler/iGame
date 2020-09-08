@@ -94,12 +94,18 @@ iGame.OS4: $(OBJS_OS4)
 	$(LINK) $(OBJS_OS4) $(LIBFLAGS_OS4) $@
 
 ##########################################################################
+# generated source files
+##########################################################################
+src/iGameStrings_cat.c src/iGameStrings_cat.h: src/iGameStrings.cd
+	cd src && flexcat iGameStrings.cd iGameStrings_cat.c=C_c.sd iGameStrings_cat.h=C_h.sd
+
+##########################################################################
 # object files (generic 000)
 ##########################################################################
-src/funcs.o: src/funcs.c
+src/funcs.o: src/funcs.c src/iGameStrings_cat.h
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/funcs.c
 
-src/iGameGUI.o: src/iGameGUI.c src/iGameGUI.h src/version.h
+src/iGameGUI.o: src/iGameGUI.c src/iGameGUI.h src/version.h src/iGameStrings_cat.h
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/iGameGUI.c
 
 src/iGameMain.o: src/iGameMain.c
