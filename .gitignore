@@ -4,5 +4,5 @@ src/*.o
 iGame.0*0
 iGame_rel/iGame.info
 iGame.MOS
-iGame.AOS4
+iGame.OS4
 send_to_emul
