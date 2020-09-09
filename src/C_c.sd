@@ -34,12 +34,14 @@
 
 /****************************************************************
     This file uses the auto initialization features of
-    Dice, gcc and SAS/C, respectively.
+    Dice, gcc, SAS/C and VBCC, respectively.
 
     Dice does this by using the __autoinit and __autoexit
     keywords, whereas SAS/C uses names beginning with _STI
     or _STD, respectively. gcc uses the asm() instruction
-    to emulate C++ constructors and destructors.
+    to emulate C++ constructors and destructors. VBCC uses
+    names starting with _INIT_n_ and _INIT_n_, respectively,
+    where n can be any digit between 1 and 9 inclusive.
 
     Using this file you don't have *all* the benefits of
     locale.library (no Locale or Language arguments are
@@ -87,6 +89,8 @@ STATIC __autoexit VOID _STDClose%bCatalog(VOID)
 VOID _STDClose%bCatalog(VOID)
 #elif defined(__GNUC__)
 STATIC VOID __attribute__ ((destructor)) _STDClose%bCatalog(VOID)
+#elif defined(__VBCC__)
+void _EXIT_9_Close%bCatalog(void)
 #else
 VOID Close%bCatalog(VOID)
 #endif
@@ -109,6 +113,8 @@ STATIC __autoinit VOID _STIOpen%bCatalog(VOID)
 VOID _STIOpen%bCatalog(VOID)
 #elif defined(__GNUC__)
 VOID __attribute__ ((constructor)) _STIOpen%bCatalog(VOID)
+#elif defined(__VBCC__)
+void _INIT_9_Open%bCatalog(void)
 #else
 VOID Open%bCatalog(VOID)
 #endif
