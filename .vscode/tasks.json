@@ -23,7 +23,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "osx": {
@@ -43,7 +43,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "linux": {
@@ -63,7 +63,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "problemMatcher": {
@@ -103,7 +103,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "osx": {
@@ -124,7 +124,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "linux": {
@@ -145,7 +145,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "problemMatcher": {
@@ -185,7 +185,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "osx": {
@@ -206,7 +206,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "linux": {
@@ -227,7 +227,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "problemMatcher": {
@@ -267,7 +267,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "osx": {
@@ -288,7 +288,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "linux": {
@@ -309,7 +309,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "problemMatcher": {
@@ -348,7 +348,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "osx": {
@@ -368,7 +368,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "linux": {
@@ -388,7 +388,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "problemMatcher": {
@@ -427,7 +427,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "osx": {
@@ -447,7 +447,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "linux": {
@@ -467,7 +467,7 @@
                     "src/iGameGUI.c",
                     "src/iGameMain.c",
                     "src/strdup.c",
-                    "src/iGameStrings_cat.c"
+                    "src/iGame_cat.c"
                 ]
             },
             "problemMatcher": {

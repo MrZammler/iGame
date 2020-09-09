@@ -2,7 +2,7 @@
 ##stringtype C
 ##shortstrings
 /*
-  iGameStrings_cat.c
+  %b_cat.c
   Translatable strings for iGame
 
   Copyright (c) 2018, Emmanuel Vasilakis
