@@ -66,8 +66,11 @@ iGame.AOS4: $(OBJS_AOS4)
 ##########################################################################
 # Rules for generating catalog source files
 ##########################################################################
-src/iGame_cat.c src/iGame_cat.h: src/iGame.cd src/C_c.sd src/C_h.sd
-	cd src && flexcat iGame.cd iGame_cat.c=C_c.sd iGame_cat.h=C_h.sd
+src/iGame_cat.c: src/iGame.cd src/C_c.sd
+	cd src && flexcat iGame.cd iGame_cat.c=C_c.sd
+
+src/iGame_cat.h: src/iGame.cd src/C_h.sd
+	cd src && flexcat iGame.cd iGame_cat.h=C_h.sd
 
 ##########################################################################
 # Rules for building library object files (generic 00)
