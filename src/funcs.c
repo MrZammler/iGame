@@ -2082,24 +2082,12 @@ void save_to_csv(const char* filename, const int check_exists)
 
 	for (item_games = games; item_games != NULL; item_games = item_games->next)
 	{
-			if (check_exists == 1)
+		if (check_exists == 1)
+		{
+			if (item_games->exists == 1)
 			{
-				if (item_games->exists == 1)
-				{
-					fprintf(
-						fpgames,
-						"%d;%s;%s;%s;%d;%d;%d;%d\n",
-						item_games->index, item_games->title, item_games->genre, item_games->path,
-						item_games->favorite, item_games->times_played, item_games->last_played, item_games->hidden
-					);
-				}
-				else
-				{
-					strcpy(item_games->path, "");
-				}
-			}
-			else
-			{
+				if (strlen(item_games->genre) == 0)
+					strcpy(item_games->genre, "Unknown");
 				fprintf(
 					fpgames,
 					"%d;%s;%s;%s;%d;%d;%d;%d\n",
@@ -2107,6 +2095,22 @@ void save_to_csv(const char* filename, const int check_exists)
 					item_games->favorite, item_games->times_played, item_games->last_played, item_games->hidden
 				);
 			}
+			else
+			{
+				strcpy(item_games->path, "");
+			}
+		}
+		else
+		{
+			if (strlen(item_games->genre) == 0)
+				strcpy(item_games->genre, "Unknown");
+			fprintf(
+				fpgames,
+				"%d;%s;%s;%s;%d;%d;%d;%d\n",
+				item_games->index, item_games->title, item_games->genre, item_games->path,
+				item_games->favorite, item_games->times_played, item_games->last_played, item_games->hidden
+			);
+		}
 	}
 	fclose(fpgames);
 
