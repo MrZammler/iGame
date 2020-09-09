@@ -2957,7 +2957,7 @@ void open_current_dir()
 	}
 
 	//Open path directory
-	OpenWorkbenchObject(path_only);
+	OpenWorkbenchObject((char *)path_only);
 	free(path_only); // get_directory_path uses malloc()
 
 }
