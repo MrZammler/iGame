@@ -16,14 +16,13 @@ all: iGame
 ##########################################################################
 CC			= vc
 LINK		= vc
-INCLUDES	= -I$(NDK_INC) -I$(MUI38_INC)
-INCLUDES_AOS4 = -I$(SDK_INC) -I$(MUI50_INC)
-CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99
-CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99
-CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99
-CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99
-CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99
-CFLAGS_AOS4	= -c +aosppc -dontwarn=-1 -O2 -c99 -D__USE_INLINE__
+INCLUDES	= -I/opt/vbcc/targets/m68k-amigaos/ndk-include/ -I/opt/vbcc/targets/m68k-amigaos/include/mui/
+CFLAGS			= -c +aos68k -dontwarn=-1 -O2 -c99 -DCPU_VERS=68000
+CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68030
+CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68040
+CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68060
+CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99 -DCPU_VERS=MorphOS
+CFLAGS_AOS4	= -c +aosppc -dontwarn=-1 -O2 -c99 -DCPU_VERS=AmigaOS4
 
 DATE = $(shell date --iso=date)
 
