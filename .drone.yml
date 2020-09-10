@@ -42,13 +42,7 @@ steps:
   image: walkero/docker4amigavbcc:latest-m68k
   commands:
     - cd /drone/src
-    - make -f Makefile.docker release
-  when:
-    branch:
-      - develop
-  event:
-    include:
-      - push
+    - make -f Makefile.docker releases
 
 trigger:
   when:
