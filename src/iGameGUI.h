@@ -1,9 +1,9 @@
 /*
   iGameGUI.h
   GUI header file for iGame
-  
+
   Copyright (c) 2018, Emmanuel Vasilakis
-  
+
   This file is part of iGame.
 
   iGame is free software: you can redistribute it and/or modify
@@ -22,6 +22,9 @@
 
 #ifndef GUI_FILE_H
 #define GUI_FILE_H
+
+#define STR_HELPER(s) #s      //stringify argument
+#define STR(s) STR_HELPER(s)  //indirection to expand argument macros
 
 /* Types */
 #include <exec/types.h>
