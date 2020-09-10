@@ -37,10 +37,26 @@ steps:
   commands:
     - cd /drone/src
     - make -f Makefile.docker iGame.MOS
-
-trigger:
+- name: create-release-files
+  pull: always
+  image: walkero/docker4amigavbcc:latest-m68k
+  commands:
+    - cd /drone/src
+    - make -f Makefile.docker release
+  when:
+    branch:
+      - develop
   event:
     include:
+      - push
+
+trigger:
+  when:
+    branch:
+      - develop
+  event:
+    include:
+      - push
       - pull_request
 
 ---
