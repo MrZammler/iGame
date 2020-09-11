@@ -68,7 +68,7 @@ iGame.AOS4: $(OBJS_AOS4)
 ##########################################################################
 # generated source files
 ##########################################################################
-src/iGameStrings_cat.c src/iGameStrings_cat.h: src/iGameStrings.cd
+src/iGameStrings_cat.c src/iGameStrings_cat.h: src/iGameStrings.cd src/C_c.sd src/C_h.sd
 	cd src && flexcat iGameStrings.cd iGameStrings_cat.c=C_c.sd iGameStrings_cat.h=C_h.sd
 
 ##########################################################################
@@ -93,10 +93,10 @@ src/iGameStrings_cat.o: src/iGameStrings_cat.c
 # object files (030)
 ##########################################################################
 
-src/funcs_030.o: src/funcs.c
+src/funcs_030.o: src/funcs.c src/iGameStrings_cat.h
 	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/funcs.c
 
-src/iGameGUI_030.o: src/iGameGUI.c src/iGameGUI.h
+src/iGameGUI_030.o: src/iGameGUI.c src/iGameGUI.h src/iGameStrings_cat.h
 	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/iGameGUI.c
 
 src/iGameMain_030.o: src/iGameMain.c
@@ -112,10 +112,10 @@ src/iGameStrings_cat_030.o: src/iGameStrings_cat.c
 # object files (040)
 ##########################################################################
 
-src/funcs_040.o: src/funcs.c
+src/funcs_040.o: src/funcs.c src/iGameStrings_cat.h
 	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/funcs.c
 
-src/iGameGUI_040.o: src/iGameGUI.c src/iGameGUI.h
+src/iGameGUI_040.o: src/iGameGUI.c src/iGameGUI.h src/iGameStrings_cat.h
 	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/iGameGUI.c
 
 src/iGameMain_040.o: src/iGameMain.c
@@ -131,10 +131,10 @@ src/iGameStrings_cat_040.o: src/iGameStrings_cat.c
 # object files (060)
 ##########################################################################
 
-src/funcs_060.o: src/funcs.c
+src/funcs_060.o: src/funcs.c src/iGameStrings_cat.h
 	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/funcs.c
 
-src/iGameGUI_060.o: src/iGameGUI.c src/iGameGUI.h
+src/iGameGUI_060.o: src/iGameGUI.c src/iGameGUI.h src/iGameStrings_cat.h
 	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/iGameGUI.c
 
 src/iGameMain_060.o: src/iGameMain.c
@@ -150,10 +150,10 @@ src/iGameStrings_cat_060.o: src/iGameStrings_cat.c
 # object files (MOS)
 ##########################################################################
 
-src/funcs_MOS.o: src/funcs.c
+src/funcs_MOS.o: src/funcs.c src/iGameStrings_cat.h
 	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/funcs.c
 
-src/iGameGUI_MOS.o: src/iGameGUI.c src/iGameGUI.h
+src/iGameGUI_MOS.o: src/iGameGUI.c src/iGameGUI.h src/iGameStrings_cat.h
 	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/iGameGUI.c
 
 src/iGameMain_MOS.o: src/iGameMain.c
@@ -169,10 +169,10 @@ src/iGameStrings_cat_MOS.o: src/iGameStrings_cat.c
 # object files (AOS4)
 ##########################################################################
 
-src/funcs_AOS4.o: src/funcs.c
+src/funcs_AOS4.o: src/funcs.c src/iGameStrings_cat.h
 	$(CC) $(CFLAGS_AOS4) $(INCLUDES_AOS4) -o $@ src/funcs.c
 
-src/iGameGUI_AOS4.o: src/iGameGUI.c src/iGameGUI.h
+src/iGameGUI_AOS4.o: src/iGameGUI.c src/iGameGUI.h src/iGameStrings_cat.h
 	$(CC) $(CFLAGS_AOS4) $(INCLUDES_AOS4) -o $@ src/iGameGUI.c
 
 src/iGameMain_AOS4.o: src/iGameMain.c
