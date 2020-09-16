@@ -101,11 +101,11 @@ iGame.OS4: $(OBJS_OS4)
 ##########################################################################
 # generated source files
 ##########################################################################
-src/iGame_cat.c: src/iGame.cd src/C_c.sd
-	cd src && flexcat iGame.cd iGame_cat.c=C_c.sd
+src/iGame_cat.c: catalogs/iGame.cd catalogs/C_c.sd
+	cd catalogs && flexcat iGame.cd ../src/iGame_cat.c=C_c.sd
 
-src/iGame_cat.h: src/iGame.cd src/C_h.sd
-	cd src && flexcat iGame.cd iGame_cat.h=C_h.sd
+src/iGame_cat.h: catalogs/iGame.cd catalogs/C_h.sd
+	cd catalogs && flexcat iGame.cd ../src/iGame_cat.h=C_h.sd
 
 ##########################################################################
 # object files (generic 000)
