@@ -76,13 +76,20 @@ iGame.OS4: $(OBJS_OS4)
 	$(LINK_PPC) $(OBJS_OS4) $(LIBFLAGS_OS4) $@
 
 ##########################################################################
-# generated source files
+# catalog files
 ##########################################################################
 src/iGame_cat.c: catalogs/iGame.cd catalogs/C_c.sd
 	cd catalogs && flexcat iGame.cd ../src/iGame_cat.c=C_c.sd
 
 src/iGame_cat.h: catalogs/iGame.cd catalogs/C_h.sd
 	cd catalogs && flexcat iGame.cd ../src/iGame_cat.h=C_h.sd
+
+catalogs/%/iGame.catalog: catalogs/%/iGame.ct catalogs/iGame.cd
+	flexcat catalogs/iGame.cd $< CATALOG $@
+
+catalog_files := $(patsubst %/iGame.ct,%/iGame.catalog,$(wildcard catalogs/*/iGame.ct))
+
+catalogs: $(catalog_files)
 
 ##########################################################################
 # object files (generic 000)
@@ -220,7 +227,7 @@ src/iGame_cat_OS4.o: src/iGame_cat.c
 ##########################################################################
 
 clean:
-	rm iGame iGame.* src/funcs*.o src/iGameGUI*.o src/iGameMain*.o src/strcasestr*.o src/strdup*.o src/iGame_cat*.o
+	rm iGame iGame.* src/funcs*.o src/iGameGUI*.o src/iGameMain*.o src/strcasestr*.o src/strdup*.o src/iGame_cat*.o $(catalog_files)
 
 # pack everything in a nice lha file
 release:
