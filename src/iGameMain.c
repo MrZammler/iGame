@@ -1,9 +1,9 @@
 /*
   iGameMain.c
   Main source for iGame
-  
+
   Copyright (c) 2018, Emmanuel Vasilakis
-  
+
   This file is part of iGame.
 
   iGame is free software: you can redistribute it and/or modify
@@ -40,7 +40,12 @@
 #include "iGameExtern.h"
 
 /* Increase stack size */
+#if defined(__amigaos4__)
+static const char USED min_stack[] = "$STACK:102400";
+#else
 LONG __stack = 32768;
+#endif
+
 
 #ifndef MAKE_ID
 #define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
@@ -62,7 +67,7 @@ struct Library* GuiGfxMCC;
 struct Library* GuiGfxBase;
 struct Library* RenderLibBase;
 struct Library* LowLevelBase;
-char* executable_name;
+char *executable_name;
 
 igame_settings* iGameSettings = NULL;
 
@@ -72,7 +77,7 @@ void joystick_buttons(ULONG val)
 	//if (val & JPF_BUTTON_REVERSE) printf("[REVERSE]\n");
 	//if (val & JPF_BUTTON_FORWARD) printf("[FORWARD]\n");
 	//if (val & JPF_BUTTON_GREEN) printf("[SHUFFLE]\n");
-	if (val & JPF_BUTTON_RED) 
+	if (val & JPF_BUTTON_RED)
 	{
 		launch_game();
 	}
@@ -84,7 +89,7 @@ void joystick_directions(ULONG val)
 	if (val & JPF_JOY_UP)
 		set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Up);
 
-	if (val & JPF_JOY_DOWN) 
+	if (val & JPF_JOY_DOWN)
 		set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Down);
 
 	if (val & JPF_JOY_LEFT)
@@ -143,7 +148,7 @@ void clean_exit(CONST_STRPTR msg)
   exit(0);
 }
 
-BOOL init_app(int argc, char** argv)
+BOOL init_app(int argc, char **argv)
 {
 	MUIMasterBase = OpenLibrary((CONST_STRPTR)MUIMASTER_LIBRARY, 19);
 	if (MUIMasterBase == NULL)
@@ -213,7 +218,7 @@ BOOL init_app(int argc, char** argv)
 	return TRUE;
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
 	init_app(argc, argv);
 	ULONG sigs = 0;

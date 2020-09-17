@@ -22,8 +22,8 @@
 
 /* MUI */
 #include <libraries/mui.h>
-#include <MUI/Guigfx_mcc.h>
-#include <MUI/TextEditor_mcc.h>
+#include <mui/Guigfx_mcc.h>
+#include <mui/TextEditor_mcc.h>
 
 /* Prototypes */
 #include <clib/alib_protos.h>
@@ -2047,10 +2047,10 @@ BOOL get_filename(const char* title, const char* positive_text, const BOOL save_
 		                       TAG_DONE))
 		{
 			memset(&fname[0], 0, sizeof fname);
-			strcat(fname, request->rf_Dir);
+			strcat(fname, request->fr_Drawer);
 			if (fname[strlen(fname) - 1] != (UBYTE)58) /* Check for : */
 				strcat(fname, "/");
-			strcat(fname, request->rf_File);
+			strcat(fname, request->fr_File);
 
 			result = TRUE;
 		}
