@@ -26,7 +26,7 @@ LINK		= vc
 INCLUDES_COMMON	= -IDevkits:sdk/classic/MCC_Guigfx/Developer/C/Include -IDevkits:sdk/classic/MCC_Texteditor/Developer/C/Include
 INCLUDES	= -IDevkits:sdk/classic/ndk_39/include/include_h -IDevkits:sdk/classic/MUI/Developer/C/Include $(INCLUDES_COMMON)
 INCLUDES_OS4= -ISDK:include/include_h -ISDK:MUI/C/include $(INCLUDES_COMMON)
-INCLUDES_MOS= -IDevkits:sdk/morphos/1.0/os-include -IDevkits:sdk/classic/MUI/Developer/C/Include $(INCLUDES_COMMON)
+INCLUDES_MOS= -IDevkits:sdk/morphos/1.0/os-include -IDevkits:sdk/classic/ndk_39/include/include_h -IDevkits:sdk/classic/MUI/Developer/C/Include $(INCLUDES_COMMON)
 
 CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99 -DCPU_VERS=68000
 CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68030
