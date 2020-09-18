@@ -7,16 +7,26 @@
 ##########################################################################
 
 ##########################################################################
-# Default: Build iGame with standard optimizations and 00 support
+# Default: Build iGame with standard optimizations and 000 support
 ##########################################################################
 all: iGame
+
+##########################################################################
+# Set up version and date properties
+##########################################################################
+
+DATE = $(shell date --iso=date)
 
 ##########################################################################
 # Compiler settings
 ##########################################################################
 CC			= vc
 LINK		= vc
-INCLUDES	= -I$(MUI38_INC) -I$(MCC_Guigfx_INC) -I$(MCC_TextEditor_INC)
+
+INCLUDES	= -I$(NDK_INC) -I$(MUI38_INC)
+INCLUDES_OS4= -I$(SDK_INC) -I$(MUI50_INC)
+INCLUDES_MOS= -I$(NDK_INC) -I$(MUI50_INC)
+
 CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99 -DCPU_VERS=68000
 CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68030
 CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68040
@@ -24,18 +34,16 @@ CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68060
 CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99 -DCPU_VERS=MorphOS
 CFLAGS_OS4	= -c +aosppc -dontwarn=-1 -O2 -c99 -D__USE_INLINE__ -DCPU_VERS=AmigaOS4
 
-DATE = $(shell date --iso=date)
-
 ##########################################################################
-# Library builder settings
+# Builder settings
 ##########################################################################
-#MKLIB	 = join
+#MKLIB			= join
 LIBFLAGS		= +aos68k -lamiga -lauto -o
 LIBFLAGS_MOS	= +morphos -lamiga -lauto -o
 LIBFLAGS_OS4	= +aosppc -lamiga -lauto -o
 
 ##########################################################################
-# Object files which are part of the GLFW library
+# Object files which are part of iGame
 ##########################################################################
 OBJS		= src/funcs.o src/iGameGUI.o src/iGameMain.o src/strcasestr.o src/strdup.o src/iGame_cat.o
 OBJS_030	= src/funcs_030.o src/iGameGUI_030.o src/iGameMain_030.o src/strcasestr_030.o src/strdup_030.o src/iGame_cat_030.o
@@ -45,7 +53,7 @@ OBJS_MOS	= src/funcs_MOS.o src/iGameGUI_MOS.o src/iGameMain_MOS.o src/strcasestr
 OBJS_OS4	= src/funcs_OS4.o src/iGameGUI_OS4.o src/iGameMain_OS4.o src/strcasestr_OS4.o src/strdup_OS4.o src/iGame_cat_OS4.o
 
 ##########################################################################
-# Rule for building library
+# Rule for building
 ##########################################################################
 iGame: $(OBJS)
 	$(LINK) $(OBJS) $(LIBFLAGS) $@
@@ -75,7 +83,7 @@ src/iGame_cat.h: src/iGame.cd src/C_h.sd
 	cd src && flexcat iGame.cd iGame_cat.h=C_h.sd
 
 ##########################################################################
-# object files (generic 00)
+# object files (generic 000)
 ##########################################################################
 src/funcs.o: src/funcs.c src/iGame_cat.h
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/funcs.c
@@ -166,44 +174,44 @@ src/iGame_cat_060.o: src/iGame_cat.c
 ##########################################################################
 
 src/funcs_MOS.o: src/funcs.c src/iGame_cat.h
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/funcs.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/funcs.c
 
 src/iGameGUI_MOS.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/iGameGUI.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/iGameGUI.c
 
 src/iGameMain_MOS.o: src/iGameMain.c
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/iGameMain.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/iGameMain.c
 
 src/strcasestr_MOS.o: src/strcasestr.c
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/strcasestr.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/strcasestr.c
 
 src/strdup_MOS.o: src/strdup.c
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/strdup.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/strdup.c
 
 src/iGame_cat_MOS.o: src/iGame_cat.c
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/iGame_cat.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/iGame_cat.c
 
 ##########################################################################
 # object files (AOS4)
 ##########################################################################
 
 src/funcs_OS4.o: src/funcs.c src/iGame_cat.h
-	$(CC) $(CFLAGS_OS4) -o $@ src/funcs.c
+	$(CC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/funcs.c
 
 src/iGameGUI_OS4.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
-	$(CC) $(CFLAGS_OS4) -o $@ src/iGameGUI.c
+	$(CC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/iGameGUI.c
 
 src/iGameMain_OS4.o: src/iGameMain.c
-	$(CC) $(CFLAGS_OS4) -o $@ src/iGameMain.c
+	$(CC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/iGameMain.c
 
 src/strcasestr_OS4.o: src/strcasestr.c
-	$(CC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/strcasestr.c
+	$(CC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/strcasestr.c
 
 src/strdup_OS4.o: src/strdup.c
-	$(CC) $(CFLAGS_OS4) -o $@ src/strdup.c
+	$(CC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/strdup.c
 
 src/iGame_cat_OS4.o: src/iGame_cat.c
-	$(CC) $(CFLAGS_OS4) $(INCLUDES) -o $@ src/iGame_cat.c
+	$(CC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/iGame_cat.c
 
 ##########################################################################
 # generic build options
@@ -212,4 +220,22 @@ src/iGame_cat_OS4.o: src/iGame_cat.c
 clean:
 	del iGame iGame.* src\funcs*.o src\iGameGUI*.o src\iGameMain*.o src\strcasestr*.o src\strdup*.o src\iGame_cat*.o
 
+# pack everything in a nice lha file
+release:
+	cp required_files iGame_rel/iGame-$(DATE) -r
+	cp alt_icons iGame_rel/iGame-$(DATE)/Icons -r
+	cp iGame_rel/iGame-$(DATE)/igame_drawer_3.0.info iGame_rel/iGame-$(DATE).info
+	mv iGame_rel/iGame-$(DATE)/igame_drawer_3.0.info iGame_rel/iGame-$(DATE)/Icons/
+	mv iGame_rel/iGame-$(DATE)/igame_drawer.info iGame_rel/iGame-$(DATE)/Icons/
+	if [ -f "iGame" ]; then cp iGame iGame_rel/iGame-$(DATE)/; fi
+	if [ -f "iGame.030" ]; then cp iGame.030 iGame_rel/iGame-$(DATE)/; fi
+	if [ -f "iGame.040" ]; then cp iGame.040 iGame_rel/iGame-$(DATE)/; fi
+	if [ -f "iGame.060" ]; then cp iGame.060 iGame_rel/iGame-$(DATE)/; fi
+	if [ -f "iGame.MOS" ]; then cp iGame.MOS iGame_rel/iGame-$(DATE)/; fi
+	if [ -f "iGame.OS4" ]; then cp iGame.OS4 iGame_rel/iGame-$(DATE)/; fi
+	cd iGame_rel && lha -aq2o6 iGame-$(DATE).lha iGame-$(DATE)/ iGame-$(DATE).info
 
+clean-release:
+	rm -rf iGame_rel/iGame-$(DATE)
+	rm iGame_rel/iGame-$(DATE).lha
+	rm iGame_rel/iGame-$(DATE).info
