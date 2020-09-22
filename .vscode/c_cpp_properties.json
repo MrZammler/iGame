@@ -4,51 +4,65 @@
             "name": "AmigaOS3.x",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${VBCC}/targets/m68k-amigaos/include/",
                 "${VBCC}/NDK39/Include/include_h",
                 "${VBCC}/MUI/Developer/C/Include",
                 "${VBCC}/MCC_Guigfx/Developer/C/Include",
-                "${VBCC}/MCC_TextEditor/Developer/C/include"
+                "${VBCC}/MCC_TextEditor/Developer/C/include",
+                "${VBCC}/targets/m68k-amigaos/include/"
             ],
-            "defines": [],
+            "defines": [
+                "__VBCC__"
+            ],
             "compilerPath": "${VBCC}/bin/vc",
             "cStandard": "c99",
             "cppStandard": "c++98",
-            "intelliSenseMode": "${default}"
+            "intelliSenseMode": "${default}",
+            "forcedInclude": [
+                "${workspaceFolder}/.vscode/vscode-fake.h"
+            ]
         },
         {
             "name": "AmigaOS4.x",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${VBCC}/targets/ppc-amigaos/include/",
                 "${VBCC}/SDK/include/include_h",
                 "${VBCC}/SDK/MUI/C/include",
                 "${VBCC}/MCC_Guigfx/Developer/C/Include",
-                "${VBCC}/MCC_TextEditor/Developer/C/include"
+                "${VBCC}/MCC_TextEditor/Developer/C/include",
+                "${VBCC}/targets/ppc-amigaos/include/"
             ],
             "defines": [
-                "__amigaos4__"
+                "__amigaos4__",
+                "__VBCC__"
             ],
             "compilerPath": "${VBCC}/bin/vc",
             "cStandard": "c99",
             "cppStandard": "c++98",
-            "intelliSenseMode": "${default}"
+            "intelliSenseMode": "${default}",
+            "forcedInclude": [
+                "${workspaceFolder}/.vscode/vscode-fake.h"
+            ]
         },
         {
             "name": "MorphOS",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${VBCC}/targets/ppc-morphos/include/",
                 "${VBCC}/NDK39/Include/include_h",
                 "${VBCC}/MUI/Developer/C/Include",
                 "${VBCC}/MCC_Guigfx/Developer/C/Include",
-                "${VBCC}/MCC_TextEditor/Developer/C/include"
+                "${VBCC}/MCC_TextEditor/Developer/C/include",
+                "${VBCC}/targets/ppc-morphos/include/"
             ],
-            "defines": [],
+            "defines": [
+                "__VBCC__"
+            ],
             "compilerPath": "${VBCC}/bin/vc",
             "cStandard": "c99",
             "cppStandard": "c++98",
-            "intelliSenseMode": "${default}"
+            "intelliSenseMode": "${default}",
+            "forcedInclude": [
+                "${workspaceFolder}/.vscode/vscode-fake.h"
+            ]
         }
     ],
     "version": 4
