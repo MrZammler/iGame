@@ -28,12 +28,12 @@ INCLUDES	= -IDevkits:sdk/classic/ndk_39/include/include_h -IDevkits:sdk/classic/
 INCLUDES_OS4= -ISDK:include/include_h -ISDK:MUI/C/include $(INCLUDES_COMMON)
 INCLUDES_MOS= -IDevkits:sdk/morphos/1.0/os-include -IDevkits:sdk/classic/ndk_39/include/include_h -IDevkits:sdk/classic/MUI/Developer/C/Include $(INCLUDES_COMMON)
 
-CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99 -DCPU_VERS=68000
-CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68030
-CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68040
-CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68060
-CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99 -DCPU_VERS=MorphOS
-CFLAGS_OS4	= -c +aosppc -dontwarn=-1 -O2 -c99 -D__USE_INLINE__ -DCPU_VERS=AmigaOS4
+CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99 -DCPU_VERS=68000 -DRELEASE_DATE=$(DATE)
+CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68030 -DRELEASE_DATE=$(DATE)
+CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68040 -DRELEASE_DATE=$(DATE)
+CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68060 -DRELEASE_DATE=$(DATE)
+CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99 -DCPU_VERS=MorphOS -DRELEASE_DATE=$(DATE)
+CFLAGS_OS4	= -c +aosppc -dontwarn=-1 -O2 -c99 -D__USE_INLINE__ -DCPU_VERS=AmigaOS4 -DRELEASE_DATE=$(DATE)
 
 ##########################################################################
 # Builder settings
