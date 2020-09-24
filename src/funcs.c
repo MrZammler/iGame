@@ -101,6 +101,7 @@ char* get_slave_from_path(char* slave, int start, char* path);
 void read_tool_types();
 void check_for_wbrun();
 void list_show_favorites(char* str);
+int str_exists(char* title, char* needlestr);
 
 /* structures */
 struct EasyStruct msgbox;
@@ -596,12 +597,10 @@ void list_show_favorites(char* str)
 			const int length = strlen(helper);
 			for (int i = 0; i <= length - 1; i++) helper[i] = tolower(helper[i]);
 
-			if (item_games->favorite == 1 && item_games->hidden != 1)
+			if (item_games->favorite == 1 && item_games->hidden != 1 && str_exists(helper, (char *)str))
 			{
-				if (strstr(helper, (char *)str) || (str == NULL)) {
-					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-					total_games++;
-				}
+				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+				total_games++;
 			}
 		}
 	}
@@ -609,6 +608,26 @@ void list_show_favorites(char* str)
 
 	if (helper)
 		free(helper);
+}
+
+/*
+ * This function checks if a needle exists in haystack, but it accepts NULL as value.
+ *
+ * @param title This is the entry title
+ * @param needle This is the searching string
+ * @return bool True if needle exists in title or if it is NULL
+ */
+int str_exists(char* title, char* needle)
+{
+	if (needle == NULL) {
+		return TRUE;
+	} else {
+		if (strstr(title, needle)) {
+			return TRUE;
+		}
+	}
+
+	return FALSE;
 }
 
 void list_show_last_played(char* str)
@@ -816,6 +835,8 @@ void filter_change()
 
 	get(app->STR_Filter, MUIA_String_Contents, &str);
 	DoMethod(app->LV_GenresList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str_gen);
+
+	printf("filter_change:%s~~~\n", str);
 
 	if (str && strlen(str) != 0)
 		for (int i = 0; i <= strlen((char *)str) - 1; i++)
