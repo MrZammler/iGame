@@ -836,8 +836,6 @@ void filter_change()
 	get(app->STR_Filter, MUIA_String_Contents, &str);
 	DoMethod(app->LV_GenresList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str_gen);
 
-	printf("filter_change:%s~~~\n", str);
-
 	if (str && strlen(str) != 0)
 		for (int i = 0; i <= strlen((char *)str) - 1; i++)
 			str[i] = tolower(str[i]);
