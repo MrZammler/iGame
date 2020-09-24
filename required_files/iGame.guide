@@ -38,7 +38,7 @@ iGame is a frontend application for your games and demos collection. It runs on 
  - Simple statistics
  - Find-as-you-type search filter
 
-iGame can "discover" your games on pre-defined repositories and create a small database. You can then categorize each game according to it's genre, provide a small screenshot image to be displayed when the game is selected and quickly find the one you're looking for, using the filter gadget.
+iGame can "discover" your games on pre-defined repositories and create a small database. You can then categorize each game according to its genre, provide a small screenshot image to be displayed when the game is selected and quickly find the one you're looking for, using the filter gadget.
 
 But iGame can support more than just WHDLoad games or demos. You can add and launch any type of executable, though it mostly makes sense if it's a game ;-)
 
@@ -152,7 +152,7 @@ You can install iGame manually if you prefer. To do that, you need to follow the
 6. Run iGame!
 
 @{lindent 3}
-iGame saves it's support files on it's own folder (PROGDIR:). We recommend you to install it on it's own separated directory in your hard disk.
+iGame saves its support files on its own folder (PROGDIR:). We recommend you to install it on its own separated directory in your hard disk.
 
 If you upgrade from a previous release, the only thing you need to do is to copy the new executable over the previous one. Make sure to keep the igame.prefs, gameslist.csv, genres and repos.prefs files!
 
@@ -248,7 +248,7 @@ At the bottom there is a read only field which shows information about iGame, ba
 @{lindent 3}
 This window opens from the menu "Actions > Add a Game". This is useful in cases you want to add a WDHLoad game/demo or any other game/demo which can be started from Workbench/Shell. Depending the AmigaOS version it uses compatible methods to run the executable.
 
-By this window you can set the "Title" of the game/demo, select the path on HD of the executable and set it's "Genre".
+By this window you can set the "Title" of the game/demo, select the path on HD of the executable and set its "Genre".
 
 Click OK if you are fine with your selections, so that this new entry will be saved on the list. Click on "Cancel" if you changed your mind.
 
@@ -283,7 +283,7 @@ After that there is a big text area, showing the icon tooltypes. This is extreme
 @ENDNODE
 @NODE "WINSETS" "Settings Window"
 @{lindent 3}
-The iGame settings window opens from the menu item "Settings > Settings...". This configuration selections override the iGame tooltypes set on it's icon. These are saved on a text file named "igame.prefs", inside iGame folder. If this file is missing, iGame defaults to tooltypes.
+The iGame settings window opens from the menu item "Settings > Settings...". This configuration selections override the iGame tooltypes set on its icon. These are saved on a text file named "igame.prefs", inside iGame folder. If this file is missing, iGame defaults to tooltypes.
 
 Settings window has three separated sections:
 
@@ -324,7 +324,7 @@ Place a tooltype in parenthesis to disable it.
 @{b}SCREENSHOT=WIDTHxHEIGHT@{ub} sets the screenshot width and height in pixels
 @{b}FILTERUSEENTER@{ub} sets the filter field to be initiated with enter
 @{b}SAVESTATSONEXIT@{ub} saves game statistics when iGame is closed
-@{b}TITLESFROMDIRS@{ub} gets the game/demo title from it's parent directory
+@{b}TITLESFROMDIRS@{ub} gets the game/demo title from its parent directory
 @{b}NOSMARTSPACES@{ub} doesn't add extra spaces on title where it is needed
 @{b}NOSIDEPANEL@{ub} hides the right side of the main window
 
