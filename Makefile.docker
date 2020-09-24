@@ -219,6 +219,7 @@ release:
 	cp iGame-$(DRONE_TAG)/igame_drawer_3.0.info iGame-$(DRONE_TAG).info
 	mv iGame-$(DRONE_TAG)/igame_drawer_3.0.info iGame-$(DRONE_TAG)/icons
 	mv iGame-$(DRONE_TAG)/igame_drawer.info iGame-$(DRONE_TAG)/icons
+	cp CHANGELOG.md iGame-$(DRONE_TAG)/
 	if [ -f "iGame" ]; then cp iGame iGame-$(DRONE_TAG)/; fi
 	if [ -f "iGame.030" ]; then cp iGame.030 iGame-$(DRONE_TAG)/; fi
 	if [ -f "iGame.040" ]; then cp iGame.040 iGame-$(DRONE_TAG)/; fi
