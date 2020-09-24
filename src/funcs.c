@@ -596,10 +596,13 @@ void list_show_favorites(char* str)
 			const int length = strlen(helper);
 			for (int i = 0; i <= length - 1; i++) helper[i] = tolower(helper[i]);
 
-			if (item_games->favorite == 1 && item_games->hidden != 1 && strstr(helper, (char *)str))
+			if (item_games->favorite == 1 && item_games->hidden != 1)
 			{
-				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-				total_games++;
+				if (str == NULL || strstr(helper, (char *)str))
+				{
+					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+					total_games++;
+				}
 			}
 		}
 	}
