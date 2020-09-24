@@ -1,14 +1,18 @@
-## iGame 2.0b7 [future]
+## iGame 2.0b7 - 2020-09-25
 ### Added
 - Changelog file
 
 ### Changed
 - Fully updated iGame.guide file
+- Changed the menu item name "Add non-WHDLoad game..." to "Add game.." to be more precise, since from that you can add WHDLoad games as well
 
 ### Fixed
 - Fixed a problem with saving of the CSV file when the old gameslist file had empty genres
+- Fixed "Show Favorites" on startup which was not working under AmigaOS 3 with MUI 5
+- Fixed the release version and the date on about window
+- Fixed the installer that was complaining about missing locale/catalogs folder
 
-## iGame 2.0b6 (4 Sep 2020)
+## iGame 2.0b6 - 2020-09-04
 ### Added
 - Now iGame checks for any missing library and informs the user if it is started from the shell
 - New installation script
@@ -26,7 +30,7 @@
 - Fixed menu shortcuts that didn't work
 
 
-## iGame 2.0b5 (3 May 2019)
+## iGame 2.0b5 - 2019-05-03
 ### Added
 - Option to start with the favorites list
 - If C:WBRun exists, run non-whdload games with it

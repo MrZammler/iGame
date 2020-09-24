@@ -24,7 +24,7 @@ MSG_MNlabelScanChar (//)
 R_
 ;MUIB Menu Title
 MSG_MNMainAddnonWHDLoadgame (//)
-Add non-WHDLoad game...
+Add game...
 ;MUIB Menu ShortCut
 MSG_MNMainAddnonWHDLoadgameChar (//)
 A_
@@ -141,7 +141,7 @@ MSG_BT_CloseRepoWindow (//)
 Close
 ;MUIB window Title
 MSG_WI_AddNonWHDLoad (//)
-Add a non-WHDLoad Game
+Add a Game
 ;MUIB Label
 MSG_LA_AddGameTitle (//)
 Title:

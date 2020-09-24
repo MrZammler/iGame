@@ -7,11 +7,22 @@
             "label": "Build for 68000",
             "type": "shell",
             "linux": {
-							"command": "make",
-							"args": [
-									"-f",
-									"Makefile.docker"
+                "command": "make",
+                "args": [
+                        "-f",
+                        "Makefile.docker"
                 ]
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(warning|error) ([0-9]*) in line ([0-9]*) of \"(.*)\": (.*)$",
+                    "severity": 1,
+                    "line": 3,
+                    "file": 4,
+                    "message": 5
+                }
             },
             "group": {
                 "kind": "build",
@@ -22,12 +33,23 @@
             "label": "Build for 68030",
             "type": "shell",
             "linux": {
-							"command": "make",
-							"args": [
-									"-f",
-									"Makefile.docker",
-									"iGame.030"
+                "command": "make",
+                "args": [
+                        "-f",
+                        "Makefile.docker",
+                        "iGame.030"
                 ]
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(warning|error) ([0-9]*) in line ([0-9]*) of \"(.*)\": (.*)$",
+                    "severity": 1,
+                    "line": 3,
+                    "file": 4,
+                    "message": 5
+                }
             },
             "group": {
                 "kind": "build",
@@ -38,12 +60,23 @@
             "label": "Build for 68040",
             "type": "shell",
             "linux": {
-							"command": "make",
-							"args": [
-									"-f",
-									"Makefile.docker",
-									"iGame.040"
+                "command": "make",
+                "args": [
+                        "-f",
+                        "Makefile.docker",
+                        "iGame.040"
                 ]
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(warning|error) ([0-9]*) in line ([0-9]*) of \"(.*)\": (.*)$",
+                    "severity": 1,
+                    "line": 3,
+                    "file": 4,
+                    "message": 5
+                }
             },
             "group": {
                 "kind": "build",
@@ -54,12 +87,23 @@
             "label": "Build for 68060",
             "type": "shell",
             "linux": {
-							"command": "make",
-							"args": [
-									"-f",
-									"Makefile.docker",
-									"iGame.060"
+                "command": "make",
+                "args": [
+                        "-f",
+                        "Makefile.docker",
+                        "iGame.060"
                 ]
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(warning|error) ([0-9]*) in line ([0-9]*) of \"(.*)\": (.*)$",
+                    "severity": 1,
+                    "line": 3,
+                    "file": 4,
+                    "message": 5
+                }
             },
             "group": {
                 "kind": "build",
@@ -70,12 +114,23 @@
             "label": "Build MorphOS",
             "type": "shell",
             "linux": {
-							"command": "make",
-							"args": [
-									"-f",
-									"Makefile.docker",
-									"iGame.MOS"
+                "command": "make",
+                "args": [
+                        "-f",
+                        "Makefile.docker",
+                        "iGame.MOS"
                 ]
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(warning|error) ([0-9]*) in line ([0-9]*) of \"(.*)\": (.*)$",
+                    "severity": 1,
+                    "line": 3,
+                    "file": 4,
+                    "message": 5
+                }
             },
             "group": {
                 "kind": "build",
@@ -88,10 +143,21 @@
             "linux": {
                 "command": "make",
                 "args": [
-										"-f",
-										"Makefile.docker",
+                    "-f",
+                    "Makefile.docker",
                     "iGame.OS4"
                 ]
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(warning|error) ([0-9]*) in line ([0-9]*) of \"(.*)\": (.*)$",
+                    "severity": 1,
+                    "line": 3,
+                    "file": 4,
+                    "message": 5
+                }
             },
             "group": {
                 "kind": "build",
@@ -118,6 +184,23 @@
         {
             "label": "Clean",
             "type": "shell",
+            "windows": {
+                "command": "rm",
+                "args": [
+                    "-Path",
+                    "./iGame,",
+                    "./iGame.*,",
+                    "./src/*.o"
+                ]
+            },
+            "osx": {
+                "command": "rm",
+                "args": [
+                    "./iGame",
+                    "./iGame.*",
+                    "./src/*.o"
+                ]
+            },
             "linux": {
                 "command": "rm",
                 "args": [

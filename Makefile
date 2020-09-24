@@ -208,6 +208,7 @@ release:
 	cp required_files/iGame.info iGame_rel/iGame-$(DATE)/
 	cp required_files/igame_drawer_3.0.info iGame_rel/iGame.info
 	cp guide/* iGame_rel/iGame-$(DATE)/
+	cp CHANGELOG.md iGame_rel/iGame=$(DATE)/
 	mkdir iGame_rel/iGame-$(DATE)/Icons/
 	cp alt_icons/* iGame_rel/iGame-$(DATE)/Icons/
 	cp required_files/igame_drawer.info iGame_rel/iGame-$(DATE)/Icons.info

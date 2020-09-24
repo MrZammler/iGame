@@ -1080,7 +1080,7 @@ void scan_repositories()
 		for (item_games = games; item_games != NULL; item_games = item_games->next)
 		{
 			//only apply the not exists hack to slaves that are in the current repos, that will be scanned later
-			//Binaries (that are added through add-non-whdload, should be handled afterwards
+			//Binaries (that are added through add game) should be handled afterwards
 			if (strstr(item_games->path, ".slave") || strlen(item_games->path) == 0)
 				item_games->exists = 0;
 			else
