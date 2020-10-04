@@ -10,6 +10,8 @@
 ; $VER: Install-iGame 1.0 (20.3.2020)
 ;
 ; History:
+;   1.1   04.10.2020: Fixed the copy of OS4 version
+;                     Added the Italiano catalog
 ;   1.0   20.03.2020: initial release
 ;******************************************************************************
 
@@ -18,7 +20,8 @@
 
 (set #lang_english             0)
 (set #lang_greek               1)
-(set #lang_maximum             2)
+(set #lang_italiano            2)
+(set #lang_maximum             3)
 
 ;=============================================================================
 ; Set defaults
@@ -49,11 +52,11 @@
 ; always add english as default language
 (set #defaultLanguages (bitor #defaultLanguages (shiftleft 1 #lang_english)))
 
-; scan the Locale/Catalogs directory for supported languages
+; scan the catalogs directory for supported languages
 (set #supportedLanguages %00000000000000000)
-(foreach "Locale/Catalogs" "#?"
+(foreach "catalogs" "#?"
     (set #i 0)
-    (while (<> @each-name (select #i "english" "greek" @each-name))
+    (while (<> @each-name (select #i "english" "greek" "italiano" @each-name))
         (set #i (+ #i 1))
     )
     (if (<> #lang_maximum #i)
@@ -126,11 +129,13 @@
     (
         (set #cat_name_english               "english")
         (set #cat_name_greek                 "greek")
+        (set #cat_name_italiano              "italian")
     )
     ; all other systems use localized locale names
     (
         (set #cat_name_english               "english")
         (set #cat_name_greek                 "greek")
+        (set #cat_name_italiano              "italiano")
     )
 )
 
@@ -162,9 +167,9 @@
 						(prompt #acknowledgeCPU)
 						(help @askchoice-help)
 						(choices 	"68000"
-											"68030"
-											"68040"
-											"68060"
+									"68030"
+									"68040"
+									"68060"
 						)
 						(default #selectedCPU)
 				)
@@ -180,7 +185,7 @@
 
 (if (= #detectedSystem "os4")
     (
-        (set #selectedVersion "iGame")
+        (set #selectedVersion "iGame.OS4")
     )
 )
 (if (= #detectedSystem "mos")
@@ -235,6 +240,10 @@
 			)
 			(if (in #supportedLanguages #lang_greek)
 				(cat #prop "Greek")
+				("")
+			)
+			(if (in #supportedLanguages #lang_italiano)
+				(cat #prop "Italiano")
 				("")
 			)
 		)
@@ -307,16 +316,16 @@
 ; check if there were any catalogs selected
 (if (<> 0 #catalog_lang)
 	(
-		(makedir (tackon #destination "Locale")
+		(makedir (tackon #destination "catalogs")
 			(help @makedir-help)
 			(confirm "expert")
 		)
 
 		; copy the .cd files
-		(foreach "Locale" "#?.cd"
+		(foreach "catalogs" "#?.cd"
 			(copyfiles
-				(source (tackon "Locale" @each-name))
-				(dest (tackon #destination "Locale"))
+				(source (tackon "catalogs" @each-name))
+				(dest (tackon #destination "catalogs"))
 				(help @copyfiles-help)
 			)
 		)
@@ -324,12 +333,27 @@
 		; greek catalog file
 		(if (in #catalog_lang #lang_greek)
 			(
-				(makedir (tackon #destination (tackon "Locale/Catalogs" #cat_name_greek)))
+				(makedir (tackon #destination (tackon "catalogs" #cat_name_greek)))
 
-				(foreach "Locale/Catalogs/greek" "#?.catalog"
+				(foreach "catalogs/greek" "#?.catalog"
 					(copyfiles
-						(source (tackon "Locale/Catalogs/greek" @each-name))
-						(dest (tackon #destination (tackon "Locale/Catalogs" #cat_name_greek)))
+						(source (tackon "catalogs/greek" @each-name))
+						(dest (tackon #destination (tackon "catalogs" #cat_name_greek)))
+						(help @copyfiles-help)
+					)
+				)
+			)
+		)
+
+		; italiano catalog file
+		(if (in #catalog_lang #lang_italiano)
+			(
+				(makedir (tackon #destination (tackon "catalogs" #cat_name_italiano)))
+
+				(foreach "catalogs/italiano" "#?.catalog"
+					(copyfiles
+						(source (tackon "catalogs/italiano" @each-name))
+						(dest (tackon #destination (tackon "catalogs" #cat_name_italiano)))
 						(help @copyfiles-help)
 					)
 				)
