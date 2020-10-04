@@ -165,19 +165,26 @@
             }
         },
         {
-            "label": "LHA Pack",
+            "label": "Create release",
             "type": "shell",
             "linux": {
-                "command": "lha",
+                "command": "make",
                 "args": [
-                    "a",
-                    "iGame.lha",
-                    "iGame",
-                    "iGame.030",
-                    "iGame.040",
-                    "iGame.060",
-                    "iGame.MOS",
-                    "iGame.OS4"
+                    "-f",
+                    "Makefile.docker",
+                    "release"
+                ]
+            }
+        },
+        {
+            "label": "Clean release files",
+            "type": "shell",
+            "linux": {
+                "command": "make",
+                "args": [
+                    "-f",
+                    "Makefile.docker",
+                    "clean-release"
                 ]
             }
         },
