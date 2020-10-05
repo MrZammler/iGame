@@ -937,9 +937,9 @@ void launch_game()
 	else
 	{
 		if (wbrun)
-			sprintf(exec, "C:WBRun %s", path);
+			sprintf(exec, "C:WBRun \"%s\"", path);
 		else
-			strcpy(exec, path);
+			sprintf(exec, "\"%s\"", path);
 	}
 
 	//tooltypes only for whdload games
