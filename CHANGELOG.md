@@ -1,3 +1,11 @@
+## iGame 2.0b8 - future
+### Added
+- Added Italian catalog file in release package and it is now selectable in install script
+
+### Fixed
+- Fixed the copy of the OS4 native version on installer
+- Fixed the running of games that include spaces in path or file names and added by "Add a game" menu item
+
 ## iGame 2.0b7 - 2020-09-25
 ### Added
 - Changelog file
