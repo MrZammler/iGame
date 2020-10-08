@@ -2076,7 +2076,7 @@ void save_to_csv(const char* filename, const int check_exists)
 	strcpy(csvFilename, (CONST_STRPTR)filename);
 	strcat(csvFilename, ".csv");
 
-	fpgames = fopen(csvFilename,"w+");
+	fpgames = fopen(csvFilename,"w");
 	if (!fpgames)
 	{
 		msg_box((const char*)GetMBString(MSG_FailedOpeningGameslist));
