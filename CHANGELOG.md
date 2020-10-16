@@ -1,3 +1,6 @@
+## iGame 2.0 - 2020-10-16
+This release includes all the fixes and changes of the 2.0 beta releases below.
+
 ## iGame 2.0b8 - 2020-10-08
 ### Added
 - Added Italian catalog file in release package and it is now selectable in install script

@@ -1,5 +1,5 @@
 @DATABASE iGame.guide
-@$VER: iGame.guide 2.0b7 (25.09.2020)
+@$VER: iGame.guide 2.0 (16.10.2020)
 @INDEX "Index"
 @wordwrap
 
@@ -25,7 +25,7 @@ iGame
 @ENDNODE
 @NODE "INTR" "Introduction"
 @{lindent 3}
-iGame is a frontend application for your games and demos collection. It runs on AmigaOS 2.04 and above, AmigaOS 4 and MorphOS.
+iGame is a frontend application for your WHDLoad games and demos collection. It runs on AmigaOS 2.04 and above, AmigaOS 4 and MorphOS.
 
 @{b}Features@{ub}
 
