@@ -1,0 +1,66 @@
+Short:        Frontend for WHDLoad
+Uploader:     walkero@gmail.com (George Sokianos)
+Author:       mrzammler@freemail.gr (Emmanuel Vasilakis)
+Type:         util/misc
+Version:      2.0
+Architecture: m68k-amigaos >= 2.04; ppc-amigaos; ppc-morphos
+Distribution: Aminet
+Replaces:     util/misc/iGame.lha
+
+iGame is a frontend application for your WHDLoad games and demos collection.
+It runs on AmigaOS 2.04 and above, AmigaOS 4 and MorphOS.
+
+Features
+
+* Multiple WHDLoad slaves repositories on hard disk partitions
+* On demand scanning in repositories for installed WHDLoad slaves (games,
+demos etc.)
+* Use games' tooltypes on run
+* Shows game screenshot (screenshot window can be altered through
+tooltypes/settings, uses datatypes to load foreign formats)
+* Categorization of the games and filtering
+* Manual addition of non-WHDLoad games, demos etc.
+* Simple statistics
+* Find-as-you-type search filter
+
+iGame can "discover" your games on pre-defined repositories and create a small
+database. You can then categorize each game according to its genre, provide a
+small screenshot image to be displayed when the game is selected and quickly
+find the one you're looking for, using the filter gadget.
+
+But iGame can support more than just WHDLoad games or demos. You can add and
+launch any type of executable, though it mostly makes sense if it's a game ;-)
+
+iGame can be found on many AmigaOS distributions like AmiKit XE and ApolloOS.
+
+iGame was initially developed on an Amiga 3000 with a CSMKII 68060 with
+128MB RAM, using the Cubic IDE (gcc). Nowadays, we use mostly vbcc as a cross
+compiler on a Linux system.
+
+iGame is open source and free software, licensed under the GPLv3, and you can
+find it at the following websites.
+
+https://github.com/MrZammler/iGame
+http://winterland.no-ip.org/igame/index.html
+
+Requirements:
+* Kickstart 2.04 or higher
+* Workbench 2.1 or higher
+* MUI 3.8 or higher
+* guigfx.library
+* render.library
+* guigfx.mcc
+* Texteditor.mcc
+
+The project is open source and you can find the code at:
+https://github.com/MrZammler/iGame
+
+If you have any requests or you would like to report any problems you found,
+you can do that at:
+https://github.com/MrZammler/iGame/issues
+
+
+Changelog
+-------------
+A lot changed since the previous stable v1.5. Please read the enclosed
+CHANGELOG.md file for all the changes.
