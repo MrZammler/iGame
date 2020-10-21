@@ -68,6 +68,7 @@
 #include "iGameStrings_cat.h"
 
 extern char* strdup(const char* s);
+extern char* strcasestr(const char *haystack, const char *needle);
 extern struct ObjApp* app;
 extern char* executable_name;
 
@@ -962,7 +963,7 @@ void launch_game()
 
 			while ((success = ExNext(lock, m)))
 			{
-				if (strstr(m->fib_FileName, ".info"))
+				if (strcasestr(m->fib_FileName, ".info"))
 				{
 					NameFromLock(lock, (unsigned char*)str2, 512);
 					sprintf(fullpath, "%s/%s", str2, m->fib_FileName);
@@ -1081,7 +1082,7 @@ void scan_repositories()
 		{
 			//only apply the not exists hack to slaves that are in the current repos, that will be scanned later
 			//Binaries (that are added through add game) should be handled afterwards
-			if (strstr(item_games->path, ".slave") || strlen(item_games->path) == 0)
+			if (strcasestr(item_games->path, ".slave") || strlen(item_games->path) == 0)
 				item_games->exists = 0;
 			else
 				item_games->exists = 1;
@@ -1176,7 +1177,7 @@ void game_click()
 			BPTR fp = Open((CONST_STRPTR)naked_path, MODE_OLDFILE);
 			if (!fp) //no igame.iff, try .info and newicons
 			{
-				if (strstr(path, ".slave")) //check for whdload game
+				if (strcasestr(path, ".slave")) //check for whdload game
 				{
 					path[strlen(path) - 6] = '\0';
 					sprintf(naked_path, "%s.info", (const char*)path);
@@ -1490,7 +1491,7 @@ void game_properties()
 
 		while ((success = ExNext(lock, m)))
 		{
-			if (strstr(m->fib_FileName, ".info"))
+			if (strcasestr(m->fib_FileName, ".info"))
 			{
 				NameFromLock(lock, (unsigned char*)str2, 512);
 				sprintf(fullpath, "%s/%s", str2, m->fib_FileName);
@@ -1658,7 +1659,7 @@ void game_properties_ok()
 
 			while (ExNext(lock, m))
 			{
-				if (strstr(m->fib_FileName, ".info"))
+				if (strcasestr(m->fib_FileName, ".info"))
 				{
 					NameFromLock(lock, (unsigned char*)str2, 512);
 					sprintf(fullpath, "%s/%s", str2, m->fib_FileName);
@@ -1890,7 +1891,7 @@ void follow_thread(BPTR lock, int tab_level)
 		//make m->fib_FileName to lower
 		const int kp = strlen((char *)m->fib_FileName);
 		for (int s = 0; s < kp; s++) m->fib_FileName[s] = tolower(m->fib_FileName[s]);
-		if (strstr(m->fib_FileName, ".slave"))
+		if (strcasestr(m->fib_FileName, ".slave"))
 		{
 			NameFromLock(lock, (unsigned char*)str, 511);
 			sprintf(fullpath, "%s/%s", str, m->fib_FileName);
