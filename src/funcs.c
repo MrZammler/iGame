@@ -65,7 +65,7 @@
 
 #include "iGameGUI.h"
 #include "iGameExtern.h"
-#include "iGameStrings_cat.h"
+#include "iGame_cat.h"
 
 extern char* strdup(const char* s);
 extern char* strcasestr(const char *haystack, const char *needle);
