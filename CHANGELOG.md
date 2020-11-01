@@ -1,4 +1,4 @@
-## iGame 2.0b8 - [future]
+## iGame 2.1b1 - [future]
 ### Fixed
 - Fixed install script on MorphOS
 
