@@ -1,3 +1,7 @@
+## iGame 2.0b8 - [future]
+### Added
+- Three extra PNG icons contributed by AmigaSystem
+
 ## iGame 2.0 - 2020-10-16
 This release includes all the fixes and changes of the 2.0 beta releases below.
 
