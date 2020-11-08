@@ -1,5 +1,8 @@
 ## iGame 2.1b1 - [future]
+### Added
 - Three extra PNG icons contributed by Carlo Spadoni
+
+### Fixed
 - Fixed install script on MorphOS
 
 ## iGame 2.0 - 2020-10-16
