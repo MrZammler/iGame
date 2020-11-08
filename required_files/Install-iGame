@@ -7,9 +7,13 @@
 ; | | |__| | (_| | | | | | |  __/
 ; |_|\_____|\__,_|_| |_| |_|\___|
 ;
-; $VER: Install-iGame 1.0 (20.3.2020)
+; $VER: Install-iGame 1.2 (02.11.2020)
 ;
 ; History:
+;   1.2   02.11.2020: Added prompt messages on expert mode
+;                     Added the copy of default genres list,
+;                         requesting user approval
+;                     Request user approval to copy the .info
 ;   1.1   04.10.2020: Fixed the copy of OS4 version
 ;                     Added the Italiano catalog
 ;   1.0   20.03.2020: initial release
@@ -82,8 +86,8 @@
                                  "\n"
                                  "Have fun!"))
 
-				(set #destexists_1      "\nThe directory\n\n")
-				(set #destexists_2      "\n\nalready contains an iGame drawer. If you continue, the iGame in this drawer will be updated. No backups will be created. The games, genre and repositories files will remain intact.")
+        (set #destexists_1      "\nThe directory\n\n")
+        (set #destexists_2      "\n\nalready contains an iGame drawer. If you continue, the iGame in this drawer will be updated. No backups will be created. The gameslist and repositories files will remain intact.")
     )
 )
 
@@ -258,6 +262,7 @@
 (if (= (exists #destination) 0)
 	(
 		(makedir #destination
+			(prompt (cat "iGame will be installed at\n" #destination))
 			(help @makedir-help)
 			(confirm "expert")
 		)
@@ -269,6 +274,7 @@
 (complete 50)
 
 (makedir (tackon #destination "Icons")
+	(prompt (cat "Extra icons will be installed at\n" (tackon #destination "Icons")))
 	(help @makedir-help)
 	(confirm "expert")
 )
@@ -277,7 +283,6 @@
 		(source (tackon "Icons" @each-name))
 		(dest (tackon #destination "Icons"))
 		(help @copyfiles-help)
-		(confirm "expert")
 	)
 )
 
@@ -286,6 +291,7 @@
 (complete 60)
 
 (copyfiles
+	(prompt (cat "Should iGame.guide be installed at\n" #destination "?"))
 	(source "iGame.guide")
 	(dest #destination)
 	(help @copyfiles-help)
@@ -295,7 +301,6 @@
 	(source "iGame.guide.info")
 	(dest #destination)
 	(help @copyfiles-help)
-	(confirm "expert")
 )
 
 ;=============================================================================
@@ -303,6 +308,7 @@
 (complete 70)
 
 (copyfiles
+	(prompt (cat "Should igame.iff be installed at\n" #destination "?"))
 	(source "igame.iff")
 	(dest #destination)
 	(help @copyfiles-help)
@@ -318,7 +324,6 @@
 	(
 		(makedir (tackon #destination "catalogs")
 			(help @makedir-help)
-			(confirm "expert")
 		)
 
 		; copy the .cd files
@@ -363,21 +368,35 @@
 )
 
 ;=============================================================================
-; Copy main executable
+; Copy default genres
 (complete 90)
 
 (copyfiles
+	(prompt (cat "Should default genres list file be installed at\n" #destination "?"))
+	(source "genres")
+	(dest #destination)
+	(help "This step will copy the genres default list file at the destination folder. If you have your own list, with extra genres added, you might want to skip this step. Otherwise, proceed with the copy.")
+	(confirm "average")
+)
+
+;=============================================================================
+; Copy main executable
+(complete 95)
+
+(copyfiles
+	(prompt (cat "Should iGame be installed at\n" #destination "?"))
 	(source #selectedVersion)
 	(dest #destination)
 	(newname "iGame")
-	(help @copyfiles-help)
+	(help "This step will copy the iGame executable at the destination folder. If this is the first time you install iGame or you want to update an older version, proceed with the copy.")
 	(confirm "expert")
 )
 (copyfiles
+	(prompt (cat "Should iGame.info be installed at\n" #destination "?"))
 	(source "iGame.info")
 	(dest #destination)
-	(help @copyfiles-help)
-	(confirm "expert")
+	(help "This step will copy the iGame.info file at the destination folder. If you update an older version and you have already changed the default tooltypes, you might want to skip this step. Otherwise, proceed with the copy.")
+	(confirm "average")
 )
 
 ;=============================================================================
