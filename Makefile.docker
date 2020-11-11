@@ -56,8 +56,8 @@ CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99 -DCPU_VERS=68000 $(VERS_FLAGS)
 CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68030 $(VERS_FLAGS)
 CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68040 $(VERS_FLAGS)
 CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68060 $(VERS_FLAGS)
-CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99 -DCPU_VERS=MorphOS $(VERS_FLAGS)
-CFLAGS_OS4	= -c +aosppc -dontwarn=-1 -O2 -c99 -D__USE_INLINE__ -DCPU_VERS=AmigaOS4 $(VERS_FLAGS)
+CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -DCPU_VERS=MorphOS $(VERS_FLAGS)
+CFLAGS_OS4	= -c +aosppc -dontwarn=-1 -O2 -D__USE_INLINE__ -DCPU_VERS=AmigaOS4 $(VERS_FLAGS)
 
 ##########################################################################
 # Builder settings
