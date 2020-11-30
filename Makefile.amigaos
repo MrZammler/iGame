@@ -7,43 +7,54 @@
 ##########################################################################
 
 ##########################################################################
-# Default: Build iGame
+# Default: Build iGame with standard optimizations and 000 support
 ##########################################################################
 all: iGame
+
+##########################################################################
+# Set up version and date properties
+##########################################################################
+
+DATE = $(shell date --iso=date)
 
 ##########################################################################
 # Compiler settings
 ##########################################################################
 CC			= vc
 LINK		= vc
-INCLUDES	= -IDevkits:sdk/classic/MUI/Developer/C/Include -IDevkits:sdk/classic/MCC_Guigfx/Developer/C/Include -IDevkits:sdk/classic/MCC_Texteditor/Developer/C/Include -IDevkits:sdk/classic/ndk_39/include/include_h
-CFLAGS			= -c +aos68k -dontwarn=-1 -O2 -c99 -DCPU_VERS=68000
-CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68030
-CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68040
-CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68060
-CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -c99 -DCPU_VERS=MorphOS
-CFLAGS_AOS4	= -c +aosppc -dontwarn=-1 -O2 -c99 -DCPU_VERS=AmigaOS4
+
+INCLUDES_COMMON	= -IDevkits:sdk/classic/MCC_Guigfx/Developer/C/Include -IDevkits:sdk/classic/MCC_Texteditor/Developer/C/Include
+INCLUDES	= -IDevkits:sdk/classic/ndk_39/include/include_h -IDevkits:sdk/classic/MUI/Developer/C/Include $(INCLUDES_COMMON)
+INCLUDES_OS4= -ISDK:include/include_h -ISDK:MUI/C/include $(INCLUDES_COMMON)
+INCLUDES_MOS= -IDevkits:sdk/morphos/1.0/os-include -IDevkits:sdk/classic/ndk_39/include/include_h -IDevkits:sdk/classic/MUI/Developer/C/Include $(INCLUDES_COMMON)
+
+CFLAGS		= -c +aos68k -dontwarn=-1 -O2 -c99 -DCPU_VERS=68000 -DRELEASE_DATE=$(DATE)
+CFLAGS_030	= -c +aos68k -cpu=68030 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68030 -DRELEASE_DATE=$(DATE)
+CFLAGS_040	= -c +aos68k -cpu=68040 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68040 -DRELEASE_DATE=$(DATE)
+CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68060 -DRELEASE_DATE=$(DATE)
+CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -DCPU_VERS=MorphOS -DRELEASE_DATE=$(DATE)
+CFLAGS_OS4	= -c +aosppc -dontwarn=-1 -O2 -D__USE_INLINE__ -DCPU_VERS=AmigaOS4 -DRELEASE_DATE=$(DATE)
 
 ##########################################################################
-# Library builder settings
+# Builder settings
 ##########################################################################
 #MKLIB			= join
 LIBFLAGS		= +aos68k -lamiga -lauto -o
 LIBFLAGS_MOS	= +morphos -lamiga -lauto -o
-LIBFLAGS_AOS4	= +aosppc -lamiga -lauto -o
+LIBFLAGS_OS4	= +aosppc -lamiga -lauto -o
 
 ##########################################################################
-# Object files which are part of the GLFW library
+# Object files which are part of iGame
 ##########################################################################
 OBJS		= src/funcs.o src/iGameGUI.o src/iGameMain.o src/strcasestr.o src/strdup.o src/iGame_cat.o
 OBJS_030	= src/funcs_030.o src/iGameGUI_030.o src/iGameMain_030.o src/strcasestr_030.o src/strdup_030.o src/iGame_cat_030.o
 OBJS_040	= src/funcs_040.o src/iGameGUI_040.o src/iGameMain_040.o src/strcasestr_040.o src/strdup_040.o src/iGame_cat_040.o
 OBJS_060	= src/funcs_060.o src/iGameGUI_060.o src/iGameMain_060.o src/strcasestr_060.o src/strdup_060.o src/iGame_cat_060.o
 OBJS_MOS	= src/funcs_MOS.o src/iGameGUI_MOS.o src/iGameMain_MOS.o src/strcasestr_MOS.o src/strdup_MOS.o src/iGame_cat_MOS.o
-OBJS_AOS4	= src/funcs_AOS4.o src/iGameGUI_AOS4.o src/iGameMain_AOS4.o src/strcasestr_AOS4.o src/strdup_AOS4.o src/iGame_cat_AOS4.o
+OBJS_OS4	= src/funcs_OS4.o src/iGameGUI_OS4.o src/iGameMain_OS4.o src/strcasestr_OS4.o src/strdup_OS4.o src/iGame_cat_OS4.o
 
 ##########################################################################
-# Rule for building library
+# Rule for building
 ##########################################################################
 iGame: $(OBJS)
 	$(LINK) $(OBJS) $(LIBFLAGS) $@
@@ -60,8 +71,8 @@ iGame.060: $(OBJS_060)
 iGame.MOS: $(OBJS_MOS)
 	$(LINK) $(OBJS_MOS) $(LIBFLAGS_MOS) $@
 
-iGame.AOS4: $(OBJS_AOS4)
-	$(LINK) $(OBJS_AOS4) $(LIBFLAGS_AOS4) $@
+iGame.OS4: $(OBJS_OS4)
+	$(LINK) $(OBJS_OS4) $(LIBFLAGS_OS4) $@
 
 ##########################################################################
 # Rules for generating catalog source files
@@ -73,7 +84,7 @@ src/iGame_cat.h: src/iGame.cd src/C_h.sd
 	cd src && flexcat iGame.cd iGame_cat.h=C_h.sd
 
 ##########################################################################
-# Rules for building library object files (generic 00)
+# object files (generic 000)
 ##########################################################################
 src/funcs.o: src/funcs.c src/iGame_cat.h
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/funcs.c
@@ -164,49 +175,49 @@ src/iGame_cat_060.o: src/iGame_cat.c
 ##########################################################################
 
 src/funcs_MOS.o: src/funcs.c src/iGame_cat.h
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/funcs.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/funcs.c
 
 src/iGameGUI_MOS.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/iGameGUI.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/iGameGUI.c
 
 src/iGameMain_MOS.o: src/iGameMain.c
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/iGameMain.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/iGameMain.c
 
 src/strcasestr_MOS.o: src/strcasestr.c
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/strcasestr.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/strcasestr.c
 
 src/strdup_MOS.o: src/strdup.c
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/strdup.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/strdup.c
 
 src/iGame_cat_MOS.o: src/iGame_cat.c
-	$(CC) $(CFLAGS_MOS) $(INCLUDES) -o $@ src/iGame_cat.c
+	$(CC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/iGame_cat.c
 
 ##########################################################################
 # object files (AOS4)
 ##########################################################################
 
-src/funcs_AOS4.o: src/funcs.c src/iGame_cat.h
-	$(CC) $(CFLAGS_AOS4) -o $@ src/funcs.c
+src/funcs_OS4.o: src/funcs.c src/iGame_cat.h
+	$(CC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/funcs.c
 
-src/iGameGUI_AOS4.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
-	$(CC) $(CFLAGS_AOS4) -o $@ src/iGameGUI.c
+src/iGameGUI_OS4.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
+	$(CC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/iGameGUI.c
 
-src/iGameMain_AOS4.o: src/iGameMain.c
-	$(CC) $(CFLAGS_AOS4) -o $@ src/iGameMain.c
+src/iGameMain_OS4.o: src/iGameMain.c
+	$(CC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/iGameMain.c
 
-src/strcasestr_AOS4.o: src/strcasestr.c
-	$(CC) $(CFLAGS_AOS4) -o $@ src/strcasestr.c
+src/strcasestr_OS4.o: src/strcasestr.c
+	$(CC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/strcasestr.c
 
-src/strdup_AOS4.o: src/strdup.c
-	$(CC) $(CFLAGS_AOS4) -o $@ src/strdup.c
+src/strdup_OS4.o: src/strdup.c
+	$(CC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/strdup.c
 
-src/iGame_cat_AOS4.o: src/iGame_cat.c
-	$(CC) $(CFLAGS_AOS4) $(INCLUDES) -o $@ src/iGame_cat.c
+src/iGame_cat_OS4.o: src/iGame_cat.c
+	$(CC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/iGame_cat.c
 
 ##########################################################################
 # generic build options
 ##########################################################################
 
 clean:
-	delete iGame iGame.030 iGame.040 iGame.060 iGame.MOS iGame.AOS4 $(OBJS) $(OBJS_030) $(OBJS_040) $(OBJS_060) $(OBJS_MOS) $(OBJS_AOS4)
+	delete iGame iGame.030 iGame.040 iGame.060 iGame.MOS iGame.OS4 $(OBJS) $(OBJS_030) $(OBJS_040) $(OBJS_060) $(OBJS_MOS) $(OBJS_OS4)
 
