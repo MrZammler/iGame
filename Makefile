@@ -76,13 +76,21 @@ iGame.OS4: $(OBJS_OS4)
 	$(LINK_PPC) $(OBJS_OS4) $(LIBFLAGS_OS4) $@
 
 ##########################################################################
-# generated source files
+# catalog files
 ##########################################################################
-src/iGame_cat.c: src/iGame.cd src/C_c.sd
-	cd src && flexcat iGame.cd iGame_cat.c=C_c.sd
+src/iGame_cat.c: catalogs/iGame.cd catalogs/C_c.sd
+	cd catalogs && flexcat iGame.cd ../src/iGame_cat.c=C_c.sd
 
-src/iGame_cat.h: src/iGame.cd src/C_h.sd
-	cd src && flexcat iGame.cd iGame_cat.h=C_h.sd
+src/iGame_cat.h: catalogs/iGame.cd catalogs/C_h.sd
+	cd catalogs && flexcat iGame.cd ../src/iGame_cat.h=C_h.sd
+
+catalogs/%/iGame.catalog: catalogs/%/iGame.ct catalogs/iGame.cd
+	flexcat catalogs/iGame.cd $< CATALOG $@
+
+catalog_files := $(patsubst %/iGame.ct,%/iGame.catalog,$(wildcard catalogs/*/iGame.ct))
+catalog_dirs := $(dir $(catalog_files))
+
+catalogs: $(catalog_files)
 
 ##########################################################################
 # object files (generic 000)
@@ -220,10 +228,10 @@ src/iGame_cat_OS4.o: src/iGame_cat.c
 ##########################################################################
 
 clean:
-	rm iGame iGame.* src/funcs*.o src/iGameGUI*.o src/iGameMain*.o src/strcasestr*.o src/strdup*.o src/iGame_cat*.o
+	rm iGame iGame.* src/funcs*.o src/iGameGUI*.o src/iGameMain*.o src/strcasestr*.o src/strdup*.o src/iGame_cat*.o $(catalog_files)
 
 # pack everything in a nice lha file
-release:
+release: $(catalog_files)
 	cp required_files iGame_rel/iGame-$(DATE) -r
 	cp alt_icons iGame_rel/iGame-$(DATE)/Icons -r
 	cp iGame_rel/iGame-$(DATE)/igame_drawer_3.0.info iGame_rel/iGame-$(DATE).info
@@ -235,6 +243,10 @@ release:
 	if [ -f "iGame.060" ]; then cp iGame.060 iGame_rel/iGame-$(DATE)/; fi
 	if [ -f "iGame.MOS" ]; then cp iGame.MOS iGame_rel/iGame-$(DATE)/; fi
 	if [ -f "iGame.OS4" ]; then cp iGame.OS4 iGame_rel/iGame-$(DATE)/; fi
+	mkdir iGame_rel/iGame-$(DATE)/catalogs
+	cp catalogs/iGame.cd iGame_rel/iGame-$(DATE)/catalogs/
+	cd iGame_rel/iGame-$(DATE) && mkdir $(catalog_dirs)
+	for c in $(catalog_files); do cp $$c iGame_rel/iGame-$(DATE)/$$(dirname $$c)/; done
 	cp CHANGELOG.md iGame_rel/iGame=$(DATE)/
 	cd iGame_rel && lha -aq2o6 iGame-$(DATE).lha iGame-$(DATE)/ iGame-$(DATE).info
 
