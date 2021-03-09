@@ -1,9 +1,11 @@
 ## iGame 2.1b1 - [future]
 ### Added
 - Three extra PNG icons contributed by Carlo Spadoni
+- Added Greek translation
 
 ### Fixed
 - Fixed install script on MorphOS
+- Fixed usage of Catalog files (thanks coldacid)
 
 ## iGame 2.0 - 2020-10-16
 This release includes all the fixes and changes of the 2.0 beta releases below.
