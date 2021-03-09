@@ -990,6 +990,12 @@ void launch_game()
 								if (tool_type[0] == '*') continue;
 								if (tool_type[0] == ';') continue;
 								if (tool_type[0] == '\0') continue;
+								if (tool_type[0] == -69) continue; // »
+								if (tool_type[0] == -85) continue; // «
+								if (tool_type[0] == '.') continue;
+								if (tool_type[0] == '=') continue;
+								if (tool_type[0] == '#') continue;
+								if (tool_type[0] == '!') continue;
 
 								/* Must check here for numerical values */
 								/* Those (starting with $ should be transformed to dec from hex) */
