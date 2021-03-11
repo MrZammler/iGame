@@ -1,4 +1,4 @@
-## version $VER: iGame.catalog 2.0 (26.09.2020)
+## version $VER: iGame.catalog 2.1 (10.03.2021)
 ## codeset 0
 ## language italiano
 ## chunk AUTH Translated by Samir Hawamdeh
@@ -36,15 +36,15 @@ R_
 ; R_
 ;
 MSG_MNMainAddnonWHDLoadgame
-Aggiungi gioco non-WHDLoad...
-; Add non-WHDLoad game...
+Aggiungi gioco...
+; Add game......
 ;
 MSG_MNMainAddnonWHDLoadgameChar
 A_
 ; A_
 ;
 MSG_MNMainMenuShowHidehiddenentries
-Mostra/Nascondi voci nascoste
+Mostra/Nascondi voci
 ; Show/Hide hidden entries
 ;
 MSG_MNMainOpenList
@@ -92,7 +92,7 @@ Duplica...
 ; Duplicate...
 ;
 MSG_MNMainProperties
-Proprietï¿½...
+Proprietà...
 ; Properties...
 ;
 MSG_MNMainPropertiesChar
@@ -108,7 +108,7 @@ D_
 ; D_
 ;
 MSG_MNlabel2Tools
-Impostazioni
+Preferenze
 ; Settings
 ;
 MSG_MNMainiGameSettings
@@ -128,11 +128,11 @@ Filtro:
 ; Filter:
 ;
 MSG_LV_GenresListTitle
-Generi
+Genere
 ; Genres
 ;
 MSG_WI_Properties
-Proprietï¿½ gioco
+Proprietà gioco
 ; Game Properties
 ;
 MSG_STR_PropertiesGameTitleTitle
@@ -180,7 +180,7 @@ Directory giochi
 ; Game Repositories
 ;
 MSG_BT_AddRepo
-_Aggiungi
+Aggiungi
 ; Add
 ;
 MSG_BT_RemoveRepo
@@ -224,7 +224,7 @@ Informazioni su iGame
 ; About iGame
 ;
 MSG_TX_About
-Emmanuel Vasilakis (mrzammler@mm.st)\n\nContribuzioni a cura di:\nDimitris Panokostas (midwan@gmail.com)\nGeorge Sokianos (walkero@gmail.com)\nChris Charabaruk (chris+igame@charabaruk.com)\nJavier R. Santurde (tolkien)\n\n
+Emmanuel Vasilakis (mrzammler@mm.st)\n\nContributi a cura di:\nDimitris Panokostas (midwan@gmail.com)\nGeorge Sokianos (walkero@gmail.com)\nChris Charabaruk (chris+igame@charabaruk.com)\nJavier R. Santurde (tolkien)\n\n
 ; Emmanuel Vasilakis (mrzammler@mm.st)\n\nContributors:\nDimitris Panokostas (midwan@gmail.com)\nGeorge Sokianos (walkero@gmail.com)\nChris Charabaruk (chris+igame@charabaruk.com)\nJavier R. Santurde (tolkien)\n\n
 ;
 MSG_BT_AboutOK
@@ -248,7 +248,7 @@ No GuiGfx
 ; No GuiGfx
 ;
 MSG_LA_ScreenshotSize
-Dimensione miniature:
+Dimensioni miniature:
 ; Screenshot Size:
 ;
 MSG_CY_ScreenshotSize0
@@ -260,7 +260,7 @@ MSG_CY_ScreenshotSize1
 ; 320x256
 ;
 MSG_CY_ScreenshotSize2
-Predefinita
+Predefinite
 ; Custom
 ;
 MSG_LA_Width
@@ -300,7 +300,7 @@ Salva statistiche all'uscita
 ; Save Stats on Exit
 ;
 MSG_LA_FilterUseEnter
-Usa tasto "Invio" per filtrare
+Usa tasto Invio per filtrare
 ; Use Enter to Filter
 ;
 MSG_LA_HideSidepanel
@@ -320,11 +320,11 @@ _Annulla
 ; Cancel
 ;
 MSG_SelectDir
-Seleziona dir...
+Seleziona directory...
 ; Select dir...
 ;
 MSG_GameExecutable
-Seleziona eseguibile gioco...
+Seleziona eseguibile del gioco...
 ; Select Game executable...
 ;
 MSG_TotalNumberOfGames
@@ -348,7 +348,7 @@ MSG_FilterLastPlayed
 ; --Last Played--
 ;
 MSG_FilterMostPlayed
---Piï¿½ Giocati--
+--Più Giocati--
 ; --Most Played--
 ;
 MSG_FilterNeverPlayed
@@ -360,7 +360,7 @@ Avvio di %s...
 ; Running %s...
 ;
 MSG_ErrorExecutingWhdload
-Attenzione, si ï¿½ verificato un errore durante l'esecuzione di WHDLoad o del gioco.\nPer favore assicurati che WHDLoad sia correttamente installato nel percorso.
+Attenzione, si è verificato un errore durante l'esecuzione di WHDLoad o del gioco.\nPer favore assicurati che WHDLoad sia correttamente installato nel percorso.
 ; Error while executing WHDLoad or Game.\nPlease make sure WHDLoad is in your path.
 ;
 MSG_ScanningPleaseWait
@@ -376,7 +376,7 @@ Per favore seleziona un gioco dalla lista
 ; Please select a Game from the List.
 ;
 MSG_TitleAlreadyExists
-Il titolo selezionato ï¿½ giï¿½ esistente!
+Il titolo selezionato è già esistente!
 ; The Title you selected, already exists.
 ;
 MSG_SavingGamelist
@@ -404,7 +404,7 @@ Impossibile allocare la memoria!\nProcesso interrotto...
 ; Could not allocate memory! Aborting...
 ;
 MSG_DirectoryNotFound
-Directory gioco non trovata!
+Directory del gioco non trovata!
 ; Game Directory not found!
 ;
 MSG_LA_StartWithFavorites
@@ -414,7 +414,7 @@ Mostra preferiti all'avvio
 ; MUIB Menu Title
 ;
 MSG_MNMainOpenCurrentDir
-Apri directory gioco
+Apri directory
 ; Open Game Dir
 ;
 ; MUIB Menu ShortCut
