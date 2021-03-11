@@ -2,6 +2,7 @@
 ### Added
 - Three extra PNG icons contributed by Carlo Spadoni
 - Added Greek translation
+- Added screen title that includes the version
 
 ### Fixed
 - Fixed install script on MorphOS

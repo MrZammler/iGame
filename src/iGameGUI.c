@@ -44,6 +44,7 @@
 
 /* ANSI C */
 #include <string.h>
+#include <stdio.h>
 
 #ifndef CPU_VERS
 #define CPU_VERS 68000
@@ -64,6 +65,18 @@ extern igame_settings *current_settings;
 struct ObjApp * CreateApp(void)
 {
 	struct ObjApp * object;
+	unsigned char about_text[512];
+	unsigned char *version_string;
+
+	strcpy(version_string, GetMBString(MSG_WI_MainWindow));
+	strcat(version_string, " v");
+	strcat(version_string, STR(MAJOR_VERS));
+	strcat(version_string, ".");
+	strcat(version_string, STR(MINOR_VERS));
+	#ifdef BETA_VERS
+	strcat(version_string, "b");
+	strcat(version_string, STR(BETA_VERS));
+	#endif
 
 	APTR	MNlabel2Actions, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainMenuShowHidehiddenentries;
 	APTR	MNMainOpenList, MNMainSaveList, MNMainSaveListAs;
@@ -253,22 +266,14 @@ struct ObjApp * CreateApp(void)
 	object->STR_TX_PropertiesSlavePath = NULL;
 	object->STR_TX_PropertiesTooltypes = NULL;
 
-	unsigned char about_text[512];
-	strcpy(about_text, "iGame v");
-	strcat(about_text, STR(MAJOR_VERS));
-	strcat(about_text, ".");
-	strcat(about_text, STR(MINOR_VERS));
-	#ifdef BETA_VERS
-	strcat(about_text, "b");
-	strcat(about_text, STR(BETA_VERS));
-	#endif
+	strcpy(about_text, version_string);
 	strcat(about_text, " (");
 	strcat(about_text, STR(RELEASE_DATE));
 	strcat(about_text, ") ");
 	strcat(about_text, "\ncompiled for ");
 	strcat(about_text, STR(CPU_VERS));
 	strcat(about_text, "\n\n");
-	strcat(about_text, "Copyright 2005-2020\n");
+	strcat(about_text, "Copyright 2005-2021\n");
 	strcat(about_text, GetMBString(MSG_TX_About));
 
 	object->STR_TX_About = (CONST_STRPTR)about_text;
@@ -531,6 +536,7 @@ struct ObjApp * CreateApp(void)
 		End;
 
 	object->WI_MainWindow = WindowObject,
+		MUIA_Window_ScreenTitle, version_string,
 		MUIA_Window_Title, GetMBString(MSG_WI_MainWindow),
 		MUIA_Window_Menustrip, object->MN_MainMenu,
 		MUIA_Window_ID, MAKE_ID('0', 'I', 'G', 'A'),
