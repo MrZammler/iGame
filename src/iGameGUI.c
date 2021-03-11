@@ -44,7 +44,6 @@
 
 /* ANSI C */
 #include <string.h>
-#include <stdio.h>
 
 #ifndef CPU_VERS
 #define CPU_VERS 68000
