@@ -108,7 +108,7 @@ src/iGame_cat.h: catalogs/iGame.cd catalogs/C_h.sd
 	cd catalogs && flexcat iGame.cd ../src/iGame_cat.h=C_h.sd
 
 catalogs/%/iGame.catalog: catalogs/%/iGame.ct catalogs/iGame.cd
-	flexcat catalogs/iGame.cd $< CATALOG $@
+	flexcat catalogs/iGame.cd $< CATALOG $@ FILL
 
 catalog_files := $(patsubst %/iGame.ct,%/iGame.catalog,$(wildcard catalogs/*/iGame.ct))
 catalog_dirs := $(dir $(catalog_files))
