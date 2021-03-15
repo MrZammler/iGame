@@ -102,6 +102,7 @@ char* get_slave_from_path(char* slave, int start, char* path);
 void read_tool_types();
 void check_for_wbrun();
 void list_show_favorites(char* str);
+int check_path_exists(char* path);
 
 /* structures */
 struct EasyStruct msgbox;
@@ -891,11 +892,15 @@ void launch_game()
 	}
 
 	char* path = malloc(256 * sizeof(char));
-	if (path != NULL)
-		get_path(game_title, path);
-	else
+	if (path == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+		return;
+	}
+	get_path(game_title, path);
+
+	if(!check_path_exists(path)) {
+		msg_box((const char*)GetMBString(MSG_slavePathDoesntExist));
 		return;
 	}
 
@@ -1379,6 +1384,20 @@ char* get_slave_from_path(char* slave, int start, char* path)
 		z++;
 	}
 	return slave;
+}
+
+// Check if a path actually exists in hard disk.
+// Return True if exists
+// Return False if it doesn't exist
+int check_path_exists(char* path)
+{
+	const BPTR lock = Lock(path, ACCESS_READ);
+	if (!lock) {
+		return FALSE;
+	}
+
+	UnLock(lock);
+	return TRUE;
 }
 
 //shows and inits the GameProperties Window

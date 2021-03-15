@@ -1,13 +1,23 @@
-## iGame 2.1b1 - [future]
+## iGame 2.1b2 - [future]
+### Added
+- Added iGame version at the screen title
+
+### Updated
+- Updated Italian catalog
+- Updated Greek catalog
+### Fixed
+- Fixed starting whdload games that have tooltypes start with the characters »«.=#!
+- Fixed starting whdload games/demos that the Slave path is missing. Now an error message is shown, and iGame doesn't crash hard, bringing down the whole system.
+
+
+## iGame 2.1b1 - [2021-03-09]
 ### Added
 - Three extra PNG icons contributed by Carlo Spadoni
 - Added Greek translation
-- Added screen title that includes the version
 
 ### Fixed
 - Fixed install script on MorphOS
 - Fixed usage of Catalog files (thanks coldacid)
-- Fixed starting whdload games that have tooltypes start with the characters »«.=#!
 
 ## iGame 2.0 - 2020-10-16
 This release includes all the fixes and changes of the 2.0 beta releases below.

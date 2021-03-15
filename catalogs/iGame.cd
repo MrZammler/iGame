@@ -312,3 +312,9 @@ Open Game Dir
 ;MUIB Menu ShortCut
 MSG_MNMainOpenCurrentDirChar (//)
 W_
+;Slave path does not exist
+MSG_slavePathDoesntExist (//)
+Slave path does not exist!
+;compiled for
+MSG_compiledForAboutWin (//)
+compiled for

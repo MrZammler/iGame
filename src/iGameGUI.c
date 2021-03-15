@@ -44,6 +44,7 @@
 
 /* ANSI C */
 #include <string.h>
+#include <stdio.h>
 
 #ifndef CPU_VERS
 #define CPU_VERS 68000
@@ -80,8 +81,8 @@ struct ObjApp * CreateApp(void)
 	);
 
 	snprintf(about_text, sizeof(about_text),
-		"%s (%s)\ncompiled for %s\n\nCopyright 2005-2021\n%s"
-		, version_string, STR(RELEASE_DATE), STR(CPU_VERS), GetMBString(MSG_TX_About)
+		"%s (%s)\n%s %s\n\nCopyright 2005-2021\n%s"
+		, version_string, STR(RELEASE_DATE), GetMBString(MSG_compiledForAboutWin), STR(CPU_VERS), GetMBString(MSG_TX_About)
 	);
 
 	APTR	MNlabel2Actions, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainMenuShowHidehiddenentries;
