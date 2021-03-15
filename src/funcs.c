@@ -69,6 +69,10 @@
 
 extern char* strdup(const char* s);
 extern char* strcasestr(const char *haystack, const char *needle);
+extern void string_to_lower(char* slave);
+extern char** my_split(char* str, char* spl);
+extern int get_delimiter_position(const char* str);
+extern const char* add_spaces_to_string(const char* input);
 extern struct ObjApp* app;
 extern char* executable_name;
 
@@ -83,7 +87,6 @@ int IntroPic = 0;
 int wbrun = 0;
 
 /* function definitions */
-char** my_split(char* str, char* spl);
 int get_genre(char* title, char* genre);
 void get_path(char* title, char* path);
 void follow_thread(BPTR lock, int tab_level);
@@ -92,11 +95,9 @@ int hex2dec(char* hexin);
 void msg_box(const char* msg);
 int get_title_from_slave(char* slave, char* title);
 int check_dup_title(char* title);
-int get_delimiter_position(const char* str);
 const char* get_directory_name(const char* str);
 const char* get_directory_path(const char* str);
 const char* get_executable_name(int argc, char** argv);
-const char* add_spaces_to_string(const char* input);
 void strip_path(const char* path, char* naked_path);
 char* get_slave_from_path(char* slave, int start, char* path);
 void read_tool_types();
@@ -843,12 +844,6 @@ void filter_change()
 		list_show_filtered(str, str_gen);
 }
 
-void string_to_lower(char* slave)
-{
-	for (int i = 0; i <= strlen(slave) - 1; i++)
-		slave[i] = tolower(slave[i]);
-}
-
 /*
  * Checks if WBRun exists in C:
  */
@@ -1386,9 +1381,11 @@ char* get_slave_from_path(char* slave, int start, char* path)
 	return slave;
 }
 
-// Check if a path actually exists in hard disk.
-// Return True if exists
-// Return False if it doesn't exist
+/*
+ * Check if a path actually exists in hard disk.
+ * - Return True if exists
+ * - Return False if it doesn't exist
+ */
 int check_path_exists(char* path)
 {
 	const BPTR lock = Lock(path, ACCESS_READ);
@@ -1835,53 +1832,6 @@ void app_stop()
 void genres_click()
 {
 	filter_change();
-}
-
-/*
-* Splits a string using spl
-*/
-char** my_split(char* str, char* spl)
-{
-	char **ret, *buffer[256], buf[4096];
-	int i;
-
-	if (!spl)
-	{
-		ret = (char **)malloc(2 * sizeof(char *));
-		ret[0] = (char *)strdup(str);
-		ret[1] = NULL;
-		return (ret);
-	}
-
-	int count = 0;
-
-	char* fptr = str;
-	const int spl_len = strlen(spl);
-	char* sptr = strstr(fptr, spl);
-	while (sptr)
-	{
-		i = sptr - fptr;
-		memcpy(buf, fptr, i);
-		buf[i] = '\0';
-		buffer[count++] = (char *)strdup(buf);
-		fptr = sptr + spl_len;
-		sptr = strstr(fptr, spl);
-	}
-	sptr = strchr(fptr, '\0');
-	i = sptr - fptr;
-	memcpy(buf, fptr, i);
-	buf[i] = '\0';
-	buffer[count++] = (char *)strdup(buf);
-
-	ret = (char **)malloc((count + 1) * sizeof(char *));
-
-	for (i = 0; i < count; i++)
-	{
-		ret[i] = buffer[i];
-	}
-	ret[count] = NULL;
-
-	return ret;
 }
 
 void follow_thread(BPTR lock, int tab_level)
@@ -2736,21 +2686,6 @@ int check_dup_title(char* title)
 	return 0;
 }
 
-int get_delimiter_position(const char* str)
-{
-	char* delimiter = strrchr(str, '/');
-	if (!delimiter)
-		delimiter = strrchr(str, ':');
-
-	if (!delimiter)
-	{
-		return 0;
-	}
-
-	const int pos = delimiter - str;
-	return pos;
-}
-
 // Get the Directory part from a full path containing a file
 const char* get_directory_name(const char* str)
 {
@@ -2813,57 +2748,6 @@ const char *get_executable_name(int argc, char **argv)
 	}
 
 	return executable_name;
-}
-
-// Add spaces to a string, based on letter capitalization and numbers
-// E.g. input "A10TankKiller2Disk" -> "A10 Tank Killer 2 Disk"
-const char* add_spaces_to_string(const char* input)
-{
-	char input_string[100];
-	strcpy(input_string, input);
-	char* output = (char*)malloc(sizeof input_string * 2);
-
-	// Special case for the first character, we don't touch it
-	output[0] = input_string[0];
-
-	unsigned int output_index = 1;
-	unsigned int input_index = 1;
-	unsigned int capital_found = 0;
-	unsigned int number_found = 0;
-	while (input_string[input_index])
-	{
-		if (isspace(input_string[input_index]))
-			return input;
-
-		if (isdigit(input_string[input_index]))
-		{
-			if (number_found < input_index - 1)
-			{
-				output[output_index] = ' ';
-				output_index++;
-				output[output_index] = input_string[input_index];
-			}
-			number_found = input_index;
-		}
-
-		else if (isupper(input_string[input_index]))
-		{
-			if (capital_found < input_index - 1)
-			{
-				output[output_index] = ' ';
-				output_index++;
-				output[output_index] = input_string[input_index];
-			}
-			capital_found = input_index;
-		}
-
-		output[output_index] = input_string[input_index];
-		output_index++;
-		input_index++;
-	}
-	output[output_index] = '\0';
-
-	return output;
 }
 
 void joy_left()
