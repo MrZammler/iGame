@@ -66,13 +66,8 @@
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGame_cat.h"
+#include "strfuncs.h"
 
-extern char* strdup(const char* s);
-extern char* strcasestr(const char *haystack, const char *needle);
-extern void string_to_lower(char* slave);
-extern char** my_split(char* str, char* spl);
-extern int get_delimiter_position(const char* str);
-extern const char* add_spaces_to_string(const char* input);
 extern struct ObjApp* app;
 extern char* executable_name;
 

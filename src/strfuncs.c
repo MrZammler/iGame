@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "strfuncs.h"
+
 /*
  * strcasestr() implementation for AmigaOS
  *
