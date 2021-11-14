@@ -1,0 +1,39 @@
+/*
+  iGameMain.c
+  Filesystem functions header for iGame
+
+  Copyright (c) 2018, Emmanuel Vasilakis
+
+  This file is part of iGame.
+
+  iGame is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  iGame is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with iGame. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#ifndef _FS_FUNCS_H
+#define _FS_FUNCS_H
+
+void strip_path(const char *, char *);
+char *get_slave_from_path(char *, int, char *);
+int check_path_exists(char *);
+BOOL get_filename(const char *, const char *, const BOOL);
+void save_to_csv(const char *, const int);
+void read_tool_types(void);
+int get_title_from_slave(char *, char *);
+const char *get_directory_name(const char *);
+const char *get_directory_path(const char *);
+const char *get_executable_name(int, char **);
+void open_current_dir(void);
+void get_path(char *, char *);
+
+#endif
