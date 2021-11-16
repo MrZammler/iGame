@@ -26,7 +26,7 @@
 STRPTR getParentPath(STRPTR);
 void strip_path(const char *, char *);
 char *get_slave_from_path(char *, int, char *);
-int check_path_exists(char *);
+BOOL check_path_exists(char *);
 BOOL get_filename(const char *, const char *, const BOOL);
 void save_to_csv(const char *, const int);
 void read_tool_types(void);

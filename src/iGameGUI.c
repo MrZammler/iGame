@@ -56,10 +56,11 @@
 #endif
 
 #include "version.h"
-#include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGame_cat.h"
 #include "fsfuncs.h"
+#include "funcs.h"
+#include "iGameGUI.h"
 
 extern igame_settings *current_settings;
 
