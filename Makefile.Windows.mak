@@ -113,7 +113,7 @@ include make_includes/obj_os4.inc
 ##########################################################################
 
 clean:
-	del iGame iGame.* src\funcs*.o src\iGameGUI*.o src\iGameMain*.o src\strcasestr*.o src\strdup*.o src\iGame_cat*.o $(catalog_files)
+	del iGame iGame.* src\funcs*.o src\iGameGUI*.o src\iGameMain*.o src/strfuncs*.o src\iGame_cat*.o $(catalog_files)
 
 # pack everything in a nice lha file
 release:

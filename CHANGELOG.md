@@ -1,3 +1,7 @@
+## iGame 2.1b3 - [future]
+### Changed
+- Gathered the string methods into one separate file. This is work that needs to be done so to make funcs.c smaller. Also merged the strcasestr.c and strdup.c files.
+
 ## iGame 2.1b2 - [2021-03-15]
 ### Added
 - Added iGame version at the screen title
