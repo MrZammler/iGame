@@ -16,6 +16,6 @@ src/strfuncs.o: src/strfuncs.c src/strfuncs.h
 
 src/fsfuncs.o: src/fsfuncs.c src/fsfuncs.h
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/fsfuncs.c
-
+  
 src/iGame_cat.o: src/iGame_cat.c
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/iGame_cat.c

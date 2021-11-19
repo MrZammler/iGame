@@ -57,15 +57,11 @@
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGame_cat.h"
-<<<<<<< HEAD
-=======
 #include "strfuncs.h"
 #include "fsfuncs.h"
 #include "funcs.h"
->>>>>>> 4e4e6cd... Moved the filesystem methods to a new file
 
-extern char* strdup(const char* s);
-extern char* strcasestr(const char *haystack, const char *needle);
+
 extern struct ObjApp* app;
 extern char* executable_name;
 
@@ -80,7 +76,6 @@ int IntroPic = 0;
 int wbrun = 0;
 
 /* function definitions */
-char** my_split(char* str, char* spl);
 int get_genre(char* title, char* genre);
 void follow_thread(BPTR lock, int tab_level);
 void refresh_list(int check_exists);
@@ -825,12 +820,6 @@ void filter_change()
 
 	else
 		list_show_filtered(str, str_gen);
-}
-
-void string_to_lower(char* slave)
-{
-	for (int i = 0; i <= strlen(slave) - 1; i++)
-		slave[i] = tolower(slave[i]);
 }
 
 /*
@@ -1764,53 +1753,6 @@ void app_stop()
 void genres_click()
 {
 	filter_change();
-}
-
-/*
-* Splits a string using spl
-*/
-char** my_split(char* str, char* spl)
-{
-	char **ret, *buffer[256], buf[4096];
-	int i;
-
-	if (!spl)
-	{
-		ret = (char **)malloc(2 * sizeof(char *));
-		ret[0] = (char *)strdup(str);
-		ret[1] = NULL;
-		return (ret);
-	}
-
-	int count = 0;
-
-	char* fptr = str;
-	const int spl_len = strlen(spl);
-	char* sptr = strstr(fptr, spl);
-	while (sptr)
-	{
-		i = sptr - fptr;
-		memcpy(buf, fptr, i);
-		buf[i] = '\0';
-		buffer[count++] = (char *)strdup(buf);
-		fptr = sptr + spl_len;
-		sptr = strstr(fptr, spl);
-	}
-	sptr = strchr(fptr, '\0');
-	i = sptr - fptr;
-	memcpy(buf, fptr, i);
-	buf[i] = '\0';
-	buffer[count++] = (char *)strdup(buf);
-
-	ret = (char **)malloc((count + 1) * sizeof(char *));
-
-	for (i = 0; i < count; i++)
-	{
-		ret[i] = buffer[i];
-	}
-	ret[count] = NULL;
-
-	return ret;
 }
 
 void follow_thread(BPTR lock, int tab_level)
