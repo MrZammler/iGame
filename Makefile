@@ -47,12 +47,12 @@ LIBFLAGS_OS4	= -v -lamiga -lstubs -o
 ##########################################################################
 # Object files which are part of iGame
 ##########################################################################
-OBJS		= src/funcs.o src/iGameGUI.o src/iGameMain.o src/strcasestr.o src/strdup.o src/iGame_cat.o
-OBJS_030	= src/funcs_030.o src/iGameGUI_030.o src/iGameMain_030.o src/strcasestr_030.o src/strdup_030.o src/iGame_cat_030.o
-OBJS_040	= src/funcs_040.o src/iGameGUI_040.o src/iGameMain_040.o src/strcasestr_040.o src/strdup_040.o src/iGame_cat_040.o
-OBJS_060	= src/funcs_060.o src/iGameGUI_060.o src/iGameMain_060.o src/strcasestr_060.o src/strdup_060.o src/iGame_cat_060.o
-OBJS_MOS	= src/funcs_MOS.o src/iGameGUI_MOS.o src/iGameMain_MOS.o src/strcasestr_MOS.o src/strdup_MOS.o src/iGame_cat_MOS.o
-OBJS_OS4	= src/funcs_OS4.o src/iGameGUI_OS4.o src/iGameMain_OS4.o src/strcasestr_OS4.o src/strdup_OS4.o src/iGame_cat_OS4.o
+OBJS		= src/funcs.o src/iGameGUI.o src/iGameMain.o src/strfuncs.o src/iGame_cat.o
+OBJS_030	= src/funcs_030.o src/iGameGUI_030.o src/iGameMain_030.o src/strfuncs_030.o src/iGame_cat_030.o
+OBJS_040	= src/funcs_040.o src/iGameGUI_040.o src/iGameMain_040.o src/strfuncs_040.o src/iGame_cat_040.o
+OBJS_060	= src/funcs_060.o src/iGameGUI_060.o src/iGameMain_060.o src/strfuncs_060.o src/iGame_cat_060.o
+OBJS_MOS	= src/funcs_MOS.o src/iGameGUI_MOS.o src/iGameMain_MOS.o src/strfuncs_MOS.o src/iGame_cat_MOS.o
+OBJS_OS4	= src/funcs_OS4.o src/iGameGUI_OS4.o src/iGameMain_OS4.o src/strfuncs_OS4.o src/iGame_cat_OS4.o
 
 ##########################################################################
 # Rule for building
@@ -95,7 +95,7 @@ catalogs: $(catalog_files)
 ##########################################################################
 # object files (generic 000)
 ##########################################################################
-src/funcs.o: src/funcs.c src/iGame_cat.h
+src/funcs.o: src/funcs.c src/iGame_cat.h src/strfuncs.h
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/funcs.c
 
 src/iGameGUI.o: src/iGameGUI.c src/iGameGUI.h src/version.h src/iGame_cat.h
@@ -104,11 +104,8 @@ src/iGameGUI.o: src/iGameGUI.c src/iGameGUI.h src/version.h src/iGame_cat.h
 src/iGameMain.o: src/iGameMain.c
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/iGameMain.c
 
-src/strcasestr.o: src/strcasestr.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/strcasestr.c
-
-src/strdup.o: src/strdup.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/strdup.c
+src/strfuncs.o: src/strfuncs.c src/strfuncs.h
+	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/strfuncs.c
 
 src/iGame_cat.o: src/iGame_cat.c
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/iGame_cat.c
@@ -117,7 +114,7 @@ src/iGame_cat.o: src/iGame_cat.c
 # object files (030)
 ##########################################################################
 
-src/funcs_030.o: src/funcs.c src/iGame_cat.h
+src/funcs_030.o: src/funcs.c src/iGame_cat.h src/strfuncs.h
 	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/funcs.c
 
 src/iGameGUI_030.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
@@ -126,11 +123,8 @@ src/iGameGUI_030.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
 src/iGameMain_030.o: src/iGameMain.c
 	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/iGameMain.c
 
-src/strcasestr_030.o: src/strcasestr.c
-	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/strcasestr.c
-
-src/strdup_030.o: src/strdup.c
-	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/strdup.c
+src/strfuncs_030.o: src/strfuncs.c src/strfuncs.h
+	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/strfuncs.c
 
 src/iGame_cat_030.o: src/iGame_cat.c
 	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/iGame_cat.c
@@ -139,7 +133,7 @@ src/iGame_cat_030.o: src/iGame_cat.c
 # object files (040)
 ##########################################################################
 
-src/funcs_040.o: src/funcs.c src/iGame_cat.h
+src/funcs_040.o: src/funcs.c src/iGame_cat.h src/strfuncs.h
 	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/funcs.c
 
 src/iGameGUI_040.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
@@ -148,11 +142,8 @@ src/iGameGUI_040.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
 src/iGameMain_040.o: src/iGameMain.c
 	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/iGameMain.c
 
-src/strcasestr_040.o: src/strcasestr.c
-	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/strcasestr.c
-
-src/strdup_040.o: src/strdup.c
-	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/strdup.c
+src/strfuncs_040.o: src/strfuncs.c src/strfuncs.h
+	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/strfuncs.c
 
 src/iGame_cat_040.o: src/iGame_cat.c
 	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/iGame_cat.c
@@ -161,7 +152,7 @@ src/iGame_cat_040.o: src/iGame_cat.c
 # object files (060)
 ##########################################################################
 
-src/funcs_060.o: src/funcs.c src/iGame_cat.h
+src/funcs_060.o: src/funcs.c src/iGame_cat.h src/strfuncs.h
 	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/funcs.c
 
 src/iGameGUI_060.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
@@ -170,11 +161,8 @@ src/iGameGUI_060.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
 src/iGameMain_060.o: src/iGameMain.c
 	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/iGameMain.c
 
-src/strcasestr_060.o: src/strcasestr.c
-	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/strcasestr.c
-
-src/strdup_060.o: src/strdup.c
-	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/strdup.c
+src/strfuncs_060.o: src/strfuncs.c
+	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/strfuncs.c
 
 src/iGame_cat_060.o: src/iGame_cat.c
 	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/iGame_cat.c
@@ -183,7 +171,7 @@ src/iGame_cat_060.o: src/iGame_cat.c
 # object files (MOS)
 ##########################################################################
 
-src/funcs_MOS.o: src/funcs.c src/iGame_cat.h
+src/funcs_MOS.o: src/funcs.c src/iGame_cat.h src/strfuncs.h
 	$(CC_PPC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/funcs.c
 
 src/iGameGUI_MOS.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
@@ -192,11 +180,8 @@ src/iGameGUI_MOS.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
 src/iGameMain_MOS.o: src/iGameMain.c
 	$(CC_PPC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/iGameMain.c
 
-src/strcasestr_MOS.o: src/strcasestr.c
-	$(CC_PPC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/strcasestr.c
-
-src/strdup_MOS.o: src/strdup.c
-	$(CC_PPC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/strdup.c
+src/strfuncs_MOS.o: src/strfuncs.c src/strfuncs.h
+	$(CC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/strfuncs.c
 
 src/iGame_cat_MOS.o: src/iGame_cat.c
 	$(CC_PPC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/iGame_cat.c
@@ -205,7 +190,7 @@ src/iGame_cat_MOS.o: src/iGame_cat.c
 # object files (AOS4)
 ##########################################################################
 
-src/funcs_OS4.o: src/funcs.c src/iGame_cat.h
+src/funcs_OS4.o: src/funcs.c src/iGame_cat.h src/strfuncs.h
 	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/funcs.c
 
 src/iGameGUI_OS4.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
@@ -214,11 +199,8 @@ src/iGameGUI_OS4.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
 src/iGameMain_OS4.o: src/iGameMain.c
 	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/iGameMain.c
 
-src/strcasestr_OS4.o: src/strcasestr.c
-	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/strcasestr.c
-
-src/strdup_OS4.o: src/strdup.c
-	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/strdup.c
+src/strfuncs_OS4.o: src/strfuncs.c src/strfuncs.h
+	$(CC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/strfuncs.c
 
 src/iGame_cat_OS4.o: src/iGame_cat.c
 	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/iGame_cat.c
@@ -228,7 +210,7 @@ src/iGame_cat_OS4.o: src/iGame_cat.c
 ##########################################################################
 
 clean:
-	rm iGame iGame.* src/funcs*.o src/iGameGUI*.o src/iGameMain*.o src/strcasestr*.o src/strdup*.o src/iGame_cat*.o $(catalog_files)
+	rm iGame iGame.* src/funcs*.o src/iGameGUI*.o src/iGameMain*.o src/strfuncs*.o src/iGame_cat*.o $(catalog_files)
 
 # pack everything in a nice lha file
 release: $(catalog_files)
