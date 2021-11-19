@@ -26,7 +26,6 @@
 #include <mui/TextEditor_mcc.h>
 
 /* Prototypes */
-#include <clib/alib_protos.h>
 #include <proto/wb.h>
 
 #if defined(__amigaos4__)
@@ -44,18 +43,10 @@
 #endif
 
 /* System */
-#include <dos/dos.h>
 #if defined(__amigaos4__)
 #include <dos/obsolete.h>
-#endif
-#include <exec/memory.h>
-#include <exec/types.h>
-#if defined(__amigaos4__)
 #define ASL_PRE_V38_NAMES
 #endif
-#include <libraries/asl.h>
-#include <workbench/startup.h>
-#include <workbench/workbench.h>
 
 /* ANSI C */
 #include <stdio.h>
@@ -67,6 +58,9 @@
 #include "iGameExtern.h"
 #include "iGame_cat.h"
 #include "strfuncs.h"
+#include "fsfuncs.h"
+#include "funcs.h"
+
 
 extern struct ObjApp* app;
 extern char* executable_name;
@@ -83,31 +77,20 @@ int wbrun = 0;
 
 /* function definitions */
 int get_genre(char* title, char* genre);
-void get_path(char* title, char* path);
 void follow_thread(BPTR lock, int tab_level);
 void refresh_list(int check_exists);
 int hex2dec(char* hexin);
-void msg_box(const char* msg);
-int get_title_from_slave(char* slave, char* title);
 int check_dup_title(char* title);
-const char* get_directory_name(const char* str);
-const char* get_directory_path(const char* str);
-const char* get_executable_name(int argc, char** argv);
-void strip_path(const char* path, char* naked_path);
-char* get_slave_from_path(char* slave, int start, char* path);
-void read_tool_types();
 void check_for_wbrun();
 void list_show_favorites(char* str);
-int check_path_exists(char* path);
 
 /* structures */
 struct EasyStruct msgbox;
-struct FileRequester* request;
 
 games_list *item_games = NULL, *games = NULL;
 repos_list *item_repos = NULL, *repos = NULL;
 genres_list *item_genres = NULL, *genres = NULL;
-igame_settings* current_settings = NULL;
+igame_settings *current_settings = NULL;
 
 const unsigned char* GetMBString(const unsigned char* ref)
 {
@@ -116,7 +99,7 @@ const unsigned char* GetMBString(const unsigned char* ref)
 	return ref;
 }
 
-void status_show_total()
+void status_show_total(void)
 {
 	char helper[200];
 	set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
@@ -1128,21 +1111,6 @@ void refresh_sidepanel()
 	DoMethod(app->GR_sidepanel, MUIM_Group_ExitChange);
 }
 
-void strip_path(const char* path, char* naked_path)
-{
-	int i, k;
-	/* strip the path from the slave file and get the rest */
-	for (i = strlen(path) - 1; i >= 0; i--)
-	{
-		if (path[i] == '/')
-			break;
-	}
-
-	for (k = 0; k <= i - 1; k++)
-		naked_path[k] = path[k];
-	naked_path[k] = '\0';
-}
-
 void game_click()
 {
 	if (current_settings->hide_side_panel || current_settings->hide_screenshots)
@@ -1277,21 +1245,6 @@ int get_genre(char* title, char* genre)
 	return 0;
 }
 
-void get_path(char* title, char* path)
-{
-	for (item_games = games; item_games != NULL; item_games = item_games->next)
-	{
-		if (item_games->deleted != 1)
-		{
-			if (!strcmp(title, item_games->title))
-			{
-				strcpy(path, item_games->path);
-				break;
-			}
-		}
-	}
-}
-
 /*
 * Adds a repository (path on the disk)
 * to the list of repositories
@@ -1363,33 +1316,6 @@ int title_exists(char* game_title)
 	}
 	// Title not found
 	return 0;
-}
-
-char* get_slave_from_path(char* slave, int start, char* path)
-{
-	int z = 0;
-	for (int k = start + 1; k <= strlen(path); k++)
-	{
-		slave[z] = path[k];
-		z++;
-	}
-	return slave;
-}
-
-/*
- * Check if a path actually exists in hard disk.
- * - Return True if exists
- * - Return False if it doesn't exist
- */
-int check_path_exists(char* path)
-{
-	const BPTR lock = Lock(path, ACCESS_READ);
-	if (!lock) {
-		return FALSE;
-	}
-
-	UnLock(lock);
-	return TRUE;
 }
 
 //shows and inits the GameProperties Window
@@ -2008,89 +1934,6 @@ void refresh_list(const int check_exists)
 	status_show_total();
 }
 
-BOOL get_filename(const char* title, const char* positive_text, const BOOL save_mode)
-{
-	BOOL result = FALSE;
-	if ((request = MUI_AllocAslRequest(ASL_FileRequest, NULL)) != NULL)
-	{
-		if (MUI_AslRequestTags(request,
-		                       ASLFR_TitleText, title,
-		                       ASLFR_PositiveText, positive_text,
-		                       ASLFR_DoSaveMode, save_mode,
-		                       ASLFR_InitialDrawer, PROGDIR,
-		                       TAG_DONE))
-		{
-			memset(&fname[0], 0, sizeof fname);
-			strcat(fname, request->fr_Drawer);
-			if (fname[strlen(fname) - 1] != (UBYTE)58) /* Check for : */
-				strcat(fname, "/");
-			strcat(fname, request->fr_File);
-
-			result = TRUE;
-		}
-
-		if (request)
-			MUI_FreeAslRequest(request);
-	}
-
-	return result;
-}
-
-void save_to_csv(const char* filename, const int check_exists)
-{
-	char csvFilename[32];
-	FILE *fpgames;
-
-	const char* saving_message = (const char*)GetMBString(MSG_SavingGamelist);
-	set(app->TX_Status, MUIA_Text_Contents, saving_message);
-
-	strcpy(csvFilename, (CONST_STRPTR)filename);
-	strcat(csvFilename, ".csv");
-
-	fpgames = fopen(csvFilename,"w");
-	if (!fpgames)
-	{
-		msg_box((const char*)GetMBString(MSG_FailedOpeningGameslist));
-		return;
-	}
-
-	for (item_games = games; item_games != NULL; item_games = item_games->next)
-	{
-		if (check_exists == 1)
-		{
-			if (item_games->exists == 1)
-			{
-				if (strlen(item_games->genre) == 0)
-					strcpy(item_games->genre, "Unknown");
-				fprintf(
-					fpgames,
-					"%d;%s;%s;%s;%d;%d;%d;%d\n",
-					item_games->index, item_games->title, item_games->genre, item_games->path,
-					item_games->favorite, item_games->times_played, item_games->last_played, item_games->hidden
-				);
-			}
-			else
-			{
-				strcpy(item_games->path, "");
-			}
-		}
-		else
-		{
-			if (strlen(item_games->genre) == 0)
-				strcpy(item_games->genre, "Unknown");
-			fprintf(
-				fpgames,
-				"%d;%s;%s;%s;%d;%d;%d;%d\n",
-				item_games->index, item_games->title, item_games->genre, item_games->path,
-				item_games->favorite, item_games->times_played, item_games->last_played, item_games->hidden
-			);
-		}
-	}
-	fclose(fpgames);
-
-	status_show_total();
-}
-
 void save_list(const int check_exists)
 {
 	save_to_csv(DEFAULT_GAMESLIST_FILE, check_exists);
@@ -2392,7 +2235,7 @@ void msg_box(const char* msg)
 	EasyRequest(NULL, &msgbox, NULL);
 }
 
-void get_screen_size(int* width, int* height)
+void get_screen_size(int *width, int *height)
 {
 	struct Screen* wbscreen;
 	struct Library* intuition_base;
@@ -2433,107 +2276,6 @@ void get_screen_size(int* width, int* height)
 			CloseLibrary(gfx_base);
 		}
 		CloseLibrary(intuition_base);
-	}
-}
-
-void read_tool_types()
-{
-	struct Library *icon_base;
-	struct DiskObject *disk_obj;
-
-	int screen_width, screen_height;
-	unsigned char filename[32];
-
-	if ((icon_base = (struct Library *)OpenLibrary((CONST_STRPTR)ICON_LIBRARY, 0)))
-	{
-		strcpy(filename, PROGDIR);
-		strcat(filename, executable_name);
-
-		if ((disk_obj = GetDiskObject((STRPTR)filename)))
-		{
-			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_SCREENSHOT))
-			{
-				char** tool_types = (char **)disk_obj->do_ToolTypes;
-				char* tool_type = *tool_types;
-
-				char** temp_tbl = my_split((char *)tool_type, "=");
-				if (temp_tbl == NULL
-					|| temp_tbl[0] == NULL
-					|| !strcmp(temp_tbl[0], " ")
-					|| !strcmp(temp_tbl[0], ""))
-				{
-					msg_box((const char*)GetMBString(MSG_BadTooltype));
-					exit(0);
-				}
-
-				if (temp_tbl[1] != NULL)
-				{
-					char** temp_tbl2 = my_split((char *)temp_tbl[1], "x");
-					if (temp_tbl2[0]) current_settings->screenshot_width = atoi((char *)temp_tbl2[0]);
-					if (temp_tbl2[1]) current_settings->screenshot_height = atoi((char *)temp_tbl2[1]);
-
-					free(temp_tbl2[0]);
-					free(temp_tbl2[1]);
-					free(temp_tbl2);
-					free(temp_tbl[0]);
-					free(temp_tbl[1]);
-					free(temp_tbl);
-				}
-			}
-
-			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOGUIGFX))
-				current_settings->no_guigfx = 1;
-
-			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_FILTERUSEENTER))
-				current_settings->filter_use_enter = 1;
-
-			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSCREENSHOT))
-				current_settings->hide_screenshots = 1;
-
-			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_SAVESTATSONEXIT))
-				current_settings->save_stats_on_exit = 1;
-
-			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_TITLESFROMDIRS))
-				current_settings->titles_from_dirs = 1;
-
-			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSMARTSPACES))
-				current_settings->no_smart_spaces = 1;
-
-			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSIDEPANEL))
-				current_settings->hide_side_panel = 1;
-		}
-		CloseLibrary(icon_base);
-	}
-
-	if (!current_settings->hide_side_panel)
-	{
-		//check screen res and adjust image box accordingly
-		if (current_settings->screenshot_height <= 0 && current_settings->screenshot_width <= 0)
-		{
-			get_screen_size(&screen_width, &screen_height);
-
-			//if values are ok from the previous function, and user has not provided his own values, calculate a nice size
-			if (screen_width != -1 && screen_height != -1)
-			{
-				//for hi-res screens (1024x768 or greater) we'll use 320x256
-				if (screen_width >= 1024 && screen_height >= 768)
-				{
-					current_settings->screenshot_width = 320;
-					current_settings->screenshot_height = 256;
-				}
-				else
-				{
-					// for anything less, we'll go with half that
-					current_settings->screenshot_width = 160;
-					current_settings->screenshot_height = 128;
-				}
-			}
-			else
-			{
-				current_settings->screenshot_width = 160;
-				current_settings->screenshot_height = 128;
-			}
-		}
 	}
 }
 
@@ -2596,76 +2338,6 @@ void non_whdload_ok()
 }
 
 /*
-* Gets title from a slave file
-* returns 0 on success, 1 on fail
-*/
-int get_title_from_slave(char* slave, char* title)
-{
-	char slave_title[100];
-
-	struct slave_info
-	{
-		unsigned long security;
-		char id[8];
-		unsigned short version;
-		unsigned short flags;
-		unsigned long base_mem_size;
-		unsigned long exec_install;
-		unsigned short game_loader;
-		unsigned short current_dir;
-		unsigned short dont_cache;
-		char keydebug;
-		char keyexit;
-		unsigned long exp_mem;
-		unsigned short name;
-		unsigned short copy;
-		unsigned short info;
-	};
-
-	struct slave_info sl;
-
-	FILE* fp = fopen(slave, "rbe");
-	if (fp == NULL)
-	{
-		return 1;
-	}
-
-	//seek to +0x20
-	fseek(fp, 32, SEEK_SET);
-	fread(&sl, 1, sizeof sl, fp);
-
-	//sl.Version = (sl.Version>>8) | (sl.Version<<8);
-	//sl.name = (sl.name>>8) | (sl.name<<8);
-
-	//printf ("[%s] [%d]\n", sl.ID, sl.Version);
-
-	//sl.name holds the offset for the slave name
-	fseek(fp, sl.name + 32, SEEK_SET);
-	//title = calloc (1, 100);
-	//fread (title, 1, 100, fp);
-
-	if (sl.version < 10)
-	{
-		return 1;
-	}
-
-	for (int i = 0; i <= 99; i++)
-	{
-		slave_title[i] = fgetc(fp);
-		if (slave_title[i] == '\n')
-		{
-			slave_title[i] = '\0';
-			break;
-		}
-	}
-
-	strcpy(title, slave_title);
-	fclose(fp);
-
-	return 0;
-}
-
-/*
 * Checks if the title already exists
 * returns 1 if yes, 0 otherwise
 */
@@ -2679,70 +2351,6 @@ int check_dup_title(char* title)
 		}
 	}
 	return 0;
-}
-
-// Get the Directory part from a full path containing a file
-const char* get_directory_name(const char* str)
-{
-	int pos1 = get_delimiter_position(str);
-	if (!pos1)
-		return NULL;
-
-	char full_path[100];
-	strncpy(full_path, str, pos1);
-	full_path[pos1] = '\0';
-
-	const int pos2 = get_delimiter_position(full_path);
-	if (!pos2)
-		return NULL;
-
-	char* dir_name = malloc(sizeof full_path);
-	int c = 0;
-	for (unsigned int i = pos2 + 1; i <= sizeof full_path; i++)
-	{
-		dir_name[c] = full_path[i];
-		c++;
-	}
-	dir_name[c] = '\0';
-
-	return dir_name;
-}
-
-// Get the complete directory path from a full path containing a file
-const char *get_directory_path(const char *str)
-{
-	int pos1 = get_delimiter_position(str);
-	if (!pos1)
-		return NULL;
-
-	char *dir_name = malloc(pos1 + 1);
-	strncpy(dir_name, str, pos1);
-	dir_name[pos1] = '\0';
-
-	return dir_name;
-}
-
-// Get the application's executable name
-const char *get_executable_name(int argc, char **argv)
-{
-	// argc is zero when run from the Workbench,
-	// positive when run from the CLI
-	if (argc == 0)
-	{
-		// in AmigaOS, argv is a pointer to the WBStartup message
-		// when argc is zero (run under the Workbench)
-		struct WBStartup* argmsg = (struct WBStartup *)argv;
-		struct WBArg* wb_arg = argmsg->sm_ArgList; /* head of the arg list */
-
-		executable_name = wb_arg->wa_Name;
-	}
-	else
-	{
-		// Run from the CLI
-		executable_name = argv[0];
-	}
-
-	return executable_name;
 }
 
 void joy_left()
@@ -2832,44 +2440,4 @@ ULONG get_wb_version()
 	ver = WorkbenchBase->lib_Version;
 
 	return ver;
-}
-
-void open_current_dir()
-{
-	// Allocate Memory for variables
-	char *game_title = NULL;
-	const char *path_only = NULL;
-
-	if (get_wb_version() < 44)
-	{
-		// workbench.library doesn't support OpenWorkbenchObjectA yet
-		return;
-	}
-
-	//set the elements on the window
-	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
-	if (game_title == NULL || strlen(game_title) == 0)
-	{
-		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
-		return;
-	}
-
-	const int found = title_exists(game_title);
-	if (!found)
-	{
-		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
-		return;
-	}
-
-	path_only = get_directory_path(item_games->path);
-	if(!path_only)
-	{
-		msg_box((const char*)GetMBString(MSG_DirectoryNotFound));
-		return;
-	}
-
-	//Open path directory
-	OpenWorkbenchObject((char *)path_only);
-	free(path_only); // get_directory_path uses malloc()
-
 }

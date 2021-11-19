@@ -1,6 +1,6 @@
 /*
   iGameMain.c
-  String functions header for iGame
+  Misc functions header for iGame
 
   Copyright (c) 2018, Emmanuel Vasilakis
 
@@ -20,14 +20,12 @@
   along with iGame. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _STR_FUNCS_H
-#define _STR_FUNCS_H
+#ifndef _FUNCS_H
+#define _FUNCS_H
 
-char *strcasestr(const char *, const char *);
-char* strdup(const char *); // TODO: Possible obsolete. Maybe needed on some old tools. Better move it there
-void string_to_lower(char *);
-char** my_split(char *, char *);
-int get_delimiter_position(const char *);
-const char* add_spaces_to_string(const char *);
+void msg_box(const char *);
+void status_show_total(void);
+void get_screen_size(int *, int *);
+int title_exists(char *game_title);
 
 #endif

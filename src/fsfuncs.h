@@ -1,6 +1,6 @@
 /*
   iGameMain.c
-  String functions header for iGame
+  Filesystem functions header for iGame
 
   Copyright (c) 2018, Emmanuel Vasilakis
 
@@ -20,14 +20,20 @@
   along with iGame. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _STR_FUNCS_H
-#define _STR_FUNCS_H
+#ifndef _FS_FUNCS_H
+#define _FS_FUNCS_H
 
-char *strcasestr(const char *, const char *);
-char* strdup(const char *); // TODO: Possible obsolete. Maybe needed on some old tools. Better move it there
-void string_to_lower(char *);
-char** my_split(char *, char *);
-int get_delimiter_position(const char *);
-const char* add_spaces_to_string(const char *);
+void strip_path(const char *, char *);
+char *get_slave_from_path(char *, int, char *);
+int check_path_exists(char *);
+BOOL get_filename(const char *, const char *, const BOOL);
+void save_to_csv(const char *, const int);
+void read_tool_types(void);
+int get_title_from_slave(char *, char *);
+const char *get_directory_name(const char *);
+const char *get_directory_path(const char *);
+const char *get_executable_name(int, char **);
+void open_current_dir(void);
+void get_path(char *, char *);
 
 #endif

@@ -58,7 +58,7 @@
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGame_cat.h"
-#include "version.h"
+#include "fsfuncs.h"
 
 extern igame_settings *current_settings;
 
