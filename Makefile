@@ -47,33 +47,14 @@ LIBFLAGS_OS4	= -v -lamiga -lstubs -o
 ##########################################################################
 # Object files which are part of iGame
 ##########################################################################
-OBJS		= src/funcs.o src/iGameGUI.o src/iGameMain.o src/strfuncs.o src/iGame_cat.o
-OBJS_030	= src/funcs_030.o src/iGameGUI_030.o src/iGameMain_030.o src/strfuncs_030.o src/iGame_cat_030.o
-OBJS_040	= src/funcs_040.o src/iGameGUI_040.o src/iGameMain_040.o src/strfuncs_040.o src/iGame_cat_040.o
-OBJS_060	= src/funcs_060.o src/iGameGUI_060.o src/iGameMain_060.o src/strfuncs_060.o src/iGame_cat_060.o
-OBJS_MOS	= src/funcs_MOS.o src/iGameGUI_MOS.o src/iGameMain_MOS.o src/strfuncs_MOS.o src/iGame_cat_MOS.o
-OBJS_OS4	= src/funcs_OS4.o src/iGameGUI_OS4.o src/iGameMain_OS4.o src/strfuncs_OS4.o src/iGame_cat_OS4.o
+
+include make_includes/obj_files.inc
 
 ##########################################################################
 # Rule for building
 ##########################################################################
-iGame: $(OBJS)
-	$(LINK) $(OBJS) $(LIBFLAGS) $@
 
-iGame.030: $(OBJS_030)
-	$(LINK) $(OBJS_030) $(LIBFLAGS) $@
-
-iGame.040: $(OBJS_040)
-	$(LINK) $(OBJS_040) $(LIBFLAGS) $@
-
-iGame.060: $(OBJS_060)
-	$(LINK) $(OBJS_060) $(LIBFLAGS) $@
-
-iGame.MOS: $(OBJS_MOS)
-	$(LINK_PPC) $(OBJS_MOS) $(LIBFLAGS_MOS) $@
-
-iGame.OS4: $(OBJS_OS4)
-	$(LINK_PPC) $(OBJS_OS4) $(LIBFLAGS_OS4) $@
+include make_includes/rules.inc
 
 ##########################################################################
 # catalog files
@@ -95,115 +76,38 @@ catalogs: $(catalog_files)
 ##########################################################################
 # object files (generic 000)
 ##########################################################################
-src/funcs.o: src/funcs.c src/iGame_cat.h src/strfuncs.h
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/funcs.c
 
-src/iGameGUI.o: src/iGameGUI.c src/iGameGUI.h src/version.h src/iGame_cat.h
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/iGameGUI.c
-
-src/iGameMain.o: src/iGameMain.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/iGameMain.c
-
-src/strfuncs.o: src/strfuncs.c src/strfuncs.h
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/strfuncs.c
-
-src/iGame_cat.o: src/iGame_cat.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ src/iGame_cat.c
+include make_includes/obj_000.inc
 
 ##########################################################################
 # object files (030)
 ##########################################################################
 
-src/funcs_030.o: src/funcs.c src/iGame_cat.h src/strfuncs.h
-	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/funcs.c
-
-src/iGameGUI_030.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
-	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/iGameGUI.c
-
-src/iGameMain_030.o: src/iGameMain.c
-	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/iGameMain.c
-
-src/strfuncs_030.o: src/strfuncs.c src/strfuncs.h
-	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/strfuncs.c
-
-src/iGame_cat_030.o: src/iGame_cat.c
-	$(CC) $(CFLAGS_030) $(INCLUDES) -o $@ src/iGame_cat.c
+include make_includes/obj_030.inc
 
 ##########################################################################
 # object files (040)
 ##########################################################################
 
-src/funcs_040.o: src/funcs.c src/iGame_cat.h src/strfuncs.h
-	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/funcs.c
-
-src/iGameGUI_040.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
-	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/iGameGUI.c
-
-src/iGameMain_040.o: src/iGameMain.c
-	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/iGameMain.c
-
-src/strfuncs_040.o: src/strfuncs.c src/strfuncs.h
-	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/strfuncs.c
-
-src/iGame_cat_040.o: src/iGame_cat.c
-	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/iGame_cat.c
+include make_includes/obj_040.inc
 
 ##########################################################################
 # object files (060)
 ##########################################################################
 
-src/funcs_060.o: src/funcs.c src/iGame_cat.h src/strfuncs.h
-	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/funcs.c
-
-src/iGameGUI_060.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
-	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/iGameGUI.c
-
-src/iGameMain_060.o: src/iGameMain.c
-	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/iGameMain.c
-
-src/strfuncs_060.o: src/strfuncs.c
-	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/strfuncs.c
-
-src/iGame_cat_060.o: src/iGame_cat.c
-	$(CC) $(CFLAGS_060) $(INCLUDES) -o $@ src/iGame_cat.c
+include make_includes/obj_060.inc
 
 ##########################################################################
 # object files (MOS)
 ##########################################################################
 
-src/funcs_MOS.o: src/funcs.c src/iGame_cat.h src/strfuncs.h
-	$(CC_PPC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/funcs.c
-
-src/iGameGUI_MOS.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
-	$(CC_PPC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/iGameGUI.c
-
-src/iGameMain_MOS.o: src/iGameMain.c
-	$(CC_PPC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/iGameMain.c
-
-src/strfuncs_MOS.o: src/strfuncs.c src/strfuncs.h
-	$(CC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/strfuncs.c
-
-src/iGame_cat_MOS.o: src/iGame_cat.c
-	$(CC_PPC) $(CFLAGS_MOS) $(INCLUDES_MOS) -o $@ src/iGame_cat.c
+include make_includes/obj_mos.inc
 
 ##########################################################################
 # object files (AOS4)
 ##########################################################################
 
-src/funcs_OS4.o: src/funcs.c src/iGame_cat.h src/strfuncs.h
-	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/funcs.c
-
-src/iGameGUI_OS4.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
-	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/iGameGUI.c
-
-src/iGameMain_OS4.o: src/iGameMain.c
-	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/iGameMain.c
-
-src/strfuncs_OS4.o: src/strfuncs.c src/strfuncs.h
-	$(CC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/strfuncs.c
-
-src/iGame_cat_OS4.o: src/iGame_cat.c
-	$(CC_PPC) $(CFLAGS_OS4) $(INCLUDES_OS4) -o $@ src/iGame_cat.c
+include make_includes/obj_os4.inc
 
 ##########################################################################
 # generic build options

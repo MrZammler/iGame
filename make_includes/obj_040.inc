@@ -1,0 +1,18 @@
+##########################################################################
+# object files (040)
+##########################################################################
+
+src/funcs_040.o: src/funcs.c src/iGame_cat.h src/strfuncs.h
+	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/funcs.c
+
+src/iGameGUI_040.o: src/iGameGUI.c src/iGameGUI.h src/iGame_cat.h
+	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/iGameGUI.c
+
+src/iGameMain_040.o: src/iGameMain.c
+	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/iGameMain.c
+
+src/strfuncs_040.o: src/strfuncs.c src/strfuncs.h
+	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/strfuncs.c
+
+src/iGame_cat_040.o: src/iGame_cat.c
+	$(CC) $(CFLAGS_040) $(INCLUDES) -o $@ src/iGame_cat.c
