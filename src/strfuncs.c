@@ -20,6 +20,8 @@
   along with iGame. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <proto/wb.h>
+
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
@@ -192,4 +194,29 @@ const char* add_spaces_to_string(const char* input)
 	output[output_index] = '\0';
 
 	return output;
+}
+
+STRPTR substring(STRPTR string, int position, int length)
+{
+	STRPTR p;
+	size_t c;
+	if (position < 0) position = 0;
+	if (length < 0) length = strlen(string) + length;
+
+	p = malloc(length+1);
+
+	if (p == NULL)
+	{
+		return NULL;
+	}
+
+	for (c = 0; c < length; c++)
+	{
+		*(p+c) = *(string + position);
+		string++;
+	}
+
+	*(p+c) = '\0';
+
+	return p;
 }

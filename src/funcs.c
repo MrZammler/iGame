@@ -26,6 +26,7 @@
 #include <mui/TextEditor_mcc.h>
 
 /* Prototypes */
+#include <clib/alib_protos.h>
 #include <proto/wb.h>
 
 #if defined(__amigaos4__)
@@ -61,7 +62,6 @@
 #include "fsfuncs.h"
 #include "funcs.h"
 
-
 extern struct ObjApp* app;
 extern char* executable_name;
 
@@ -74,6 +74,7 @@ char* game_tooltypes;
 char fname[255];
 int IntroPic = 0;
 int wbrun = 0;
+const int MAX_PATH_SIZE = 255;
 
 /* function definitions */
 int get_genre(char* title, char* genre);
@@ -1111,118 +1112,118 @@ void refresh_sidepanel()
 	DoMethod(app->GR_sidepanel, MUIM_Group_ExitChange);
 }
 
-void game_click()
+static void show_screenshot(STRPTR screenshot_path)
+{
+	static char prvScreenshot[255];
+
+	if (strcmp(screenshot_path, prvScreenshot))
+	{
+		if (current_settings->no_guigfx)
+		{
+			app->IM_GameImage_1 = MUI_NewObject(Dtpic_Classname,
+						MUIA_Dtpic_Name,		screenshot_path,
+						MUIA_Frame, 				MUIV_Frame_ImageButton,
+			End;
+		}
+		else
+		{
+			app->IM_GameImage_1 = GuigfxObject,
+						MUIA_Guigfx_FileName,				screenshot_path,
+						MUIA_Guigfx_Quality,				MUIV_Guigfx_Quality_Best,
+						MUIA_Guigfx_ScaleMode,			NISMF_SCALEFREE | NISMF_KEEPASPECT_PICTURE,
+						MUIA_Guigfx_Transparency,		0,
+						MUIA_Frame, 								MUIV_Frame_ImageButton,
+						MUIA_FixHeight, 						current_settings->screenshot_height,
+						MUIA_FixWidth, 							current_settings->screenshot_width,
+			End;
+		}
+
+		if (app->IM_GameImage_1)
+		{
+			refresh_sidepanel();
+		}
+
+		strcpy(prvScreenshot, screenshot_path);
+	}
+}
+
+static char *get_screenshot_path(char *game_title)
+{
+	STRPTR path = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
+	if(path == NULL)
+	{
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+		return NULL;
+	}
+	get_path(game_title, path);
+
+	STRPTR slavePath = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
+	if(slavePath == NULL)
+	{
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+		FreeVec(path);
+		return NULL;
+	}
+	strcpy(slavePath, getParentPath(path));
+
+	STRPTR screenshot_path = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
+	if (screenshot_path == NULL)
+	{
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+		FreeVec(path);
+		FreeVec(slavePath);
+		return NULL;
+	}
+
+	// Return the igame.iff from the game folder, if exists
+	snprintf(screenshot_path, sizeof(char) * MAX_PATH_SIZE, "%s/igame.iff", slavePath);
+	FreeVec(slavePath);
+	if(check_path_exists(screenshot_path) && checkImageDatatype(screenshot_path))
+	{
+		FreeVec(path);
+		return screenshot_path;
+	}
+
+	// Return the slave icon from the game folder, if exists
+	snprintf(screenshot_path, sizeof(char) * MAX_PATH_SIZE, "%s.info", substring(path, 0, -6));
+	if(check_path_exists(screenshot_path) && checkImageDatatype(screenshot_path))
+	{
+		FreeVec(path);
+		return screenshot_path;
+	}
+
+	// Return the default image from iGame folder, if exists
+	if(check_path_exists(DEFAULT_SCREENSHOT_FILE))
+	{
+		FreeVec(path);
+		return DEFAULT_SCREENSHOT_FILE;
+	}
+
+	FreeVec(path);
+	return NULL;
+}
+
+void game_click(void)
 {
 	if (current_settings->hide_side_panel || current_settings->hide_screenshots)
 		return;
 
-	char* game_title = NULL;
+	char *game_title = NULL;
 	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
 
 	if (game_title) //for some reason, game_click is called and game_title is null??
 	{
-		char* path = malloc(256 * sizeof(char));
-		if (path != NULL)
-			get_path(game_title, path);
-		else
+		STRPTR image_path = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
+		if(image_path == NULL)
 		{
 			msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 			return;
 		}
 
-		char* naked_path = malloc(300 * sizeof(char));
-		if (naked_path != NULL)
-			strip_path(path, naked_path);
-		else
+		strcpy(image_path, get_screenshot_path(game_title));
+		if (strcmp(image_path, ""))
 		{
-			msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-			return;
-		}
-
-		//Check the string, when filter is populated there is trouble
-		if (strlen(naked_path) != 0)
-		{
-			sprintf(naked_path, "%s/igame.iff", (const char*)naked_path);
-			BPTR fp = Open((CONST_STRPTR)naked_path, MODE_OLDFILE);
-			if (!fp) //no igame.iff, try .info and newicons
-			{
-				if (strcasestr(path, ".slave")) //check for whdload game
-				{
-					path[strlen(path) - 6] = '\0';
-					sprintf(naked_path, "%s.info", (const char*)path);
-					fp = Open((CONST_STRPTR)naked_path, MODE_OLDFILE);
-				}
-			}
-
-			if (fp)
-			{
-				// We don't need the file open anymore
-				Close(fp);
-
-				if (current_settings->no_guigfx)
-				{
-					app->IM_GameImage_1 = MUI_NewObject(Dtpic_Classname,
-					                                    MUIA_Dtpic_Name, naked_path,
-					                                    MUIA_Frame, MUIV_Frame_ImageButton,
-					End;
-				}
-				else
-				{
-					app->IM_GameImage_1 = GuigfxObject, MUIA_Guigfx_FileName, naked_path,
-					                                  MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
-					                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE | NISMF_KEEPASPECT_PICTURE,
-					                                  MUIA_Guigfx_Transparency, 0,
-					                                  MUIA_Frame, MUIV_Frame_ImageButton,
-					                                  MUIA_FixHeight, current_settings->screenshot_height,
-					                                  MUIA_FixWidth, current_settings->screenshot_width,
-					End;
-				}
-
-				if (app->IM_GameImage_1)
-				{
-					refresh_sidepanel();
-					IntroPic = 0;
-				}
-				else
-					//in case it failed to load something, lets hope it gets picked up here and is forced to load the default igame.iff
-				{
-					goto loaddef;
-				}
-			}
-			else //no pic found
-			{
-			loaddef:
-				if (IntroPic == 0)
-				{
-					if (current_settings->no_guigfx)
-					{
-						app->IM_GameImage_1 = (Object *)MUI_NewObject(Dtpic_Classname,
-						                                              MUIA_Dtpic_Name, DEFAULT_SCREENSHOT_FILE,
-						                                              MUIA_Frame, MUIV_Frame_ImageButton,
-						End;
-					}
-					else
-					{
-						app->IM_GameImage_1 = GuigfxObject, MUIA_Guigfx_FileName, DEFAULT_SCREENSHOT_FILE,
-						                                  MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
-						                                  MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE | NISMF_KEEPASPECT_PICTURE,
-						                                  MUIA_Guigfx_Transparency, 0,
-						                                  MUIA_Frame, MUIV_Frame_ImageButton,
-						                                  MUIA_FixHeight, current_settings->screenshot_height,
-						                                  MUIA_FixWidth, current_settings->screenshot_width,
-						End;
-					}
-					if (app->IM_GameImage_1)
-					{
-						refresh_sidepanel();
-						IntroPic = 1;
-					}
-				}
-			}
-			if (path)
-				free(path);
-			if (naked_path)
-				free(naked_path);
+			show_screenshot(image_path);
 		}
 	}
 }

@@ -32,6 +32,7 @@
 #include <proto/exec.h>
 #include <proto/icon.h>
 #include <proto/asl.h>
+#include <proto/datatypes.h>
 #include <proto/muimaster.h>
 
 /* System */
@@ -55,10 +56,11 @@
 #endif
 
 #include "version.h"
-#include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "iGame_cat.h"
 #include "fsfuncs.h"
+#include "funcs.h"
+#include "iGameGUI.h"
 
 extern igame_settings *current_settings;
 
@@ -1598,4 +1600,19 @@ void DisposeApp(struct ObjApp * object)
 		MUI_DisposeObject(object->App);
 		FreeVec(object);
 	}
+}
+
+BOOL checkImageDatatype(STRPTR filename)
+{
+	Object *dtObj = NewDTObject(filename,
+			DTA_GroupID,	GID_PICTURE,
+			TAG_DONE);
+
+	if (dtObj)
+	{
+		DisposeDTObject (dtObj);
+		return TRUE;
+	}
+
+	return FALSE;
 }

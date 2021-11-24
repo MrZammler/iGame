@@ -98,4 +98,6 @@ struct ObjApp
 extern struct ObjApp* CreateApp(void);
 extern void DisposeApp(struct ObjApp*);
 
+BOOL checkImageDatatype(STRPTR);
+
 #endif
