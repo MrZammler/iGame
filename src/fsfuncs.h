@@ -23,6 +23,7 @@
 #ifndef _FS_FUNCS_H
 #define _FS_FUNCS_H
 
+STRPTR getParentPath(STRPTR);
 void strip_path(const char *, char *);
 char *get_slave_from_path(char *, int, char *);
 int check_path_exists(char *);
