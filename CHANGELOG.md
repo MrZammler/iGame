@@ -1,6 +1,10 @@
 ## iGame 2.1b3 - [future]
+### Added
+- Added a check if the screenshot image is supported by the installed datatypes. If not, it is skipped. This fixes situations where the Info datatype is not installed and no image is shown instead of the default.
+
 ### Changed
-- Gathered the string methods into one separate file. This is work that needs to be done so to make funcs.c smaller. Also merged the strcasestr.c and strdup.c files.
+- Gathered the strings methods into one separate file. This is work that needs to be done so to make funcs.c smaller. Also merged the strcasestr.c and strdup.c files.
+- Moved the filesystem methods to a separate file.
 
 ## iGame 2.1b2 - [2021-03-15]
 ### Added
