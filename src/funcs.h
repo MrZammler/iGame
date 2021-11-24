@@ -27,5 +27,6 @@ void msg_box(const char *);
 void status_show_total(void);
 void get_screen_size(int *, int *);
 int title_exists(char *game_title);
+void game_click(void);
 
 #endif

@@ -129,7 +129,6 @@ void list_show_hidden();
 void app_start();
 void game_properties();
 void add_non_whdload();
-void game_click();
 void genres_click();
 void non_whdload_ok();
 void repo_stop();
@@ -149,7 +148,6 @@ void settings_use();
 const unsigned char* GetMBString(const unsigned char* ref);
 void joy_left();
 void joy_right();
-// void open_current_dir();
 ULONG get_wb_version();
 
 #endif
