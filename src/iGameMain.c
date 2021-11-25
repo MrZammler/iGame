@@ -21,7 +21,6 @@
 */
 
 #define MUI_OBSOLETE
-#define MUIMASTER_LIBRARY "muimaster.library"
 
 /* MUI */
 #include <libraries/mui.h>
@@ -38,6 +37,9 @@
 #include <stdlib.h>
 
 #include "iGameExtern.h"
+#include "fsfuncs.h"
+#include "funcs.h"
+#include "iGameGUI.h"
 
 /* Increase stack size */
 #if defined(__amigaos4__)
@@ -46,87 +48,46 @@ static const char USED min_stack[] = "$STACK:102400";
 LONG __stack = 32768;
 #endif
 
-
 #ifndef MAKE_ID
 #define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
 #endif
 
-#include "iGameGUI.h"
-
 struct ObjApp* app = NULL; /* Object */
-extern void app_stop();
-extern igame_settings* load_settings(const char* filename);
-extern char* get_executable_name(int argc, char** argv);
 
 struct Library* MUIMasterBase;
 #if defined(__amigaos4__)
 struct MUIMasterIFace *IMUIMaster;
 #endif
-struct Library* TextEditorMCC;
-struct Library* GuiGfxMCC;
-struct Library* GuiGfxBase;
-struct Library* RenderLibBase;
-struct Library* LowLevelBase;
-char *executable_name;
+struct Library *GraphicsBase;
+struct Library *TextEditorMCC;
+struct Library *GuiGfxMCC;
+struct Library *GuiGfxBase;
+struct Library *RenderLibBase;
+struct Library *LowLevelBase;
+
+char *executable_name;   // TODO: Why global?
 
 igame_settings* iGameSettings = NULL;
 
-void joystick_buttons(ULONG val)
-{
-	//if (val & JPF_BUTTON_PLAY) printf("[PLAY/MMB]\n");
-	//if (val & JPF_BUTTON_REVERSE) printf("[REVERSE]\n");
-	//if (val & JPF_BUTTON_FORWARD) printf("[FORWARD]\n");
-	//if (val & JPF_BUTTON_GREEN) printf("[SHUFFLE]\n");
-	if (val & JPF_BUTTON_RED)
-	{
-		launch_game();
-	}
-	//if (val & JPF_BUTTON_BLUE) printf("[STOP/RMB]\n");
-}
-
-void joystick_directions(ULONG val)
-{
-	if (val & JPF_JOY_UP)
-		set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Up);
-
-	if (val & JPF_JOY_DOWN)
-		set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Down);
-
-	if (val & JPF_JOY_LEFT)
-	  joy_left();
-
-	if (val & JPF_JOY_RIGHT)
-	  joy_right();
-}
-
-void joystick_input(ULONG val)
-{
-	if ((val & JP_TYPE_MASK) == JP_TYPE_NOTAVAIL)
-		return;
-	if ((val & JP_TYPE_MASK) == JP_TYPE_UNKNOWN)
-		return;
-	if ((val & JP_TYPE_MASK) == JP_TYPE_MOUSE)
-		return;
-
-	if ((val & JP_TYPE_MASK) == JP_TYPE_JOYSTK)
-	{
-		joystick_directions(val);
-		joystick_buttons(val);
-	}
-
-	if ((val & JP_TYPE_MASK) == JP_TYPE_GAMECTLR)
-	{
-		joystick_directions(val);
-		joystick_buttons(val);
-	}
-}
-
-void clean_exit(CONST_STRPTR msg)
+void clean_exit(STRPTR msg)
 {
 	if (app)
 		app_stop();
 
 	executable_name = NULL;
+
+	if (TextEditorMCC)
+		CloseLibrary(TextEditorMCC);
+	if (LowLevelBase)
+		CloseLibrary(LowLevelBase);
+	if (RenderLibBase)
+		CloseLibrary(RenderLibBase);
+	if (GuiGfxBase)
+		CloseLibrary(GuiGfxBase);
+	if (GuiGfxMCC)
+		CloseLibrary(GuiGfxMCC);
+	if (GraphicsBase)
+		CloseLibrary(GraphicsBase);
 
 	#if defined(__amigaos4__)
 	if (IMUIMaster)
@@ -134,8 +95,6 @@ void clean_exit(CONST_STRPTR msg)
 	#endif
 	if (MUIMasterBase)
 		CloseLibrary(MUIMasterBase);
-	if (LowLevelBase)
-		CloseLibrary(LowLevelBase);
 
 	if(app)
 		DisposeApp(app);
@@ -150,68 +109,71 @@ void clean_exit(CONST_STRPTR msg)
 
 BOOL init_app(int argc, char **argv)
 {
-	MUIMasterBase = OpenLibrary((CONST_STRPTR)MUIMASTER_LIBRARY, 19);
+	executable_name = get_executable_name(argc, argv);
+	iGameSettings = load_settings(DEFAULT_SETTINGS_FILE);
+
+	MUIMasterBase = OpenLibrary(MUIMASTER_NAME, 19);
 	if (MUIMasterBase == NULL)
 	{
-		clean_exit((unsigned char*)"Can't open muimaster.library v19\n");
+		clean_exit("Can't open muimaster.library v19\n");
 		return FALSE;
 	}
 
 	#if defined(__amigaos4__)
 	if (!(IMUIMaster = (struct MUIMasterIFace *)GetInterface(MUIMasterBase, "main", 1, NULL))) {
-		clean_exit((unsigned char*)"Failed to open "MUIMASTER_NAME".");
+		clean_exit("Failed to open "MUIMASTER_NAME".");
 		return FALSE;
 	}
 	#endif
 
-	TextEditorMCC = OpenLibrary((CONST_STRPTR)"mui/TextEditor.mcc", 15);
+	TextEditorMCC = OpenLibrary("mui/TextEditor.mcc", 15);
 	if (TextEditorMCC == NULL)
 	{
-		clean_exit((unsigned char*)"Can't open TextEditor.mcc v15 or greater\n");
+		clean_exit("Can't open TextEditor.mcc v15 or greater\n");
 		return FALSE;
 	}
-	CloseLibrary(TextEditorMCC);
 
-	LowLevelBase = OpenLibrary((CONST_STRPTR)"lowlevel.library", 0);
+	LowLevelBase = OpenLibrary("lowlevel.library", 0);
 	if (LowLevelBase == NULL)
 	{
-		clean_exit((unsigned char*)"Can't open lowlevel.library\n");
+		clean_exit("Can't open lowlevel.library\n");
 		return FALSE;
 	}
 
-	executable_name = get_executable_name(argc, argv);
-	iGameSettings = load_settings(DEFAULT_SETTINGS_FILE);
+	GraphicsBase = OpenLibrary("graphics.library", 37);
+	if (GraphicsBase == NULL)
+	{
+		clean_exit("Can't open graphics.library v37 or greater\n");
+		return FALSE;
+	}
 
 	if (!iGameSettings->no_guigfx && !iGameSettings->hide_screenshots)
 	{
-		RenderLibBase = OpenLibrary((CONST_STRPTR)"render.library", 30);
+		RenderLibBase = OpenLibrary("render.library", 30);
 		if (RenderLibBase == NULL)
 		{
-			clean_exit((unsigned char*)"Can't open render.library v30 or greater\n");
+			clean_exit("Can't open render.library v30 or greater\n");
 			return FALSE;
 		}
-		CloseLibrary(RenderLibBase);
 
-		GuiGfxBase = OpenLibrary((CONST_STRPTR)"guigfx.library", 17);
+		GuiGfxBase = OpenLibrary("guigfx.library", 17);
 		if (GuiGfxBase == NULL)
 		{
-			clean_exit((unsigned char*)"Can't open guigfx.library v17 or greater\n");
+			clean_exit("Can't open guigfx.library v17 or greater\n");
 			return FALSE;
 		}
-		CloseLibrary(GuiGfxBase);
 
-		GuiGfxMCC = OpenLibrary((CONST_STRPTR)"mui/Guigfx.mcc", 19);
+		GuiGfxMCC = OpenLibrary("mui/Guigfx.mcc", 19);
 		if (GuiGfxMCC == NULL)
 		{
-			clean_exit((unsigned char*)"Can't open Guigfx.mcc v19 or greater\n");
+			clean_exit("Can't open Guigfx.mcc v19 or greater\n");
 			return FALSE;
 		}
-		CloseLibrary(GuiGfxMCC);
 	}
 
 	app = CreateApp();
 	if (!app)
-		clean_exit((unsigned char*)"Can't initialize application\n");
+		clean_exit("Can't initialize application\n");
 	else
 		app_start();
 
@@ -255,7 +217,7 @@ int main(int argc, char **argv)
 		clean_exit(NULL);
 	}
 	else
-		clean_exit((unsigned char*)"Can't create application\n");
+		clean_exit("Can't create application\n");
 
 	return 0;
 }

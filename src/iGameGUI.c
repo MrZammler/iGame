@@ -60,13 +60,14 @@
 #include "iGame_cat.h"
 #include "fsfuncs.h"
 #include "funcs.h"
+#include "strfuncs.h"
 #include "iGameGUI.h"
 
 extern igame_settings *current_settings;
 
-struct ObjApp * CreateApp(void)
+struct ObjApp *CreateApp(void)
 {
-	struct ObjApp * object;
+	struct ObjApp *object;
 	static char about_text[512];
 	static char version_string[16];
 
@@ -312,7 +313,7 @@ struct ObjApp * CreateApp(void)
 
 	object->LV_GamesList = ListviewObject,
 		MUIA_HelpNode, "LV_GamesList",
-		MUIA_Listview_MultiSelect, MUIV_Listview_MultiSelect_Default,
+		MUIA_Listview_MultiSelect, MUIV_Listview_MultiSelect_None,
 		MUIA_Listview_DoubleClick, TRUE,
 		MUIA_Listview_List, object->LV_GamesList,
 		End;
@@ -725,7 +726,7 @@ struct ObjApp * CreateApp(void)
 
 	object->LV_GameRepositories = ListviewObject,
 		MUIA_HelpNode, "LV_GameRepositories",
-		MUIA_Listview_MultiSelect, MUIV_Listview_MultiSelect_Default,
+		MUIA_Listview_MultiSelect, MUIV_Listview_MultiSelect_None,
 		MUIA_Listview_List, object->LV_GameRepositories,
 		End;
 

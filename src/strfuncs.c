@@ -1,5 +1,5 @@
 /*
-  iGameMain.c
+  strfuncs.c
   String functions source for iGame
 
   Copyright (c) 2018, Emmanuel Vasilakis
@@ -144,7 +144,6 @@ int get_delimiter_position(const char* str)
 	return delimiter - str;
 }
 
-
 // Add spaces to a string, based on letter capitalization and numbers
 // E.g. input "A10TankKiller2Disk" -> "A10 Tank Killer 2 Disk"
 const char* add_spaces_to_string(const char* input)
@@ -219,4 +218,11 @@ STRPTR substring(STRPTR string, int position, int length)
 	*(p+c) = '\0';
 
 	return p;
+}
+
+const unsigned char *GetMBString(const unsigned char *ref)
+{
+	if (ref[1] == '\0')
+		return &ref[2];
+	return ref;
 }

@@ -11,7 +11,7 @@ MSG_AppDescription (//)
 A front-end to WHDLoad
 ;MUIB
 MSG_AppCopyright (//)
-Emmanuel Vasilakis, Dimitris Panokostas
+Emmanuel Vasilakis
 ;MUIB window Title
 MSG_WI_MainWindow (//)
 iGame

@@ -1,5 +1,5 @@
 /*
-  iGameMain.c
+  fsfuncs.c
   Filesystem functions source for iGame
 
   Copyright (c) 2018, Emmanuel Vasilakis
@@ -60,6 +60,7 @@
 #include "fsfuncs.h"
 
 extern struct ObjApp* app;
+extern struct Library *IconBase;
 extern char* executable_name;
 extern const int MAX_PATH_SIZE;
 
@@ -162,6 +163,75 @@ BOOL get_filename(const char *title, const char *positive_text, const BOOL save_
 	return result;
 }
 
+void load_games_csv_list(const char *filename)
+{
+	char *buf = malloc(256 * sizeof(char));
+	char *tmp;
+
+	const BPTR fpgames = Open((CONST_STRPTR) filename, MODE_OLDFILE);
+	if (fpgames)
+	{
+		if (games != NULL)
+		{
+			free(games);
+			games = NULL;
+		}
+
+		while (FGets(fpgames, buf, 255) != NULL)
+		{
+				item_games = (games_list *)calloc(1, sizeof(games_list));
+				item_games->next = NULL;
+
+			if (strlen(buf) > 1)
+			{
+				item_games->index = 0;
+				item_games->exists = 0;
+				item_games->deleted = 0;
+				item_games->hidden = 0;
+
+				tmp = strtok(buf, ";");
+
+				tmp = strtok(NULL, ";");
+				strcpy(item_games->title, tmp);
+
+				tmp = strtok(NULL, ";");
+				strcpy(item_games->genre, tmp);
+
+				tmp = strtok(NULL, ";");
+				strcpy(item_games->path, tmp);
+
+				tmp = strtok(NULL, ";");
+				item_games->favorite = atoi(tmp);
+
+				tmp = strtok(NULL, ";");
+				item_games->times_played = atoi(tmp);
+
+				tmp = strtok(NULL, ";");
+				item_games->last_played = atoi(tmp);
+
+				tmp = strtok(NULL, ";");
+				item_games->hidden = atoi(tmp);
+			}
+
+			if (games)
+			{
+				item_games->next = games;
+				games = item_games;
+			}
+			else
+			{
+				games = item_games;
+			}
+		}
+
+		add_games_to_listview();
+		Close(fpgames);
+	}
+
+	if (buf)
+		free(buf);
+}
+
 void save_to_csv(const char *filename, const int check_exists)
 {
 	char csvFilename[32];
@@ -219,14 +289,12 @@ void save_to_csv(const char *filename, const int check_exists)
 
 void read_tool_types(void)
 {
-	struct Library *icon_base;
 	struct DiskObject *disk_obj;
 
 	int screen_width, screen_height;
 	unsigned char filename[32];
 
-	// TODO: The opening and the close of the library needs to be done at application start and end
-	if ((icon_base = (struct Library *)OpenLibrary((CONST_STRPTR)ICON_LIBRARY, 0)))
+	if (IconBase)
 	{
 		strcpy(filename, PROGDIR);
 		strcat(filename, executable_name);
@@ -284,7 +352,6 @@ void read_tool_types(void)
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSIDEPANEL))
 				current_settings->hide_side_panel = 1;
 		}
-		CloseLibrary(icon_base);
 	}
 
 	if (!current_settings->hide_side_panel)
@@ -433,7 +500,7 @@ const char *get_directory_path(const char *str)
 }
 
 // Get the application's executable name
-const char *get_executable_name(int argc, char **argv)
+char *get_executable_name(int argc, char **argv)
 {
 	// argc is zero when run from the Workbench,
 	// positive when run from the CLI
