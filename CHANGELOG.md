@@ -5,6 +5,7 @@
 ### Changed
 - Gathered the strings methods into one separate file. This is work that needs to be done so to make funcs.c smaller. Also merged the strcasestr.c and strdup.c files.
 - Moved the filesystem methods to a separate file.
+- Now shows the icon image for non-WHDLoad games that do not have a screenshot file, if the Info datatype is installed.
 
 ## iGame 2.1b2 - [2021-03-15]
 ### Added

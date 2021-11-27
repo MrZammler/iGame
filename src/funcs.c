@@ -1192,6 +1192,14 @@ static char *get_screenshot_path(char *game_title)
 		return screenshot_path;
 	}
 
+	// Return the executable icon from the game folder, if it exists
+	snprintf(screenshot_path, sizeof(char) * MAX_PATH_SIZE, "%s.info", path);
+	if(check_path_exists(screenshot_path) && checkImageDatatype(screenshot_path))
+	{
+		FreeVec(path);
+		return screenshot_path;
+	}
+
 	// Return the default image from iGame folder, if exists
 	if(check_path_exists(DEFAULT_SCREENSHOT_FILE))
 	{
