@@ -1,0 +1,216 @@
+##rem $Id$
+##stringtype C
+##shortstrings
+/*
+  %b_strings.h
+  Header strings file for iGame
+
+  Copyright (c) 2018, Emmanuel Vasilakis
+
+  This file is part of iGame.
+
+  iGame is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  iGame is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with iGame. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/****************************************************************
+
+   This file was created automatically by `%fv'
+   from "%f0"
+
+   using the custom CatComp_h.sd
+
+   Do NOT edit by hand!
+
+****************************************************************/
+
+#ifndef %b_STRINGS_H
+#define %b_STRINGS_H
+
+#ifndef EXEC_TYPES_H
+#include <exec/types.h>
+#endif
+
+#ifdef %b_CODE
+#ifndef %b_BLOCK
+#define %b_ARRAY
+#endif
+#endif
+
+#ifdef %b_ARRAY
+#ifndef %b_NUMBERS
+#define %b_NUMBERS
+#endif
+#ifndef %b_STRINGS
+#define %b_STRINGS
+#endif
+#endif
+
+#ifdef %b_BLOCK
+#ifndef %b_STRINGS
+#define %b_STRINGS
+#endif
+#endif
+
+
+/****************************************************************************/
+
+
+#ifdef %b_NUMBERS
+
+#define %i %d
+
+#endif /* %b_NUMBERS */
+
+
+/****************************************************************************/
+
+
+#ifdef %b_STRINGS
+
+#define %i_STR %s
+
+#endif /* %b_STRINGS */
+
+
+/****************************************************************************/
+
+
+#ifdef %b_ARRAY
+
+struct %b_ArrayType
+{
+    LONG         cca_ID;
+    CONST_STRPTR cca_Str;
+};
+
+static const struct %b_ArrayType %b_Array[] =
+{
+    { %i, (CONST_STRPTR)%i_STR },
+};
+
+
+#endif /* %b_ARRAY */
+
+
+/****************************************************************************/
+
+
+#ifdef %b_BLOCK
+
+STATIC CONST UBYTE %b_Block[] =
+{
+
+     "%4a" "%2t"\n    %i_STR "%z"
+
+};
+
+#endif /* %b_BLOCK */
+
+
+/****************************************************************************/
+
+
+#ifndef PROTO_LOCALE_H
+ #ifndef __NOLIBBASE__
+  #define _NLB_DEFINED_
+  #define __NOLIBBASE__
+ #endif
+ #ifndef __NOGLOBALIFACE__
+  #define _NGI_DEFINED_
+  #define __NOGLOBALIFACE__
+ #endif
+ #include <proto/locale.h>
+ #ifdef _NLB_DEFINED_
+  #undef __NOLIBBASE__
+  #undef _NLB_DEFINED_
+ #endif
+ #ifdef _NGI_DEFINED_
+  #undef __NOGLOBALIFACE__
+  #undef _NGI_DEFINED_
+ #endif
+#endif
+
+struct %b_LocaleInfo
+{
+#ifndef __amigaos4__
+    struct Library     *li_LocaleBase;
+#else
+    struct LocaleIFace *li_ILocale;
+#endif
+    struct Catalog     *li_Catalog;
+};
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+CONST_STRPTR %b_GetString(struct %b_LocaleInfo *li, LONG stringNum);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
+
+#ifdef %b_CODE
+
+
+CONST_STRPTR %b_GetString(struct %b_LocaleInfo *li, LONG stringNum)
+{
+#ifndef __amigaos4__
+    struct Library     *LocaleBase = li->li_LocaleBase;
+#else
+    struct LocaleIFace *ILocale    = li->li_ILocale;
+#endif
+    LONG         *l;
+    UWORD        *w;
+    CONST_STRPTR  builtIn = NULL;
+
+    l = (LONG *)CatCompBlock;
+
+    while (*l != stringNum && l < (LONG *)(&CatCompBlock[sizeof(CatCompBlock)]))
+    {
+        w = (UWORD *)((ULONG)l + 4);
+        l = (LONG *)((ULONG)l + (ULONG)*w + 6);
+    }
+    if (*l == stringNum)
+    {
+        builtIn = (CONST_STRPTR)((ULONG)l + 6);
+    }
+
+#ifndef __amigaos4__
+    if (LocaleBase)
+    {
+        return GetCatalogStr(li->li_Catalog, stringNum, builtIn);
+    }
+#else
+    if (ILocale)
+    {
+#ifdef __USE_INLINE__
+        return GetCatalogStr(li->li_Catalog, stringNum, builtIn);
+#else
+        return ILocale->GetCatalogStr(li->li_Catalog, stringNum, builtIn);
+#endif
+    }
+#endif
+    return builtIn;
+}
+
+#endif /* %b_CODE */
+
+
+/****************************************************************************/
+
+
+#endif /* %b_STRINGS_H */

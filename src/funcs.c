@@ -56,15 +56,17 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#define iGame_NUMBERS
+#include "iGame_strings.h"
+
 #include "iGameGUI.h"
 #include "iGameExtern.h"
-#include "iGame_cat.h"
 #include "strfuncs.h"
 #include "fsfuncs.h"
 #include "funcs.h"
 
 extern struct ObjApp* app;
-extern struct Library *GraphicsBase;
+extern struct Library *GfxBase;
 extern struct Library *IconBase;
 extern struct Library *IntuitionBase;
 extern char* executable_name;
@@ -1048,20 +1050,20 @@ static void show_screenshot(STRPTR screenshot_path)
 		if (current_settings->no_guigfx)
 		{
 			app->IM_GameImage_1 = MUI_NewObject(Dtpic_Classname,
-						MUIA_Dtpic_Name,		screenshot_path,
-						MUIA_Frame, 				MUIV_Frame_ImageButton,
+						MUIA_Dtpic_Name,				screenshot_path,
+						MUIA_Frame, 					MUIV_Frame_ImageButton,
 			End;
 		}
 		else
 		{
 			app->IM_GameImage_1 = GuigfxObject,
-						MUIA_Guigfx_FileName,				screenshot_path,
-						MUIA_Guigfx_Quality,				MUIV_Guigfx_Quality_Best,
+						MUIA_Guigfx_FileName,			screenshot_path,
+						MUIA_Guigfx_Quality,			MUIV_Guigfx_Quality_Best,
 						MUIA_Guigfx_ScaleMode,			NISMF_SCALEFREE | NISMF_KEEPASPECT_PICTURE,
 						MUIA_Guigfx_Transparency,		0,
-						MUIA_Frame, 								MUIV_Frame_ImageButton,
-						MUIA_FixHeight, 						current_settings->screenshot_height,
-						MUIA_FixWidth, 							current_settings->screenshot_width,
+						MUIA_Frame, 					MUIV_Frame_ImageButton,
+						MUIA_FixHeight, 				current_settings->screenshot_height,
+						MUIA_FixWidth, 					current_settings->screenshot_width,
 			End;
 		}
 
@@ -1076,57 +1078,53 @@ static void show_screenshot(STRPTR screenshot_path)
 
 static char *get_screenshot_path(char *game_title)
 {
-	STRPTR path = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
-	if(path == NULL)
-	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return NULL;
-	}
-	get_path(game_title, path);
-
 	STRPTR slavePath = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
 	if(slavePath == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		FreeVec(path);
 		return NULL;
 	}
-	strcpy(slavePath, getParentPath(path));
+	get_path(game_title, slavePath);
 
-	STRPTR screenshot_path = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
-	if (screenshot_path == NULL)
+	STRPTR gameFolderPath = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
+
+	if(gameFolderPath == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		FreeVec(path);
-		FreeVec(slavePath);
 		return NULL;
 	}
 
-	// Return the igame.iff from the game folder, if exists
-	snprintf(screenshot_path, sizeof(char) * MAX_PATH_SIZE, "%s/igame.iff", slavePath);
-	FreeVec(slavePath);
-	if(check_path_exists(screenshot_path) && checkImageDatatype(screenshot_path))
+	if ((gameFolderPath = getParentPath(slavePath)) != NULL)
 	{
-		FreeVec(path);
-		return screenshot_path;
-	}
+		STRPTR screenshotPath = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
 
-	// Return the slave icon from the game folder, if exists
-	snprintf(screenshot_path, sizeof(char) * MAX_PATH_SIZE, "%s.info", substring(path, 0, -6));
-	if(check_path_exists(screenshot_path) && checkImageDatatype(screenshot_path))
-	{
-		FreeVec(path);
-		return screenshot_path;
+		if (screenshotPath == NULL)
+		{
+			msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+			return NULL;
+		}
+
+		// Return the igame.iff from the game folder, if exists
+		snprintf(screenshotPath, sizeof(char) * MAX_PATH_SIZE, "%s/igame.iff", gameFolderPath);
+		if(checkImageDatatype(screenshotPath))
+		{
+			return screenshotPath;
+		}
+
+		// Return the slave icon from the game folder, if exists
+		snprintf(screenshotPath, sizeof(char) * MAX_PATH_SIZE, "%s.info", substring(slavePath, 0, -6));
+		if(checkImageDatatype(screenshotPath))
+		{
+			return screenshotPath;
+		}
 	}
 
 	// Return the default image from iGame folder, if exists
 	if(check_path_exists(DEFAULT_SCREENSHOT_FILE))
 	{
-		FreeVec(path);
 		return DEFAULT_SCREENSHOT_FILE;
 	}
 
-	FreeVec(path);
 	return NULL;
 }
 
@@ -2139,7 +2137,6 @@ void settings_save(void)
 		free(file_line);
 }
 
-
 void setting_hide_side_panel_changed(void)
 {
 	current_settings->hide_side_panel = (BOOL)xget(app->CH_HideSidepanel, MUIA_Selected);
@@ -2167,7 +2164,7 @@ void get_screen_size(int *width, int *height)
 
 	if (IntuitionBase)
 	{
-		if (GraphicsBase)
+		if (GfxBase)
 		{
 			if ((wbscreen = LockPubScreen((CONST_STRPTR)WB_PUBSCREEN_NAME)))
 			{

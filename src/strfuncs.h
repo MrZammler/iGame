@@ -30,6 +30,6 @@ char** my_split(char *, char *);
 int get_delimiter_position(const char *);
 const char* add_spaces_to_string(const char *);
 STRPTR substring(STRPTR, int, int);
-const unsigned char *GetMBString(const unsigned char *);
+STRPTR GetMBString(ULONG);
 
 #endif

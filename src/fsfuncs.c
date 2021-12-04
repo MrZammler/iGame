@@ -52,9 +52,11 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define iGame_NUMBERS
+#include "iGame_strings.h"
+
 #include "iGameGUI.h"
 #include "iGameExtern.h"
-#include "iGame_cat.h"
 #include "strfuncs.h"
 #include "funcs.h"
 #include "fsfuncs.h"
@@ -93,7 +95,7 @@ STRPTR getParentPath(STRPTR filename)
 	STRPTR path = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
 	if (path)
 	{
-		BPTR fileLock = Lock(filename, ACCESS_READ);
+		BPTR fileLock = Lock(filename, SHARED_LOCK);
 		if (fileLock)
 		{
 			BPTR folderLock = ParentDir(fileLock);
@@ -126,7 +128,7 @@ char* get_slave_from_path(char *slave, int start, char *path)
  */
 BOOL check_path_exists(char *path)
 {
-	const BPTR lock = Lock(path, ACCESS_READ);
+	const BPTR lock = Lock(path, SHARED_LOCK);
 	if (lock) {
 		UnLock(lock);
 		return TRUE;

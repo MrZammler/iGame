@@ -24,9 +24,23 @@
 
 #include <ctype.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
+// #define iGame_CODE
+#define iGame_NUMBERS
+#define iGame_ARRAY
+#include "iGame_strings.h"
+
 #include "strfuncs.h"
+
+// extern struct LocaleBase *LocaleBase;
+#ifndef __amigaos4__
+	extern struct Library		*LocaleBase;
+#else
+	extern struct LocaleIFace	*ILocale;
+#endif
+extern struct Catalog *Catalog;
 
 /*
  * strcasestr() implementation for AmigaOS
@@ -220,9 +234,13 @@ STRPTR substring(STRPTR string, int position, int length)
 	return p;
 }
 
-const unsigned char *GetMBString(const unsigned char *ref)
+STRPTR GetMBString(ULONG refId)
 {
-	if (ref[1] == '\0')
-		return &ref[2];
-	return ref;
+	const struct iGame_ArrayType *t = iGame_Array + refId;
+
+	#ifndef __amigaos4__
+	return LocaleBase ? GetCatalogStr(Catalog, t->cca_ID, t->cca_Str) : t->cca_Str;
+	#else
+	return GetCatalogStr(Catalog, t->cca_ID, t->cca_Str);
+	#endif
 }

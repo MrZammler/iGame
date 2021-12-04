@@ -65,9 +65,9 @@ CFLAGS_OS4	= -c +aosppc -dontwarn=-1 -O2 -D__USE_INLINE__ -DCPU_VERS=AmigaOS4 $(
 # Builder settings
 ##########################################################################
 #MKLIB			= join
-LIBFLAGS		= +aos68k -lamiga -lauto -o
-LIBFLAGS_MOS	= +morphos -lamiga -lauto -o
-LIBFLAGS_OS4	= +aosppc -lamiga -lauto -o
+LIBFLAGS		= +aos68k -lamiga -o
+LIBFLAGS_MOS	= +morphos -lamiga -o
+LIBFLAGS_OS4	= +aosppc -lamiga -o
 
 ##########################################################################
 # Object files which are part of iGame
@@ -84,11 +84,8 @@ include make_includes/rules.inc
 ##########################################################################
 # catalog files
 ##########################################################################
-src/iGame_cat.c: catalogs/iGame.cd catalogs/C_c.sd
-	cd catalogs && flexcat iGame.cd ../src/iGame_cat.c=C_c.sd
-
-src/iGame_cat.h: catalogs/iGame.cd catalogs/C_h.sd
-	cd catalogs && flexcat iGame.cd ../src/iGame_cat.h=C_h.sd
+src/iGame_strings.h: catalogs/iGame.cd catalogs/CatComp_h.sd
+	cd catalogs && flexcat iGame.cd ../src/iGame_strings.h=CatComp_h.sd
 
 catalogs/%/iGame.catalog: catalogs/%/iGame.ct catalogs/iGame.cd
 	flexcat catalogs/iGame.cd $< CATALOG $@ FILL QUIET || exit 0
