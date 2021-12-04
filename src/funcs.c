@@ -1847,10 +1847,10 @@ static void refresh_list(const int check_exists)
 				total_games++;
 				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
 			}
-			else
-			{
-				printf("[%s] [%s] [%d]\n", item_games->title, item_games->path, item_games->exists);
-			}
+			// else
+			// {
+			// 	printf("[%s] [%s] [%d]\n", item_games->title, item_games->path, item_games->exists);
+			// }
 		}
 	}
 

@@ -69,7 +69,8 @@
 
 extern igame_settings *current_settings;
 
-static void TranslateMenus(struct NewMenu *);
+static void translateMenu(struct NewMenu *);
+static void flagMenuItem(struct NewMenu *, APTR, UWORD);
 
 #define TICK (CHECKIT|MENUTOGGLE)
 #define DIS  NM_ITEMDISABLED
@@ -106,7 +107,7 @@ struct ObjApp *CreateApp(void)
 	static char about_text[512];
 	static char version_string[16];
 
-	TranslateMenus(MenuMainWin);
+	translateMenu(MenuMainWin);
 
 	snprintf(version_string, sizeof(version_string),
 		"%s v%d.%d"
@@ -442,7 +443,10 @@ struct ObjApp *CreateApp(void)
 		MUIA_Menuitem_Shortcut, MENU_DELETE_HOTKEY,
 		End;
 
-	// TODO: Disable the Open Game Folder menu item based on the workbench version (if (get_wb_version() >= 44))
+	if (get_wb_version() < 44)
+	{
+		flagMenuItem(MenuMainWin, (APTR)MENU_GAMEFOLDER, DIS);
+	}
 
 	object->WI_MainWindow = WindowObject,
 		MUIA_Window_ScreenTitle, version_string,
@@ -1460,13 +1464,28 @@ BOOL checkImageDatatype(STRPTR filename)
 	return result;
 }
 
-static void TranslateMenus(struct NewMenu *nm)
+static void translateMenu(struct NewMenu *nm)
 {
 	while(nm->nm_Type != NM_END)
 	{
 		if(nm->nm_Label != NM_BARLABEL)
 		{
 			nm->nm_Label = GetMBString((ULONG)nm->nm_Label);
+		}
+		nm++;
+	}
+}
+
+static void flagMenuItem(struct NewMenu *nm, APTR userData, UWORD flags)
+{
+	while(nm->nm_Type != NM_END)
+	{
+		if(nm->nm_Label != NM_BARLABEL)
+		{
+			if (nm->nm_UserData == userData)
+			{
+				nm->nm_Flags = flags;
+			}
 		}
 		nm++;
 	}
