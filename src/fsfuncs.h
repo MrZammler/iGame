@@ -1,5 +1,5 @@
 /*
-  iGameMain.c
+  fsfuncs.h
   Filesystem functions header for iGame
 
   Copyright (c) 2018, Emmanuel Vasilakis
@@ -28,12 +28,13 @@ void strip_path(const char *, char *);
 char *get_slave_from_path(char *, int, char *);
 BOOL check_path_exists(char *);
 BOOL get_filename(const char *, const char *, const BOOL);
+void load_games_csv_list(const char *);
 void save_to_csv(const char *, const int);
 void read_tool_types(void);
 int get_title_from_slave(char *, char *);
 const char *get_directory_name(const char *);
 const char *get_directory_path(const char *);
-const char *get_executable_name(int, char **);
+char *get_executable_name(int, char **);
 void open_current_dir(void);
 void get_path(char *, char *);
 

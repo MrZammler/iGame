@@ -1,5 +1,5 @@
 /*
-  iGameMain.c
+  strfuncs.c
   String functions source for iGame
 
   Copyright (c) 2018, Emmanuel Vasilakis
@@ -24,9 +24,23 @@
 
 #include <ctype.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
+// #define iGame_CODE
+#define iGame_NUMBERS
+#define iGame_ARRAY
+#include "iGame_strings.h"
+
 #include "strfuncs.h"
+
+// extern struct LocaleBase *LocaleBase;
+#ifndef __amigaos4__
+	extern struct Library		*LocaleBase;
+#else
+	extern struct LocaleIFace	*ILocale;
+#endif
+extern struct Catalog *Catalog;
 
 /*
  * strcasestr() implementation for AmigaOS
@@ -144,7 +158,6 @@ int get_delimiter_position(const char* str)
 	return delimiter - str;
 }
 
-
 // Add spaces to a string, based on letter capitalization and numbers
 // E.g. input "A10TankKiller2Disk" -> "A10 Tank Killer 2 Disk"
 const char* add_spaces_to_string(const char* input)
@@ -219,4 +232,15 @@ STRPTR substring(STRPTR string, int position, int length)
 	*(p+c) = '\0';
 
 	return p;
+}
+
+STRPTR GetMBString(ULONG refId)
+{
+	const struct iGame_ArrayType *t = iGame_Array + refId;
+
+	#ifndef __amigaos4__
+	return LocaleBase ? GetCatalogStr(Catalog, t->cca_ID, t->cca_Str) : t->cca_Str;
+	#else
+	return GetCatalogStr(Catalog, t->cca_ID, t->cca_Str);
+	#endif
 }

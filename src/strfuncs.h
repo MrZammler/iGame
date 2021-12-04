@@ -1,5 +1,5 @@
 /*
-  iGameMain.c
+  strfuncs.h
   String functions header for iGame
 
   Copyright (c) 2018, Emmanuel Vasilakis
@@ -30,5 +30,6 @@ char** my_split(char *, char *);
 int get_delimiter_position(const char *);
 const char* add_spaces_to_string(const char *);
 STRPTR substring(STRPTR, int, int);
+STRPTR GetMBString(ULONG);
 
 #endif

@@ -11,7 +11,7 @@ MSG_AppDescription (//)
 A front-end to WHDLoad
 ;MUIB
 MSG_AppCopyright (//)
-Emmanuel Vasilakis, Dimitris Panokostas
+Emmanuel Vasilakis
 ;MUIB window Title
 MSG_WI_MainWindow (//)
 iGame
@@ -32,7 +32,7 @@ MSG_MNMainAddnonWHDLoadgameChar (//)
 A_
 ;MUIB Menu Title
 MSG_MNMainMenuShowHidehiddenentries (//)
-Show/Hide hidden entries
+Show hidden entries
 ;MUIB Menu Title
 MSG_MNMainOpenList (//)
 Open List...
@@ -86,7 +86,7 @@ MSG_MNMainiGameSettings (//)
 Settings...
 ;MUIB Menu Title
 MSG_MNlabel2GameRepositories (//)
-Game Repositories...
+Repositories...
 ;MUIB Menu Title
 MSG_MNMainMUISettings (//)
 MUI Settings...
@@ -308,7 +308,7 @@ MSG_LA_StartWithFavorites (//)
 Display favorites on start
 ;MUIB Menu Title
 MSG_MNMainOpenCurrentDir (//)
-Open Game Dir
+Open game folder
 ;MUIB Menu ShortCut
 MSG_MNMainOpenCurrentDirChar (//)
 W_
@@ -318,3 +318,5 @@ Slave path does not exist!
 ;compiled for
 MSG_compiledForAboutWin (//)
 compiled for
+MSG_MNMainPreferences (//)
+Preferences

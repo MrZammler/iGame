@@ -95,8 +95,8 @@ struct ObjApp
 	CONST_STRPTR RA_TitlesFromContent[3];
 };
 
-extern struct ObjApp* CreateApp(void);
-extern void DisposeApp(struct ObjApp*);
+struct ObjApp *CreateApp(void);
+void DisposeApp(struct ObjApp *);
 
 BOOL checkImageDatatype(STRPTR);
 

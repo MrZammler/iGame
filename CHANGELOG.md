@@ -1,10 +1,21 @@
-## iGame 2.1b3 - [future]
+## iGame 2.1b3 - [2021-12-04]
 ### Added
 - Added a check if the screenshot image is supported by the installed datatypes. If not, it is skipped. This fixes situations where the Info datatype is not installed and no image is shown instead of the default.
 
+### Fixed
+- Fixed the menus on Aros 68k. Menus should work on ApolloOS now.
+
 ### Changed
-- Gathered the strings methods into one separate file. This is work that needs to be done so to make funcs.c smaller. Also merged the strcasestr.c and strdup.c files.
+- The games list is not multiselect now. This speeds up a little bit the selection of games on slow machines.
+- Moved the strings methods to a separate file. Also merged the strcasestr.c and strdup.c files.
 - Moved the filesystem methods to a separate file.
+- Set local methods as static in the funcs.c and cleaned up the iGameExtern.h from the shared methods
+- Now all the libraries open on application start and close on application exit. No OpenLibrary() calls in the middle of the application.
+- Moved the joystick methods from iGameMain.c to funcs.c
+- A lot of global methods and variables removed
+- A lot of refactoring happened, so to make funcs.c file smaller. This makes code more clear and readable.
+- All the necessary libraries and interfaces are set to be loaded in the code. No "-lauto" is necessary any more.
+- Changed the localization system to support the new menus. Now the strings header file is created based on catcomp
 
 ## iGame 2.1b2 - [2021-03-15]
 ### Added

@@ -33,6 +33,7 @@
 #include <proto/icon.h>
 #include <proto/asl.h>
 #include <proto/datatypes.h>
+#include <proto/dos.h>
 #include <proto/muimaster.h>
 
 /* System */
@@ -55,20 +56,58 @@
 #define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
 #endif
 
+
+#define iGame_NUMBERS
+#include "iGame_strings.h"
+
 #include "version.h"
 #include "iGameExtern.h"
-#include "iGame_cat.h"
 #include "fsfuncs.h"
 #include "funcs.h"
+#include "strfuncs.h"
 #include "iGameGUI.h"
 
 extern igame_settings *current_settings;
 
-struct ObjApp * CreateApp(void)
+static void translateMenu(struct NewMenu *);
+static void flagMenuItem(struct NewMenu *, APTR, UWORD);
+
+#define TICK (CHECKIT|MENUTOGGLE)
+#define DIS  NM_ITEMDISABLED
+#define STR_ID(x) ( (STRPTR)(x) )
+
+static struct NewMenu MenuMainWin[] =
 {
-	struct ObjApp * object;
+	{ NM_TITLE, STR_ID(MSG_MNlabel2Actions)							, 0 ,0 ,0			,(APTR)MENU_ACTIONS },
+	{ NM_ITEM ,  STR_ID(MSG_MNlabelScan)							,"R",0 ,0			,(APTR)MENU_SCAN },
+	{ NM_ITEM ,  STR_ID(MSG_MNMainAddnonWHDLoadgame)				,"A",0 ,0			,(APTR)MENU_ADDGAME },
+	{ NM_ITEM ,  STR_ID(MSG_MNMainMenuShowHidehiddenentries)		, 0 ,TICK ,0		,(APTR)MENU_SHOWHIDDEN },
+	{ NM_ITEM ,  NM_BARLABEL										, 0 ,0 ,0			,(APTR)0 },
+	{ NM_ITEM ,  STR_ID(MSG_MNMainAbout)							,"?",0 ,0			,(APTR)MENU_ABOUT },
+	{ NM_ITEM ,  NM_BARLABEL										, 0 ,0 ,0			,(APTR)0 },
+	{ NM_ITEM ,  STR_ID(MSG_MNMainQuit)								,"Q",0 ,0			,(APTR)MENU_QUIT },
+
+	{ NM_TITLE, STR_ID(MSG_MNlabel2Game)							, 0 ,0 ,0			,(APTR)MENU_GAME },
+	{ NM_ITEM ,  STR_ID(MSG_MNMainProperties)						,"P",0 ,0			,(APTR)MENU_GAMEPROPERTIES },
+	{ NM_ITEM ,  STR_ID(MSG_MNMainOpenCurrentDir)					,"D",0 ,0			,(APTR)MENU_GAMEFOLDER },
+
+	{ NM_TITLE, STR_ID(MSG_MNMainPreferences)						, 0 ,0 ,0			,(APTR)MENU_PREFERENCES },
+	{ NM_ITEM ,  STR_ID(MSG_MNMainiGameSettings)					, 0 ,0 ,0			,(APTR)MENU_SETTINGS },
+	{ NM_ITEM ,  STR_ID(MSG_MNlabel2GameRepositories)				, 0 ,0 ,0			,(APTR)MENU_REPOSITORIES },
+	{ NM_ITEM ,  NM_BARLABEL										, 0 ,0 ,0			,(APTR)0 },
+	{ NM_ITEM ,  STR_ID(MSG_MNMainMUISettings)						, 0 ,0 ,0			,(APTR)MENU_MUISETTINGS },
+
+	{ NM_END,NULL,0,0,0,NULL }
+};
+
+struct ObjApp *CreateApp(void)
+{
+	struct ObjApp *object;
+	APTR strip;
 	static char about_text[512];
 	static char version_string[16];
+
+	translateMenu(MenuMainWin);
 
 	snprintf(version_string, sizeof(version_string),
 		"%s v%d.%d"
@@ -87,12 +126,10 @@ struct ObjApp * CreateApp(void)
 		, version_string, STR(RELEASE_DATE), GetMBString(MSG_compiledForAboutWin), STR(CPU_VERS), GetMBString(MSG_TX_About)
 	);
 
-	APTR	MNlabel2Actions, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainMenuShowHidehiddenentries;
 	APTR	MNMainOpenList, MNMainSaveList, MNMainSaveListAs;
-	APTR	MNMainBarLabel0, MNMainAbout;
-	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Game, MNMainMenuDuplicate, MNMainProperties, MNMainOpenCurrentDir;
-	APTR	MNMainDelete, MNlabel2Tools, MNMainiGameSettings;
-	APTR	MNlabel2GameRepositories, MNMainBarLabel2, MNMainMUISettings, GROUP_ROOT;
+	APTR	MNMainMenuDuplicate;
+	APTR	MNMainDelete;
+	APTR	GROUP_ROOT;
 	APTR	GR_Filter, LA_Filter, GR_main, Space_Gamelist;
 	APTR	GROUP_ROOT_1, GR_Genre, LA_PropertiesGenre, Space_Genre;
 	APTR	GR_PropertiesChecks, obj_aux0, obj_aux1, Space_Properties, obj_aux2;
@@ -102,7 +139,7 @@ struct ObjApp * CreateApp(void)
 	APTR	GR_AddGameTitle, LA_AddGameTitle, GR_AddGamePath, LA_AddGamePath;
 	APTR	GR_AddGameGenre, LA_AddGameGenre, Space_AddGame, GR_AddGameButtons;
 	APTR	GROUP_ROOT_4, GROUP_ROOT_Settings, GR_Settings;
-	APTR	LA_HideScreenshots, GR_Screenshots, GR_NoGuiGfx;
+	APTR	LA_HideScreenshots, GR_Screenshots;
 	APTR	LA_NoGuiGfx, GR_ScreenshotSize, LA_ScreenshotSize;
 	APTR	Space_ScreenshotSize, GR_CustomSize, LA_Width, LA_Height, GR_Titles;
 	APTR	GR_TitlesFrom, Space_TitlesFrom, GR_SmartSpaces, Space_SmartSpaces;
@@ -110,11 +147,7 @@ struct ObjApp * CreateApp(void)
 	APTR	LA_SaveStatsOnExit, LA_FilterUseEnter, LA_StartWithFavorites;
 	APTR	LA_HideSidepanel;
 	APTR	GR_SettingsButtons, Space_SettingsButtons1, Space_SettingsButtons2;
-#if defined(__amigaos4__)
-	static const struct Hook MenuScanHook = { { NULL,NULL }, (HOOKFUNC)scan_repositories, NULL, NULL };
-#else
-	static const struct Hook MenuScanHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)scan_repositories, NULL };
-#endif
+
 #if defined(__amigaos4__)
 	static const struct Hook MenuOpenListHook = { { NULL,NULL }, (HOOKFUNC)open_list, NULL, NULL };
 #else
@@ -156,24 +189,9 @@ struct ObjApp * CreateApp(void)
 	static const struct Hook LaunchGameHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)launch_game, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook MenuShowHideHiddenHook = { { NULL,NULL }, (HOOKFUNC)list_show_hidden, NULL, NULL };
-#else
-	static const struct Hook MenuShowHideHiddenHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)list_show_hidden, NULL };
-#endif
-#if defined(__amigaos4__)
 	static const struct Hook AppStartHook = { { NULL,NULL }, (HOOKFUNC)app_start, NULL, NULL };
 #else
 	static const struct Hook AppStartHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)app_start, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook MenuPropertiesHook = { { NULL,NULL }, (HOOKFUNC)game_properties, NULL, NULL };
-#else
-	static const struct Hook MenuPropertiesHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_properties, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook MenuAddNonWhdloadHook = { { NULL,NULL }, (HOOKFUNC)add_non_whdload, NULL, NULL };
-#else
-	static const struct Hook MenuAddNonWhdloadHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)add_non_whdload, NULL };
 #endif
 #if defined(__amigaos4__)
 	static const struct Hook GameClickHook = { { NULL,NULL }, (HOOKFUNC)game_click, NULL, NULL };
@@ -260,11 +278,6 @@ struct ObjApp * CreateApp(void)
 #else
 	static const struct Hook SettingsUseHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)settings_use, NULL };
 #endif
-#if defined(__amigaos4__)
-	static const struct Hook OpenCurrentDirHook = { { NULL,NULL }, (HOOKFUNC)open_current_dir, NULL, NULL };
-#else
-	static const struct Hook OpenCurrentDirHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)open_current_dir, NULL };
-#endif
 
 
 	if (!((object = AllocVec(sizeof(struct ObjApp), MEMF_PUBLIC | MEMF_CLEAR))))
@@ -312,7 +325,7 @@ struct ObjApp * CreateApp(void)
 
 	object->LV_GamesList = ListviewObject,
 		MUIA_HelpNode, "LV_GamesList",
-		MUIA_Listview_MultiSelect, MUIV_Listview_MultiSelect_Default,
+		MUIA_Listview_MultiSelect, MUIV_Listview_MultiSelect_None,
 		MUIA_Listview_DoubleClick, TRUE,
 		MUIA_Listview_List, object->LV_GamesList,
 		End;
@@ -407,20 +420,6 @@ struct ObjApp * CreateApp(void)
 		Child, object->TX_Status,
 		End;
 
-	MNlabelScan = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNlabelScan),
-		MUIA_Menuitem_Shortcut, MENU_SCANREPOS_HOTKEY,
-		End;
-
-	MNMainAddnonWHDLoadgame = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNMainAddnonWHDLoadgame),
-		MUIA_Menuitem_Shortcut, MENU_ADDNONWHDLOADGAME_HOTKEY,
-		End;
-
-	MNMainMenuShowHidehiddenentries = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNMainMenuShowHidehiddenentries),
-		End;
-
 	MNMainOpenList = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainOpenList),
 		MUIA_Menuitem_Shortcut, MENU_OPENLIST_HOTKEY,
@@ -435,47 +434,8 @@ struct ObjApp * CreateApp(void)
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainSaveListAs),
 		End;
 
-	MNMainBarLabel0 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
-
-	MNMainAbout = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNMainAbout),
-		MUIA_Menuitem_Shortcut, MENU_ABOUT_HOTKEY,
-		End;
-
-	MNMainBarLabel1 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
-
-	MNMainQuit = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNMainQuit),
-		MUIA_Menuitem_Shortcut, MENU_QUIT_HOTKEY,
-		End;
-
-	MNlabel2Actions = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Actions),
-		MUIA_Family_Child, MNlabelScan,
-		MUIA_Family_Child, MNMainAddnonWHDLoadgame,
-		MUIA_Family_Child, MNMainMenuShowHidehiddenentries,
-		/* MUIA_Family_Child, MNMainBarLabel5, */
-		/* MUIA_Family_Child, MNMainOpenList, */
-		/* MUIA_Family_Child, MNMainSaveList, */
-		/* MUIA_Family_Child, MNMainSaveListAs, */
-		MUIA_Family_Child, MNMainBarLabel0,
-		MUIA_Family_Child, MNMainAbout,
-		MUIA_Family_Child, MNMainBarLabel1,
-		MUIA_Family_Child, MNMainQuit,
-		End;
-
 	MNMainMenuDuplicate = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainMenuDuplicate),
-		End;
-
-	MNMainProperties = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNMainProperties),
-		MUIA_Menuitem_Shortcut, MENU_PROPERTIES_HOTKEY,
-		End;
-
-	MNMainOpenCurrentDir = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNMainOpenCurrentDir),
-		//MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainOpenCurrentDirChar),
 		End;
 
 	MNMainDelete = MenuitemObject,
@@ -483,61 +443,15 @@ struct ObjApp * CreateApp(void)
 		MUIA_Menuitem_Shortcut, MENU_DELETE_HOTKEY,
 		End;
 
-	// Only include the open dir menu item if we have a supportive workbench
-	if (get_wb_version() >= 44)
+	if (get_wb_version() < 44)
 	{
-	MNlabel2Game = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Game),
-	  /* MUIA_Family_Child, MNMainMenuDuplicate, */
-		MUIA_Family_Child, MNMainProperties,
-		MUIA_Family_Child, MNMainOpenCurrentDir,
-	  /*	MUIA_Family_Child, MNMainBarLabel4,
-		MUIA_Family_Child, MNMainDelete, */
-		End;
+		flagMenuItem(MenuMainWin, (APTR)MENU_GAMEFOLDER, DIS);
 	}
-	else
-	{
-	MNlabel2Game = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Game),
-	  /* MUIA_Family_Child, MNMainMenuDuplicate, */
-		MUIA_Family_Child, MNMainProperties,
-	  /*	MUIA_Family_Child, MNMainBarLabel4,
-		MUIA_Family_Child, MNMainDelete, */
-		End;
-	}
-
-	MNMainiGameSettings = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNMainiGameSettings),
-		End;
-
-	MNlabel2GameRepositories = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2GameRepositories),
-		End;
-
-	MNMainBarLabel2 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
-
-	MNMainMUISettings = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNMainMUISettings),
-		End;
-
-	MNlabel2Tools = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Tools),
-		MUIA_Family_Child, MNMainiGameSettings,
-		MUIA_Family_Child, MNlabel2GameRepositories,
-		MUIA_Family_Child, MNMainBarLabel2,
-		MUIA_Family_Child, MNMainMUISettings,
-		End;
-
-	object->MN_MainMenu = MenustripObject,
-		MUIA_Family_Child, MNlabel2Actions,
-		MUIA_Family_Child, MNlabel2Game,
-		MUIA_Family_Child, MNlabel2Tools,
-		End;
 
 	object->WI_MainWindow = WindowObject,
 		MUIA_Window_ScreenTitle, version_string,
 		MUIA_Window_Title, GetMBString(MSG_WI_MainWindow),
-		MUIA_Window_Menustrip, object->MN_MainMenu,
+		MUIA_Window_Menustrip, strip = MUI_MakeObject(MUIO_MenustripNM, MenuMainWin, 0),
 		MUIA_Window_ID, MAKE_ID('0', 'I', 'G', 'A'),
 		MUIA_Window_AppWindow, TRUE,
 		WindowContents, GROUP_ROOT,
@@ -725,7 +639,7 @@ struct ObjApp * CreateApp(void)
 
 	object->LV_GameRepositories = ListviewObject,
 		MUIA_HelpNode, "LV_GameRepositories",
-		MUIA_Listview_MultiSelect, MUIV_Listview_MultiSelect_Default,
+		MUIA_Listview_MultiSelect, MUIV_Listview_MultiSelect_None,
 		MUIA_Listview_List, object->LV_GameRepositories,
 		End;
 
@@ -1122,27 +1036,6 @@ struct ObjApp * CreateApp(void)
 		object->WI_MainWindow,
 		3,
 		MUIM_Set, MUIA_Window_ActiveObject, object->LV_GamesList
-		);
-
-	DoMethod(MNlabelScan,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->App,
-		2,
-		MUIM_CallHook, &MenuScanHook
-	);
-
-	DoMethod(MNMainAddnonWHDLoadgame,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->App,
-		2,
-		MUIM_CallHook, &MenuAddNonWhdloadHook
-	);
-
-	DoMethod(MNMainMenuShowHidehiddenentries,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->App,
-		2,
-		MUIM_CallHook, &MenuShowHideHiddenHook
 	);
 
 	DoMethod(MNMainOpenList,
@@ -1166,20 +1059,6 @@ struct ObjApp * CreateApp(void)
 		MUIM_CallHook, &MenuSaveListAsHook
 	);
 
-	DoMethod(MNMainAbout,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->WI_About,
-		3,
-		MUIM_Set, MUIA_Window_Open, TRUE
-	);
-
-	DoMethod(MNMainQuit,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->App,
-		2,
-		MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit
-	);
-
 	DoMethod(MNMainMenuDuplicate,
 		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
 		object->App,
@@ -1187,47 +1066,11 @@ struct ObjApp * CreateApp(void)
 		MUIM_CallHook, &MenuDuplicateHook
 	);
 
-	DoMethod(MNMainProperties,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->App,
-		2,
-		MUIM_CallHook, &MenuPropertiesHook
-	);
-
-	//OPEN CURRENT DIR
-	DoMethod(MNMainOpenCurrentDir,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->App,
-		2,
-		MUIM_CallHook, &OpenCurrentDirHook
-	);
-
 	DoMethod(MNMainDelete,
 		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
 		object->App,
 		2,
 		MUIM_CallHook, &MenuDeleteHook
-	);
-
-	DoMethod(MNMainiGameSettings,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->WI_Settings,
-		3,
-		MUIM_Set, MUIA_Window_Open, TRUE
-	);
-
-	DoMethod(MNlabel2GameRepositories,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->WI_GameRepositories,
-		3,
-		MUIM_Set, MUIA_Window_Open, TRUE
-	);
-
-	DoMethod(MNMainMUISettings,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->App,
-		2,
-		MUIM_Application_OpenConfigWindow, 0
 	);
 
 	DoMethod(object->WI_MainWindow,
@@ -1580,11 +1423,6 @@ struct ObjApp * CreateApp(void)
 		0
 	);
 
-	// Delay opening the Window until after we've loaded everything
-	/*set(object->WI_MainWindow,
-		MUIA_Window_Open, TRUE
-	);*/
-
 	return object;
 }
 
@@ -1604,15 +1442,51 @@ void DisposeApp(struct ObjApp * object)
 
 BOOL checkImageDatatype(STRPTR filename)
 {
-	Object *dtObj = NewDTObject(filename,
-			DTA_GroupID,	GID_PICTURE,
-			TAG_DONE);
+	BOOL result = FALSE;
+	BPTR lock;
+	struct DataType *dtn;
 
-	if (dtObj)
+	if((lock = Lock(filename, SHARED_LOCK)))
 	{
-		DisposeDTObject (dtObj);
-		return TRUE;
+		if((dtn = ObtainDataType(DTST_FILE, (APTR)lock, TAG_END)))
+		{
+			const struct DataTypeHeader *dth = dtn->dtn_Header;
+			if (dth->dth_GroupID == GID_PICTURE)
+			{
+				result = TRUE;
+			}
+
+			ReleaseDataType(dtn);
+		}
+		UnLock(lock);
 	}
 
-	return FALSE;
+	return result;
+}
+
+static void translateMenu(struct NewMenu *nm)
+{
+	while(nm->nm_Type != NM_END)
+	{
+		if(nm->nm_Label != NM_BARLABEL)
+		{
+			nm->nm_Label = GetMBString((ULONG)nm->nm_Label);
+		}
+		nm++;
+	}
+}
+
+static void flagMenuItem(struct NewMenu *nm, APTR userData, UWORD flags)
+{
+	while(nm->nm_Type != NM_END)
+	{
+		if(nm->nm_Label != NM_BARLABEL)
+		{
+			if (nm->nm_UserData == userData)
+			{
+				nm->nm_Flags = flags;
+			}
+		}
+		nm++;
+	}
 }

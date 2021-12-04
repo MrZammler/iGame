@@ -33,9 +33,6 @@
 #define DEFAULT_SCREENSHOT_FILE "PROGDIR:igame.iff"
 #define DEFAULT_SETTINGS_FILE "PROGDIR:igame.prefs"
 #define SLAVE_STRING "slave"
-#define ICON_LIBRARY "icon.library"
-#define INTUITION_LIBRARY "intuition.library"
-#define GRAPHICS_LIBRARY "graphics.library"
 #define WB_PUBSCREEN_NAME "Workbench"
 
 #define TOOLTYPE_SCREENSHOT "SCREENSHOT"
@@ -116,38 +113,21 @@ typedef struct games
 	struct games* next;
 } games_list;
 
-void scan_repositories();
-void open_list();
-void save_list(int check_exists);
-void save_list_as();
-void game_duplicate();
-void game_delete();
-void game_properties_ok();
-void filter_change();
-void launch_game();
-void list_show_hidden();
-void app_start();
-void game_properties();
-void add_non_whdload();
-void genres_click();
-void non_whdload_ok();
-void repo_stop();
-void repo_add();
-void repo_remove();
-void setting_filter_use_enter_changed();
-void setting_save_stats_on_exit_changed();
-void setting_smart_spaces_changed();
-void setting_titles_from_changed();
-void setting_hide_screenshot_changed();
-void setting_start_with_favorites_changed();
-void setting_no_guigfx_changed();
-void setting_screenshot_size_changed();
-void settings_save();
-void setting_hide_side_panel_changed();
-void settings_use();
-const unsigned char* GetMBString(const unsigned char* ref);
-void joy_left();
-void joy_right();
-ULONG get_wb_version();
+enum {
+	MENU_ACTIONS=1,
+	MENU_SCAN,
+	MENU_ADDGAME,
+	MENU_SHOWHIDDEN,
+	MENU_ABOUT,
+	MENU_QUIT,
+	MENU_GAME,
+	MENU_GAMEPROPERTIES,
+	MENU_GAMEFOLDER,
+	MENU_PREFERENCES,
+	MENU_SETTINGS,
+	MENU_REPOSITORIES,
+	MENU_MUISETTINGS,
+	MENU_LAST
+};
 
 #endif
