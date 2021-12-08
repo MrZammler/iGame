@@ -59,19 +59,11 @@ include make_includes/rules.inc
 ##########################################################################
 # catalog files
 ##########################################################################
-src/iGame_cat.c: catalogs/iGame.cd catalogs/C_c.sd
-	cd catalogs && flexcat iGame.cd ../src/iGame_cat.c=C_c.sd
 
-src/iGame_cat.h: catalogs/iGame.cd catalogs/C_h.sd
-	cd catalogs && flexcat iGame.cd ../src/iGame_cat.h=C_h.sd
+include make_includes/catalogs.inc
 
 catalogs/%/iGame.catalog: catalogs/%/iGame.ct catalogs/iGame.cd
-	flexcat catalogs/iGame.cd $< CATALOG $@
-
-catalog_files := $(patsubst %/iGame.ct,%/iGame.catalog,$(wildcard catalogs/*/iGame.ct))
-catalog_dirs := $(dir $(catalog_files))
-
-catalogs: $(catalog_files)
+	flexcat catalogs/iGame.cd $< CATALOG $@ FILL QUIET || exit 0
 
 ##########################################################################
 # object files (generic 000)
