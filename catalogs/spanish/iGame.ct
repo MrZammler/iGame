@@ -1,0 +1,431 @@
+## version $VER: igame.catalog 0.1 (15.12.2021)
+## codeset 4
+## language spanish
+;
+;
+MSG_AppDescription
+Interfaz para WHDLoad
+; A front-end to WHDLoad
+;
+MSG_AppCopyright
+Emmanuel Vasilakis
+; Emmanuel Vasilakis
+;
+MSG_WI_MainWindow
+iGame
+; iGame
+;
+MSG_MNlabel2Actions
+Acciones
+; Actions
+;
+MSG_MNlabelScan
+Releer repositorios
+; Scan Repositories
+;
+MSG_MNlabelScanChar
+R_
+; R_
+;
+MSG_MNMainAddnonWHDLoadgame
+Añadir juego...
+; Add game...
+;
+MSG_MNMainAddnonWHDLoadgameChar
+A_
+; A_
+;
+MSG_MNMainMenuShowHidehiddenentries
+Mostrar juegos ocultos
+; Show hidden entries
+;
+MSG_MNMainOpenList
+Abrir lista...
+; Open List...
+;
+MSG_MNMainOpenListChar
+O_
+; O_
+;
+MSG_MNMainSaveList
+Guardar lista
+; Save List
+;
+MSG_MNMainSaveListChar
+S_
+; S_
+;
+MSG_MNMainSaveListAs
+Guardar lista como...
+; Save List As...
+;
+MSG_MNMainExportListtoTextfile
+Exportar lista como texto...
+; Export List to Text file...
+;
+MSG_MNMainAbout
+Acerca de...
+; About...
+;
+MSG_MNMainQuit
+Salir
+; Quit
+;
+MSG_MNMainQuitChar
+Q_
+; Q_
+;
+MSG_MNlabel2Game
+Juego
+; Game
+;
+MSG_MNMainMenuDuplicate
+Duplicar...
+; Duplicate...
+;
+MSG_MNMainProperties
+Propiedades...
+; Properties...
+;
+MSG_MNMainPropertiesChar
+P_
+; P_
+;
+MSG_MNMainDelete
+Borrar
+; Delete
+;
+MSG_MNMainDeleteChar
+D_
+; D_
+;
+MSG_MNlabel2Tools
+Ajustes
+; Settings
+;
+MSG_MNMainiGameSettings
+Generales...
+; Settings...
+;
+MSG_MNlabel2GameRepositories
+Repositorios...
+; Repositories...
+;
+MSG_MNMainMUISettings
+Ajustes MUI...
+; MUI Settings...
+;
+MSG_LA_Filter
+Filtro:
+; Filter:
+;
+MSG_LV_GenresListTitle
+Géneros
+; Genres
+;
+MSG_WI_Properties
+Propiedades del juego
+; Game Properties
+;
+MSG_STR_PropertiesGameTitleTitle
+Título
+; Title
+;
+MSG_LA_PropertiesGenre
+Género:
+; Genre:
+;
+MSG_CY_PropertiesGenre0
+<desconocido>
+; Unknown
+;
+MSG_CH_PropertiesFavorite
+Favorito
+; Favorite:
+;
+MSG_CH_PropertiesHidden
+Oculto
+; Hidden:
+;
+MSG_LA_PropertiesTimesPlayed
+Veces jugado:
+; Times Played:
+;
+MSG_LA_PropertiesSlavePath
+\"Slave"\:
+; Slave Path:
+;
+MSG_TX_PropertiesTooltypesTitle
+Argumentos
+; Tooltypes
+;
+MSG_BT_PropertiesOK
+Aceptar
+; OK
+;
+MSG_BT_PropertiesCancel
+Cancelar
+; Cancel
+;
+MSG_WI_GameRepositories
+Repositorios de juegos
+; Game Repositories
+;
+MSG_BT_AddRepo
+Añadir
+; Add
+;
+MSG_BT_RemoveRepo
+Eliminar
+; Remove
+;
+MSG_BT_CloseRepoWindow
+Cerrar
+; Close
+;
+MSG_WI_AddNonWHDLoad
+Añadir juego
+; Add a Game
+;
+MSG_LA_AddGameTitle
+Título:
+; Title:
+;
+MSG_LA_AddGamePath
+Ubicación:
+; Path:
+;
+MSG_LA_AddGameGenre
+Género:
+; Genre:
+;
+MSG_CY_AddGameGenre0
+<desconocido>
+; Unknown
+;
+MSG_BT_AddGameOK
+Aceptar
+; OK
+;
+MSG_BT_AddGameCancel
+Cancelar
+; Cancel
+;
+MSG_WI_About
+Acerca de iGame
+; About iGame
+;
+MSG_TX_About
+ Emmanuel Vasilakis (mrzammler@mm.st)\n\n\
+Contribuidores:\n\
+ Dimitris Panokostas (midwan@gmail.com)\n\
+ George Sokianos (walkero@gmail.com)\n\
+ Chris Charabaruk (chris+igame@charabaruk.com)\n\
+ Javier R. Santurde 'tolkien'\n
+; Emmanuel Vasilakis (mrzammler@mm.st)\n\nContributors:\nDimitris Panokostas (midwan@gmail.com)\nGeorge Sokianos (walkero@gmail.com)\nChris Charabaruk (chris+igame@charabaruk.com)\nJavier R. Santurde (tolkien)\n\n
+;
+MSG_BT_AboutOK
+Aceptar
+; OK
+;
+MSG_WI_Settings
+Ajustes de iGame
+; iGame Settings
+;
+MSG_LA_HideScreenshots
+Ocultar imágenes
+; Hide Screenshots
+;
+MSG_GR_ScreenshotsTitle
+Imágenes
+; Screenshots
+;
+MSG_LA_NoGuiGfx
+No usar 'guigfx.library'
+; No GuiGfx
+;
+MSG_LA_ScreenshotSize
+Dimensiones imagen:
+; Screenshot Size:
+;
+MSG_CY_ScreenshotSize0
+160x128
+; 160x128
+;
+MSG_CY_ScreenshotSize1
+320x256
+; 320x256
+;
+MSG_CY_ScreenshotSize2
+propias
+; Custom
+;
+MSG_LA_Width
+ancho:
+; Width
+;
+MSG_LA_Height
+alto:
+; Height
+;
+MSG_GR_TitlesTitle
+Título Del Juego
+; Titles
+;
+MSG_RA_TitlesFromTitle
+Obtener Título
+; Titles From:
+;
+MSG_RA_TitlesFrom0
+del 'slave'
+; Slave Contents
+;
+MSG_RA_TitlesFrom1
+del directorio
+; Directories
+;
+MSG_LA_SmartSpaces
+Sin espacios \"inteligentes\"
+; No Smart Spaces
+;
+MSG_GR_MiscTitle
+Miscelánea
+; Misc
+;
+MSG_LA_SaveStatsOnExit
+Guardar estadísticas al salir
+; Save stats on exit
+;
+MSG_LA_FilterUseEnter
+Usar <ENTER> para filtrar
+; Use enter to filter
+;
+MSG_LA_HideSidepanel
+Ocultar panel lateral
+; Hide side panel
+;
+MSG_BT_SettingsSave
+Guardar
+; Save
+;
+MSG_BT_SettingsUse
+Usar
+; Use
+;
+MSG_BT_SettingsCancel
+Cancelar
+; Cancel
+;
+MSG_SelectDir
+Elegir repositorio/directorio
+; Select dir...
+;
+MSG_GameExecutable
+Elegir ejecutable del juego
+; Select Game executable...
+;
+MSG_TotalNumberOfGames
+Juegos: %d
+; Total %d games.
+;
+MSG_UnknownGenre
+<desconocido>
+; Unknown
+;
+MSG_FilterShowAll
+--Mostrar Todos--
+; --Show All--
+;
+MSG_FilterFavorites
+--Favoritos--
+; --Favorites--
+;
+MSG_FilterLastPlayed
+--Últimos Jugados--
+; --Last Played--
+;
+MSG_FilterMostPlayed
+--Más Jugados--
+; --Most Played--
+;
+MSG_FilterNeverPlayed
+--Nunca Jugados--
+; --Never Played--
+;
+MSG_RunningGameTitle
+Ejecutando '%s'...
+; Running %s...
+;
+MSG_ErrorExecutingWhdload
+Error al ejecutar WHDLoad/juego.\n\
+Comprueba que WHDLoad esta en el 'PATH'.
+; Error while executing WHDLoad or Game.\nPlease make sure WHDLoad is in your path.
+;
+MSG_ScanningPleaseWait
+(Re)Leyendo [%s]...
+; Scanning [%s]. Please wait...
+;
+MSG_CouldNotCreateReposFile
+¡No se pudo crear 'repos.prefs'!
+; Could not create repos.prefs file!
+;
+MSG_SelectGameFromList
+Has de elegir un juego de la lista.
+; Please select a Game from the List.
+;
+MSG_TitleAlreadyExists
+El título seleccionado ya existe.
+; The Title you selected, already exists.
+;
+MSG_SavingGamelist
+Guardando lista de juegos...
+; Please wait, saving gameslist...
+;
+MSG_FailedOpeningGameslist
+¡No se pudo cargar lista de juegos!
+; Could not open gameslist file!
+;
+MSG_BadTooltype
+¡Argumento incorrecto!
+; Bad tooltype!
+;
+MSG_NoTitleSpecified
+Indicar el nombre del juego...
+; Please let me know the name of the game...
+;
+MSG_NoExecutableSpecified
+Elegir ejecutable del juego
+; Please pick the game executable...
+;
+MSG_NotEnoughMemory
+¡Memoria insuficiente! Interrumpiendo...
+; Could not allocate memory! Aborting...
+;
+MSG_DirectoryNotFound
+¡No encontrado directorio de juegos!
+; Game Directory not found!
+;
+MSG_LA_StartWithFavorites
+Mostrar favoritos al iniciar
+; Display favorites on start
+;
+MSG_MNMainOpenCurrentDir
+Ubicación del juego...
+; Open game folder
+;
+MSG_MNMainOpenCurrentDirChar
+W_
+; W_
+;
+MSG_slavePathDoesntExist
+¡No existe ubicación del 'slave'!
+; Slave path does not exist!
+;
+MSG_compiledForAboutWin
+ para
+; compiled for
+;
+MSG_MNMainPreferences
+Ajustes
+; Preferences
+;
