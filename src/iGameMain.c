@@ -149,7 +149,7 @@ int main(int argc, char **argv)
 
 	if (!initStatus)
 	{
-		clean_exit("Can't create application\n");
+		return clean_exit("Can't create application\n");
 	}
 
 	ULONG old = 0;
