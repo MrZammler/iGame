@@ -1,8 +1,8 @@
 ##########################################################################
-# Makefile for iGame on AmigaOS using VBCC.
+# Makefile for iGame on AmigaOS using GCC.
 #-------------------------------------------------------------------------
 # To compile iGame using this makefile, run:
-#  make -f Makefile.amigaos
+#  make -f Makefile.amigaos_GCC
 #-------------------------------------------------------------------------
 ##########################################################################
 
