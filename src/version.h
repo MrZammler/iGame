@@ -35,9 +35,9 @@
 #ifndef VERSION
 
 #ifndef BETA_VERS
-#define VERSION "$VER: iGame v" STR(MAJOR_VERS) "." STR(MINOR_VERS) " for " STR(CPU_VERS) " (" STR(RELEASE_DATE) ")"
+#define VERSION "$VER: iGame " STR(MAJOR_VERS) "." STR(MINOR_VERS) " (" STR(RELEASE_DATE) ") for " STR(CPU_VERS) " " STR(COMPILER_VERS)
 #else
-#define VERSION "$VER: iGame v" STR(MAJOR_VERS) "." STR(MINOR_VERS) "b" STR(BETA_VERS) " for " STR(CPU_VERS) " (" STR(RELEASE_DATE) ")"
+#define VERSION "$VER: iGame " STR(MAJOR_VERS) "." STR(MINOR_VERS) "b" STR(BETA_VERS) " (" STR(RELEASE_DATE) ") for " STR(CPU_VERS) " " STR(COMPILER_VERS)
 #endif
 
 #endif
