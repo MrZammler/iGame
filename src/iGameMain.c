@@ -298,7 +298,7 @@ static int initLibraries(void)
 	#ifndef __amigaos4__
 	if ((IntuitionBase = (struct IntuitionBase *)OpenLibrary("intuition.library", 37)))
 	#else
-	if ((IntuitionBase = OpenLibrary("intuition.library", 37)))
+	if ((IntuitionBase = OpenLibrary("intuition.library", 50)))
 	#endif
 	{
 		#ifdef __amigaos4__
@@ -365,7 +365,7 @@ static void cleanupLibraries(void)
 {
 	#ifdef __amigaos4__
 	if(IDataTypes)		DropInterface((struct Interface *) IDataTypes);
-	if(IMUIMaster)		DropInterface((struct Interface *) IMUIMaster);
+	//if(IMUIMaster)		DropInterface((struct Interface *) IMUIMaster);
 	if(IGraphics)		DropInterface((struct Interface *) IGraphics);
 	if(IIcon)			DropInterface((struct Interface *) IIcon);
 	if(IIntuition)		DropInterface((struct Interface *) IIntuition);

@@ -21,6 +21,7 @@
 */
 
 #include <proto/wb.h>
+//#include <proto/exec.h>
 
 #include <ctype.h>
 #include <stdlib.h>
@@ -237,10 +238,10 @@ STRPTR substring(STRPTR string, int position, int length)
 STRPTR GetMBString(ULONG refId)
 {
 	const struct iGame_ArrayType *t = iGame_Array + refId;
-
+//DebugPrintF("'%s'\n",GetCatalogStr(Catalog, t->cca_ID, t->cca_Str));
 	#ifndef __amigaos4__
 	return LocaleBase ? GetCatalogStr(Catalog, t->cca_ID, t->cca_Str) : t->cca_Str;
 	#else
-	return GetCatalogStr(Catalog, t->cca_ID, t->cca_Str);
+	return (STRPTR)GetCatalogStr(Catalog, t->cca_ID, t->cca_Str);
 	#endif
 }

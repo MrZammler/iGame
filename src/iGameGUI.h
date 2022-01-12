@@ -54,7 +54,7 @@ struct ObjApp
 	APTR BT_PropertiesCancel;
 	APTR WI_GameRepositories;
 	APTR PA_RepoPath;
-	APTR STR_PA_RepoPath;
+	//APTR STR_PA_RepoPath;
 	APTR BT_AddRepo;
 	APTR LV_GameRepositories;
 	APTR BT_RemoveRepo;

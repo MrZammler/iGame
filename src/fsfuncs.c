@@ -92,7 +92,11 @@ void strip_path(const char *path, char *naked_path)
 
 STRPTR getParentPath(STRPTR filename)
 {
+#if defined(__amigaos4__)
+	STRPTR path = AllocVecTags(sizeof(char) * MAX_PATH_SIZE, AVT_ClearWithValue,0, TAG_DONE);
+#else
 	STRPTR path = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
+#endif
 	if (path)
 	{
 		BPTR fileLock = Lock(filename, SHARED_LOCK);
@@ -561,7 +565,7 @@ void open_current_dir(void)
 
 	//Open path directory
 	OpenWorkbenchObject((char *)path_only);
-	free(path_only); // get_directory_path uses malloc()
+	free((char *)path_only); // get_directory_path uses malloc()
 }
 
 void get_path(char *title, char *path)

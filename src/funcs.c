@@ -862,7 +862,11 @@ void launch_game(void)
 			//one of them should be the game's project icon.
 
 			/*  allocate space for a FileInfoBlock */
+#if defined(__amigaos4__)
+			struct FileInfoBlock* m = (struct FileInfoBlock *)AllocVecTags(sizeof(struct FileInfoBlock), AVT_ClearWithValue,0, TAG_DONE);
+#else
 			struct FileInfoBlock* m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
+#endif
 
 			Examine(lock, m);
 			if (m->fib_DirEntryType <= 0)
@@ -1050,20 +1054,20 @@ static void show_screenshot(STRPTR screenshot_path)
 		if (current_settings->no_guigfx)
 		{
 			app->IM_GameImage_1 = MUI_NewObject(Dtpic_Classname,
-						MUIA_Dtpic_Name,				screenshot_path,
-						MUIA_Frame, 					MUIV_Frame_ImageButton,
+				MUIA_Dtpic_Name, screenshot_path,
+				MUIA_Frame,      MUIV_Frame_ImageButton,
 			End;
 		}
 		else
 		{
 			app->IM_GameImage_1 = GuigfxObject,
-						MUIA_Guigfx_FileName,			screenshot_path,
-						MUIA_Guigfx_Quality,			MUIV_Guigfx_Quality_Best,
-						MUIA_Guigfx_ScaleMode,			NISMF_SCALEFREE | NISMF_KEEPASPECT_PICTURE,
-						MUIA_Guigfx_Transparency,		0,
-						MUIA_Frame, 					MUIV_Frame_ImageButton,
-						MUIA_FixHeight, 				current_settings->screenshot_height,
-						MUIA_FixWidth, 					current_settings->screenshot_width,
+				MUIA_Guigfx_FileName,     screenshot_path,
+				MUIA_Guigfx_Quality,      MUIV_Guigfx_Quality_Best,
+				MUIA_Guigfx_ScaleMode,    NISMF_SCALEFREE | NISMF_KEEPASPECT_PICTURE,
+				MUIA_Guigfx_Transparency, 0,
+				MUIA_Frame,     MUIV_Frame_ImageButton,
+				MUIA_FixHeight, current_settings->screenshot_height,
+				MUIA_FixWidth,  current_settings->screenshot_width,
 			End;
 		}
 
@@ -1078,7 +1082,11 @@ static void show_screenshot(STRPTR screenshot_path)
 
 static char *get_screenshot_path(char *game_title)
 {
+#if defined(__amigaos4__)
+	STRPTR slavePath = AllocVecTags(sizeof(char) * MAX_PATH_SIZE, AVT_ClearWithValue,0, TAG_DONE);
+#else
 	STRPTR slavePath = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
+#endif
 	if(slavePath == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
@@ -1086,8 +1094,11 @@ static char *get_screenshot_path(char *game_title)
 	}
 	get_path(game_title, slavePath);
 
+#if defined(__amigaos4__)
+	STRPTR gameFolderPath = AllocVecTags(sizeof(char) * MAX_PATH_SIZE, AVT_ClearWithValue,0, TAG_DONE);
+#else
 	STRPTR gameFolderPath = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
-
+#endif
 	if(gameFolderPath == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
@@ -1096,8 +1107,11 @@ static char *get_screenshot_path(char *game_title)
 
 	if ((gameFolderPath = getParentPath(slavePath)) != NULL)
 	{
+#if defined(__amigaos4__)
+		STRPTR screenshotPath = AllocVecTags(sizeof(char) * MAX_PATH_SIZE, AVT_ClearWithValue,0, TAG_DONE);
+#else
 		STRPTR screenshotPath = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
-
+#endif
 		if (screenshotPath == NULL)
 		{
 			msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
@@ -1138,7 +1152,11 @@ void game_click(void)
 
 	if (game_title) //for some reason, game_click is called and game_title is null??
 	{
+#if defined(__amigaos4__)
+		STRPTR image_path = AllocVecTags(sizeof(char) * MAX_PATH_SIZE, AVT_ClearWithValue,0, TAG_DONE);
+#else
 		STRPTR image_path = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
+#endif
 		if(image_path == NULL)
 		{
 			msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
@@ -1255,12 +1273,21 @@ void game_properties(void)
 
 	// Allocate Memory for variables
 	char* game_title = NULL;
+#if defined(__amigaos4__)
+	char* helperstr  = AllocVecTags(sizeof(char) * 512, AVT_ClearWithValue,0, TAG_DONE);
+	char* fullpath   = AllocVecTags(sizeof(char) * 800, AVT_ClearWithValue,0, TAG_DONE);
+	char* str2       = AllocVecTags(sizeof(char) * 512, AVT_ClearWithValue,0, TAG_DONE);
+	char* path       = AllocVecTags(sizeof(char) * 256, AVT_ClearWithValue,0, TAG_DONE);
+	char* naked_path = AllocVecTags(sizeof(char) * 256, AVT_ClearWithValue,0, TAG_DONE);
+	char* slave      = AllocVecTags(sizeof(char) * 256, AVT_ClearWithValue,0, TAG_DONE);
+#else
 	char* helperstr = AllocMem(512 * sizeof(char), MEMF_CLEAR);
 	char* fullpath = AllocMem(800 * sizeof(char), MEMF_CLEAR);
 	char* str2 = AllocMem(512 * sizeof(char), MEMF_CLEAR);
 	char* path = AllocMem(256 * sizeof(char), MEMF_CLEAR);
 	char* naked_path = AllocMem(256 * sizeof(char), MEMF_CLEAR);
 	char* slave = AllocMem(256 * sizeof(char), MEMF_CLEAR);
+#endif
 
 	// Check if any of them failed
 	if (helperstr == NULL
@@ -1335,7 +1362,11 @@ void game_properties(void)
 	if (game_tooltypes)
 		memset(&game_tooltypes[0], 0, 1024 * sizeof(char));
 	else
+#if defined(__amigaos4__)
+		game_tooltypes = AllocVecTags(sizeof(char *) * 1024, AVT_ClearWithValue,0, TAG_DONE);
+#else
 		game_tooltypes = AllocMem(1024 * sizeof(char), MEMF_CLEAR);
+#endif
 
 	if (game_tooltypes == 0)
 	{
@@ -1349,7 +1380,11 @@ void game_properties(void)
 		//one of them should be the game's project icon.
 
 		/*  allocate space for a FileInfoBlock */
+#if defined(__amigaos4__)
+		struct FileInfoBlock* m = (struct FileInfoBlock *)AllocVecTags(sizeof(struct FileInfoBlock), AVT_ClearWithValue,0, TAG_DONE);
+#else
 		struct FileInfoBlock* m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
+#endif
 
 		int success = Examine(lock, m);
 		if (m->fib_DirEntryType <= 0)
@@ -1397,6 +1432,14 @@ void game_properties(void)
 	}
 
 	// Cleanup the memory allocations
+#if defined(__amigaos4__)
+	FreeVec(slave);
+	FreeVec(path);
+	FreeVec(naked_path);
+	FreeVec(helperstr);
+	FreeVec(fullpath);
+	FreeVec(str2);
+#else
 	if (slave)
 		FreeMem(slave, 256 * sizeof(char));
 	if (path)
@@ -1409,6 +1452,7 @@ void game_properties(void)
 		FreeMem(fullpath, 800 * sizeof(char));
 	if (str2)
 		FreeMem(str2, 512 * sizeof(char));
+#endif
 
 	if (strlen(game_tooltypes) == 0)
 	{
@@ -1430,8 +1474,13 @@ void game_properties_ok(void)
 
 	char* game_title = NULL;
 	char* path = NULL; //AllocMem(256 * sizeof(char), MEMF_CLEAR);
+#if defined(__amigaos4__)
+	char* fullpath = AllocVecTags(sizeof(char) * 800, AVT_ClearWithValue,0, TAG_DONE);
+	char* str2     = AllocVecTags(sizeof(char) * 512, AVT_ClearWithValue,0, TAG_DONE);
+#else
 	char* fullpath = AllocMem(800 * sizeof(char), MEMF_CLEAR);
 	char* str2 = AllocMem(512 * sizeof(char), MEMF_CLEAR);
+#endif
 
 	get(app->STR_PropertiesGameTitle, MUIA_String_Contents, &game_title);
 	get(app->TX_PropertiesSlavePath, MUIA_Text_Contents, &path);
@@ -1485,7 +1534,11 @@ void game_properties_ok(void)
 	//tooltypes changed
 	if (strcmp((char *)tools, game_tooltypes))
 	{
+#if defined(__amigaos4__)
+		char* naked_path = AllocVecTags(sizeof(char) * 256, AVT_ClearWithValue,0, TAG_DONE);
+#else
 		char* naked_path = AllocMem(256 * sizeof(char), MEMF_CLEAR);
+#endif
 		if (naked_path != NULL)
 			strip_path(path, naked_path);
 		else
@@ -1494,7 +1547,11 @@ void game_properties_ok(void)
 			return;
 		}
 
+#if defined(__amigaos4__)
+		char* slave = AllocVecTags(sizeof(char) * 256, AVT_ClearWithValue,0, TAG_DONE);
+#else
 		char* slave = AllocMem(256 * sizeof(char), MEMF_CLEAR);
+#endif
 		if (slave != NULL)
 			get_slave_from_path(slave, strlen(naked_path), path);
 		else
@@ -1515,7 +1572,11 @@ void game_properties_ok(void)
 			//one of them should be the game's project icon.
 
 			/*  allocate space for a FileInfoBlock */
+#if defined(__amigaos4__)
+			struct FileInfoBlock* m = (struct FileInfoBlock *)AllocVecTags(sizeof(struct FileInfoBlock), AVT_ClearWithValue,0, TAG_DONE);
+#else
 			struct FileInfoBlock* m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
+#endif
 
 			Examine(lock, m);
 			if (m->fib_DirEntryType <= 0)
@@ -1554,12 +1615,15 @@ void game_properties_ok(void)
 							for (i = 0; i <= strlen(game_tooltypes); i++)
 								if (game_tooltypes[i] == '\n') old_tool_type_count++;
 
-							for (char** tool_types = (char **)disk_obj->do_ToolTypes; (tool_type = *tool_types); ++
-							     tool_types)
+							for (char** tool_types = (char **)disk_obj->do_ToolTypes; (tool_type = *tool_types); ++tool_types)
 								old_real_tool_type_count++;
 
+#if defined(__amigaos4__)
+							unsigned char** new_tool_types = AllocVecTags(sizeof(char *) * new_tool_type_count, AVT_ClearWithValue,0, TAG_DONE);
+#else
 							unsigned char** new_tool_types = AllocVec(new_tool_type_count * sizeof(char *),
 							                                          MEMF_FAST | MEMF_CLEAR);
+#endif
 							unsigned char** newptr = new_tool_types;
 
 							char** temp_tbl = my_split((char *)tools, "\n");
@@ -1574,7 +1638,7 @@ void game_properties_ok(void)
 
 							*newptr = NULL;
 
-							disk_obj->do_ToolTypes = new_tool_types;
+							disk_obj->do_ToolTypes = (STRPTR *)new_tool_types;
 							PutDiskObject((STRPTR)fullpath, disk_obj);
 							FreeDiskObject(disk_obj);
 
@@ -1589,13 +1653,24 @@ void game_properties_ok(void)
 					}
 				}
 			}
+#if defined(__amigaos4__)
+			FreeVec(m);
+#else
 			if (m)
 				FreeMem(m, sizeof(struct FileInfoBlock));
+#endif
 		}
 
 		CurrentDir(oldlock);
 
 		// Cleanup the memory allocations
+#if defined(__amigaos4__)
+		FreeVec(slave);
+		FreeVec(naked_path);
+		//FreeVec(game_tooltypes);
+		FreeVec(fullpath);
+		FreeVec(str2);
+#else
 		if (slave)
 			FreeMem(slave, 256 * sizeof(char));
 		if (naked_path)
@@ -1606,6 +1681,7 @@ void game_properties_ok(void)
 			FreeMem(fullpath, 800 * sizeof(char));
 		if (str2)
 			FreeMem(str2, 512 * sizeof(char));
+#endif
 	}
 	FreeVec(tools);
 
@@ -1688,7 +1764,11 @@ static void follow_thread(BPTR lock, int tab_level)
 		return;
 
 	/*  allocate space for a FileInfoBlock */
+#if defined(__amigaos4__)
+		struct FileInfoBlock* m = (struct FileInfoBlock *)AllocVecTags(sizeof(struct FileInfoBlock), AVT_ClearWithValue,0, TAG_DONE);
+#else
 	struct FileInfoBlock* m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
+#endif
 
 	int success = Examine(lock, m);
 	if (m->fib_DirEntryType <= 0)
@@ -1813,7 +1893,11 @@ static void follow_thread(BPTR lock, int tab_level)
 				UnLock(newlock);
 		}
 	}
+#if defined(__amigaos4__)
+	FreeVec(m);
+#else
 	FreeMem(m, sizeof(struct FileInfoBlock));
+#endif
 }
 
 static void refresh_list(const int check_exists)
