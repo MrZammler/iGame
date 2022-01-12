@@ -19,8 +19,10 @@ OS := $(shell uname)
 
 ifeq ($(strip $(OS)),AmigaOS)
 	DATE = $(shell c:date LFORMAT %d.%m.%Y)
+	RM = delete
 else
 	DATE = $(shell date --iso=date)
+	RM = rm -f
 endif
 
 ##########################################################################
@@ -115,5 +117,5 @@ include make_includes/obj_os4.inc
 ##########################################################################
 
 clean:
-	delete iGame iGame.030 iGame.040 iGame.060 iGame.MOS iGame.OS4 $(OBJS) $(OBJS_030) $(OBJS_040) $(OBJS_060) $(OBJS_MOS) $(OBJS_OS4) $(catalog_files)
+	$(RM) iGame iGame.030 iGame.040 iGame.060 iGame.MOS iGame.OS4 $(OBJS) $(OBJS_030) $(OBJS_040) $(OBJS_060) $(OBJS_MOS) $(OBJS_OS4) $(catalog_files)
 
