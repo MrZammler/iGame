@@ -1,4 +1,4 @@
-; $VER: igame.catalog 1.0 (22.12.2021)
+; $VER: igame.catalog 1.0 (25.12.2021)
 ; iGame.cd
 ;
 #language english
@@ -165,7 +165,7 @@ MSG_WI_About (//)
 About iGame
 ;
 MSG_TX_About (//400)
-Emmanuel Vasilakis (mrzammler@mm.st)\n\nContributors:\nDimitris Panokostas (midwan@gmail.com)\nGeorge Sokianos (walkero@gmail.com)\nChris Charabaruk (chris+igame@charabaruk.com)\nJavier R. Santurde 'tolkien'\n\n
+Emmanuel Vasilakis (mrzammler@mm.st)\n\nContributors:\nDimitris Panokostas (midwan@gmail.com)\nGeorge Sokianos (walkero@gmail.com)\nChris Charabaruk (chris+igame@charabaruk.com)\nJavier R. Santurde 'tolkien'
 ;
 MSG_BT_AboutOK (//)
 OK
@@ -204,7 +204,7 @@ MSG_GR_TitlesTitle (//)
 Titles
 ;
 MSG_RA_TitlesFromTitle (//)
-Titles From:
+Get Title From:
 ;
 MSG_RA_TitlesFrom0 (//)
 Slave Contents
