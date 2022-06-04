@@ -40,10 +40,6 @@
 #include <proto/locale.h>
 #endif
 
-/* ANSI C */
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "iGameExtern.h"
 #include "fsfuncs.h"
 #include "funcs.h"
@@ -94,8 +90,7 @@ igame_settings* iGameSettings = NULL;
 static int initLibraries(void);
 static void cleanupLibraries(void);
 
-
-static int clean_exit(STRPTR msg)
+static void cleanUp(void)
 {
 	if (app)
 		app_stop();
@@ -106,7 +101,10 @@ static int clean_exit(STRPTR msg)
 
 	if(app)
 		DisposeApp(app);
+}
 
+static int clean_exit(STRPTR msg)
+{
 	if (msg)
 	{
 		PutStr(msg);
@@ -116,42 +114,28 @@ static int clean_exit(STRPTR msg)
 	return RETURN_OK;
 }
 
-BOOL init_app(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	executable_name = get_executable_name(argc, argv);
-	iGameSettings = load_settings(DEFAULT_SETTINGS_FILE);
 
-	if (initLibraries() == RETURN_OK)
+	if (initLibraries() != RETURN_OK)
 	{
-		app = CreateApp();
-		if (app)
-		{
-			app_start();
-		}
-		else
-		{
-			clean_exit("Can't initialize application\n");
-			return FALSE;
-		}
+		cleanUp();
+		return RETURN_ERROR;
+	}
+
+	app = CreateApp();
+	if (app)
+	{
+		app_start();
 	}
 	else
 	{
-		return FALSE;
+		cleanUp();
+		return RETURN_ERROR;
 	}
 
-	return TRUE;
-}
-
-int main(int argc, char **argv)
-{
-	BOOL initStatus = init_app(argc, argv);
 	const int unit = 1;
-
-	if (!initStatus)
-	{
-		clean_exit("Can't create application\n");
-	}
-
 	ULONG old = 0;
 	ULONG signals;
 	BOOL running = TRUE;
@@ -222,10 +206,9 @@ int main(int argc, char **argv)
 		if (running && signals) Wait(signals);
 	}
 
-	clean_exit(NULL);
-	return 0;
+	cleanUp();
+	return RETURN_OK;
 }
-
 
 static BOOL initLocale(void)
 {
@@ -340,21 +323,28 @@ static int initLibraries(void)
 		return RETURN_ERROR;
 	}
 
-	if (!iGameSettings->no_guigfx && !iGameSettings->hide_screenshots)
+	// Load settings here, after we load the icon.library
+	iGameSettings = load_settings(DEFAULT_SETTINGS_FILE);
+
+	if (!iGameSettings->hide_screenshots && !iGameSettings->hide_side_panel)
 	{
 		if (!(RenderLibBase = OpenLibrary("render.library", 30)))
 		{
 			return clean_exit("Can't open render.library v30 or greater\n");
 		}
 
-		if (!(GuiGfxBase = OpenLibrary("guigfx.library", 17)))
+		if (!iGameSettings->no_guigfx)
 		{
-			return clean_exit("Can't open guigfx.library v17 or greater\n");
-		}
 
-		if (!(GuiGfxMCC = OpenLibrary("mui/Guigfx.mcc", 19)))
-		{
-			return clean_exit("Can't open Guigfx.mcc v19 or greater\n");
+			if (!(GuiGfxBase = OpenLibrary("guigfx.library", 17)))
+			{
+				return clean_exit("Can't open guigfx.library v17 or greater\n");
+			}
+
+			if (!(GuiGfxMCC = OpenLibrary("mui/Guigfx.mcc", 19)))
+			{
+				return clean_exit("Can't open Guigfx.mcc v19 or greater\n");
+			}
 		}
 	}
 
@@ -373,35 +363,22 @@ static void cleanupLibraries(void)
 	if(IWorkbench)		DropInterface((struct Interface *) IWorkbench);
 	#endif
 
-	if (TextEditorMCC)
-		CloseLibrary(TextEditorMCC);
-	if (LowLevelBase)
-		CloseLibrary(LowLevelBase);
-	if (RenderLibBase)
-		CloseLibrary(RenderLibBase);
-	if (GfxBase)
-		CloseLibrary(GfxBase);
-	if (GuiGfxBase)
-		CloseLibrary(GuiGfxBase);
-	if (GuiGfxMCC)
-		CloseLibrary(GuiGfxMCC);
-	if (DataTypesBase)
-		CloseLibrary(DataTypesBase);
-	if (IconBase)
-		CloseLibrary(IconBase);
-	if (IntuitionBase)
-		CloseLibrary((struct Library *)IntuitionBase);
-	if (DataTypesBase)
-		CloseLibrary(DataTypesBase);
-	if (WorkbenchBase)
-		CloseLibrary(WorkbenchBase);
+	if (TextEditorMCC)	CloseLibrary(TextEditorMCC);
+	if (LowLevelBase)	CloseLibrary(LowLevelBase);
+	if (RenderLibBase)	CloseLibrary(RenderLibBase);
+	if (GfxBase)		CloseLibrary(GfxBase);
+	if (GuiGfxBase)		CloseLibrary(GuiGfxBase);
+	if (GuiGfxMCC)		CloseLibrary(GuiGfxMCC);
+	if (DataTypesBase)	CloseLibrary(DataTypesBase);
+	if (IconBase)		CloseLibrary(IconBase);
+	if (IntuitionBase)	CloseLibrary((struct Library *)IntuitionBase);
+	if (DataTypesBase)	CloseLibrary(DataTypesBase);
+	if (WorkbenchBase)	CloseLibrary(WorkbenchBase);
 
 	cleanupLocale();
 
 	#if defined(__amigaos4__)
-	if (IMUIMaster)
-		DropInterface((struct Interface *)IMUIMaster);
+	if (IMUIMaster)		DropInterface((struct Interface *)IMUIMaster);
 	#endif
-	if (MUIMasterBase)
-		CloseLibrary(MUIMasterBase);
+	if (MUIMasterBase)	CloseLibrary(MUIMasterBase);
 }

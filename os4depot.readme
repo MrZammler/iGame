@@ -1,12 +1,18 @@
-Short:        Frontend for WHDLoad
-Uploader:     walkero@gmail.com (George Sokianos)
-Author:       mrzammler@freemail.gr (Emmanuel Vasilakis)
-Type:         util/misc
-Version:      2.1
-Architecture: m68k-amigaos >= 2.04; ppc-amigaos; ppc-morphos
-Distribution: Aminet
-Replaces:     util/misc/iGame.lha
-
+name: iGame
+description: Frontend for WHDLoad
+version: 2.1
+author: Emmanuel Vasilakis and contributors
+submitter: George Sokianos
+email: walkero@gmail.com
+url: https://github.com/MrZammler/iGame
+category: util/misc
+replaces: util/misc/iGame.lha
+requirements: MUI, render.library
+license: Freeware
+minosversion: 4.0
+distribute: yes
+passphrase: OS4DEPOT_PASSPHRASE
+hend:
 iGame is a frontend application for your WHDLoad games and demos collection.
 It runs on AmigaOS 2.04 and above, AmigaOS 4 and MorphOS.
 

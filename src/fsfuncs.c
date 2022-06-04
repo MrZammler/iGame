@@ -353,6 +353,8 @@ void read_tool_types(void)
 
 			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSIDEPANEL))
 				current_settings->hide_side_panel = 1;
+
+			FreeDiskObject(disk_obj);
 		}
 	}
 

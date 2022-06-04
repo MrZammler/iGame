@@ -1,5 +1,5 @@
 @DATABASE iGame.guide
-@$VER: iGame.guide 2.0 (16.10.2020)
+@$VER: iGame.guide 2.1 (04.06.2022)
 @INDEX "Index"
 @wordwrap
 
@@ -7,7 +7,7 @@
 @{jcenter}
 iGame
 =============================================
-(c) 2005-2020 Emmanuel Vasilakis
+(c) 2005-2022 Emmanuel Vasilakis
 @{jleft}
 @{lindent 3}
 @{" Introduction    " LINK "INTR" 0} - About iGame
