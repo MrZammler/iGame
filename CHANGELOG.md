@@ -1,3 +1,12 @@
+## iGame 2.1 - [2022-06-04]
+### Changed
+- Did some fixes on libraries checks during application start based on the selected tooltypes
+- Some minor fixes
+- Update icons' positions to not overlap each other
+- Added NOSIDEPANEL to iGame tooltypes that was missing
+
+... plus all the changes that were released in previous beta versions (2.1b1 up to 2.1b3), which you can see below
+
 ## iGame 2.1b3 - [2021-12-04]
 ### Added
 - Added a check if the screenshot image is supported by the installed datatypes. If not, it is skipped. This fixes situations where the Info datatype is not installed and no image is shown instead of the default.
