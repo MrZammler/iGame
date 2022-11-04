@@ -1,5 +1,5 @@
 @DATABASE iGame.guide
-@$VER: iGame.guide 2.1 (04.06.2022)
+@$VER: iGame.guide 2.2 (04.11.2022)
 @INDEX "Index"
 @wordwrap
 
@@ -32,7 +32,7 @@ iGame is a frontend application for your WHDLoad games and demos collection. It 
  - Multiple WHDLoad slaves repositories on hard disk partitions
  - On demand scanning in repositories for installed WHDLoad slaves (games, demos etc.)
  - Use games' tooltypes on run
- - Shows game screenshot (screenshot window can be altered through tooltypes/settings, uses datatypes to load foreign formats)
+ - Shows game screenshot (screenshot window can be altered through settings, uses datatypes to load foreign formats)
  - Categorization of the games and filtering
  - Manual addition of non-WHDLoad games, demos etc.
  - Simple statistics
@@ -152,7 +152,7 @@ You can install iGame manually if you prefer. To do that, you need to follow the
 6. Run iGame!
 
 @{lindent 3}
-iGame saves its support files on its own folder (PROGDIR:). We recommend you to install it on its own separated directory in your hard disk.
+iGame saves its support files on its own folder (PROGDIR:). We recommend you to install it on its own separate directory in your hard disk.
 
 If you upgrade from a previous release, the only thing you need to do is to copy the new executable over the previous one. Make sure to keep the igame.prefs, gameslist.csv, genres and repos.prefs files!
 
@@ -162,7 +162,9 @@ Make sure that render.library and guigfx.library are supported by your system an
 
 If it still persists, check http://winterland.no-ip.org/igame/files.html, where you will find an archive of these 2 libraries for systems with 020/no fpu (thanks to Jools 'buzz' Smyth for providing them!). These libraries might fix issues on 68030/882 systems as well.
 
-If the problem is not gone, add the NOGUIGFX tooltype to iGame. This option will use MUI's internal datatypes loading routines (dtpic.mui) instead of guigfx.mcc's. In this case though, there will be no scaling of the used screenshots. This means that all the screenshots should have the same height and width, so to keep the GUI consistent.
+If the problem is not gone, select the "No GuiGfx" checkbox at the settings. This option will use MUI's internal datatypes loading routines (dtpic.mui) instead of guigfx.mcc's. If yu can't access the settings, then delete the igame.prefs file, which will make iGame return to its default values.
+
+If the GuiGfx library is not used there will be no scaling of the used screenshots. This means that all the screenshots should have the same height and width, so to keep the GUI consistent.
 
 @ENDNODE
 @NODE "USAG" "Using iGame"
@@ -185,7 +187,6 @@ If you would like more details for all the available menus and windows, visit th
 @{" Settings Window          " LINK "WINSETS" 0}
 @{" Game Repositories Window " LINK "WINREPO" 0}
 @{" Properties Window        " LINK "WINPROP" 0}
-@{" Icon Tooltypes           " LINK "ICNTLTP" 0}
 
 @ENDNODE
 @NODE "MENUS" "Menus"
@@ -237,7 +238,7 @@ At the top there is the "Filter" field which is used to filter the list of entri
 
 At the left side there is the list, where all the entries (games, demos etc.) are shown. With double click on an entry it is executed. If you want to add some information on an entry using the "Game > Properties..." menu, that's the list where you have to select it first.
 
-At the top right side there is a screenshot of the selected entry. For the screenshot iGame uses an image file, which must be in the same folder with the game/demo, named @{b}igame.iff@{ub}. If no screenshot is available then the game icon is shown. You can disable the screenshots from the @{" Settings Window " LINK "WINSETS" 0} or the @{" Icon Tooltypes " LINK "ICNTLTP" 0}.
+At the top right side there is a screenshot of the selected entry. For the screenshot iGame uses an image file, which must be in the same folder with the game/demo, named @{b}igame.iff@{ub}. If no screenshot is available then the game icon is shown. You can disable the screenshots from the @{" Settings Window " LINK "WINSETS" 0}.
 
 Under the screenshot there is the "Genres" list which help you filter the games based on the "Genre", as well as by "Last played", "Favorites", "Most Played" and "Never Played". There is also an "Unknown" selection which shows the entries that do not have any Genre assigned.
 
@@ -283,7 +284,7 @@ After that there is a big text area, showing the icon tooltypes. This is extreme
 @ENDNODE
 @NODE "WINSETS" "Settings Window"
 @{lindent 3}
-The iGame settings window opens from the menu item "Settings > Settings...". This configuration selections override the iGame tooltypes set on its icon. These are saved on a text file named "igame.prefs", inside iGame folder. If this file is missing, iGame defaults to tooltypes.
+The iGame settings window opens from the menu item "Settings > Settings...". These are saved on a text file named "igame.prefs", inside iGame folder. If this file is missing, iGame uses the default values which is the optimal to work on any system.
 
 Settings window has three separated sections:
 
@@ -311,22 +312,6 @@ The "No Smart Spaces" disables the ability iGame to add extra spaces on game/dem
 "Save" button saves the settings in configuration file.
 "Use" button applies the settings, except the ones that require to restart iGame, as mentioned above, but if you close iGame, those changes are lost.
 "Cancel" button closes the window and forgets the changes you did.
-
-@ENDNODE
-@NODE "ICNTLTP" "Icon Tooltypes"
-@{lindent 3}
-Using iGame's icon tooltypes you can define how the program will work. The options are the same as can be found at the @{" Settings Window " LINK "WINSETS" 0}. Check this section to find more details for each option.
-
-Place a tooltype in parenthesis to disable it.
-
-@{b}NOSCREENSHOT@{ub} disables the screenshot
-@{b}NOGUIGFX@{ub} makes iGame to not use the GuiGfx library
-@{b}SCREENSHOT=WIDTHxHEIGHT@{ub} sets the screenshot width and height in pixels
-@{b}FILTERUSEENTER@{ub} sets the filter field to be initiated with enter
-@{b}SAVESTATSONEXIT@{ub} saves game statistics when iGame is closed
-@{b}TITLESFROMDIRS@{ub} gets the game/demo title from its parent directory
-@{b}NOSMARTSPACES@{ub} doesn't add extra spaces on title where it is needed
-@{b}NOSIDEPANEL@{ub} hides the right side of the main window
 
 @ENDNODE
 @NODE "TODO" "Todo & Bugs"
