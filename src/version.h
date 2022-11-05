@@ -25,19 +25,19 @@
 #endif
 
 #ifndef MINOR_VERS
-#define MINOR_VERS 0
+#define MINOR_VERS 2
+#endif
+
+#ifndef PATCH_VERS
+#define PATCH_VERS 0
 #endif
 
 #ifndef RELEASE_DATE
-#define RELEASE_DATE "2020"
+#define RELEASE_DATE "2022"
 #endif
+
+#define COPY_END_YEAR 2022
 
 #ifndef VERSION
-
-#ifndef BETA_VERS
-#define VERSION "$VER: iGame v" STR(MAJOR_VERS) "." STR(MINOR_VERS) " for " STR(CPU_VERS) " (" STR(RELEASE_DATE) ")"
-#else
-#define VERSION "$VER: iGame v" STR(MAJOR_VERS) "." STR(MINOR_VERS) "b" STR(BETA_VERS) " for " STR(CPU_VERS) " (" STR(RELEASE_DATE) ")"
-#endif
-
+#define VERSION "$VER: iGame v" STR(MAJOR_VERS) "." STR(MINOR_VERS) "." STR(PATCH_VERS) " for " STR(CPU_VERS) " (" STR(RELEASE_DATE) ")"
 #endif

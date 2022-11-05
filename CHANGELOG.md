@@ -3,6 +3,7 @@
 ### Changed
 - Removed completely the Tooltypes. Now iGame defaults to the optimal settings and uses only the settings file to change its behaviour.
 - Now if the file "envarc:igame.prefs" exists then this is used by iGame, instead of the one that exists at the PROGDIR:. This way multiple iGame instances will have common settings (#173)
+- Introducing semantic versioning. No beta versions any more. Now the versions will have three digits based on MAJOR.MINOR.PATCH pattern. More info at https://semver.org/
 
 ## iGame 2.1 - [2022-06-04]
 ### Changed
