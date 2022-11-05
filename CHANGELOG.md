@@ -1,3 +1,8 @@
+## iGame 2.2.0 - [future]
+
+### Changed
+- Removed completely the Tooltypes. Now iGame defaults to the optimal settings and uses only the settings file to change its behaviour.
+
 ## iGame 2.1 - [2022-06-04]
 ### Changed
 - Did some fixes on libraries checks during application start based on the selected tooltypes

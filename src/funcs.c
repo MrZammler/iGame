@@ -168,6 +168,19 @@ static void apply_settings()
 	set(app->CH_StartWithFavorites, MUIA_Selected, current_settings->start_with_favorites);
 }
 
+static setDefaultSettings(igame_settings *settings) {
+	current_settings->no_guigfx				= TRUE;
+	current_settings->filter_use_enter		= TRUE;
+	current_settings->hide_side_panel		= FALSE;
+	current_settings->save_stats_on_exit	= TRUE;
+	current_settings->no_smart_spaces		= FALSE;
+	current_settings->titles_from_dirs		= TRUE;
+	current_settings->hide_screenshots		= TRUE;
+	current_settings->screenshot_width		= 160;
+	current_settings->screenshot_height		= 128;
+	current_settings->start_with_favorites	= FALSE;
+}
+
 igame_settings *load_settings(const char* filename)
 {
 	const int buffer_size = 512;
@@ -184,49 +197,47 @@ igame_settings *load_settings(const char* filename)
 		current_settings = NULL;
 	}
 	current_settings = (igame_settings *)calloc(1, sizeof(igame_settings));
+	setDefaultSettings(current_settings);
 
-	// TODO: Maybe it would be a good idea to lock the file before open it
-	const BPTR fpsettings = Open((CONST_STRPTR)filename, MODE_OLDFILE);
-	if (fpsettings)
+	if (check_path_exists((STRPTR)filename))
 	{
-		do
+		const BPTR fpsettings = Open((CONST_STRPTR)filename, MODE_OLDFILE);
+		if (fpsettings)
 		{
-			if (FGets(fpsettings, file_line, buffer_size) == NULL)
-				break;
+			do
+			{
+				if (FGets(fpsettings, file_line, buffer_size) == NULL)
+					break;
 
-			file_line[strlen(file_line) - 1] = '\0';
-			if (strlen(file_line) == 0)
-				continue;
+				file_line[strlen(file_line) - 1] = '\0';
+				if (strlen(file_line) == 0)
+					continue;
 
-			if (!strncmp(file_line, "no_guigfx=", 10))
-				current_settings->no_guigfx = atoi((const char*)file_line + 10);
-			if (!strncmp(file_line, "filter_use_enter=", 17))
-				current_settings->filter_use_enter = atoi((const char*)file_line + 17);
-			if (!strncmp(file_line, "hide_side_panel=", 16))
-				current_settings->hide_side_panel = atoi((const char*)file_line + 16);
-			if (!strncmp(file_line, "save_stats_on_exit=", 19))
-				current_settings->save_stats_on_exit = atoi((const char*)file_line + 19);
-			if (!strncmp(file_line, "no_smart_spaces=", 16))
-				current_settings->no_smart_spaces = atoi((const char*)file_line + 16);
-			if (!strncmp(file_line, "titles_from_dirs=", 17))
-				current_settings->titles_from_dirs = atoi((const char*)file_line + 17);
-			if (!strncmp(file_line, "hide_screenshots=", 17))
-				current_settings->hide_screenshots = atoi((const char*)file_line + 17);
-			if (!strncmp(file_line, "screenshot_width=", 17))
-				current_settings->screenshot_width = atoi((const char*)file_line + 17);
-			if (!strncmp(file_line, "screenshot_height=", 18))
-				current_settings->screenshot_height = atoi((const char*)file_line + 18);
-			if (!strncmp(file_line, "start_with_favorites=", 21))
-				current_settings->start_with_favorites = atoi((const char*)file_line + 21);
+				if (!strncmp(file_line, "no_guigfx=", 10))
+					current_settings->no_guigfx = atoi((const char*)file_line + 10);
+				if (!strncmp(file_line, "filter_use_enter=", 17))
+					current_settings->filter_use_enter = atoi((const char*)file_line + 17);
+				if (!strncmp(file_line, "hide_side_panel=", 16))
+					current_settings->hide_side_panel = atoi((const char*)file_line + 16);
+				if (!strncmp(file_line, "save_stats_on_exit=", 19))
+					current_settings->save_stats_on_exit = atoi((const char*)file_line + 19);
+				if (!strncmp(file_line, "no_smart_spaces=", 16))
+					current_settings->no_smart_spaces = atoi((const char*)file_line + 16);
+				if (!strncmp(file_line, "titles_from_dirs=", 17))
+					current_settings->titles_from_dirs = atoi((const char*)file_line + 17);
+				if (!strncmp(file_line, "hide_screenshots=", 17))
+					current_settings->hide_screenshots = atoi((const char*)file_line + 17);
+				if (!strncmp(file_line, "screenshot_width=", 17))
+					current_settings->screenshot_width = atoi((const char*)file_line + 17);
+				if (!strncmp(file_line, "screenshot_height=", 18))
+					current_settings->screenshot_height = atoi((const char*)file_line + 18);
+				if (!strncmp(file_line, "start_with_favorites=", 21))
+					current_settings->start_with_favorites = atoi((const char*)file_line + 21);
+			}
+			while (1);
+
+			Close(fpsettings);
 		}
-		while (1);
-
-		Close(fpsettings);
-	}
-	else
-	{
-		// No "igame.prefs" file found, fallback to reading Tooltypes
-		read_tool_types();
 	}
 
 	if (file_line)
