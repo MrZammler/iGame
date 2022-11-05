@@ -110,20 +110,14 @@ struct ObjApp *CreateApp(void)
 	translateMenu(MenuMainWin);
 
 	snprintf(version_string, sizeof(version_string),
-		"%s v%d.%d"
-#ifdef BETA_VERS
-		"b%d"
-#endif
-		, GetMBString(MSG_WI_MainWindow),
-		MAJOR_VERS, MINOR_VERS
-#ifdef BETA_VERS
-		, BETA_VERS
-#endif
+		"%s v%d.%d.%d",
+		GetMBString(MSG_WI_MainWindow),
+		MAJOR_VERS, MINOR_VERS, PATCH_VERS
 	);
 
 	snprintf(about_text, sizeof(about_text),
-		"%s (%s)\n%s %s\n\nCopyright 2005-2021\n%s"
-		, version_string, STR(RELEASE_DATE), GetMBString(MSG_compiledForAboutWin), STR(CPU_VERS), GetMBString(MSG_TX_About)
+		"%s (%s)\n%s %s\n\nCopyright 2005-%d\n%s"
+		, version_string, STR(RELEASE_DATE), GetMBString(MSG_compiledForAboutWin), STR(CPU_VERS), COPY_END_YEAR, GetMBString(MSG_TX_About)
 	);
 
 	APTR	MNMainOpenList, MNMainSaveList, MNMainSaveListAs;

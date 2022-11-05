@@ -18,26 +18,21 @@ all: iGame
 DATEISO = $(shell date --iso=date)
 DATESTR = $(shell date "+%Y%m%d")
 
+DRONE_TAG = v2.2.0
+
 # DRONE_TAG is set by Drone CI/CD
 # Parse the repo tag to different defines, that will be used while
 # compiling iGame
 #
-# The tags should be like v(MAJOR).(MINOR) or v(MAJOR).(MINOR)b(BETA)
-# in example v2.1 or v2.0b5
+# The tags should be like v(MAJOR).(MINOR).(PATCH)
+# in example v2.2.0
 #
 ifneq ($(origin DRONE_TAG),undefined)
 	MAJOR = $(patsubst v%,%,$(firstword $(subst ., ,$(DRONE_TAG))))
+	MINOR = $(word 2, $(subst ., ,$(DRONE_TAG)))
+	PATCH = $(word 3, $(subst ., ,$(DRONE_TAG)))
 
-	ifeq ($(findstring b,$(DRONE_TAG)), b)
-		MINOR = $(lastword $(subst ., , $(firstword $(subst b, ,$(DRONE_TAG)))))
-		BETA = $(lastword $(subst b, ,$(DRONE_TAG)))
-
-		VERS_FLAGS = -DMAJOR_VERS=$(MAJOR) -DMINOR_VERS=$(MINOR) -DBETA_VERS=$(BETA) -DRELEASE_DATE=$(DATEISO)
-	else
-		MINOR = $(lastword $(subst ., ,$(DRONE_TAG)))
-
-		VERS_FLAGS = -DMAJOR_VERS=$(MAJOR) -DMINOR_VERS=$(MINOR) -DRELEASE_DATE=$(DATEISO)
-	endif
+	VERS_FLAGS = -DMAJOR_VERS=$(MAJOR) -DMINOR_VERS=$(MINOR) -DPATCH_VERS=$(PATCH) -DRELEASE_DATE=$(DATEISO)
 else
 	VERS_FLAGS = -DRELEASE_DATE=$(DATEISO)
 endif
