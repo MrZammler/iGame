@@ -18,8 +18,6 @@ all: iGame
 DATEISO = $(shell date --iso=date)
 DATESTR = $(shell date "+%Y%m%d")
 
-DRONE_TAG = v2.2.0
-
 # DRONE_TAG is set by Drone CI/CD
 # Parse the repo tag to different defines, that will be used while
 # compiling iGame
