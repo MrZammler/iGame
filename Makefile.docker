@@ -122,12 +122,26 @@ catalogs/%/iGame.catalog: catalogs/%/iGame.ct catalogs/iGame.cd
 	flexcat catalogs/iGame.cd $< CATALOG $@ FILL QUIET || exit 0
 
 ##########################################################################
-# generic build options
+# build rules
 ##########################################################################
 
 %_$(CPU).o: %.c
 	@echo "Compiling $<"
 	@$(CC) -c $< -o $*_$(CPU).o $(CFLAGS) $(INCLUDES)
+
+src/funcs_$(CPU).o: src/funcs.c src/iGame_strings.h src/strfuncs.h src/fsfuncs.h src/iGameExtern.h
+
+src/iGameGUI_$(CPU).o: src/iGameGUI.c src/iGameGUI.h src/iGame_strings.h src/fsfuncs.h src/iGameExtern.h
+
+src/iGameMain_$(CPU).o: src/iGameMain.c src/iGameExtern.h
+
+src/strfuncs_$(CPU).o: src/strfuncs.c src/strfuncs.h
+
+src/fsfuncs_$(CPU).o: src/fsfuncs.c src/fsfuncs.h src/funcs.h src/iGameExtern.h
+
+##########################################################################
+# generic rules
+##########################################################################
 
 clean:
 	rm iGame iGame.* src/funcs*.o src/iGameGUI*.o src/iGameMain*.o src/strfuncs*.o src/iGame_cat*.o $(catalog_files)
