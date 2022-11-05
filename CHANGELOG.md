@@ -2,6 +2,7 @@
 
 ### Changed
 - Removed completely the Tooltypes. Now iGame defaults to the optimal settings and uses only the settings file to change its behaviour.
+- Now if the file "envarc:igame.prefs" exists then this is used by iGame, instead of the one that exists at the PROGDIR:. This way multiple iGame instances will have common settings (#173)
 
 ## iGame 2.1 - [2022-06-04]
 ### Changed
