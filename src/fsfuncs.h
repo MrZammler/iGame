@@ -30,7 +30,6 @@ BOOL check_path_exists(char *);
 BOOL get_filename(const char *, const char *, const BOOL);
 void load_games_csv_list(const char *);
 void save_to_csv(const char *, const int);
-void read_tool_types(void);
 int get_title_from_slave(char *, char *);
 const char *get_directory_name(const char *);
 const char *get_directory_path(const char *);

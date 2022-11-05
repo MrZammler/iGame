@@ -62,7 +62,6 @@
 #include "fsfuncs.h"
 
 extern struct ObjApp* app;
-extern struct Library *IconBase;
 extern char* executable_name;
 extern const int MAX_PATH_SIZE;
 
@@ -287,107 +286,6 @@ void save_to_csv(const char *filename, const int check_exists)
 	fclose(fpgames);
 
 	status_show_total();
-}
-
-void read_tool_types(void)
-{
-	struct DiskObject *disk_obj;
-
-	int screen_width, screen_height;
-	unsigned char filename[32];
-
-	if (IconBase)
-	{
-		strcpy(filename, PROGDIR);
-		strcat(filename, executable_name);
-
-		if ((disk_obj = GetDiskObject((STRPTR)filename)))
-		{
-			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_SCREENSHOT))
-			{
-				char** tool_types = (char **)disk_obj->do_ToolTypes;
-				char* tool_type = *tool_types;
-
-				char** temp_tbl = my_split((char *)tool_type, "=");
-				if (temp_tbl == NULL
-					|| temp_tbl[0] == NULL
-					|| !strcmp(temp_tbl[0], " ")
-					|| !strcmp(temp_tbl[0], ""))
-				{
-					msg_box((const char*)GetMBString(MSG_BadTooltype));
-					exit(0);
-				}
-
-				if (temp_tbl[1] != NULL)
-				{
-					char** temp_tbl2 = my_split((char *)temp_tbl[1], "x");
-					if (temp_tbl2[0]) current_settings->screenshot_width = atoi((char *)temp_tbl2[0]);
-					if (temp_tbl2[1]) current_settings->screenshot_height = atoi((char *)temp_tbl2[1]);
-
-					free(temp_tbl2[0]);
-					free(temp_tbl2[1]);
-					free(temp_tbl2);
-					free(temp_tbl[0]);
-					free(temp_tbl[1]);
-					free(temp_tbl);
-				}
-			}
-
-			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOGUIGFX))
-				current_settings->no_guigfx = 1;
-
-			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_FILTERUSEENTER))
-				current_settings->filter_use_enter = 1;
-
-			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSCREENSHOT))
-				current_settings->hide_screenshots = 1;
-
-			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_SAVESTATSONEXIT))
-				current_settings->save_stats_on_exit = 1;
-
-			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_TITLESFROMDIRS))
-				current_settings->titles_from_dirs = 1;
-
-			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSMARTSPACES))
-				current_settings->no_smart_spaces = 1;
-
-			if (FindToolType(disk_obj->do_ToolTypes, (STRPTR)TOOLTYPE_NOSIDEPANEL))
-				current_settings->hide_side_panel = 1;
-
-			FreeDiskObject(disk_obj);
-		}
-	}
-
-	if (!current_settings->hide_side_panel)
-	{
-		//check screen res and adjust image box accordingly
-		if (current_settings->screenshot_height <= 0 && current_settings->screenshot_width <= 0)
-		{
-			get_screen_size(&screen_width, &screen_height);
-
-			//if values are ok from the previous function, and user has not provided his own values, calculate a nice size
-			if (screen_width != -1 && screen_height != -1)
-			{
-				//for hi-res screens (1024x768 or greater) we'll use 320x256
-				if (screen_width >= 1024 && screen_height >= 768)
-				{
-					current_settings->screenshot_width = 320;
-					current_settings->screenshot_height = 256;
-				}
-				else
-				{
-					// for anything less, we'll go with half that
-					current_settings->screenshot_width = 160;
-					current_settings->screenshot_height = 128;
-				}
-			}
-			else
-			{
-				current_settings->screenshot_width = 160;
-				current_settings->screenshot_height = 128;
-			}
-		}
-	}
 }
 
 /*

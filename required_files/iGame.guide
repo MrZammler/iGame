@@ -1,5 +1,5 @@
 @DATABASE iGame.guide
-@$VER: iGame.guide 2.1 (04.06.2022)
+@$VER: iGame.guide 2.2 (04.11.2022)
 @INDEX "Index"
 @wordwrap
 
@@ -187,7 +187,6 @@ If you would like more details about all the available menus and windows, visit 
 @{" Settings Window          " LINK "WINSETS" 0}
 @{" Game Repositories Window " LINK "WINREPO" 0}
 @{" Properties Window        " LINK "WINPROP" 0}
-@{" Icon Tooltypes           " LINK "ICNTLTP" 0}
 
 @ENDNODE
 @NODE "MENUS" "Menus"
@@ -315,22 +314,6 @@ The "Hide side panel" checkbox, if selected, hides the right side of the main wi
 The "Save" button saves the settings in the configuration file.
 The "Use" button applies the settings, except the ones that require restart iGame, as mentioned above, but if you close iGame, those changes are lost.
 The "Cancel" button closes the window and forgets the changes you did.
-
-@ENDNODE
-@NODE "ICNTLTP" "Icon Tooltypes"
-@{lindent 3}
-Using iGame's icon tooltypes you can define how the program will work. The options are the same as can be found at the @{" Settings Window " LINK "WINSETS" 0}. Check this section to find more details for each option.
-
-Place a tooltype in parenthesis to disable it.
-
-@{b}NOSCREENSHOT@{ub} disables the screenshot
-@{b}NOGUIGFX@{ub} makes iGame to not use the GuiGfx library
-@{b}SCREENSHOT=WIDTHxHEIGHT@{ub} sets the screenshot width and height in pixels
-@{b}FILTERUSEENTER@{ub} sets the filter field to be initiated with enter
-@{b}SAVESTATSONEXIT@{ub} saves game statistics when iGame is closed
-@{b}TITLESFROMDIRS@{ub} gets the game/demo title from its parent directory
-@{b}NOSMARTSPACES@{ub} doesn't add extra spaces on title where it is needed
-@{b}NOSIDEPANEL@{ub} hides the right side of the main window
 
 @ENDNODE
 @NODE "TODO" "Todo & Bugs"
