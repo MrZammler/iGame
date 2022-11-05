@@ -1,4 +1,3 @@
----
 kind: pipeline
 type: docker
 name: compile-tests
@@ -11,38 +10,38 @@ steps:
   pull: always
   image: walkero/docker4amigavbcc:latest-m68k
   commands:
-    - make -f Makefile.docker
-    - make -f Makefile.docker iGame.030
-    - make -f Makefile.docker iGame.040
-    - make -f Makefile.docker iGame.060
+  - make -f Makefile.docker CPU=000
+  - make -f Makefile.docker CPU=030
+  - make -f Makefile.docker CPU=040
+  - make -f Makefile.docker CPU=060
 - name: compile-os4
   pull: always
   image: walkero/docker4amigavbcc:latest-ppc
   commands:
-    - make -f Makefile.docker iGame.OS4
+  - make -f Makefile.docker CPU=OS4
 - name: compile-mos
   pull: always
   image: walkero/docker4amigavbcc:latest-mos
   commands:
-    - make -f Makefile.docker iGame.MOS
+  - make -f Makefile.docker CPU=MOS
 - name: create-release-lha
   image: walkero/docker4amigavbcc:latest-m68k
   commands:
-    - make -f Makefile.docker release
+  - make -f Makefile.docker release
   depends_on:
-    - compile-m68k
-    - compile-os4
-    - compile-mos
+  - compile-m68k
+  - compile-os4
+  - compile-mos
 
 trigger:
   branch:
-    include:
-    - master
-    - develop
+  include:
+  - master
+  - develop
   event:
-    include:
-    - push
-    - pull_request
+  include:
+  - push
+  - pull_request
 ---
 kind: pipeline
 type: docker
@@ -56,40 +55,40 @@ steps:
   pull: always
   image: walkero/docker4amigavbcc:latest-m68k
   commands:
-    - make -f Makefile.docker
-    - make -f Makefile.docker iGame.030
-    - make -f Makefile.docker iGame.040
-    - make -f Makefile.docker iGame.060
+  - make -f Makefile.docker CPU=000
+  - make -f Makefile.docker CPU=030
+  - make -f Makefile.docker CPU=040
+  - make -f Makefile.docker CPU=060
 - name: compile-os4
   pull: always
   image: walkero/docker4amigavbcc:latest-ppc
   commands:
-    - make -f Makefile.docker iGame.OS4
+  - make -f Makefile.docker CPU=OS4
 - name: compile-mos
   pull: always
   image: walkero/docker4amigavbcc:latest-mos
   commands:
-    - make -f Makefile.docker iGame.MOS
+  - make -f Makefile.docker CPU=MOS
 - name: create-release-lha
   image: walkero/docker4amigavbcc:latest-m68k
   commands:
-    - make -f Makefile.docker release
+  - make -f Makefile.docker release
   depends_on:
-    - compile-m68k
-    - compile-os4
-    - compile-mos
+  - compile-m68k
+  - compile-os4
+  - compile-mos
 - name: deploy-all-binary
   image: plugins/github-release
   settings:
-    api_key:
-      from_secret: GITHUB_RELEASE_API_KEY
-    files:
-      - "iGame-*.lha"
-    title: "iGame release ${DRONE_TAG}"
+  api_key:
+    from_secret: GITHUB_RELEASE_API_KEY
+  files:
+    - "iGame-*.lha"
+  title: "iGame release ${DRONE_TAG}"
   depends_on:
-    - create-release-lha
+  - create-release-lha
 
 trigger:
   event:
-    include:
-    - tag
+  include:
+  - tag
