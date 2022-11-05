@@ -1,6 +1,6 @@
 name: iGame
 description: Frontend for WHDLoad
-version: 2.1
+version: VERSION_TAG
 author: Emmanuel Vasilakis and contributors
 submitter: George Sokianos
 email: walkero@gmail.com

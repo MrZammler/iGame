@@ -2,7 +2,7 @@ Short:        Frontend for WHDLoad
 Uploader:     walkero@gmail.com (George Sokianos)
 Author:       mrzammler@freemail.gr (Emmanuel Vasilakis)
 Type:         util/misc
-Version:      2.1
+Version:      VERSION_TAG
 Architecture: m68k-amigaos >= 2.04; ppc-amigaos; ppc-morphos
 Distribution: Aminet
 Replaces:     util/misc/iGame.lha

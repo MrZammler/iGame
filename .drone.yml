@@ -1,5 +1,34 @@
 kind: pipeline
 type: docker
+name: drone-agents-poweron
+
+clone:
+  disable: true
+
+steps:
+- name: drone-agents-poweron
+  image: walkero/hcloud:1.30
+  environment:
+    HCLOUD_TOKEN:
+      from_secret: HCLOUD_TOKEN
+  commands:
+    - hcloud server poweron drone-agents
+
+trigger:
+  branch:
+    include:
+    - master
+    - develop
+  event:
+    include:
+    - push
+    - pull_request
+    - tag
+
+---
+
+kind: pipeline
+type: docker
 name: compile-tests
 
 workspace:
@@ -32,6 +61,38 @@ steps:
   - compile-m68k
   - compile-os4
   - compile-mos
+- name: Prepare test release
+  image: walkero/lha-on-docker:latest
+  environment:
+    OS4DEPOT_PASSPHRASE:
+      from_secret: OS4DEPOT_PASSPHRASE
+  commands:
+  - mkdir test-release
+  - ls -la ./
+  - cp iGame--$(date +'%Y%m%d').lha ./test-release/iGame-$(date +'%Y%m%d%H%M').lha
+  - sed -i "s/VERSION_TAG/nightly-$(date +'%Y%m%d%H%M')/" ./aminet.readme
+  - sed -i "s/VERSION_TAG/nightly-$(date +'%Y%m%d%H%M')/" ./os4depot.readme
+  - sed -i "s/OS4DEPOT_PASSPHRASE/$OS4DEPOT_PASSPHRASE/" ./os4depot.readme
+  - cp ./os4depot.readme ./test-release/os4depot.readme
+  - cp ./aminet.readme ./test-release/aminet.readme
+  - ls -la ./test-release
+  depends_on:
+  - create-release-lha
+# - name: Upload to TEST FTP
+#   image: cschlosser/drone-ftps
+#   environment:
+#     FTP_USERNAME:
+#       from_secret: TESTFTP_USERNAME
+#     FTP_PASSWORD:
+#       from_secret: TESTFTP_PASSWORD
+#     PLUGIN_HOSTNAME: mediavault.amiga-projects.net:21
+#     PLUGIN_SRC_DIR: /test-release
+#     PLUGIN_DEST_DIR: ./web/betas
+#     PLUGIN_SECURE: "false"
+#     PLUGIN_VERIFY: "false"
+#     PLUGIN_CLEAN_DIR: "false"
+#   depends_on:
+#   - Prepare test release
 
 trigger:
   branch:
@@ -42,6 +103,12 @@ trigger:
     include:
     - push
     - pull_request
+
+depends_on:
+  - drone-agents-poweron
+
+node:
+  agents: builders
 
 ---
 
@@ -71,7 +138,7 @@ steps:
   image: walkero/docker4amigavbcc:latest-mos
   commands:
   - make -f Makefile.docker CPU=MOS
-- name: create-release-lha
+- name: Create release
   image: walkero/docker4amigavbcc:latest-m68k
   commands:
   - make -f Makefile.docker release
@@ -79,18 +146,108 @@ steps:
   - compile-m68k
   - compile-os4
   - compile-mos
-- name: deploy-all-binary
+- name: deploy-on-repo
   image: plugins/github-release
   settings:
-  api_key:
-    from_secret: GITHUB_RELEASE_API_KEY
-  files:
-    - "iGame-*.lha"
+    api_key:
+      from_secret: GITHUB_RELEASE_API_KEY
+    files:
+      - "iGame-*.lha"
   title: "iGame release ${DRONE_TAG}"
   depends_on:
-  - create-release-lha
+  - Create release
+- name: Prepare Aminet release
+  image: walkero/lha-on-docker:latest
+  commands:
+  - mkdir aminet-release
+  - cp iGame-${DRONE_TAG}-$(date +'%Y%m%d').lha ./aminet-release/iGame.lha
+  - sed -i "s/VERSION_TAG/${DRONE_TAG}/" ./aminet.readme
+  - cp ./aminet.readme ./aminet-release/iGame.readme
+  depends_on:
+  - Create release
+- name: Upload to Aminet
+  image: cschlosser/drone-ftps
+  environment:
+    FTP_USERNAME: "anonymous"
+    FTP_PASSWORD: "walkero@gmail.com"
+    PLUGIN_HOSTNAME: main.aminet.net:21
+    PLUGIN_SRC_DIR: /aminet-release
+    PLUGIN_DEST_DIR: ./new
+    PLUGIN_SECURE: "false"
+    PLUGIN_VERIFY: "false"
+    PLUGIN_CHMOD: "false"
+  depends_on:
+  - Prepare Aminet release
+- name: Prepare OS4Depot release
+  image: walkero/lha-on-docker:latest
+  environment:
+    OS4DEPOT_PASSPHRASE:
+      from_secret: OS4DEPOT_PASSPHRASE
+  commands:
+  - mkdir os4depot-release
+  - cp iGame-${DRONE_TAG}-$(date +'%Y%m%d').lha ./os4depot-release/iGame.lha
+  - sed -i "s/VERSION_TAG/${DRONE_TAG}/" ./os4depot.readme
+  - sed -i "s/OS4DEPOT_PASSPHRASE/$OS4DEPOT_PASSPHRASE/" ./os4depot.readme
+  - cp ./os4depot.readme ./os4depot-release/iGame_lha.readme
+  depends_on:
+  - Create release
+- name: Upload to OS4Depot
+  image: cschlosser/drone-ftps
+  environment:
+    FTP_USERNAME: "ftp"
+    FTP_PASSWORD: ""
+    PLUGIN_HOSTNAME: os4depot.net:21
+    PLUGIN_SRC_DIR: /os4depot-release
+    PLUGIN_DEST_DIR: ./upload
+    PLUGIN_SECURE: "false"
+    PLUGIN_VERIFY: "false"
+    PLUGIN_CHMOD: "false"
+  depends_on:
+  - Prepare OS4Depot release
 
 trigger:
   event:
     include:
+    - tag
+
+depends_on:
+  - drone-agents-poweron
+
+node:
+  agents: builders
+
+---
+
+kind: pipeline
+type: docker
+name: drone-agents-poweroff
+
+clone:
+  disable: true
+
+steps:
+- name: drone-agents-poweroff
+  image: walkero/hcloud:1.30
+  environment:
+    HCLOUD_TOKEN:
+      from_secret: HCLOUD_TOKEN
+  commands:
+    - curl -sw "\n" "http://10.0.0.2:5000/container/count/drone-" | while read var1; do if [ $var1 -eq 1 ]; then hcloud server poweroff drone-agents; fi ; done
+
+depends_on:
+  - compile-tests
+  - compile-release-bytag
+
+trigger:
+  status:
+    - failure
+    - success
+  branch:
+    include:
+    - master
+    - develop
+  event:
+    include:
+    - push
+    - pull_request
     - tag

@@ -1,5 +1,5 @@
 @DATABASE iGame.guide
-@$VER: iGame.guide 2.2 (04.11.2022)
+@$VER: iGame.guide VERSION_TAG (RELEASE_DATE)
 @INDEX "Index"
 @wordwrap
 
