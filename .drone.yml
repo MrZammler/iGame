@@ -35,14 +35,16 @@ steps:
 
 trigger:
   branch:
-  include:
-  - master
-  - develop
+    include:
+    - master
+    - develop
   event:
-  include:
-  - push
-  - pull_request
+    include:
+    - push
+    - pull_request
+
 ---
+
 kind: pipeline
 type: docker
 name: compile-release-bytag
@@ -90,5 +92,5 @@ steps:
 
 trigger:
   event:
-  include:
-  - tag
+    include:
+    - tag
