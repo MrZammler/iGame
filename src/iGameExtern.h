@@ -31,7 +31,7 @@
 #define DEFAULT_REPOS_FILE "PROGDIR:repos.prefs"
 #define DEFAULT_GENRES_FILE "PROGDIR:genres"
 #define DEFAULT_SCREENSHOT_FILE "PROGDIR:igame.iff"
-#define DEFAULT_SETTINGS_FILE "PROGDIR:igame.prefs"
+#define DEFAULT_SETTINGS_FILE "igame.prefs"
 #define SLAVE_STRING "slave"
 #define WB_PUBSCREEN_NAME "Workbench"
 

@@ -168,7 +168,8 @@ static void apply_settings()
 	set(app->CH_StartWithFavorites, MUIA_Selected, current_settings->start_with_favorites);
 }
 
-static setDefaultSettings(igame_settings *settings) {
+static void setDefaultSettings(igame_settings *settings)
+{
 	current_settings->no_guigfx				= TRUE;
 	current_settings->filter_use_enter		= TRUE;
 	current_settings->hide_side_panel		= FALSE;
@@ -181,15 +182,35 @@ static setDefaultSettings(igame_settings *settings) {
 	current_settings->start_with_favorites	= FALSE;
 }
 
+static void getPrefsPath(STRPTR prefsPath, STRPTR prefsFile)
+{
+	strcpy(prefsPath, "ENVARC:");
+	strncat(prefsPath, prefsFile, MAX_PATH_SIZE - 5);
+	if (!check_path_exists(prefsPath))
+	{
+		strcpy(prefsPath, "PROGDIR:");
+		strncat(prefsPath, prefsFile, MAX_PATH_SIZE - 10);
+	}
+}
+
 igame_settings *load_settings(const char* filename)
 {
 	const int buffer_size = 512;
+
 	STRPTR file_line = malloc(buffer_size * sizeof(char));
 	if (file_line == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return NULL;
 	}
+
+	STRPTR prefsPath = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
+	if(prefsPath == NULL)
+	{
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+		return NULL;
+	}
+	getPrefsPath(prefsPath, (STRPTR)filename);
 
 	if (current_settings != NULL)
 	{
@@ -199,9 +220,9 @@ igame_settings *load_settings(const char* filename)
 	current_settings = (igame_settings *)calloc(1, sizeof(igame_settings));
 	setDefaultSettings(current_settings);
 
-	if (check_path_exists((STRPTR)filename))
+	if (check_path_exists(prefsPath))
 	{
-		const BPTR fpsettings = Open((CONST_STRPTR)filename, MODE_OLDFILE);
+		const BPTR fpsettings = Open(prefsPath, MODE_OLDFILE);
 		if (fpsettings)
 		{
 			do
@@ -239,6 +260,9 @@ igame_settings *load_settings(const char* filename)
 			Close(fpsettings);
 		}
 	}
+
+	if (prefsPath)
+		FreeVec(prefsPath);
 
 	if (file_line)
 		free(file_line);
@@ -2115,7 +2139,15 @@ void settings_save(void)
 		return;
 	}
 
-	const BPTR fpsettings = Open((CONST_STRPTR)DEFAULT_SETTINGS_FILE, MODE_NEWFILE);
+	STRPTR prefsPath = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
+	if(prefsPath == NULL)
+	{
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+		return;
+	}
+	getPrefsPath(prefsPath, (STRPTR)DEFAULT_SETTINGS_FILE);
+
+	const BPTR fpsettings = Open(prefsPath, MODE_NEWFILE);
 	if (!fpsettings)
 	{
 		msg_box((const char*)"Could not save Settings file!");
@@ -2144,6 +2176,10 @@ void settings_save(void)
 	FPuts(fpsettings, (CONST_STRPTR)file_line);
 
 	Close(fpsettings);
+
+	if (prefsPath)
+		FreeVec(prefsPath);
+
 	if (file_line)
 		free(file_line);
 }
