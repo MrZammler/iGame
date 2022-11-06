@@ -1,4 +1,6 @@
-## iGame 2.2.0 - [future]
+## iGame VERSION_TAG - [RELEASE_DATE]
+### Added
+- Added automatic release to Aminet and OS4Depot through the CI/CD whenever a new release tag is created at the repo
 
 ### Changed
 - Removed completely the Tooltypes. Now iGame defaults to the optimal settings and uses only the settings file to change its behaviour.
