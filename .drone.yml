@@ -12,7 +12,6 @@ steps:
     HCLOUD_TOKEN:
       from_secret: HCLOUD_TOKEN
   commands:
-    - hcloud context --help
     - hcloud server poweron drone-agents
 
 trigger:
