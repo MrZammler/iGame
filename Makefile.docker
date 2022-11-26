@@ -67,7 +67,7 @@ endif
 CFLAGS = -c -dontwarn=-1 -O2 -c99 $(VERS_FLAGS)
 
 ifneq (,$(filter 000 030 040 060,$(CPU)))
-CFLAGS += +aos68k -DCPU_VERS=68$(CPU)
+CFLAGS += +aos68k -cpu=68$(CPU) -DCPU_VERS=68$(CPU)
 endif
 ifneq (,$(filter OS4,$(CPU)))
 CFLAGS += +aosppc -D__USE_INLINE__ -DCPU_VERS=AmigaOS4
