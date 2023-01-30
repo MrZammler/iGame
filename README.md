@@ -1,3 +1,5 @@
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/0c890051ba05476f8ea4f9e4ad846a7c)](https://www.codacy.com/gh/walkero-gr/iGame/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=walkero-gr/iGame&amp;utm_campaign=Badge_Grade)
+
 ## Description
 
 iGame is a frontend to launching WHDLoad games for the Amiga. It is implemented as a MUI application.

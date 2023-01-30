@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "Makefile.*": "makefile",
-        "*.inc": "makefile",
-        "*.h": "c"
-    }
-}

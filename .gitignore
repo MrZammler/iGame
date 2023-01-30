@@ -8,3 +8,5 @@ iGame.MOS
 iGame.OS4
 send_to_emul
 catalogs/*/iGame.catalog
+.vscode
+.idea
