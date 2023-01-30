@@ -942,6 +942,19 @@ void launch_game(void)
 								if (tool_type[0] == '#') continue;
 								if (tool_type[0] == '!') continue;
 
+								/* Add quotes to Execute.... ToolTypes for WHDLoad compatibility */
+								if (!strncmp(tool_type, "Execute", 7))
+								{
+									char** temp_tbl = my_split((char *)tool_type, "=");
+									if (temp_tbl == NULL) continue;
+									if (temp_tbl[1] != NULL)
+									{
+										sprintf(tool_type,"%s=\"%s\"", temp_tbl[0],temp_tbl[1]);
+									}
+									if (temp_tbl)
+										free(temp_tbl);
+								}
+
 								/* Must check here for numerical values */
 								/* Those (starting with $ should be transformed to dec from hex) */
 								char** temp_tbl = my_split((char *)tool_type, "=");
