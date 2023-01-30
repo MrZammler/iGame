@@ -1,6 +1,7 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Fixed
 - Now the 68K cpu specific versions are included in the archive. In v2.2.0 all versions where the same 68000 binary because of a missing flag in compilation
+- Willem Drijver contributed with a fix on Execute tooltype, which was not working well.
 
 ## iGame 2.2.0 - [2022-11-06]
 ### Added
