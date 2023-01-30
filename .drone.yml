@@ -1,18 +1,21 @@
 kind: pipeline
 type: docker
-name: drone-agents-poweron
+name: awsbuilders-poweron
 
 clone:
   disable: true
 
 steps:
-- name: drone-agents-poweron
-  image: walkero/hcloud:1.30
+- name: start-aws-instances
+  pull: always
+  image: amazon/aws-cli
   environment:
-    HCLOUD_TOKEN:
-      from_secret: HCLOUD_TOKEN
+    AWS_ACCESS_KEY_ID:
+      from_secret: AWS_ACCESS_KEY
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: AWS_SECRET_ACCESS_KEY
   commands:
-    - hcloud server poweron drone-agents
+    - aws ec2 start-instances --region eu-north-1 --instance-ids i-01e3d598710a23947
 
 trigger:
   branch:
@@ -105,10 +108,10 @@ trigger:
     - pull_request
 
 depends_on:
-  - drone-agents-poweron
+  - awsbuilders-poweron
 
 node:
-  agents: builders
+  agents: awsbuilders
 
 ---
 
@@ -211,43 +214,7 @@ trigger:
     - tag
 
 depends_on:
-  - drone-agents-poweron
+  - awsbuilders-poweron
 
 node:
-  agents: builders
-
----
-
-kind: pipeline
-type: docker
-name: drone-agents-poweroff
-
-clone:
-  disable: true
-
-steps:
-- name: drone-agents-poweroff
-  image: walkero/hcloud:1.30
-  environment:
-    HCLOUD_TOKEN:
-      from_secret: HCLOUD_TOKEN
-  commands:
-    - curl -sw "\n" "http://10.0.0.2:5000/container/count/drone-" | while read var1; do if [ $var1 -eq 1 ]; then hcloud server poweroff drone-agents; fi ; done
-
-depends_on:
-  - compile-tests
-  - compile-release-bytag
-
-trigger:
-  status:
-    - failure
-    - success
-  branch:
-    include:
-    - master
-    - develop
-  event:
-    include:
-    - push
-    - pull_request
-    - tag
+  agents: awsbuilders
