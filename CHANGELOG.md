@@ -1,6 +1,4 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
-### Added
-- Added Turkish catalog contributed by Serkan Dursun
 ### Changed
 - Now we compile iGame with NDK 3.2R4
 - Now the repositories path requester accepts only drawers
@@ -9,6 +7,10 @@
 - Changed the repository scanning for files. The code simplified and now uses more function from the system API, making it more compatible. Also, all the "Data" folders are skipped from scanning, so slaves that exist in those folders are not used. A lot of code removed and optimised, so the scan becomes around 37% faster on the same machine, scanning a folder with 3562 entries.
 - Changed the way the multiple instances with the same title are shown. Now no "Alt" labels will be added. Instead we introduced a number in square brackets that represents the different instances, i.e. 3DPool [1], 4DSportsDriving [2]. Not every record have these values, so expect to see them only when there are duplicates.
 - The gamelist.csv file changed by having double quotes around the string values, like the path and the title.
+
+## iGame 2.2.1 - [2023-01-30]
+### Added
+- Added Turkish catalog contributed by Serkan Dursun
 
 ### Fixed
 - Now the 68K cpu specific versions are included in the archive. In v2.2.0 all versions where the same 68000 binary because of a missing flag in compilation
