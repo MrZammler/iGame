@@ -27,22 +27,15 @@
 /* Prototypes */
 #include <clib/alib_protos.h>
 #include <proto/wb.h>
-
-#if defined(__amigaos4__)
 #include <proto/exec.h>
 #include <proto/dos.h>
 #include <proto/icon.h>
 #include <proto/muimaster.h>
-#else
-#include <clib/exec_protos.h>
-#include <clib/dos_protos.h>
-#include <clib/icon_protos.h>
-#include <clib/muimaster_protos.h>
-#endif
+
+#include <workbench/icon.h>
 
 /* System */
 #if defined(__amigaos4__)
-// #include <dos/obsolete.h>
 #define ASL_PRE_V38_NAMES
 #endif
 #include <libraries/asl.h>
@@ -58,12 +51,12 @@
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "strfuncs.h"
+#include "slavesList.h"
 #include "funcs.h"
 #include "fsfuncs.h"
 
 extern struct ObjApp* app;
 extern char* executable_name;
-extern const int MAX_PATH_SIZE;
 
 /* structures */
 struct FileRequester* request;
@@ -89,24 +82,61 @@ void strip_path(const char *path, char *naked_path)
 	naked_path[k] = '\0';
 }
 
-STRPTR getParentPath(STRPTR filename)
-{
-	STRPTR path = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
-	if (path)
-	{
-		BPTR fileLock = Lock(filename, SHARED_LOCK);
-		if (fileLock)
-		{
-			BPTR folderLock = ParentDir(fileLock);
-			NameFromLock(folderLock, path, sizeof(char) * MAX_PATH_SIZE);
 
-			UnLock(folderLock);
-			UnLock(fileLock);
-			return path;
+/*
+ * Get the path of the parent folder
+ */
+void getParentPath(char *filename, char *result)
+{
+	BPTR fileLock = Lock(filename, SHARED_LOCK);
+	if (fileLock)
+	{
+		BPTR folderLock = ParentDir(fileLock);
+		NameFromLock(folderLock, result, sizeof(char) * MAX_PATH_SIZE);
+
+		UnLock(folderLock);
+		UnLock(fileLock);
+	}
+}
+
+/*
+ * Get the filename of a folder/file from a path
+ */
+void getNameFromPath(char *path, char *result, unsigned int size)
+{
+	BPTR pathLock = Lock(path, SHARED_LOCK);
+	if (pathLock) {
+		struct FileInfoBlock *FIblock = (struct FileInfoBlock *)AllocVec(sizeof(struct FileInfoBlock), MEMF_CLEAR);
+
+		if (Examine(pathLock, FIblock))
+		{
+			strncpy(result, FIblock->fib_FileName, size);
+			FreeVec(FIblock);
 		}
+		UnLock(pathLock);
+	}
+}
+
+void getFullPath(const char *path, char *result)
+{
+	char *buf = malloc(sizeof(char) * MAX_PATH_SIZE);
+	strcpy(buf, path);
+	if (path[0] == '/')
+	{
+		sprintf(buf, "PROGDIR:%s", path);
 	}
 
-	return NULL;
+	BPTR pathLock = Lock(buf, SHARED_LOCK);
+	if (pathLock)
+	{
+		NameFromLock(pathLock, result, sizeof(char) * MAX_PATH_SIZE);
+		UnLock(pathLock);
+		free(buf);
+		return;
+	}
+
+	free(buf);
+	return ;
 }
 
 char* get_slave_from_path(char *slave, int start, char *path)
@@ -164,6 +194,7 @@ BOOL get_filename(const char *title, const char *positive_text, const BOOL save_
 	return result;
 }
 
+// TODO: Replaced by slavesListLoadFromCSV() - OBSOLETE
 void load_games_csv_list(const char *filename)
 {
 	char *buf = malloc(256 * sizeof(char));
@@ -233,6 +264,86 @@ void load_games_csv_list(const char *filename)
 		free(buf);
 }
 
+// Replaces load_games_csv_list()
+void slavesListLoadFromCSV(char *filename)
+{
+	int bufSize = sizeof(char) * 1024;
+
+	if (check_path_exists(filename))
+	{
+		const BPTR fpgames = Open((CONST_STRPTR) filename, MODE_OLDFILE);
+		if (fpgames)
+		{
+			char *lineBuf = AllocVec(bufSize, MEMF_CLEAR);
+			char *buf = AllocVec(MAX_PATH_SIZE, MEMF_CLEAR);
+
+			while (FGets(fpgames, lineBuf, bufSize) != NULL)
+			{
+				slavesList *node = malloc(sizeof(slavesList));
+
+				buf = strtok(lineBuf, ";");
+				node->instance = atoi(buf);
+
+				buf = strtok(NULL, ";");
+				node->title[0] = '\0';
+				if (strncmp(buf, "\"\"", 2))
+				{
+					sprintf(node->title,"%s", substring(buf, 1, -2));
+				}
+
+				buf = strtok(NULL, ";");
+				node->genre[0] = '\0';
+				if (strncmp(buf, "\"\"", 2))
+				{
+					sprintf(node->genre,"%s", substring(buf, 1, -2));
+				}
+				if(isStringEmpty(node->genre))
+				{
+					sprintf(node->genre,"Unknown");
+				}
+
+				buf = strtok(NULL, ";");
+				node->path[0] = '\0';
+				if (strncmp(buf, "\"\"", 2))
+				{
+					sprintf(node->path,"%s", substring(buf, 1, -2));
+				}
+
+				buf = strtok(NULL, ";");
+				node->favourite = atoi(buf);
+
+				buf = strtok(NULL, ";");
+				node->times_played = atoi(buf);
+
+				buf = strtok(NULL, ";");
+				node->last_played = atoi(buf);
+
+				buf = strtok(NULL, ";");
+				node->hidden = atoi(buf);
+
+				buf = strtok(NULL, ";");
+				node->deleted = atoi(buf);
+
+				// TODO: Add here a check for the old CSV files
+				buf = strtok(NULL, ";");
+				node->user_title[0] = '\0';
+				if (strncmp(buf, "\"\"", 2))
+				{
+					sprintf(node->user_title,"%s", substring(buf, 1, -2));
+				}
+
+				slavesListAddTail(node);
+			}
+			Close(fpgames);
+			// FreeVec(buf);
+			// FreeVec(lineBuf);
+		}
+	}
+	// TODO: Remove this
+	// slavesListPrint();
+}
+
+// TODO: Replaced by slavesListSaveToCSV() - OBSOLETE
 void save_to_csv(const char *filename, const int check_exists)
 {
 	char csvFilename[32];
@@ -288,13 +399,53 @@ void save_to_csv(const char *filename, const int check_exists)
 	status_show_total();
 }
 
+// Replaces save_to_csv()
+void slavesListSaveToCSV(const char *filename)
+{
+	// return;
+	char csvFilename[32];
+	FILE *fpgames;
+
+	const char* saving_message = (const char*)GetMBString(MSG_SavingGamelist);
+	set(app->TX_Status, MUIA_Text_Contents, saving_message);
+
+	strcpy(csvFilename, (CONST_STRPTR)filename);
+	strcat(csvFilename, ".csv");
+
+	fpgames = fopen(csvFilename,"w");
+	if (!fpgames)
+	{
+		msg_box((const char*)GetMBString(MSG_FailedOpeningGameslist));
+		return;
+	}
+
+	slavesList *currPtr = getSlavesListHead();
+
+	while (currPtr != NULL)
+	{
+		fprintf(
+			fpgames,
+			"%d;\"%s\";\"%s\";\"%s\";%d;%d;%d;%d;%d;\"%s\";\n",
+			currPtr->instance, currPtr->title,
+			currPtr->genre, currPtr->path, currPtr->favourite,
+			currPtr->times_played, currPtr->last_played, currPtr->hidden,
+			currPtr->deleted, currPtr->user_title
+		);
+		currPtr = currPtr->next;
+	}
+
+	fclose(fpgames);
+
+	status_show_total();
+}
+
 /*
 * Gets title from a slave file
 * returns 0 on success, 1 on fail
 */
 int get_title_from_slave(char* slave, char* title)
 {
-	char slave_title[100];
+	char slave_title[MAX_SLAVE_TITLE_SIZE];
 
 	struct slave_info
 	{
@@ -358,7 +509,35 @@ int get_title_from_slave(char* slave, char* title)
 	return 0;
 }
 
-// TODO: This seems OBSOLETE and can be replaced by getParentPath(). Needs investigation
+/*
+ * Set the item title name based on the path on disk
+ */
+void getTitleFromPath(char *path, char *title)
+{
+	int bufSize = sizeof(char) * MAX_PATH_SIZE;
+	char *buf = AllocVec(bufSize, MEMF_CLEAR);
+
+	STRPTR itemFolderPath = AllocVec(bufSize, MEMF_CLEAR);
+	getParentPath(path, itemFolderPath);
+	if (itemFolderPath)
+	{
+		getNameFromPath(itemFolderPath, buf, bufSize);
+
+		if (current_settings->no_smart_spaces)
+		{
+			strcpy(title, buf);
+		}
+		else
+		{
+			strcpy(title, add_spaces_to_string(buf));
+		}
+
+	}
+	FreeVec(itemFolderPath);
+	FreeVec(buf);
+}
+
+// TODO: This seems OBSOLETE and can be replaced by getNameFromPath(). Needs investigation
 // Get the Directory part from a full path containing a file
 const char* get_directory_name(const char* str)
 {
@@ -464,6 +643,7 @@ void open_current_dir(void)
 	free(path_only); // get_directory_path uses malloc()
 }
 
+// TODO: This is replaced by slavesListSearchByTitle() - OBSOLETE
 void get_path(char *title, char *path)
 {
 	for (item_games = games; item_games != NULL; item_games = item_games->next)
@@ -478,3 +658,186 @@ void get_path(char *title, char *path)
 		}
 	}
 }
+
+BOOL isPathFolder(char *path)
+{
+	if (path[strlen(path)-1] == ':')
+		return FALSE;
+
+	return TRUE;
+}
+
+/*
+* Get the icon tooltypes and copies them in result
+* The path needs to be the full file path without .info at the end
+*/
+void getIconTooltypes(char *path, char *result)
+{
+	if (IconBase)
+	{
+		struct DiskObject *diskObj = GetDiskObjectNew(path);
+		if(diskObj)
+		{
+			char *buf = AllocVec(sizeof(char) * 64, MEMF_CLEAR);
+			// size_t cnt = 0;
+			for (STRPTR *tool_types = diskObj->do_ToolTypes; (buf = *tool_types); ++tool_types)
+			{
+				// printf("%s\n", buf);
+				// if (cnt > 10) break;
+
+				// cnt++;
+
+				if (!strncmp(buf, "*** DON'T EDIT", 14) || !strncmp(buf, "IM", 2))
+					continue;
+
+				sprintf(result, "%s%s\n", result, buf);
+			}
+			FreeVec(buf);
+			FreeDiskObject(diskObj);
+		}
+	}
+}
+
+void setIconTooltypes(char *path, char *tooltypes)
+{
+	if (IconBase)
+	{
+		// struct DiskObject *diskObj = GetDiskObjectNew(path);
+		struct DiskObject *diskObj = GetIconTags(path, TAG_DONE);
+		if(diskObj && FALSE)
+		{
+			size_t oldToolTypesCnt = 0;
+			size_t cutPos = 0;
+			size_t newToolTypesCnt = 0;
+
+			char *buf = AllocVec(sizeof(char) * 64, MEMF_CLEAR);
+
+			// Get the number of the new tooltypes
+			char **table = my_split(tooltypes, "\n");
+			for (table; (buf = *table); ++table)
+			{
+				printf("DBG: %s\n", buf);
+				newToolTypesCnt++;
+			}
+
+			// Get the number of the old tooltypes, as well as where the image data start (cutPos)
+			// for (STRPTR *oldToolTypes = diskObj->do_ToolTypes; (buf = *oldToolTypes); ++oldToolTypes)
+			// {
+			// 	oldToolTypesCnt++;
+			// 	if (!strncmp(buf, "*** DON'T EDIT", 14) && (cutPos == 0))
+			// 		cutPos = oldToolTypesCnt;
+
+			// 	if (!strncmp(buf, "IM", 2) && (cutPos == 0))
+			// 		cutPos = oldToolTypesCnt;
+
+			// }
+
+			// unsigned int allCnt = (oldToolTypesCnt - cutPos) + newToolTypesCnt + 29;
+
+
+			// newToolTypesCnt++; // That's for the last NULL
+
+			unsigned char **newToolTypes = AllocVec(sizeof(char *) * newToolTypesCnt, MEMF_CLEAR);
+			if (newToolTypes)
+			{
+				printf("DBG: newToolTypes set\n");
+
+				char **table2 = my_split(tooltypes, "\n");
+				size_t table2Cnt = 0;
+				for (table2; (buf = *table2); ++table2)
+				{
+					printf("DBG: %s\n", buf);
+					newToolTypes[table2Cnt] = buf;
+					table2Cnt++;
+				}
+				printf("DBG: table2Cnt %d\tcutPos %d\n", table2Cnt, cutPos);
+				// printf("DBG: Before old tooltypes %d\t%d\n", newToolTypesCnt, cutPos);
+				// for(size_t i = cutPos; i < oldToolTypesCnt; i++)
+				// for(size_t i = 0; i < oldToolTypesCnt; i++)
+				// {
+				// 	// printf("%d\t%d\t%d\n", newToolTypesCnt+i-cutPos, i, i-cutPos);
+				// 	// if (i > 10) break;
+				// 	newToolTypes[table2Cnt+i] = diskObj->do_ToolTypes[i];
+				// }
+				newToolTypes[newToolTypesCnt-1] = NULL;
+
+				diskObj->do_ToolTypes = newToolTypes;
+				printf("DBG: PutDiskObject\n");
+
+				// LONG errorCode;
+				// BOOL success;
+
+				// success = PutIconTags(path, diskObj,
+				// 	ICONPUTA_DropNewIconToolTypes, TRUE,
+				// 	ICONA_ErrorCode, &errorCode,
+				// TAG_DONE);
+
+				// if(success == FALSE)
+				// {
+				// 	Printf("could not store default picture icon;\n");
+				// 	PrintFault(errorCode, NULL);
+				// }
+
+				// PutDiskObject(path, diskObj);
+				FreeVec(newToolTypes);
+			}
+
+			// printf("DBG: %d\t%d\t%d\t%d\n",
+			// 	oldToolTypesCnt, cutPos, newToolTypesCnt, allCnt);
+			FreeDiskObject(diskObj);
+		}
+	}
+}
+
+// void setIconTooltypes(char *path, char *tooltypes)
+// {
+// 	if (IconBase)
+// 	{
+// 		struct DiskObject *diskObj = GetDiskObjectNew(path);
+// 		if(diskObj)
+// 		{
+// 			char* game_tooltypes;
+// 			char* tool_type;
+// 			int i;
+// 			int new_tool_type_count = 1, old_tool_type_count = 0, old_real_tool_type_count = 0;
+
+// 			for (i = 0; i <= strlen(tooltypes); i++)
+// 				if (tooltypes[i] == '\n') new_tool_type_count++;
+
+// 			//add one for the last tooltype that doesnt end with \n
+// 			new_tool_type_count++;
+
+// 			for (i = 0; i <= strlen(game_tooltypes); i++)
+// 				if (game_tooltypes[i] == '\n') old_tool_type_count++;
+
+// 			for (char** tool_types = (char **)diskObj->do_ToolTypes; (tool_type = *tool_types); ++
+// 					tool_types)
+// 				old_real_tool_type_count++;
+
+// 			unsigned char** new_tool_types = AllocVec(new_tool_type_count * sizeof(char *),
+// 														MEMF_FAST | MEMF_CLEAR);
+// 			unsigned char** newptr = new_tool_types;
+
+// 			char** temp_tbl = my_split((char *)tooltypes, "\n");
+// 			// if (temp_tbl == NULL
+// 			// 	|| temp_tbl[0] == NULL
+// 			// 	|| !strcmp((char *)temp_tbl[0], " ")
+// 			// 	|| !strcmp((unsigned char *)temp_tbl[0], ""))
+// 			// 	break;
+
+// 			for (i = 0; i <= new_tool_type_count - 2; i++)
+// 				*newptr++ = (unsigned char*)temp_tbl[i];
+
+// 			*newptr = NULL;
+
+// 			diskObj->do_ToolTypes = new_tool_types;
+// 			PutDiskObject(path, diskObj);
+// 			FreeDiskObject(diskObj);
+
+// 			if (temp_tbl)
+// 				free(temp_tbl);
+// 			if (new_tool_types)
+// 				FreeVec(new_tool_types);
+// 		}
+// 	}
+// }

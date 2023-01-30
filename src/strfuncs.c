@@ -244,3 +244,8 @@ STRPTR GetMBString(ULONG refId)
 	return GetCatalogStr(Catalog, t->cca_ID, t->cca_Str);
 	#endif
 }
+
+BOOL isStringEmpty(char *string)
+{
+	return string[0] == '\0';
+}

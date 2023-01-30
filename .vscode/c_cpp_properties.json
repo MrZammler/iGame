@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${VBCC}/targets/m68k-amigaos/include/",
-                "${NDK_INC}",
+                "${NDK32_INC}",
                 "${MUI38_INC}"
             ],
             "defines": [],
@@ -19,7 +19,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${VBCC}/targets/m68k-amigaos/include/",
-                "${NDK_INC}",
+                "${NDK32_INC}",
                 "${MUI50_INC}"
             ],
             "defines": [],
@@ -51,7 +51,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${VBCC}/targets/ppc-morphos/include/",
-                "${NDK_INC}",
+                "${NDK32_INC}",
                 "${MUI50_INC}"
             ],
             "defines": [

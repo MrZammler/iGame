@@ -32,6 +32,9 @@
 #include <proto/lowlevel.h>
 #include <proto/muimaster.h>
 
+/* ANSI C */
+#include <stdlib.h>
+
 #ifndef __amigaos4__
 #define __NOLIBBASE__
 #include <proto/locale.h>
@@ -164,7 +167,8 @@ int main(int argc, char **argv)
 				break;
 
 			case MENU_GAMEPROPERTIES:
-				game_properties();
+				// game_properties();
+				slaveProperties();
 				break;
 
 			case MENU_GAMEFOLDER:

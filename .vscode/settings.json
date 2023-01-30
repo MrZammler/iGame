@@ -3,5 +3,6 @@
         "Makefile.*": "makefile",
         "*.inc": "makefile",
         "*.h": "c"
-    }
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }

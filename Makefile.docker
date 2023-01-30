@@ -31,7 +31,8 @@ ifneq ($(origin DRONE_TAG),undefined)
 	MINOR = $(word 2, $(subst ., ,$(DRONE_TAG)))
 	PATCH = $(word 3, $(subst ., ,$(DRONE_TAG)))
 
-	VERS_FLAGS = -DMAJOR_VERS=$(MAJOR) -DMINOR_VERS=$(MINOR) -DPATCH_VERS=$(PATCH) -DRELEASE_DATE=$(DATEISO)
+	VERS_FLAGS = -DMAJOR_VERS=$(MAJOR) -DMINOR_VERS=$(MINOR) \
+		-DPATCH_VERS=$(PATCH) -DRELEASE_DATE=$(DATEISO)
 else
 	VERS_FLAGS = -DRELEASE_DATE=$(DATEISO)
 endif
@@ -51,7 +52,7 @@ CPU ?= 000
 ##########################################################################
 
 ifneq (,$(filter 000 030 040 060,$(CPU)))
-INCLUDES += -I$(NDK_INC) -I$(MUI38_INC)
+INCLUDES += -I$(NDK32_INC) -I$(MUI50_INC)
 endif
 ifneq (,$(filter OS4,$(CPU)))
 INCLUDES += -I$(AOS4_SDK_INC) -I$(MUI50_INC)
@@ -73,7 +74,7 @@ ifneq (,$(filter OS4,$(CPU)))
 CFLAGS += +aosppc -D__USE_INLINE__ -DCPU_VERS=AmigaOS4
 endif
 ifneq (,$(filter MOS,$(CPU)))
-CFLAGS += +morphos -DCPU_VERS=MorphOS
+CFLAGS += +morphos -DCPU_VERS=MorphOS -D__morphos__
 endif
 
 ##########################################################################
@@ -96,14 +97,16 @@ endif
 ##########################################################################
 
 igame_OBJS	= src/funcs_$(CPU).o src/iGameGUI_$(CPU).o \
-	src/iGameMain_$(CPU).o src/strfuncs_$(CPU).o src/fsfuncs_$(CPU).o
+	src/iGameMain_$(CPU).o src/strfuncs_$(CPU).o src/fsfuncs_$(CPU).o \
+	src/slavesList_$(CPU).o
 
 ##########################################################################
 # Rule for building
 ##########################################################################
 
 iGame: $(igame_OBJS)
-	$(LINK) $(igame_OBJS) $(LIBFLAGS) $@.$(CPU)
+	@echo "\nLinking iGame.$(CPU)\n"
+	@$(LINK) $(igame_OBJS) $(LIBFLAGS) $@.$(CPU)
 
 ##########################################################################
 # catalog files
@@ -119,25 +122,30 @@ catalogs/%/iGame.catalog: catalogs/%/iGame.ct catalogs/iGame.cd
 ##########################################################################
 
 %_$(CPU).o: %.c
-	@echo "Compiling $<"
+	@echo "\nCompiling $<"
 	@$(CC) -c $< -o $*_$(CPU).o $(CFLAGS) $(INCLUDES)
 
-src/funcs_$(CPU).o: src/funcs.c src/iGame_strings.h src/strfuncs.h src/fsfuncs.h src/iGameExtern.h
+src/funcs_$(CPU).o: src/funcs.c src/iGame_strings.h src/strfuncs.h \
+	src/fsfuncs.h src/iGameExtern.h src/slavesList.h
 
-src/iGameGUI_$(CPU).o: src/iGameGUI.c src/iGameGUI.h src/iGame_strings.h src/fsfuncs.h src/iGameExtern.h
+src/iGameGUI_$(CPU).o: src/iGameGUI.c src/iGameGUI.h src/iGame_strings.h \
+	src/fsfuncs.h src/iGameExtern.h
 
 src/iGameMain_$(CPU).o: src/iGameMain.c src/iGameExtern.h
 
 src/strfuncs_$(CPU).o: src/strfuncs.c src/strfuncs.h
 
-src/fsfuncs_$(CPU).o: src/fsfuncs.c src/fsfuncs.h src/funcs.h src/iGameExtern.h
+src/fsfuncs_$(CPU).o: src/fsfuncs.c src/fsfuncs.h src/funcs.h \
+	src/iGameExtern.h src/slavesList.h
+
+src/slavesList_$(CPU).o: src/slavesList.c src/slavesList.h
 
 ##########################################################################
 # generic rules
 ##########################################################################
 
 clean:
-	rm iGame iGame.* src/funcs*.o src/iGameGUI*.o src/iGameMain*.o src/strfuncs*.o src/iGame_cat*.o $(catalog_files)
+	rm iGame iGame.* $(igame_OBJS) $(catalog_files)
 
 release: $(catalog_files)
 ifneq ($(origin DRONE_TAG),undefined)

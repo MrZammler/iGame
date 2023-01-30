@@ -25,7 +25,6 @@
 
 #define Dtpic_Classname "Dtpic.mui"
 #define MUIA_Dtpic_Name 0x80423d72
-#define TEMPLATE "SCREENSHOT/K"
 #define PROGDIR "PROGDIR:"
 #define DEFAULT_GAMESLIST_FILE "PROGDIR:gameslist"
 #define DEFAULT_REPOS_FILE "PROGDIR:repos.prefs"
@@ -62,6 +61,10 @@
 #define MENU_QUIT_HOTKEY "Q"
 #define MENU_PROPERTIES_HOTKEY "P"
 #define MENU_DELETE_HOTKEY "D"
+
+#define MAX_SLAVE_TITLE_SIZE 128
+#define MAX_SLAVE_GENRE_SIZE 128
+#define MAX_PATH_SIZE 256
 
 typedef struct settings
 {
@@ -103,6 +106,33 @@ typedef struct games
 	int deleted; // indicates this entry should be deleted when the list is saved
 	struct games* next;
 } games_list;
+
+typedef struct slavesList
+{
+	// int index; // TODO: Possibly not used. Could be replaced by the instance number in csv files
+
+	char title[MAX_SLAVE_TITLE_SIZE];
+	char user_title[MAX_SLAVE_TITLE_SIZE];
+	char path[MAX_PATH_SIZE];
+	char genre[MAX_SLAVE_GENRE_SIZE];
+
+	size_t instance;
+	size_t times_played;
+
+	int favourite;// TODO: This could be a tag
+
+	int last_played; //indicates whether this one was the last game played
+
+	int exists; // indicates whether this game still exists after a scan
+				// TODO: Maybe needs to be removed when game deletion removes files as well
+
+	int hidden; // game is hidden from normal operation
+				// TODO: This could be a tag
+
+	int deleted; // indicates this entry should be deleted when the list is saved
+
+	struct slavesList *next;
+} slavesList;
 
 enum {
 	MENU_ACTIONS=1,

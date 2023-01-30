@@ -125,7 +125,7 @@ MSG_TX_PropertiesTooltypesTitle (//)
 Tooltypes
 ;MUIB button text
 MSG_BT_PropertiesOK (//)
-OK
+Save
 ;MUIB button text
 MSG_BT_PropertiesCancel (//)
 Cancel

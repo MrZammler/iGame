@@ -56,7 +56,6 @@
 #define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
 #endif
 
-
 #define iGame_NUMBERS
 #include "iGame_strings.h"
 
@@ -168,9 +167,9 @@ struct ObjApp *CreateApp(void)
 	static const struct Hook MenuDeleteHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_delete, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook PropertiesOKButtonHook = { { NULL,NULL }, (HOOKFUNC)game_properties_ok, NULL, NULL };
+	static const struct Hook PropertiesOKButtonHook = { { NULL,NULL }, (HOOKFUNC)saveItemProperties, NULL, NULL };
 #else
-	static const struct Hook PropertiesOKButtonHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_properties_ok, NULL };
+	static const struct Hook PropertiesOKButtonHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)saveItemProperties, NULL };
 #endif
 #if defined(__amigaos4__)
 	static const struct Hook FilterChangeHook = { { NULL,NULL }, (HOOKFUNC)filter_change, NULL, NULL };
@@ -315,6 +314,9 @@ struct ObjApp *CreateApp(void)
 	object->LV_GamesList = ListObject,
 		MUIA_Frame, MUIV_Frame_InputList,
 		MUIA_List_Active, MUIV_List_Active_Top,
+		MUIA_List_Stripes, TRUE,
+		MUIA_List_ConstructHook, MUIV_List_ConstructHook_String,
+		MUIA_List_DestructHook, MUIV_List_DestructHook_String,
 		End;
 
 	object->LV_GamesList = ListviewObject,
@@ -606,6 +608,7 @@ struct ObjApp *CreateApp(void)
 		MUIA_Popstring_String, object->STR_PA_RepoPath,
 		MUIA_Popstring_Button, object->PA_RepoPath,
 		ASLFR_TitleText, GetMBString(MSG_SelectDir),
+		ASLFR_DrawersOnly, TRUE,
 		End;
 
 	object->BT_AddRepo = TextObject,

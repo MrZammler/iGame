@@ -42,6 +42,8 @@ void filter_change(void);
 void launch_game(void);
 void list_show_hidden(void);
 void app_start(void);
+void slaveProperties(void);
+void saveItemProperties(void);
 void game_properties(void);
 void add_non_whdload(void);
 void genres_click(void);
