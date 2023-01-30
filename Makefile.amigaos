@@ -15,7 +15,11 @@ all: iGame
 # Set up version and date properties
 ##########################################################################
 
+ifeq ($(shell uname), AmigaOS)
+DATE = $(shell date LFORMAT "%Y-%m-%d")
+else
 DATE = $(shell date --iso=date)
+endif
 
 ##########################################################################
 # Compiler settings
