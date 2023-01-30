@@ -6,64 +6,12 @@
         {
             "label": "Build for 68000",
             "type": "shell",
-            "windows": {
-                "command": "vc",
-                "args": [
-                    "+aos68k",
-                    "-ID:/vbcc/MUI/Developer/C/Include",
-                    "-ID:/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-ID:/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
-                ]
-            },
-            "osx": {
-                "command": "vc",
-                "args": [
-                    "+aos68k",
-                    "-I/opt/vbcc/MUI/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
-                ]
-            },
             "linux": {
-                "command": "vc",
+                "command": "make",
                 "args": [
-                    "+aos68k",
-                    "-I/opt/vbcc/MUI/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
+                        "-f",
+                        "Makefile.docker",
+                        "CPU=000"
                 ]
             },
             "problemMatcher": {
@@ -85,67 +33,12 @@
         {
             "label": "Build for 68030",
             "type": "shell",
-            "windows": {
-                "command": "vc",
-                "args": [
-                    "+aos68k",
-                    "-cpu=68030",
-                    "-ID:/vbcc/MUI/Developer/C/Include",
-                    "-ID:/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-ID:/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame.030",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
-                ]
-            },
-            "osx": {
-                "command": "vc",
-                "args": [
-                    "+aos68k",
-                    "-cpu=68030",
-                    "-I/opt/vbcc/MUI/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame.030",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
-                ]
-            },
             "linux": {
-                "command": "vc",
+                "command": "make",
                 "args": [
-                    "+aos68k",
-                    "-cpu=68030",
-                    "-I/opt/vbcc/MUI/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame.030",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
+                        "-f",
+                        "Makefile.docker",
+                        "CPU=030"
                 ]
             },
             "problemMatcher": {
@@ -167,67 +60,12 @@
         {
             "label": "Build for 68040",
             "type": "shell",
-            "windows": {
-                "command": "vc",
-                "args": [
-                    "+aos68k",
-                    "-cpu=68040",
-                    "-ID:/vbcc/MUI/Developer/C/Include",
-                    "-ID:/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-ID:/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame.040",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
-                ]
-            },
-            "osx": {
-                "command": "vc",
-                "args": [
-                    "+aos68k",
-                    "-cpu=68040",
-                    "-I/opt/vbcc/MUI/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame.040",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
-                ]
-            },
             "linux": {
-                "command": "vc",
+                "command": "make",
                 "args": [
-                    "+aos68k",
-                    "-cpu=68040",
-                    "-I/opt/vbcc/MUI/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame.040",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
+                        "-f",
+                        "Makefile.docker",
+                        "CPU=040"
                 ]
             },
             "problemMatcher": {
@@ -249,67 +87,12 @@
         {
             "label": "Build for 68060",
             "type": "shell",
-            "windows": {
-                "command": "vc",
-                "args": [
-                    "+aos68k",
-                    "-cpu=68060",
-                    "-ID:/vbcc/MUI/Developer/C/Include",
-                    "-ID:/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-ID:/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame.060",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
-                ]
-            },
-            "osx": {
-                "command": "vc",
-                "args": [
-                    "+aos68k",
-                    "-cpu=68060",
-                    "-I/opt/vbcc/MUI/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame.060",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
-                ]
-            },
             "linux": {
-                "command": "vc",
+                "command": "make",
                 "args": [
-                    "+aos68k",
-                    "-cpu=68060",
-                    "-I/opt/vbcc/MUI/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame.060",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
+                        "-f",
+                        "Makefile.docker",
+                        "CPU=060"
                 ]
             },
             "problemMatcher": {
@@ -331,64 +114,12 @@
         {
             "label": "Build MorphOS",
             "type": "shell",
-            "windows": {
-                "command": "vc",
-                "args": [
-                    "+morphos",
-                    "-ID:/vbcc/MUI/Developer/C/Include",
-                    "-ID:/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-ID:/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame.MOS",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
-                ]
-            },
-            "osx": {
-                "command": "vc",
-                "args": [
-                    "+morphos",
-                    "-I/opt/vbcc/MUI/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame.MOS",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
-                ]
-            },
             "linux": {
-                "command": "vc",
+                "command": "make",
                 "args": [
-                    "+morphos",
-                    "-I/opt/vbcc/MUI/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame.MOS",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
+                        "-f",
+                        "Makefile.docker",
+                        "CPU=MOS"
                 ]
             },
             "problemMatcher": {
@@ -410,64 +141,12 @@
         {
             "label": "Build AmigaOS4",
             "type": "shell",
-            "windows": {
-                "command": "vc",
-                "args": [
-                    "+aosppc",
-                    "-ID:/vbcc/MUI/Developer/C/Include",
-                    "-ID:/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-ID:/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame.AOS4",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
-                ]
-            },
-            "osx": {
-                "command": "vc",
-                "args": [
-                    "+aosppc",
-                    "-I/opt/vbcc/MUI/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame.AOS4",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
-                ]
-            },
             "linux": {
-                "command": "vc",
+                "command": "make",
                 "args": [
-                    "+aosppc",
-                    "-I/opt/vbcc/MUI/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_Guigfx/Developer/C/Include",
-                    "-I/opt/vbcc/MCC_TextEditor/Developer/C/include",
-                    "-c99",
-                    "-O2",
-                    "-lamiga",
-                    "-lauto",
-                    "-o",
-                    "iGame.AOS4",
-                    "src/funcs.c",
-                    "src/iGameGUI.c",
-                    "src/iGameMain.c",
-                    "src/strdup.c",
-                    "src/iGame_cat.c"
+                    "-f",
+                    "Makefile.docker",
+                    "CPU=OS4"
                 ]
             },
             "problemMatcher": {
@@ -487,45 +166,26 @@
             }
         },
         {
-            "label": "LHA Pack",
+            "label": "Create release",
             "type": "shell",
-            "windows": {
-                "command": "lha",
-                "args": [
-                    "a",
-                    "iGame.lha",
-                    "iGame",
-                    "iGame.030",
-                    "iGame.040",
-                    "iGame.060",
-                    "iGame.MOS",
-                    "iGame.AOS4"
-                ]
-            },
-            "osx": {
-                "command": "lha",
-                "args": [
-                    "a",
-                    "iGame.lha",
-                    "iGame",
-                    "iGame.030",
-                    "iGame.040",
-                    "iGame.060",
-                    "iGame.MOS",
-                    "iGame.AOS4"
-                ]
-            },
             "linux": {
-                "command": "lha",
+                "command": "make",
                 "args": [
-                    "a",
-                    "iGame.lha",
-                    "iGame",
-                    "iGame.030",
-                    "iGame.040",
-                    "iGame.060",
-                    "iGame.MOS",
-                    "iGame.AOS4"
+                    "-f",
+                    "Makefile.docker",
+                    "release"
+                ]
+            }
+        },
+        {
+            "label": "Clean release files",
+            "type": "shell",
+            "linux": {
+                "command": "make",
+                "args": [
+                    "-f",
+                    "Makefile.docker",
+                    "clean-release"
                 ]
             }
         },
