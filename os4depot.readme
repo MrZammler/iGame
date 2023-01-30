@@ -5,10 +5,10 @@ author: Emmanuel Vasilakis and contributors
 submitter: George Sokianos
 email: walkero@gmail.com
 url: https://github.com/MrZammler/iGame
-category: util/misc
-replaces: util/misc/iGame.lha
+category: utility/misc
+replaces: utility/misc/iGame.lha
 requirements: MUI, render.library
-license: Freeware
+license: GPL
 minosversion: 4.0
 distribute: yes
 passphrase: OS4DEPOT_PASSPHRASE
