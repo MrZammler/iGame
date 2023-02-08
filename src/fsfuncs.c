@@ -702,6 +702,62 @@ void setIconTooltypes(char *path, char *tooltypes)
 {
 	if (IconBase)
 	{
+		struct DiskObject *diskObj = GetIconTags(path, TAG_DONE);
+		if(diskObj)
+		{
+			size_t oldToolTypesCnt = 0;
+			size_t cutPos = 0;
+			size_t newToolTypesCnt = 0;
+
+			char *buf = AllocVec(sizeof(char) * 64, MEMF_CLEAR);
+
+			// Get the number of the new tooltypes
+			char **table = my_split(tooltypes, "\n");
+			for (table; (buf = *table); ++table)
+			{
+				newToolTypesCnt++;
+			}
+
+			unsigned char **newToolTypes = AllocVec(sizeof(char *) * newToolTypesCnt, MEMF_CLEAR);
+			if (newToolTypes)
+			{
+				char **table2 = my_split(tooltypes, "\n");
+				size_t table2Cnt = 0;
+				for (table2; (buf = *table2); ++table2)
+				{
+					newToolTypes[table2Cnt] = buf;
+					table2Cnt++;
+				}
+
+				newToolTypes[newToolTypesCnt-1] = NULL;
+
+				diskObj->do_ToolTypes = newToolTypes;
+
+				LONG errorCode;
+				BOOL success;
+				success = PutIconTags(path, diskObj,
+					ICONPUTA_DropNewIconToolTypes, TRUE,
+					ICONA_ErrorCode, &errorCode,
+				TAG_DONE);
+
+				// if(success == FALSE)
+				// {
+				// 	Printf("could not store default picture icon;\n");
+				// 	PrintFault(errorCode, NULL);
+				// }
+
+				FreeVec(newToolTypes);
+			}
+
+			FreeDiskObject(diskObj);
+		}
+	}
+}
+
+void setIconTooltypes_v37(char *path, char *tooltypes)
+{
+	if (IconBase)
+	{
 		// struct DiskObject *diskObj = GetDiskObjectNew(path);
 		struct DiskObject *diskObj = GetIconTags(path, TAG_DONE);
 		if(diskObj && FALSE)
@@ -788,56 +844,3 @@ void setIconTooltypes(char *path, char *tooltypes)
 		}
 	}
 }
-
-// void setIconTooltypes(char *path, char *tooltypes)
-// {
-// 	if (IconBase)
-// 	{
-// 		struct DiskObject *diskObj = GetDiskObjectNew(path);
-// 		if(diskObj)
-// 		{
-// 			char* game_tooltypes;
-// 			char* tool_type;
-// 			int i;
-// 			int new_tool_type_count = 1, old_tool_type_count = 0, old_real_tool_type_count = 0;
-
-// 			for (i = 0; i <= strlen(tooltypes); i++)
-// 				if (tooltypes[i] == '\n') new_tool_type_count++;
-
-// 			//add one for the last tooltype that doesnt end with \n
-// 			new_tool_type_count++;
-
-// 			for (i = 0; i <= strlen(game_tooltypes); i++)
-// 				if (game_tooltypes[i] == '\n') old_tool_type_count++;
-
-// 			for (char** tool_types = (char **)diskObj->do_ToolTypes; (tool_type = *tool_types); ++
-// 					tool_types)
-// 				old_real_tool_type_count++;
-
-// 			unsigned char** new_tool_types = AllocVec(new_tool_type_count * sizeof(char *),
-// 														MEMF_FAST | MEMF_CLEAR);
-// 			unsigned char** newptr = new_tool_types;
-
-// 			char** temp_tbl = my_split((char *)tooltypes, "\n");
-// 			// if (temp_tbl == NULL
-// 			// 	|| temp_tbl[0] == NULL
-// 			// 	|| !strcmp((char *)temp_tbl[0], " ")
-// 			// 	|| !strcmp((unsigned char *)temp_tbl[0], ""))
-// 			// 	break;
-
-// 			for (i = 0; i <= new_tool_type_count - 2; i++)
-// 				*newptr++ = (unsigned char*)temp_tbl[i];
-
-// 			*newptr = NULL;
-
-// 			diskObj->do_ToolTypes = new_tool_types;
-// 			PutDiskObject(path, diskObj);
-// 			FreeDiskObject(diskObj);
-
-// 			if (temp_tbl)
-// 				free(temp_tbl);
-// 			if (new_tool_types)
-// 				FreeVec(new_tool_types);
-// 		}
-// 	}
-// }

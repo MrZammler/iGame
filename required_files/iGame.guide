@@ -113,6 +113,7 @@ All the required software is available on Aminet for free download.
  - Kickstart 2.04 or higher
  - Workbench 2.1 or higher
  - MUI 3.8 or higher
+ - icon.library v44+
  - guigfx.library
  - render.library
  - guigfx.mcc

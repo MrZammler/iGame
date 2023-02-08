@@ -273,14 +273,14 @@ static int initLibraries(void)
 		return clean_exit("Can't open lowlevel.library\n");
 	}
 
-	if ((IconBase = OpenLibrary("icon.library", 37)))
+	if ((IconBase = OpenLibrary("icon.library", 44)))
 	{
 		#ifdef __amigaos4__
 		IIcon = (struct IconIFace *)GetInterface( IconBase, "main", 1, NULL );
 		if(!IIcon) return clean_exit("Can't open icon.library Interface");
 		#endif
 	}
-	else clean_exit("Can't open icon.library v37 or greater\n");
+	else return clean_exit("Can't open icon.library v44 or greater\n");
 
 	#ifndef __amigaos4__
 	if ((IntuitionBase = (struct IntuitionBase *)OpenLibrary("intuition.library", 37)))
