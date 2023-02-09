@@ -1758,8 +1758,7 @@ void saveItemProperties(void)
 		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
 	}
 
-
-	// TODO: Get the Genre
+	// Get the Genre
 	get(app->CY_PropertiesGenre, MUIA_Cycle_Active, &genreId);
 	strncpy(node->genre,
 		app->CY_PropertiesGenreContent[genreId],
@@ -1769,14 +1768,15 @@ void saveItemProperties(void)
 	get(app->CH_PropertiesFavorite, MUIA_Selected, &node->favourite);
 	get(app->CH_PropertiesHidden, MUIA_Selected, &node->hidden);
 
-	// TODO: Save the tooltypes
-	showDefaultScreenshot();
-	STRPTR tooltypesBuffer = (STRPTR)DoMethod(app->TX_PropertiesTooltypes, MUIM_TextEditor_ExportText);
-	snprintf(buf, sizeof(node->path), "%s", substring(node->path, 0, -6));
-	setIconTooltypes(buf, tooltypesBuffer);
-	// FreeVec(tooltypesBuffer);
-
-	// printf("DBG: %s\n", node->user_title);
+	// Save the tooltypes
+	if (IconBase->lib_Version >= 44)
+	{
+		showDefaultScreenshot();
+		STRPTR tooltypesBuffer = (STRPTR)DoMethod(app->TX_PropertiesTooltypes, MUIM_TextEditor_ExportText);
+		snprintf(buf, sizeof(node->path), "%s", substring(node->path, 0, -6));
+		setIconTooltypes(buf, tooltypesBuffer);
+		// FreeVec(tooltypesBuffer);
+	}
 	// FreeVec(buf);
 }
 

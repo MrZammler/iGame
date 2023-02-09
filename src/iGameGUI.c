@@ -556,6 +556,7 @@ struct ObjApp *CreateApp(void)
 	object->TX_PropertiesTooltypes = TextEditorObject,
 		MUIA_Background, MUII_TextBack,
 		MUIA_Frame, MUIV_Frame_String,
+		MUIA_Disabled, IconBase->lib_Version < 44,
 		MUIA_FrameTitle, GetMBString(MSG_TX_PropertiesTooltypesTitle),
 		End;
 
