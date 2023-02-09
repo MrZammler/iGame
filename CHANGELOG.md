@@ -8,7 +8,8 @@
 - Changed the way the multiple instances with the same title are shown. Now no "Alt" labels will be added. Instead we introduced a number in square brackets that represents the different instances, i.e. 3DPool [1], 4DSportsDriving [2]. Not every record have these values, so expect to see them only when there are duplicates.
 - The gamelist.csv file changed by having double quotes around the string values, like the path and the title.
 - A new column added in the gamelist.csv file which holds the custom name of the item. The old column remains unchanged. This helps on situations like a repository rescan, where the given name by the user doesn't change. The old second column should remain unchanged.
-- Now iGame requires icon.library v44+ for changing icon tooltypes. For systems that do include a new version, there is icon.library 46.4 on Aminet free to download and use. For those that have older version of the library will still be able to use iGame, but they won't be able to change the icon tooltypes. They will need to do it from Workbench.
+- Now iGame requires icon.library v44+ for changing icon tooltypes. For systems that do include a new version, there is icon.library 46.4 on Aminet free to download and use. For those that have older version of the library will still be able to use iGame, but they won't be able to change the icon tooltypes. They will need to do it from Workbench
+- Now the filter string field is not disabled in the hidden list, allowing the user to filter the results based on the title or part of it
 
 ### Fixed
 - When a user changes the tooltypes of a slave, the NewIcon keeps working. The previous versions of iGame were deleting the image information. Now they are dropped from the icon tooltypes, but the image keeps working fine. As a result the .info file size is reduced almost to half.

@@ -89,10 +89,10 @@ char* strdup(const char* s)
 /*
  * Convert a string to lower case
  */
-void string_to_lower(char* slave)
+void string_to_lower(char *text)
 {
-	for (int i = 0; i <= strlen(slave) - 1; i++)
-		slave[i] = tolower(slave[i]);
+	for (int i = 0; i <= strlen(text) - 1; i++)
+		text[i] = tolower(text[i]);
 }
 
 

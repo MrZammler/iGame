@@ -82,7 +82,7 @@ static int hex2dec(char* hexin);
 static int check_dup_title(char* title);
 static void check_for_wbrun();
 static void list_show_favorites(char* str);
-static void showSlavesList(BOOL);
+static void showSlavesList(void);
 
 /* structures */
 struct EasyStruct msgbox;
@@ -91,6 +91,7 @@ games_list *item_games = NULL, *games = NULL;
 repos_list *item_repos = NULL, *repos = NULL;
 genres_list *item_genres = NULL, *genres = NULL;
 igame_settings *current_settings = NULL;
+listFilters filters = {0};
 
 void setStatusText(char *text)
 {
@@ -482,6 +483,7 @@ static void clear_gameslist(void)
 	set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
 }
 
+// TODO: Replaced by showSlavesList() - OBSOLETE
 static void list_show_all(char* str)
 {
 	char* helper = malloc(200 * sizeof(char));
@@ -751,40 +753,47 @@ void app_start(void)
 	// TODO: Add a message at the status line of the window
 	set(app->WI_MainWindow, MUIA_Window_Sleep, TRUE);
 	slavesListLoadFromCSV(csvFilename);
-	showSlavesList(FALSE);
+	showSlavesList();
 	set(app->WI_MainWindow, MUIA_Window_Sleep, FALSE);
 	set(app->WI_MainWindow, MUIA_Window_ActiveObject, app->LV_GamesList);
 }
 
 void filter_change(void)
 {
-	char* str = NULL;
-	char* str_gen = NULL;
+	char *title = NULL;
+	char *genreSelection = NULL;
 
-	get(app->STR_Filter, MUIA_String_Contents, &str);
-	DoMethod(app->LV_GenresList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str_gen);
+	get(app->STR_Filter, MUIA_String_Contents, &title);
+	DoMethod(app->LV_GenresList, MUIM_List_GetEntry,
+		MUIV_List_GetEntry_Active, &genreSelection);
 
-	if (str && strlen(str) != 0)
-		for (int i = 0; i <= strlen((char *)str) - 1; i++)
-			str[i] = tolower(str[i]);
+	if (title && strlen(title) > 0)
+	{
+		string_to_lower(title);
+		strncpy(filters.title, title, sizeof(filters.title));
+	}
+	else filters.title[0] = '\0';
 
-	if (str_gen == NULL || !strcmp(str_gen, GetMBString(MSG_FilterShowAll)))
-		list_show_all(str);
+	if (genreSelection == NULL || !strcmp(genreSelection, GetMBString(MSG_FilterShowAll)))
+	{
+		// showSlavesList();
+		// list_show_all(title);
+	}
+	// else if (!strcmp(genreSelection, GetMBString(MSG_FilterFavorites)))
+	// 	list_show_favorites(title);
 
-	else if (!strcmp(str_gen, GetMBString(MSG_FilterFavorites)))
-		list_show_favorites(str);
+	// else if (!strcmp(genreSelection, GetMBString(MSG_FilterLastPlayed)))
+	// 	list_show_last_played(title);
 
-	else if (!strcmp(str_gen, GetMBString(MSG_FilterLastPlayed)))
-		list_show_last_played(str);
+	// else if (!strcmp(genreSelection, GetMBString(MSG_FilterMostPlayed)))
+	// 	list_show_most_played(title);
 
-	else if (!strcmp(str_gen, GetMBString(MSG_FilterMostPlayed)))
-		list_show_most_played(str);
+	// else if (!strcmp(genreSelection, GetMBString(MSG_FilterNeverPlayed)))
+	// 	list_show_never_played(title);
 
-	else if (!strcmp(str_gen, GetMBString(MSG_FilterNeverPlayed)))
-		list_show_never_played(str);
-
-	else
-		list_show_filtered(str, str_gen);
+	// else
+	// 	list_show_filtered(title, genreSelection);
+	showSlavesList();
 }
 
 /*
@@ -1076,8 +1085,8 @@ void scan_repositories_OBSOLETE(void)
 	}
 }
 
-// Replaces refresh_list() and add_games_to_listview()
-static void showSlavesList(BOOL showHiddenOnly)
+// TODO: Replaces refresh_list() and add_games_to_listview()
+static void showSlavesList(void)
 {
 	size_t cnt = 0;
 	int bufSize = sizeof(char) * MAX_SLAVE_TITLE_SIZE;
@@ -1090,18 +1099,26 @@ static void showSlavesList(BOOL showHiddenOnly)
 	{
 		if (
 			(
-				(!showHiddenOnly && !currPtr->hidden) ||
-				(showHiddenOnly && currPtr->hidden)
+				(!filters.showHiddenOnly && !currPtr->hidden) ||
+				(filters.showHiddenOnly && currPtr->hidden)
 			) && !currPtr->deleted
 		) {
 			if(!isStringEmpty(currPtr->user_title))
 			{
+				if (!isStringEmpty(filters.title) && !strcasestr(currPtr->user_title, filters.title))
+				{
+					goto nextItem;
+				}
 				DoMethod(app->LV_GamesList,
 					MUIM_List_InsertSingle, currPtr->user_title,
 					MUIV_List_Insert_Sorted);
 			}
 			else if(isStringEmpty(currPtr->user_title) && (currPtr->instance > 0))
 			{
+				if (!isStringEmpty(filters.title) && !strcasestr(currPtr->user_title, filters.title))
+				{
+					goto nextItem;
+				}
 				sprintf(currPtr->user_title, "%s [%d]", currPtr->title, currPtr->instance);
 
 				DoMethod(app->LV_GamesList,
@@ -1110,11 +1127,16 @@ static void showSlavesList(BOOL showHiddenOnly)
 			}
 			else
 			{
+				if (!isStringEmpty(filters.title) && !strcasestr(currPtr->title, filters.title))
+				{
+					goto nextItem;
+				}
 				DoMethod(app->LV_GamesList,
 					MUIM_List_InsertSingle, currPtr->title,
 					MUIV_List_Insert_Sorted);
 			}
 			cnt++;
+		nextItem:
 		}
 
 		currPtr = currPtr->next;
@@ -1267,7 +1289,7 @@ void scan_repositories(void)
 				examineFolder(item_repos->repo);
 			}
 		}
-		showSlavesList(FALSE);
+		showSlavesList();
 		set(app->WI_MainWindow, MUIA_Window_Sleep, FALSE);
 	}
 }
@@ -1976,21 +1998,17 @@ void game_properties_ok(void)
 
 void list_show_hidden(void)
 {
-	static size_t showHiddenItems = 0;
-
-	if (showHiddenItems == 0)
+	if (!filters.showHiddenOnly)
 	{
 		set(app->LV_GenresList, MUIA_Disabled, TRUE);
-		set(app->STR_Filter, MUIA_Disabled, TRUE);
-		showSlavesList(TRUE);
-		showHiddenItems = 1;
+		filters.showHiddenOnly = TRUE;
+		showSlavesList();
 	}
 	else
 	{
 		set(app->LV_GenresList, MUIA_Disabled, FALSE);
-		set(app->STR_Filter, MUIA_Disabled, FALSE);
-		showSlavesList(FALSE);
-		showHiddenItems = 0;
+		filters.showHiddenOnly = FALSE;
+		showSlavesList();
 	}
 }
 
