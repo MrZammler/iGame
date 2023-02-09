@@ -134,6 +134,12 @@ typedef struct slavesList
 	struct slavesList *next;
 } slavesList;
 
+typedef struct listFilters
+{
+	char title[MAX_SLAVE_TITLE_SIZE];
+	BOOL showHiddenOnly;
+} listFilters;
+
 enum {
 	MENU_ACTIONS=1,
 	MENU_SCAN,
