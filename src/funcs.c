@@ -67,7 +67,6 @@ extern char* executable_name;
 
 /* global variables */
 int total_hidden = 0;
-int showing_hidden = 0;
 int total_games;
 int no_of_genres;
 char* game_tooltypes;
@@ -83,7 +82,7 @@ static int hex2dec(char* hexin);
 static int check_dup_title(char* title);
 static void check_for_wbrun();
 static void list_show_favorites(char* str);
-static void showSlavesList(void);
+static void showSlavesList(BOOL);
 
 /* structures */
 struct EasyStruct msgbox;
@@ -752,7 +751,7 @@ void app_start(void)
 	// TODO: Add a message at the status line of the window
 	set(app->WI_MainWindow, MUIA_Window_Sleep, TRUE);
 	slavesListLoadFromCSV(csvFilename);
-	showSlavesList();
+	showSlavesList(FALSE);
 	set(app->WI_MainWindow, MUIA_Window_Sleep, FALSE);
 	set(app->WI_MainWindow, MUIA_Window_ActiveObject, app->LV_GamesList);
 }
@@ -1078,21 +1077,23 @@ void scan_repositories_OBSOLETE(void)
 }
 
 // Replaces refresh_list() and add_games_to_listview()
-static void showSlavesList(void)
+static void showSlavesList(BOOL showHiddenOnly)
 {
 	size_t cnt = 0;
 	int bufSize = sizeof(char) * MAX_SLAVE_TITLE_SIZE;
 	char *buf = malloc(bufSize);
 	slavesList *currPtr = getSlavesListHead();
 
-	DoMethod(app->LV_GamesList, MUIM_List_Clear);
-	set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
+	clear_gameslist();
 
 	while (currPtr != NULL)
 	{
-
-		if (currPtr->hidden != 1 && currPtr->deleted != 1)
-		{
+		if (
+			(
+				(!showHiddenOnly && !currPtr->hidden) ||
+				(showHiddenOnly && currPtr->hidden)
+			) && !currPtr->deleted
+		) {
 			if(!isStringEmpty(currPtr->user_title))
 			{
 				DoMethod(app->LV_GamesList,
@@ -1266,7 +1267,7 @@ void scan_repositories(void)
 				examineFolder(item_repos->repo);
 			}
 		}
-		showSlavesList();
+		showSlavesList(FALSE);
 		set(app->WI_MainWindow, MUIA_Window_Sleep, FALSE);
 	}
 }
@@ -1775,11 +1776,10 @@ void saveItemProperties(void)
 		STRPTR tooltypesBuffer = (STRPTR)DoMethod(app->TX_PropertiesTooltypes, MUIM_TextEditor_ExportText);
 		snprintf(buf, sizeof(node->path), "%s", substring(node->path, 0, -6));
 		setIconTooltypes(buf, tooltypesBuffer);
-		// FreeVec(tooltypesBuffer);
 	}
-	// FreeVec(buf);
 }
 
+// TODO: Replaced by saveItemProperties() - OBSOLETE
 //when ok is pressed in GameProperties
 void game_properties_ok(void)
 {
@@ -1976,36 +1976,21 @@ void game_properties_ok(void)
 
 void list_show_hidden(void)
 {
-	if (showing_hidden == 0)
-	{
-		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
-		total_hidden = 0;
-		DoMethod(app->LV_GamesList, MUIM_List_Clear);
+	static size_t showHiddenItems = 0;
 
+	if (showHiddenItems == 0)
+	{
 		set(app->LV_GenresList, MUIA_Disabled, TRUE);
 		set(app->STR_Filter, MUIA_Disabled, TRUE);
-		if (games)
-		{
-			/* Find the entries in Games and update the list */
-			for (item_games = games; item_games != NULL; item_games = item_games->next)
-			{
-				if (item_games->hidden == 1 && item_games->deleted != 1)
-				{
-					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-					total_hidden++;
-				}
-			}
-		}
-
-		status_show_total();
-		showing_hidden = 1;
+		showSlavesList(TRUE);
+		showHiddenItems = 1;
 	}
 	else
 	{
 		set(app->LV_GenresList, MUIA_Disabled, FALSE);
 		set(app->STR_Filter, MUIA_Disabled, FALSE);
-		showing_hidden = 0;
-		refresh_list(0);
+		showSlavesList(FALSE);
+		showHiddenItems = 0;
 	}
 }
 
