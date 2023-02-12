@@ -35,7 +35,6 @@ void slavesListSaveToCSV(const char *);
 int get_title_from_slave(char *, char *);
 void getTitleFromPath(char *, char *);
 const char *get_directory_name(const char *);
-const char *get_directory_path(const char *);
 char *get_executable_name(int, char **);
 void open_current_dir(void);
 void get_path(char *, char *);

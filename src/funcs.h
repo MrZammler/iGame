@@ -26,7 +26,6 @@
 void msg_box(const char *);
 void status_show_total(void);
 void get_screen_size(int *, int *);
-int title_exists(char *);
 void game_click(void);
 void joystick_input(ULONG);
 void app_stop(void);

@@ -437,21 +437,6 @@ const char* get_directory_name(const char* str)
 	return dir_name;
 }
 
-// TODO: This seems OBSOLETE and can be replaced by getParentPath(). Needs investigation
-// Get the complete directory path from a full path containing a file
-const char *get_directory_path(const char *str)
-{
-	int pos1 = get_delimiter_position(str);
-	if (!pos1)
-		return NULL;
-
-	char *dir_name = malloc(pos1 + 1);
-	strncpy(dir_name, str, pos1);
-	dir_name[pos1] = '\0';
-
-	return dir_name;
-}
-
 // Get the application's executable name
 char *get_executable_name(int argc, char **argv)
 {
@@ -475,12 +460,12 @@ char *get_executable_name(int argc, char **argv)
 	return executable_name;
 }
 
-// TODO: This can use the getParentPath()
+// This reveals the item window on Workbench
 void open_current_dir(void)
 {
-	// Allocate Memory for variables
+	int bufSize = sizeof(char) * MAX_PATH_SIZE;
+	char *buf = AllocVec(bufSize, MEMF_CLEAR);
 	char *game_title = NULL;
-	const char *path_only = NULL;
 
 	if (get_wb_version() < 44)
 	{
@@ -488,7 +473,7 @@ void open_current_dir(void)
 		return;
 	}
 
-	//set the elements on the window
+	// Get the selected item from the list
 	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
 	if (game_title == NULL || strlen(game_title) == 0)
 	{
@@ -496,23 +481,23 @@ void open_current_dir(void)
 		return;
 	}
 
-	const int found = title_exists(game_title);
-	if (!found)
+	slavesList *existingNode = malloc(sizeof(slavesList));
+	if ((existingNode = slavesListSearchByTitle(game_title, sizeof(char) * MAX_SLAVE_TITLE_SIZE)) == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
 		return;
 	}
 
-	path_only = get_directory_path(item_games->path);
-	if(!path_only)
+	getParentPath(existingNode->path, buf);
+	if(!buf)
 	{
 		msg_box((const char*)GetMBString(MSG_DirectoryNotFound));
 		return;
 	}
 
-	//Open path directory
-	OpenWorkbenchObject((char *)path_only);
-	free(path_only); // get_directory_path uses malloc()
+	// Open path directory on workbench
+	OpenWorkbenchObject(buf);
+	FreeVec(buf);
 }
 
 // TODO: This is replaced by slavesListSearchByTitle() - OBSOLETE

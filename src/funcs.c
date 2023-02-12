@@ -1128,20 +1128,6 @@ void repo_stop(void)
 	}
 }
 
-int title_exists(char* game_title)
-{
-	for (item_games = games; item_games != NULL; item_games = item_games->next)
-	{
-		if (!strcmp(game_title, item_games->title) && item_games->deleted != 1)
-		{
-			// Title found
-			return 1;
-		}
-	}
-	// Title not found
-	return 0;
-}
-
 // Shows the Properties window populating the information fields
 void slaveProperties(void)
 {
