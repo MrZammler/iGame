@@ -272,6 +272,7 @@ void slavesListLoadFromCSV(char *filename)
 	// TODO: Remove this
 	// slavesListPrint();
 }
+
 void slavesListSaveToCSV(const char *filename)
 {
 	// return;
@@ -362,6 +363,7 @@ int get_title_from_slave(char* slave, char* title)
 
 	if (sl.version < 10)
 	{
+		fclose(fp);
 		return 1;
 	}
 
@@ -407,34 +409,6 @@ void getTitleFromPath(char *path, char *title)
 	}
 	FreeVec(itemFolderPath);
 	FreeVec(buf);
-}
-
-// TODO: This seems OBSOLETE and can be replaced by getNameFromPath(). Needs investigation
-// Get the Directory part from a full path containing a file
-const char* get_directory_name(const char* str)
-{
-	int pos1 = get_delimiter_position(str);
-	if (!pos1)
-		return NULL;
-
-	char full_path[100];
-	strncpy(full_path, str, pos1);
-	full_path[pos1] = '\0';
-
-	const int pos2 = get_delimiter_position(full_path);
-	if (!pos2)
-		return NULL;
-
-	char* dir_name = malloc(sizeof full_path);
-	int c = 0;
-	for (unsigned int i = pos2 + 1; i <= sizeof full_path; i++)
-	{
-		dir_name[c] = full_path[i];
-		c++;
-	}
-	dir_name[c] = '\0';
-
-	return dir_name;
 }
 
 // Get the application's executable name

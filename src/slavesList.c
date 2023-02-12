@@ -91,7 +91,7 @@ void slavesListPrint(void)
 		currPtr = currPtr->next;
 		cnt++;
 	}
-	printf("END OF LIST: %d items\n", cnt);
+	// printf("END OF LIST: %d items\n", cnt);
 }
 
 /*

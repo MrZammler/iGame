@@ -109,15 +109,13 @@ typedef struct games
 
 typedef struct slavesList
 {
-	// int index; // TODO: Possibly not used. Could be replaced by the instance number in csv files
-
 	char title[MAX_SLAVE_TITLE_SIZE];
 	char user_title[MAX_SLAVE_TITLE_SIZE];
 	char path[MAX_PATH_SIZE];
 	char genre[MAX_SLAVE_GENRE_SIZE];
 
-	size_t instance;
-	size_t times_played;
+	unsigned int instance;
+	unsigned int times_played;
 
 	int favourite;// TODO: This could be a tag
 
