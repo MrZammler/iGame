@@ -58,7 +58,6 @@
 #include "funcs.h"
 
 extern struct ObjApp* app;
-// extern struct Library *GfxBase;
 extern struct Library *IconBase;
 #if defined(__morphos__)
 extern struct Library *IntuitionBase;
@@ -76,7 +75,6 @@ int wbrun = 0;
 
 /* function definitions */
 // int get_genre(char* title, char* genre);
-static void follow_thread(BPTR lock, int tab_level);
 static int hex2dec(char* hexin);
 static int check_dup_title(char* title);
 static void check_for_wbrun();
@@ -253,93 +251,6 @@ igame_settings *load_settings(const char* filename)
 	return current_settings;
 }
 
-// TODO: This is OBSOLETE since the CSV files were introduced
-static void load_games_list(const char* filename)
-{
-	const int buffer_size = 512;
-	STRPTR file_line = malloc(buffer_size * sizeof(char));
-	if (file_line == NULL)
-	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
-	}
-
-	const BPTR fpgames = Open((CONST_STRPTR)filename, MODE_OLDFILE);
-	if (fpgames)
-	{
-		if (games != NULL)
-		{
-			free(games);
-			games = NULL;
-		}
-
-		do
-		{
-			if (FGets(fpgames, file_line, buffer_size) == NULL)
-				break;
-
-			file_line[strlen(file_line) - 1] = '\0';
-			if (strlen(file_line) == 0)
-				continue;
-
-			item_games = (games_list *)calloc(1, sizeof(games_list));
-			item_games->next = NULL;
-
-			if (!strcmp((char *)file_line, "index=0"))
-			{
-				item_games->index = 0;
-				item_games->exists = 0;
-				item_games->deleted = 0;
-
-				do
-				{
-					if (FGets(fpgames, file_line, 500) == NULL)
-						break;
-
-					file_line[strlen(file_line) - 1] = '\0';
-
-					if (strlen(file_line) == 0)
-						break;
-
-					//this is to make sure that gameslist goes ok from 1.2 to 1.3
-					item_games->hidden = 0;
-
-					if (!strncmp(file_line, "title=", 6))
-						strcpy(item_games->title, file_line + 6);
-					else if (!strncmp(file_line, "genre=", 6))
-						strcpy(item_games->genre, file_line + 6);
-					else if (!strncmp(file_line, "path=", 5))
-						strcpy(item_games->path, file_line + 5);
-					else if (!strncmp(file_line, "favorite=", 9))
-						item_games->favorite = atoi((const char*)file_line + 9);
-					else if (!strncmp(file_line, "timesplayed=", 12))
-						item_games->times_played = atoi((const char*)file_line + 12);
-					else if (!strncmp(file_line, "lastplayed=", 11))
-						item_games->last_played = atoi((const char*)file_line + 11);
-					else if (!strncmp(file_line, "hidden=", 7))
-						item_games->hidden = atoi((const char*)file_line + 7);
-				}
-				while (1);
-
-				if (games == NULL)
-				{
-					games = item_games;
-				}
-				else
-				{
-					item_games->next = games;
-					games = item_games;
-				}
-			}
-		}
-		while (1); //read of gameslist ends here
-
-		Close(fpgames);
-	}
-	if (file_line)
-		free(file_line);
-}
-
 static void load_repos(const char* filename)
 {
 	const int buffer_size = 512;
@@ -458,9 +369,9 @@ static void add_default_filters()
 	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, GetMBString(MSG_FilterNeverPlayed), MUIV_List_Insert_Bottom);
 }
 
+// Clears the list of items
 static void clear_gameslist(void)
 {
-	// Erase list
 	DoMethod(app->LV_GamesList, MUIM_List_Clear);
 	set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
 }
@@ -778,52 +689,6 @@ void launch_game(void)
 	status_show_total();
 }
 
-/*
-* Scans the repos for games
-*/
-// TODO: This needs to be removed
-void scan_repositories_OBSOLETE(void)
-{
-	char repotemp[256], helperstr[256];
-
-	if (repos)
-	{
-		for (item_games = games; item_games != NULL; item_games = item_games->next)
-		{
-			//only apply the not exists hack to slaves that are in the current repos, that will be scanned later
-			//Binaries (that are added through add game) should be handled afterwards
-			if (strcasestr(item_games->path, ".slave") || strlen(item_games->path) == 0)
-				item_games->exists = 0;
-			else
-				item_games->exists = 1;
-		}
-
-		const BPTR currentlock = Lock((CONST_STRPTR)PROGDIR, ACCESS_READ);
-
-		for (item_repos = repos; item_repos != NULL; item_repos = item_repos->next)
-		{
-			sprintf(repotemp, "%s", item_repos->repo);
-			sprintf(helperstr, (const char*)GetMBString(MSG_ScanningPleaseWait), repotemp);
-			set(app->TX_Status, MUIA_Text_Contents, helperstr);
-			const BPTR oldlock = Lock((unsigned char*)repotemp, ACCESS_READ);
-
-			if (oldlock != 0)
-			{
-				CurrentDir(oldlock);
-				follow_thread(oldlock, 0);
-				CurrentDir(currentlock);
-			}
-			else
-			{
-				//could not lock
-			}
-		}
-
-		save_list(1);
-		// refresh_list(1);
-	}
-}
-
 static void showSlavesList(void)
 {
 	size_t cnt = 0;
@@ -938,7 +803,6 @@ static void generateItemName(char *path, char *result)
 	}
 }
 
-// Replaces follow_thread()
 static void examineFolder(char *path)
 {
 	int bufSize = sizeof(char) * MAX_PATH_SIZE;
@@ -1439,163 +1303,26 @@ void genres_click(void)
 	filter_change();
 }
 
-static void follow_thread(BPTR lock, int tab_level)
-{
-	int exists = 0, j;
-	char str[512], fullpath[512], temptitle[256];
-
-	/*  if at the end of the road, don't print anything */
-	if (!lock)
-		return;
-
-	/*  allocate space for a FileInfoBlock */
-	struct FileInfoBlock* m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
-
-	int success = Examine(lock, m);
-	if (m->fib_DirEntryType <= 0)
-		return;
-
-	/*  The first call to Examine fills the FileInfoBlock with information
-	about the directory.  If it is called at the root level, it contains
-	the volume name of the disk.  Thus, this program is only printing
-	the output of ExNext rather than both Examine and ExNext.  If it
-	printed both, it would list directory entries twice! */
-
-	while ((success = ExNext(lock, m)))
-	{
-		/*  Print what we've got: */
-		if (m->fib_DirEntryType > 0)
-		{
-		}
-
-		//make m->fib_FileName to lower
-		const int kp = strlen((char *)m->fib_FileName);
-		for (int s = 0; s < kp; s++) m->fib_FileName[s] = tolower(m->fib_FileName[s]);
-		if (strcasestr(m->fib_FileName, ".slave"))
-		{
-			NameFromLock(lock, (unsigned char*)str, 511);
-			sprintf(fullpath, "%s/%s", str, m->fib_FileName);
-
-			/* add the slave to the gameslist (if it does not already exist) */
-			for (item_games = games; item_games != NULL; item_games = item_games->next)
-			{
-				if (!strcmp(item_games->path, fullpath))
-				{
-					exists = 1;
-					item_games->exists = 1;
-					break;
-				}
-			}
-			if (exists == 0)
-			{
-				item_games = (games_list *)calloc(1, sizeof(games_list));
-				item_games->next = NULL;
-
-				/* strip the path from the slave file and get the rest */
-				for (j = strlen(str) - 1; j >= 0; j--)
-				{
-					if (str[j] == '/' || str[j] == ':')
-						break;
-				}
-
-				//CHANGE 2007-12-03: init n=0 here
-				int n = 0;
-				for (int k = j + 1; k <= strlen(str) - 1; k++)
-					temptitle[n++] = str[k];
-				temptitle[n] = '\0';
-
-				if (current_settings->titles_from_dirs)
-				{
-					// If the TITLESFROMDIRS tooltype is enabled, set Titles from Directory names
-					const char* title = get_directory_name(fullpath);
-					if (title != NULL)
-					{
-						if (current_settings->no_smart_spaces)
-						{
-							strcpy(item_games->title, title);
-						}
-						else
-						{
-							const char* title_with_spaces = add_spaces_to_string(title);
-							strcpy(item_games->title, title_with_spaces);
-						}
-					}
-				}
-				else
-				{
-					// Default behavior: set Titles by the .slave contents
-					if (get_title_from_slave(fullpath, item_games->title))
-						strcpy(item_games->title, temptitle);
-				}
-
-				while (check_dup_title(item_games->title))
-				{
-					strcat(item_games->title, " Alt");
-				}
-
-				strcpy(item_games->genre, GetMBString(MSG_UnknownGenre));
-				strcpy(item_games->path, fullpath);
-				item_games->favorite = 0;
-				item_games->times_played = 0;
-				item_games->last_played = 0;
-				item_games->exists = 1;
-				item_games->hidden = 0;
-
-				if (games == NULL)
-				{
-					games = item_games;
-				}
-				else
-				{
-					item_games->next = games;
-					games = item_games;
-				}
-			}
-			exists = 0;
-		}
-
-		/*  If we have a directory, then enter it: */
-		if (m->fib_DirEntryType > 0)
-		{
-			/*  Since it is a directory, get a lock on it: */
-			const BPTR newlock = Lock((CONST_STRPTR)m->fib_FileName, ACCESS_READ);
-
-			/*  cd to this directory: */
-			const BPTR oldlock = CurrentDir(newlock);
-
-			/*  recursively follow the thread down to the bottom: */
-			follow_thread(newlock, tab_level + 1);
-
-			/*  cd back to where we used to be: */
-			CurrentDir(oldlock);
-
-			/*  Unlock the directory we just visited: */
-			if (newlock)
-				UnLock(newlock);
-		}
-	}
-	FreeMem(m, sizeof(struct FileInfoBlock));
-}
-
 void save_list(const int check_exists)
 {
 	slavesListSaveToCSV(DEFAULT_GAMESLIST_FILE);
 }
 
+// TODO: Make this work
 void save_list_as(void)
 {
-	// TODO: Make this work
 	// TODO: Check if file exists, warn the user about overwriting it
 	// if (get_filename("Save List As...", "Save", TRUE))
 	// 	save_to_csv(fname, 0);
 }
 
+// TODO: Make this work
 void open_list(void)
 {
 	if (get_filename("Open List", "Open", FALSE))
 	{
 		clear_gameslist();
-		load_games_list(fname);
+		// load_games_list(fname);
 	}
 }
 
