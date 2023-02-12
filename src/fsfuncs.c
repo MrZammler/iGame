@@ -256,7 +256,6 @@ void load_games_csv_list(const char *filename)
 			}
 		}
 
-		add_games_to_listview();
 		Close(fpgames);
 	}
 

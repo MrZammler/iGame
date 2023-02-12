@@ -77,11 +77,9 @@ int wbrun = 0;
 /* function definitions */
 // int get_genre(char* title, char* genre);
 static void follow_thread(BPTR lock, int tab_level);
-static void refresh_list(int check_exists);
 static int hex2dec(char* hexin);
 static int check_dup_title(char* title);
 static void check_for_wbrun();
-static void list_show_favorites(char* str);
 static void showSlavesList(void);
 
 /* structures */
@@ -104,21 +102,6 @@ void status_show_total(void)
 	set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
 	sprintf(helper, (const char*)GetMBString(MSG_TotalNumberOfGames), total_games);
 	set(app->TX_Status, MUIA_Text_Contents, helper);
-}
-
-// TODO: Replaced by showSlavesList() - OBSOLETE
-void add_games_to_listview(void)
-{
-	total_games = 0;
-	for (item_games = games; item_games != NULL; item_games = item_games->next)
-	{
-		if (item_games->hidden != 1 && item_games->deleted != 1)
-		{
-			total_games++;
-			DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-		}
-	}
-	status_show_total();
 }
 
 static void apply_settings()
@@ -351,7 +334,6 @@ static void load_games_list(const char* filename)
 		}
 		while (1); //read of gameslist ends here
 
-		add_games_to_listview();
 		Close(fpgames);
 	}
 	if (file_line)
@@ -483,245 +465,6 @@ static void clear_gameslist(void)
 	set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
 }
 
-// TODO: Replaced by showSlavesList() - OBSOLETE
-static void list_show_all(char* str)
-{
-	char* helper = malloc(200 * sizeof(char));
-	if (helper == NULL)
-	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
-	}
-
-	clear_gameslist();
-	total_games = 0;
-
-	if (games)
-	{
-		for (item_games = games; item_games != NULL; item_games = item_games->next)
-		{
-			if (item_games->deleted != 1)
-			{
-				strcpy(helper, item_games->title);
-				const int length = strlen(helper);
-				for (int i = 0; i <= length - 1; i++) helper[i] = tolower(helper[i]);
-
-				if (strstr(helper, (char *)str))
-				{
-					if (item_games->hidden != 1)
-					{
-						DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title,
-						         MUIV_List_Insert_Sorted);
-						total_games++;
-					}
-				}
-			}
-		}
-	}
-
-	status_show_total();
-
-	if (helper)
-		free(helper);
-}
-
-static void list_show_favorites(char* str)
-{
-	char* helper = malloc(200 * sizeof(char));
-	if (helper == NULL)
-	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
-	}
-
-	clear_gameslist();
-	total_games = 0;
-
-	if (games)
-	{
-		for (item_games = games; item_games != NULL; item_games = item_games->next)
-		{
-			strcpy(helper, item_games->title);
-			const int length = strlen(helper);
-			for (int i = 0; i <= length - 1; i++) helper[i] = tolower(helper[i]);
-
-			if (item_games->favorite == 1 && item_games->hidden != 1)
-			{
-				if (str == NULL || strstr(helper, (char *)str))
-				{
-					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-					total_games++;
-				}
-			}
-		}
-	}
-	status_show_total();
-
-	if (helper)
-		free(helper);
-}
-
-static void list_show_last_played(char* str)
-{
-	char* helper = malloc(200 * sizeof(char));
-	if (helper == NULL)
-	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
-	}
-
-	clear_gameslist();
-	total_games = 0;
-
-	if (games)
-	{
-		for (item_games = games; item_games != NULL; item_games = item_games->next)
-		{
-			if (item_games->deleted != 1)
-			{
-				strcpy(helper, item_games->title);
-				const int length = strlen(helper);
-				for (int i = 0; i <= length - 1; i++) helper[i] = tolower(helper[i]);
-
-				if (item_games->last_played == 1 && strstr(helper, (char *)str))
-				{
-					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-					total_games++;
-				}
-			}
-		}
-	}
-	status_show_total();
-
-	if (helper)
-		free(helper);
-}
-
-static void list_show_most_played(char* str)
-{
-	char* helper = malloc(200 * sizeof(char));
-	if (helper == NULL)
-	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
-	}
-
-	int max = 0;
-	clear_gameslist();
-	total_games = 0;
-
-	if (games)
-	{
-		for (item_games = games; item_games != NULL; item_games = item_games->next)
-		{
-			if (item_games->deleted != 1)
-			{
-				strcpy(helper, item_games->title);
-				const int length = strlen(helper);
-
-				for (int i = 0; i <= length - 1; i++)
-					helper[i] = tolower(helper[i]);
-
-				if (item_games->times_played && strstr(helper, (char *)str))
-				{
-					if (item_games->times_played >= max && item_games->hidden != 1)
-					{
-						max = item_games->times_played;
-						DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Top);
-						total_games++;
-					}
-					else
-					{
-						DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title,
-						         MUIV_List_Insert_Bottom);
-						total_games++;
-					}
-				}
-			}
-		}
-	}
-	status_show_total();
-
-	if (helper)
-		free(helper);
-}
-
-static void list_show_never_played(char* str)
-{
-	char* helper = malloc(200 * sizeof(char));
-	if (helper == NULL)
-	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
-	}
-
-	clear_gameslist();
-	total_games = 0;
-
-	if (games)
-	{
-		for (item_games = games; item_games != NULL; item_games = item_games->next)
-		{
-			if (item_games->deleted != 1)
-			{
-				strcpy(helper, item_games->title);
-				const int length = strlen(helper);
-
-				for (int i = 0; i <= length - 1; i++)
-					helper[i] = tolower(helper[i]);
-
-				if (item_games->times_played == 0 && item_games->hidden != 1 && strstr(helper, (char *)str))
-				{
-					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-					total_games++;
-				}
-			}
-		}
-	}
-	status_show_total();
-
-	if (helper)
-		free(helper);
-}
-
-static void list_show_filtered(char* str, char* str_gen)
-{
-	char* helper = malloc(200 * sizeof(char));
-	if (helper == NULL)
-	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
-	}
-
-	clear_gameslist();
-	total_games = 0;
-
-	// Find the entries in Games and update the list
-	if (games)
-	{
-		for (item_games = games; item_games != NULL; item_games = item_games->next)
-		{
-			if (item_games->deleted != 1)
-			{
-				strcpy(helper, item_games->title);
-				const int length = strlen(helper);
-				for (int i = 0; i <= length - 1; i++)
-					helper[i] = tolower(helper[i]);
-
-				if (!strcmp(item_games->genre, str_gen) && item_games->hidden != 1 && strstr(helper, (char *)str))
-				{
-					DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-					total_games++;
-				}
-			}
-		}
-	}
-	status_show_total();
-
-	if (helper)
-		free(helper);
-}
-
 void app_start(void)
 {
 	// check if the gamelist csv file exists. If not, try to load the old one
@@ -737,9 +480,9 @@ void app_start(void)
 
 	IntroPic = 1;
 
-	if (current_settings->start_with_favorites == 1)
+	if (current_settings->start_with_favorites)
 	{
-		list_show_favorites(NULL);
+		filters.showGroup = GROUP_FAVOURITES;
 	}
 
 	DoMethod(app->App,
@@ -775,24 +518,20 @@ void filter_change(void)
 	else filters.title[0] = '\0';
 
 	if (genreSelection == NULL || !strcmp(genreSelection, GetMBString(MSG_FilterShowAll)))
-	{
-		// showSlavesList();
-		// list_show_all(title);
-	}
-	// else if (!strcmp(genreSelection, GetMBString(MSG_FilterFavorites)))
-	// 	list_show_favorites(title);
+		filters.showGroup = GROUP_SHOWALL;
 
-	// else if (!strcmp(genreSelection, GetMBString(MSG_FilterLastPlayed)))
-	// 	list_show_last_played(title);
+	else if (!strcmp(genreSelection, GetMBString(MSG_FilterFavorites)))
+		filters.showGroup = GROUP_FAVOURITES;
 
-	// else if (!strcmp(genreSelection, GetMBString(MSG_FilterMostPlayed)))
-	// 	list_show_most_played(title);
+	else if (!strcmp(genreSelection, GetMBString(MSG_FilterLastPlayed)))
+		filters.showGroup = GROUP_LAST_PLAYED;
 
-	// else if (!strcmp(genreSelection, GetMBString(MSG_FilterNeverPlayed)))
-	// 	list_show_never_played(title);
+	else if (!strcmp(genreSelection, GetMBString(MSG_FilterMostPlayed)))
+		filters.showGroup = GROUP_MOST_PLAYED;
 
-	// else
-	// 	list_show_filtered(title, genreSelection);
+	else if (!strcmp(genreSelection, GetMBString(MSG_FilterNeverPlayed)))
+		filters.showGroup = GROUP_NEVER_PLAYED;
+
 	showSlavesList();
 }
 
@@ -1081,17 +820,17 @@ void scan_repositories_OBSOLETE(void)
 		}
 
 		save_list(1);
-		refresh_list(1);
+		// refresh_list(1);
 	}
 }
 
-// TODO: Replaces refresh_list() and add_games_to_listview()
 static void showSlavesList(void)
 {
 	size_t cnt = 0;
 	int bufSize = sizeof(char) * MAX_SLAVE_TITLE_SIZE;
 	char *buf = malloc(bufSize);
 	slavesList *currPtr = getSlavesListHead();
+	int mostPlayedTimes = 0;
 
 	clear_gameslist();
 
@@ -1103,38 +842,70 @@ static void showSlavesList(void)
 				(filters.showHiddenOnly && currPtr->hidden)
 			) && !currPtr->deleted
 		) {
+			// Decide from where the item name will be taken
 			if(!isStringEmpty(currPtr->user_title))
 			{
-				if (!isStringEmpty(filters.title) && !strcasestr(currPtr->user_title, filters.title))
-				{
-					goto nextItem;
-				}
-				DoMethod(app->LV_GamesList,
-					MUIM_List_InsertSingle, currPtr->user_title,
-					MUIV_List_Insert_Sorted);
+				snprintf(buf, bufSize, "%s", currPtr->user_title);
 			}
 			else if(isStringEmpty(currPtr->user_title) && (currPtr->instance > 0))
 			{
-				if (!isStringEmpty(filters.title) && !strcasestr(currPtr->user_title, filters.title))
-				{
-					goto nextItem;
-				}
-				sprintf(currPtr->user_title, "%s [%d]", currPtr->title, currPtr->instance);
-
-				DoMethod(app->LV_GamesList,
-					MUIM_List_InsertSingle, currPtr->user_title,
-					MUIV_List_Insert_Sorted);
+				snprintf(currPtr->user_title, sizeof(currPtr->user_title),
+					"%s [%d]", currPtr->title, currPtr->instance);
+				snprintf(buf, bufSize, "%s", currPtr->user_title);
 			}
 			else
 			{
-				if (!isStringEmpty(filters.title) && !strcasestr(currPtr->title, filters.title))
-				{
-					goto nextItem;
-				}
-				DoMethod(app->LV_GamesList,
-					MUIM_List_InsertSingle, currPtr->title,
-					MUIV_List_Insert_Sorted);
+				snprintf(buf, bufSize, "%s", currPtr->title);
 			}
+
+			// Filter list based on entered string
+			if (!isStringEmpty(filters.title) && !strcasestr(buf, filters.title))
+			{
+				goto nextItem;
+			}
+
+			// Filter results based on selected group
+			if (filters.showGroup > 0) {
+				switch (filters.showGroup)
+				{
+					case GROUP_FAVOURITES:
+						if (!currPtr->favourite) goto nextItem;
+						break;
+					case GROUP_LAST_PLAYED:
+						if (!currPtr->last_played) goto nextItem;
+						break;
+					case GROUP_MOST_PLAYED:
+						if (currPtr->times_played > 0)
+						{
+							if (currPtr->times_played < mostPlayedTimes)
+							{
+								DoMethod(app->LV_GamesList,
+									MUIM_List_InsertSingle, currPtr->title,
+									MUIV_List_Insert_Bottom);
+							}
+							else
+							{
+								mostPlayedTimes = currPtr->times_played;
+								DoMethod(app->LV_GamesList,
+									MUIM_List_InsertSingle, currPtr->title,
+									MUIV_List_Insert_Top);
+							}
+						}
+						goto nextItem;
+						break;
+					case GROUP_NEVER_PLAYED:
+						if (currPtr->times_played > 0)
+						{
+							goto nextItem;
+						}
+						break;
+				}
+			}
+
+			DoMethod(app->LV_GamesList,
+				MUIM_List_InsertSingle, buf,
+				MUIV_List_Insert_Sorted);
+
 			cnt++;
 		nextItem:
 		}
@@ -2177,48 +1948,6 @@ static void follow_thread(BPTR lock, int tab_level)
 		}
 	}
 	FreeMem(m, sizeof(struct FileInfoBlock));
-}
-
-// TODO: Replaced by showSlavesList() - OBSOLETE
-static void refresh_list(const int check_exists)
-{
-	DoMethod(app->LV_GamesList, MUIM_List_Clear);
-	total_games = 0;
-	set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
-
-	if (check_exists == 0)
-	{
-		for (item_games = games; item_games != NULL; item_games = item_games->next)
-		{
-			if (strlen(item_games->path) != 0
-				&& item_games->hidden != 1
-				&& item_games->deleted != 1)
-			{
-				total_games++;
-				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-			}
-		}
-	}
-	else
-	{
-		for (item_games = games; item_games != NULL; item_games = item_games->next)
-		{
-			if (strlen(item_games->path) != 0
-				&& item_games->hidden != 1
-				&& item_games->exists == 1
-				&& item_games->deleted != 1)
-			{
-				total_games++;
-				DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-			}
-			// else
-			// {
-			// 	printf("[%s] [%s] [%d]\n", item_games->title, item_games->path, item_games->exists);
-			// }
-		}
-	}
-
-	status_show_total();
 }
 
 void save_list(const int check_exists)

@@ -138,6 +138,7 @@ typedef struct listFilters
 {
 	char title[MAX_SLAVE_TITLE_SIZE];
 	BOOL showHiddenOnly;
+	int showGroup;
 } listFilters;
 
 enum {
@@ -155,6 +156,15 @@ enum {
 	MENU_REPOSITORIES,
 	MENU_MUISETTINGS,
 	MENU_LAST
+};
+
+enum {
+	GROUP_SHOWALL,
+	GROUP_FAVOURITES,
+	GROUP_LAST_PLAYED,
+	GROUP_MOST_PLAYED,
+	GROUP_NEVER_PLAYED,
+	GROUP_LAST
 };
 
 #endif
