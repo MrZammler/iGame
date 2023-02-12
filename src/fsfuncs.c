@@ -551,14 +551,8 @@ void getIconTooltypes(char *path, char *result)
 		if(diskObj)
 		{
 			char *buf = AllocVec(sizeof(char) * 64, MEMF_CLEAR);
-			// size_t cnt = 0;
 			for (STRPTR *tool_types = diskObj->do_ToolTypes; (buf = *tool_types); ++tool_types)
 			{
-				// printf("%s\n", buf);
-				// if (cnt > 10) break;
-
-				// cnt++;
-
 				if (!strncmp(buf, "*** DON'T EDIT", 14) || !strncmp(buf, "IM", 2))
 					continue;
 
@@ -612,6 +606,7 @@ void setIconTooltypes(char *path, char *tooltypes)
 					ICONA_ErrorCode, &errorCode,
 				TAG_DONE);
 
+				// TODO: Add an error message to inform the user
 				// if(success == FALSE)
 				// {
 				// 	Printf("could not store default picture icon;\n");
@@ -621,97 +616,6 @@ void setIconTooltypes(char *path, char *tooltypes)
 				FreeVec(newToolTypes);
 			}
 
-			FreeDiskObject(diskObj);
-		}
-	}
-}
-
-void setIconTooltypes_v37(char *path, char *tooltypes)
-{
-	if (IconBase)
-	{
-		// struct DiskObject *diskObj = GetDiskObjectNew(path);
-		struct DiskObject *diskObj = GetIconTags(path, TAG_DONE);
-		if(diskObj && FALSE)
-		{
-			size_t oldToolTypesCnt = 0;
-			size_t cutPos = 0;
-			size_t newToolTypesCnt = 0;
-
-			char *buf = AllocVec(sizeof(char) * 64, MEMF_CLEAR);
-
-			// Get the number of the new tooltypes
-			char **table = my_split(tooltypes, "\n");
-			for (table; (buf = *table); ++table)
-			{
-				printf("DBG: %s\n", buf);
-				newToolTypesCnt++;
-			}
-
-			// Get the number of the old tooltypes, as well as where the image data start (cutPos)
-			// for (STRPTR *oldToolTypes = diskObj->do_ToolTypes; (buf = *oldToolTypes); ++oldToolTypes)
-			// {
-			// 	oldToolTypesCnt++;
-			// 	if (!strncmp(buf, "*** DON'T EDIT", 14) && (cutPos == 0))
-			// 		cutPos = oldToolTypesCnt;
-
-			// 	if (!strncmp(buf, "IM", 2) && (cutPos == 0))
-			// 		cutPos = oldToolTypesCnt;
-
-			// }
-
-			// unsigned int allCnt = (oldToolTypesCnt - cutPos) + newToolTypesCnt + 29;
-
-
-			// newToolTypesCnt++; // That's for the last NULL
-
-			unsigned char **newToolTypes = AllocVec(sizeof(char *) * newToolTypesCnt, MEMF_CLEAR);
-			if (newToolTypes)
-			{
-				printf("DBG: newToolTypes set\n");
-
-				char **table2 = my_split(tooltypes, "\n");
-				size_t table2Cnt = 0;
-				for (table2; (buf = *table2); ++table2)
-				{
-					printf("DBG: %s\n", buf);
-					newToolTypes[table2Cnt] = buf;
-					table2Cnt++;
-				}
-				printf("DBG: table2Cnt %d\tcutPos %d\n", table2Cnt, cutPos);
-				// printf("DBG: Before old tooltypes %d\t%d\n", newToolTypesCnt, cutPos);
-				// for(size_t i = cutPos; i < oldToolTypesCnt; i++)
-				// for(size_t i = 0; i < oldToolTypesCnt; i++)
-				// {
-				// 	// printf("%d\t%d\t%d\n", newToolTypesCnt+i-cutPos, i, i-cutPos);
-				// 	// if (i > 10) break;
-				// 	newToolTypes[table2Cnt+i] = diskObj->do_ToolTypes[i];
-				// }
-				newToolTypes[newToolTypesCnt-1] = NULL;
-
-				diskObj->do_ToolTypes = newToolTypes;
-				printf("DBG: PutDiskObject\n");
-
-				// LONG errorCode;
-				// BOOL success;
-
-				// success = PutIconTags(path, diskObj,
-				// 	ICONPUTA_DropNewIconToolTypes, TRUE,
-				// 	ICONA_ErrorCode, &errorCode,
-				// TAG_DONE);
-
-				// if(success == FALSE)
-				// {
-				// 	Printf("could not store default picture icon;\n");
-				// 	PrintFault(errorCode, NULL);
-				// }
-
-				// PutDiskObject(path, diskObj);
-				FreeVec(newToolTypes);
-			}
-
-			// printf("DBG: %d\t%d\t%d\t%d\n",
-			// 	oldToolTypesCnt, cutPos, newToolTypesCnt, allCnt);
 			FreeDiskObject(diskObj);
 		}
 	}
