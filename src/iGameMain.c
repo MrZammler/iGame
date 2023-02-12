@@ -167,7 +167,6 @@ int main(int argc, char **argv)
 				break;
 
 			case MENU_GAMEPROPERTIES:
-				// game_properties();
 				slaveProperties();
 				break;
 
