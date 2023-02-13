@@ -13,6 +13,7 @@
 
 ### Fixed
 - When a user changes the tooltypes of a slave, the NewIcon keeps working. The previous versions of iGame were deleting the image information. Now they are dropped from the icon tooltypes, but the image keeps working fine. As a result the .info file size is reduced almost to half.
+- Now it is possible to save the icon tooltypes even if it is used as item screenshot
 
 ## iGame 2.2.1 - [2023-01-30]
 ### Added

@@ -1118,7 +1118,7 @@ static void refresh_sidepanel()
 
 static void show_screenshot(STRPTR screenshot_path)
 {
-	static char prvScreenshot[255];
+	static char prvScreenshot[MAX_PATH_SIZE];
 
 	if (strcmp(screenshot_path, prvScreenshot))
 	{
@@ -1194,8 +1194,10 @@ static void get_screenshot_path(char *game_title, char *result)
 
 static void showDefaultScreenshot(void)
 {
-	if (!current_settings->hide_screenshots && !current_settings->hide_side_panel)
-		show_screenshot(DEFAULT_SCREENSHOT_FILE);
+	if (current_settings->hide_side_panel || current_settings->hide_screenshots)
+		return;
+
+	show_screenshot(DEFAULT_SCREENSHOT_FILE);
 }
 
 void game_click(void)
@@ -1416,6 +1418,7 @@ void saveItemProperties(void)
 		STRPTR tooltypesBuffer = (STRPTR)DoMethod(app->TX_PropertiesTooltypes, MUIM_TextEditor_ExportText);
 		snprintf(buf, sizeof(node->path), "%s", substring(node->path, 0, -6));
 		setIconTooltypes(buf, tooltypesBuffer);
+		game_click();
 	}
 }
 
