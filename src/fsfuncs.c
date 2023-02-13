@@ -172,11 +172,11 @@ BOOL get_filename(const char *title, const char *positive_text, const BOOL save_
 	if ((request = MUI_AllocAslRequest(ASL_FileRequest, NULL)) != NULL)
 	{
 		if (MUI_AslRequestTags(request,
-		                       ASLFR_TitleText, title,
-		                       ASLFR_PositiveText, positive_text,
-		                       ASLFR_DoSaveMode, save_mode,
-		                       ASLFR_InitialDrawer, PROGDIR,
-		                       TAG_DONE))
+						ASLFR_TitleText, title,
+						ASLFR_PositiveText, positive_text,
+						ASLFR_DoSaveMode, save_mode,
+						ASLFR_InitialDrawer, PROGDIR,
+						TAG_DONE))
 		{
 			memset(&fname[0], 0, sizeof fname);
 			strcat(fname, request->fr_Drawer);
@@ -194,7 +194,6 @@ BOOL get_filename(const char *title, const char *positive_text, const BOOL save_
 	return result;
 }
 
-// Replaces load_games_csv_list()
 void slavesListLoadFromCSV(char *filename)
 {
 	int bufSize = sizeof(char) * 1024;
@@ -490,6 +489,7 @@ void get_path(char *title, char *path)
 	}
 }
 
+// TODO: Check if this is used and rename it for partition
 BOOL isPathFolder(char *path)
 {
 	if (path[strlen(path)-1] == ':')
@@ -509,7 +509,7 @@ void getIconTooltypes(char *path, char *result)
 		struct DiskObject *diskObj = GetDiskObjectNew(path);
 		if(diskObj)
 		{
-			char *buf = AllocVec(sizeof(char) * 64, MEMF_CLEAR);
+			char *buf = AllocVec(sizeof(char) * MAX_TOOLTYPE_SIZE, MEMF_CLEAR);
 			for (STRPTR *tool_types = diskObj->do_ToolTypes; (buf = *tool_types); ++tool_types)
 			{
 				if (!strncmp(buf, "*** DON'T EDIT", 14) || !strncmp(buf, "IM", 2))
@@ -534,11 +534,21 @@ void setIconTooltypes(char *path, char *tooltypes)
 			size_t cutPos = 0;
 			size_t newToolTypesCnt = 0;
 
-			char *buf = AllocVec(sizeof(char) * 64, MEMF_CLEAR);
+			char *buf = AllocVec(sizeof(char) * MAX_TOOLTYPE_SIZE, MEMF_CLEAR);
 
 			// Get the number of the new tooltypes
 			char **table = my_split(tooltypes, "\n");
+			BOOL isLastLineEmpty = FALSE;
 			for (table; (buf = *table); ++table)
+			{
+				newToolTypesCnt++;
+				isLastLineEmpty = FALSE;
+				if (buf[0] == '\0')
+				{
+					isLastLineEmpty = TRUE;
+				}
+			}
+			if (!isLastLineEmpty)
 			{
 				newToolTypesCnt++;
 			}

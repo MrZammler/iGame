@@ -688,7 +688,6 @@ void launch_game_old(void)
 		return;
 	}
 
-	// TODO: Change that with getNameFromPath()
 	char* slave = malloc(256 * sizeof(char));
 	if (slave != NULL)
 		slave = get_slave_from_path(slave, strlen(naked_path), path);
@@ -1195,7 +1194,8 @@ static void get_screenshot_path(char *game_title, char *result)
 
 static void showDefaultScreenshot(void)
 {
-	show_screenshot(DEFAULT_SCREENSHOT_FILE);
+	if (!current_settings->hide_screenshots && !current_settings->hide_side_panel)
+		show_screenshot(DEFAULT_SCREENSHOT_FILE);
 }
 
 void game_click(void)

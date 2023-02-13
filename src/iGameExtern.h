@@ -66,6 +66,7 @@
 #define MAX_SLAVE_GENRE_SIZE 128
 #define MAX_PATH_SIZE 256
 #define MAX_EXEC_SIZE 256
+#define MAX_TOOLTYPE_SIZE 64
 
 typedef struct settings
 {
