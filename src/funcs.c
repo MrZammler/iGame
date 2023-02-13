@@ -76,7 +76,6 @@ int wbrun = 0;
 /* function definitions */
 // int get_genre(char* title, char* genre);
 static int hex2dec(char* hexin);
-static int check_dup_title(char* title);
 static void check_for_wbrun();
 static void showSlavesList(void);
 
@@ -467,10 +466,185 @@ static void check_for_wbrun(void)
 	CurrentDir(oldlock);
 }
 
+static void prepareWHDExecution(slavesList *node, char *result)
+{
+	int bufSize = sizeof(char) * MAX_PATH_SIZE;
+	char *buf = AllocVec(bufSize, MEMF_CLEAR);
+
+	snprintf(buf, bufSize, "%s", substring(node->path, 0, -6));
+	struct DiskObject *diskObj = GetDiskObjectNew(buf);
+	if (diskObj)
+	{
+		char to_check[256];
+		sprintf(result, "whdload ");
+
+		for (STRPTR *tool_types = diskObj->do_ToolTypes; (buf = *tool_types); ++tool_types)
+		{
+			if (!strncmp(buf, "*** DON'T EDIT", 14) || !strncmp(buf, "IM", 2)) continue;
+			if (buf[0] == ' ') continue;
+			if (buf[0] == '(') continue;
+			if (buf[0] == '*') continue;
+			if (buf[0] == ';') continue;
+			if (buf[0] == '\0') continue;
+			if (buf[0] == -69) continue; // »
+			if (buf[0] == -85) continue; // «
+			if (buf[0] == '.') continue;
+			if (buf[0] == '=') continue;
+			if (buf[0] == '#') continue;
+			if (buf[0] == '!') continue;
+
+			/* Add quotes to Execute.... ToolTypes for WHDLoad compatibility */
+			if (!strncmp(buf, "Execute", 7))
+			{
+				char** temp_tbl = my_split((char *)buf, "=");
+				if (temp_tbl == NULL) continue;
+				if (temp_tbl[1] != NULL)
+				{
+					sprintf(buf,"%s=\"%s\"", temp_tbl[0],temp_tbl[1]);
+				}
+				if (temp_tbl)
+					free(temp_tbl);
+			}
+
+			/* Must check here for numerical values */
+			/* Those (starting with $ should be transformed to dec from hex) */
+			char** temp_tbl = my_split((char *)buf, "=");
+			if (temp_tbl == NULL
+				|| temp_tbl[0] == NULL
+				|| !strcmp((char *)temp_tbl[0], " ")
+				|| !strcmp((char *)temp_tbl[0], ""))
+				continue;
+
+			if (temp_tbl[1] != NULL)
+			{
+				sprintf(to_check, "%s", temp_tbl[1]);
+				if (to_check[0] == '$')
+				{
+					const int dec_rep = hex2dec(to_check);
+					sprintf(buf, "%s=%d", temp_tbl[0], dec_rep);
+				}
+			}
+			if (temp_tbl)
+				free(temp_tbl);
+
+			sprintf(result, "%s %s", result, buf);
+		}
+
+		FreeDiskObject(diskObj);
+	}
+
+	FreeVec(buf);
+}
+
+static void launchSlave(slavesList *node)
+{
+	int bufSize = sizeof(char) * MAX_PATH_SIZE;
+	char *buf = AllocVec(bufSize, MEMF_CLEAR);
+
+	getParentPath(node->path, buf);
+	const BPTR pathLock = Lock(buf, SHARED_LOCK);
+
+	if (pathLock && IconBase)
+	{
+		struct FileInfoBlock *FIblock = (struct FileInfoBlock *)AllocVec(sizeof(struct FileInfoBlock), MEMF_CLEAR);
+		char *tooltypesBuffer = AllocVec(sizeof(char) * 1024, MEMF_CLEAR);
+
+		const BPTR oldLock = CurrentDir(pathLock);
+
+		// Get the slave filename and replace extension
+		getNameFromPath(node->path, buf, bufSize);
+		snprintf(buf, bufSize, "%s.info", substring(buf, 0, -6));
+
+		if (Examine(pathLock, FIblock))
+		{
+			while (ExNext(pathLock, FIblock))
+			{
+				if (
+					(FIblock->fib_DirEntryType < 0) &&
+					(strcasestr(FIblock->fib_FileName, ".info")) &&
+					!strncmp(FIblock->fib_FileName, buf, sizeof(FIblock->fib_FileName))
+				) {
+					int execSize = sizeof(char) * MAX_EXEC_SIZE;
+					char *exec = AllocVec(bufSize, MEMF_CLEAR);
+					prepareWHDExecution(node, exec);
+
+					// TODO: Need to make all the other items to 0
+					// Update statistics info
+					node->last_played = 1;
+					node->times_played++;
+
+					// Save stats
+					if (!current_settings->save_stats_on_exit)
+						save_list(0);
+
+					int success = Execute(exec, 0, 0);
+					if (success == 0)
+						msg_box((const char*)GetMBString(MSG_ErrorExecutingWhdload));
+
+					FreeVec(exec);
+				}
+			}
+
+			FreeVec(FIblock);
+		}
+
+		UnLock(pathLock);
+		CurrentDir(oldLock);
+		UnLock(oldLock);
+	}
+
+	FreeVec(buf);
+}
+
+static void launchFromWB(slavesList *node)
+{
+	printf("DBG: launchFromWB()\n");
+}
+
+void launch_game(void)
+{
+	int bufSize = sizeof(char) * MAX_PATH_SIZE;
+	char *buf = AllocVec(bufSize, MEMF_CLEAR);
+	char *game_title = NULL;
+
+	// Get the selected item from the list
+	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
+	if (game_title == NULL || game_title[0] == '\0')
+	{
+		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
+		return;
+	}
+
+	slavesList *existingNode = malloc(sizeof(slavesList));
+	if ((existingNode = slavesListSearchByTitle(game_title, sizeof(char) * MAX_SLAVE_TITLE_SIZE)) == NULL)
+	{
+		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
+		return;
+	}
+
+	if(!check_path_exists(existingNode->path)) {
+		msg_box((const char*)GetMBString(MSG_slavePathDoesntExist));
+		return;
+	}
+
+	getNameFromPath(existingNode->path, buf, bufSize);
+
+	// Slave file found
+	if (strcasestr(buf, ".slave"))
+	{
+		launchSlave(existingNode);
+	}
+	else
+	{
+		launchFromWB(existingNode);
+	}
+}
+
 /*
 *   Executes whdload with the slave
 */
-void launch_game(void)
+// TODO: Refactor this method
+void launch_game_old(void)
 {
 	struct Library* icon_base;
 	struct DiskObject* disk_obj;
@@ -514,6 +688,7 @@ void launch_game(void)
 		return;
 	}
 
+	// TODO: Change that with getNameFromPath()
 	char* slave = malloc(256 * sizeof(char));
 	if (slave != NULL)
 		slave = get_slave_from_path(slave, strlen(naked_path), path);
@@ -1291,6 +1466,7 @@ void genres_click(void)
 
 void save_list(const int check_exists)
 {
+	// TODO: Maybe add here a message in status
 	slavesListSaveToCSV(DEFAULT_GAMESLIST_FILE);
 }
 
@@ -1701,22 +1877,6 @@ void non_whdload_ok(void)
 	save_list(0);
 
 	set(app->WI_AddNonWHDLoad, MUIA_Window_Open, FALSE);
-}
-
-/*
-* Checks if the title already exists
-* returns 1 if yes, 0 otherwise
-*/
-static int check_dup_title(char* title)
-{
-	for (games_list* check_games = games; check_games != NULL; check_games = check_games->next)
-	{
-		if (!strcmp(check_games->title, title))
-		{
-			return 1;
-		}
-	}
-	return 0;
 }
 
 static void joy_left(void)
