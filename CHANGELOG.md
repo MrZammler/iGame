@@ -10,6 +10,9 @@
 - A new column added in the gamelist.csv file which holds the custom name of the item. The old column remains unchanged. This helps on situations like a repository rescan, where the given name by the user doesn't change. The old second column should remain unchanged.
 - Now iGame requires icon.library v44+ for changing icon tooltypes. For systems that do include a new version, there is icon.library 46.4 on Aminet free to download and use. For those that have older version of the library will still be able to use iGame, but they won't be able to change the icon tooltypes. They will need to do it from Workbench
 - Now the filter string field is not disabled in the hidden list, allowing the user to filter the results based on the title or part of it
+- "Status" line, "Times played" and "Slave path" do not have a border any more, since they are read only fields
+- "No smart spaces" has a proper border now
+- "Slave path" in item properties window doesn't stretch the it's width any more. If MUI 5 is used the text will be shorten, showing three dots in the middle of it.
 
 ### Fixed
 - When a user changes the tooltypes of a slave, the NewIcon keeps working. The previous versions of iGame were deleting the image information. Now they are dropped from the icon tooltypes, but the image keeps working fine. As a result the .info file size is reduced almost to half.

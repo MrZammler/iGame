@@ -402,8 +402,7 @@ struct ObjApp *CreateApp(void)
 	}
 
 	object->TX_Status = TextObject,
-		MUIA_Background, MUII_TextBack,
-		MUIA_Frame, MUIV_Frame_Text,
+		MUIA_Frame, MUIV_Frame_None,
 		MUIA_Text_Contents, object->STR_TX_Status,
 		MUIA_Text_SetMin, TRUE,
 		End;
@@ -516,8 +515,7 @@ struct ObjApp *CreateApp(void)
 	Space_TimesPlayed = HSpace(1);
 
 	object->TX_PropertiesTimesPlayed = TextObject,
-		MUIA_Background, MUII_TextBack,
-		MUIA_Frame, MUIV_Frame_Text,
+		MUIA_Frame, MUIV_Frame_None,
 		MUIA_Text_Contents, object->STR_TX_PropertiesTimesPlayed,
 		MUIA_Text_SetMin, TRUE,
 		End;
@@ -537,10 +535,10 @@ struct ObjApp *CreateApp(void)
 	Space_Path = HSpace(1);
 
 	object->TX_PropertiesSlavePath = TextObject,
-		MUIA_Background, MUII_TextBack,
-		MUIA_Frame, MUIV_Frame_Text,
+		MUIA_Frame, MUIV_Frame_None,
 		MUIA_Text_Contents, object->STR_TX_PropertiesSlavePath,
-		MUIA_Text_SetMin, TRUE,
+		MUIA_Text_SetMin, FALSE,
+		MUIA_Text_Shorten, MUIV_Text_Shorten_ElideCenter,
 		End;
 
 	GR_SlavePath = GroupObject,
@@ -868,14 +866,7 @@ struct ObjApp *CreateApp(void)
 
 	Space_TitlesFrom = VSpace(1);
 
-	object->CH_SmartSpaces = ImageObject,
-		MUIA_Disabled, TRUE,
-		MUIA_InputMode, MUIV_InputMode_Toggle,
-		MUIA_Image_Spec, MUII_CheckMark,
-		MUIA_Image_FreeVert, TRUE,
-		MUIA_Selected, FALSE,
-		MUIA_ShowSelState, FALSE,
-		End;
+	object->CH_SmartSpaces = CheckMark(FALSE);
 
 	Space_SmartSpaces = VSpace(1);
 
