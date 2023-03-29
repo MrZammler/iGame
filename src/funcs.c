@@ -1325,6 +1325,7 @@ void slaveProperties(void)
 		int pathBufferSize = sizeof(char) * MAX_PATH_SIZE;
 		char *pathBuffer = malloc(pathBufferSize);
 		char *tooltypesBuffer = AllocVec(sizeof(char) * 1024, MEMF_CLEAR);
+		char timesPlayedStr[6];
 		size_t i;
 
 		setSlavesListBuffer(node);
@@ -1335,7 +1336,9 @@ void slaveProperties(void)
 			set(app->STR_PropertiesGameTitle, MUIA_String_Contents, node->user_title);
 		}
 		set(app->TX_PropertiesSlavePath, MUIA_Text_Contents, node->path);
-		set(app->TX_PropertiesTimesPlayed, MUIA_Text_Contents, node->times_played);
+
+		snprintf(timesPlayedStr, sizeof(char) * 5, "%d", node->times_played);
+		set(app->TX_PropertiesTimesPlayed, MUIA_Text_Contents, timesPlayedStr);
 
 		//set the genre
 		// TODO: Make this better when we have the new Genre lists
@@ -1361,7 +1364,7 @@ void slaveProperties(void)
 // Save item properties when the user clicks on Save button
 void saveItemProperties(void)
 {
-	int genreId;
+	int genreId, hideSelection;
 	int bufSize = sizeof(char) * MAX_PATH_SIZE;
 	char *buf = AllocVec(bufSize, MEMF_CLEAR);
 	ULONG newpos;
@@ -1409,7 +1412,15 @@ void saveItemProperties(void)
 	);
 
 	get(app->CH_PropertiesFavorite, MUIA_Selected, &node->favourite);
-	get(app->CH_PropertiesHidden, MUIA_Selected, &node->hidden);
+
+	get(app->CH_PropertiesHidden, MUIA_Selected, &hideSelection);
+	if (node->hidden != hideSelection)
+	{
+		node->hidden = hideSelection;
+		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
+		DoMethod(app->LV_GamesList, MUIM_List_Remove, MUIV_List_Remove_Active);
+		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
+	}
 
 	// Save the tooltypes
 	if (IconBase->lib_Version >= 44)
