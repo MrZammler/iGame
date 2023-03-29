@@ -63,7 +63,7 @@
 #define MENU_DELETE_HOTKEY "D"
 
 #define MAX_SLAVE_TITLE_SIZE 128
-#define MAX_SLAVE_GENRE_SIZE 128
+#define MAX_GENRE_NAME_SIZE 32
 #define MAX_PATH_SIZE 256
 #define MAX_EXEC_SIZE 256
 #define MAX_TOOLTYPE_SIZE 64
@@ -114,7 +114,7 @@ typedef struct slavesList
 	char title[MAX_SLAVE_TITLE_SIZE];
 	char user_title[MAX_SLAVE_TITLE_SIZE];
 	char path[MAX_PATH_SIZE];
-	char genre[MAX_SLAVE_GENRE_SIZE];
+	char genre[MAX_GENRE_NAME_SIZE];
 
 	unsigned int instance;
 	unsigned int times_played;
@@ -139,6 +139,7 @@ typedef struct listFilters
 	char title[MAX_SLAVE_TITLE_SIZE];
 	BOOL showHiddenOnly;
 	int showGroup;
+	char showGenre[MAX_GENRE_NAME_SIZE];
 } listFilters;
 
 enum {

@@ -415,6 +415,7 @@ void filter_change(void)
 {
 	char *title = NULL;
 	char *genreSelection = NULL;
+	filters.showGenre[0] = '\0';
 
 	get(app->STR_Filter, MUIA_String_Contents, &title);
 	DoMethod(app->LV_GenresList, MUIM_List_GetEntry,
@@ -441,6 +442,8 @@ void filter_change(void)
 
 	else if (!strcmp(genreSelection, GetMBString(MSG_FilterNeverPlayed)))
 		filters.showGroup = GROUP_NEVER_PLAYED;
+
+	else strncpy(filters.showGenre, genreSelection, sizeof(filters.showGenre));
 
 	showSlavesList();
 }
@@ -881,6 +884,15 @@ static void showSlavesList(void)
 				(filters.showHiddenOnly && currPtr->hidden)
 			) && !currPtr->deleted
 		) {
+			// Filter the list by the selected genre
+			if (
+				!isStringEmpty(filters.showGenre) &&
+				strncmp(filters.showGenre, currPtr->genre, sizeof(currPtr->genre))
+			)
+			{
+				goto nextItem;
+			}
+
 			// Decide from where the item name will be taken
 			if(!isStringEmpty(currPtr->user_title))
 			{
