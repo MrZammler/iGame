@@ -531,6 +531,29 @@ static void prepareWHDExecution(slavesList *node, char *result)
 	FreeVec(buf);
 }
 
+static BOOL createRunGameScript(slavesList *node)
+{
+	int bufSize = sizeof(char) * MAX_PATH_SIZE;
+	char *buf = AllocVec(bufSize, MEMF_CLEAR);
+
+	getParentPath(node->path, buf);
+	FILE* runGameScript = fopen("T:rungame", "we");
+	if (!runGameScript)
+	{
+		printf("Could not open rungame file!");
+		FreeVec(buf);
+		return FALSE;
+	}
+	getParentPath(node->path, buf);
+	fprintf(runGameScript, "Cd \"%s\"\n", buf);
+	getNameFromPath(node->path, buf, bufSize);
+	fprintf(runGameScript, "Run >NIL: \"%s\"\n", buf);
+	fclose(runGameScript);
+
+	FreeVec(buf);
+	return TRUE;
+}
+
 static void launchSlave(slavesList *node)
 {
 	int bufSize = sizeof(char) * MAX_PATH_SIZE;
@@ -611,20 +634,27 @@ static void launchFromWB(slavesList *node)
 
 	if (isStringEmpty(exec))
 	{
-		sprintf(exec, "\"%s\"", node->path);
+		if (createRunGameScript(node))
+		{
+			sprintf(exec, "Execute T:rungame");
+		}
 	}
 
-	// Update statistics info
-	node->last_played = 1;
-	node->times_played++;
 
-	// Save stats
-	if (!current_settings->save_stats_on_exit)
-		save_list(0);
+	if (!isStringEmpty(exec))
+	{
+		// Update statistics info
+		node->last_played = 1;
+		node->times_played++;
 
-	int success = Execute(exec, 0, 0);
-	if (success == 0)
-		msg_box((const char*)GetMBString(MSG_ErrorExecutingWhdload));
+		// Save stats
+		if (!current_settings->save_stats_on_exit)
+			save_list(0);
+
+		int success = Execute(exec, 0, 0);
+		if (success == 0)
+			msg_box((const char*)GetMBString(MSG_ErrorExecutingWhdload));
+	}
 
 	FreeVec(exec);
 	FreeVec(buf);
