@@ -13,6 +13,7 @@
 - "Status" line, "Times played" and "Slave path" do not have a border any more, since they are read only fields
 - "No smart spaces" has a proper border now
 - "Slave path" in item properties window doesn't stretch the it's width any more. If MUI 5 is used the text will be shorten, showing three dots in the middle of it.
+- If WBLoad exists in the C: folder, this is going to be used to start games/demos from WB, when they were added as extra items in the list
 
 ### Fixed
 - When a user changes the tooltypes of a slave, the NewIcon keeps working. The previous versions of iGame were deleting the image information. Now they are dropped from the icon tooltypes, but the image keeps working fine. As a result the .info file size is reduced almost to half.

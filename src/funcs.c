@@ -343,15 +343,7 @@ static void load_genres(const char* filename)
 		app->CY_PropertiesGenreContent[i] = (unsigned char*)GetMBString(MSG_UnknownGenre);
 		app->CY_PropertiesGenreContent[i + 1] = NULL;
 		set(app->CY_PropertiesGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
-
-		for (i = 0; i < no_of_genres; i++)
-		{
-			DoMethod(app->LV_GenresList, MUIM_List_GetEntry, i + 5, &app->CY_AddGameGenreContent[i]);
-		}
-
-		app->CY_AddGameGenreContent[i] = (unsigned char*)GetMBString(MSG_UnknownGenre);
-		app->CY_AddGameGenreContent[i + 1] = NULL;
-		set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_AddGameGenreContent);
+		set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
 
 		Close(fpgenres);
 	}
@@ -601,7 +593,41 @@ static void launchSlave(slavesList *node)
 
 static void launchFromWB(slavesList *node)
 {
-	printf("DBG: launchFromWB()\n");
+	int bufSize = sizeof(char) * MAX_PATH_SIZE;
+	char *buf = AllocVec(bufSize, MEMF_CLEAR);
+	char *exec = AllocVec(bufSize, MEMF_CLEAR);
+
+	strncpy(buf, "C:WBRun", bufSize);
+	if (check_path_exists(buf))
+	{
+		sprintf(exec, "C:WBRun \"%s\"", node->path);
+	}
+
+	strncpy(buf, "C:WBLoad", bufSize);
+	if (check_path_exists(buf))
+	{
+		sprintf(exec, "C:WBLoad \"%s\"", node->path);
+	}
+
+	if (isStringEmpty(exec))
+	{
+		sprintf(exec, "\"%s\"", node->path);
+	}
+
+	// Update statistics info
+	node->last_played = 1;
+	node->times_played++;
+
+	// Save stats
+	if (!current_settings->save_stats_on_exit)
+		save_list(0);
+
+	int success = Execute(exec, 0, 0);
+	if (success == 0)
+		msg_box((const char*)GetMBString(MSG_ErrorExecutingWhdload));
+
+	FreeVec(exec);
+	FreeVec(buf);
 }
 
 void launch_game(void)
@@ -646,7 +672,7 @@ void launch_game(void)
 /*
 *   Executes whdload with the slave
 */
-// TODO: Refactor this method
+// TODO: Replaced by the new launch_game() - DEPRECATED
 void launch_game_old(void)
 {
 	struct Library* icon_base;
@@ -1053,7 +1079,6 @@ static void examineFolder(char *path)
 							node->instance = 0;
 							node->genre[0] = '\0';
 							node->user_title[0] = '\0';
-							// node->index = 0;
 							node->times_played = 0;
 							node->favourite = 0;
 							node->last_played = 0;
@@ -1468,6 +1493,7 @@ void app_stop(void)
 
 	memset(&fname[0], 0, sizeof fname);
 
+	// TODO: Free the new slaves list
 	if (games)
 	{
 		free(games);
@@ -1807,6 +1833,7 @@ void msg_box(const char* msg)
 	EasyRequest(NULL, &msgbox, NULL);
 }
 
+// TODO: This seems unused and possibly needs to be removed
 void get_screen_size(int *width, int *height)
 {
 	struct Screen* wbscreen;
@@ -1856,6 +1883,54 @@ void add_non_whdload(void)
 
 void non_whdload_ok(void)
 {
+	int genreId = 0;
+	char *path, *title;
+	ULONG newpos;
+	slavesList *node = malloc(sizeof(slavesList));
+
+	node->instance = 0;
+	node->user_title[0] = '\0';
+	node->times_played = 0;
+	node->favourite = 0;
+	node->last_played = 0;
+	node->exists = 1;
+	node->hidden = 0;
+	node->deleted = 0;
+
+	get(app->PA_AddGame, MUIA_String_Contents, &path);
+	getFullPath(path, node->path);
+
+	get(app->STR_AddTitle, MUIA_String_Contents, &title);
+	strncpy(node->title, title, sizeof(node->title));
+
+	get(app->CY_AddGameGenre, MUIA_Cycle_Active, &genreId);
+	strncpy(node->genre, app->CY_PropertiesGenreContent[genreId], sizeof(node->genre));
+
+	if (isStringEmpty(title))
+	{
+		msg_box((const char*)GetMBString(MSG_NoTitleSpecified));
+		return;
+	}
+	if (isStringEmpty(path))
+	{
+		msg_box((const char*)GetMBString(MSG_NoExecutableSpecified));
+		return;
+	}
+
+	slavesListAddTail(node);
+
+	set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
+	DoMethod(app->LV_GamesList,
+		MUIM_List_InsertSingle, node->title,
+		MUIV_List_Insert_Sorted);
+	get(app->LV_GamesList, MUIA_List_InsertPosition, &newpos);
+	set(app->LV_GamesList, MUIA_List_Active, newpos);
+	set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
+}
+
+// TODO: Replaced by new non_whdload_ok() - OBSOLETE
+void non_whdload_ok_OBSOLETE(void)
+{
 	char *str, *str_title;
 	int genre = 0;
 
@@ -1879,7 +1954,7 @@ void non_whdload_ok(void)
 	item_games->next = NULL;
 	item_games->index = 0;
 	strcpy(item_games->title, (char *)str_title);
-	strcpy(item_games->genre, app->CY_AddGameGenreContent[genre]);
+	// strcpy(item_games->genre, app->CY_AddGameGenreContent[genre]);
 	strcpy(item_games->path, (char *)str);
 	item_games->favorite = 0;
 	item_games->times_played = 0;

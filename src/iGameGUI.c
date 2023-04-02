@@ -285,8 +285,6 @@ struct ObjApp *CreateApp(void)
 
 	object->CY_PropertiesGenreContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_PropertiesGenre0);
 	object->CY_PropertiesGenreContent[1] = NULL;
-	object->CY_AddGameGenreContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_AddGameGenre0);
-	object->CY_AddGameGenreContent[1] = NULL;
 	object->CY_ScreenshotSizeContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_ScreenshotSize0);
 	object->CY_ScreenshotSizeContent[1] = (CONST_STRPTR)GetMBString(MSG_CY_ScreenshotSize1);
 	object->CY_ScreenshotSizeContent[2] = (CONST_STRPTR)GetMBString(MSG_CY_ScreenshotSize2);
@@ -708,7 +706,7 @@ struct ObjApp *CreateApp(void)
 	object->CY_AddGameGenre = CycleObject,
 		MUIA_HelpNode, "CY_AddGameGenre",
 		MUIA_Frame, MUIV_Frame_Button,
-		MUIA_Cycle_Entries, object->CY_AddGameGenreContent,
+		MUIA_Cycle_Entries, object->CY_PropertiesGenreContent,
 		End;
 
 	GR_AddGameGenre = GroupObject,
