@@ -82,7 +82,6 @@ static void showSlavesList(void);
 /* structures */
 struct EasyStruct msgbox;
 
-games_list *item_games = NULL, *games = NULL;
 repos_list *item_repos = NULL, *repos = NULL;
 genres_list *item_genres = NULL, *genres = NULL;
 igame_settings *current_settings = NULL;
@@ -699,229 +698,6 @@ void launch_game(void)
 	}
 }
 
-/*
-*   Executes whdload with the slave
-*/
-// TODO: Replaced by the new launch_game() - DEPRECATED
-void launch_game_old(void)
-{
-	struct Library* icon_base;
-	struct DiskObject* disk_obj;
-	char *game_title = NULL, exec[256], *tool_type;
-	int success, i, whdload = 0;
-	char str2[512], fullpath[800], helperstr[250], to_check[256];
-
-	// clear vars:
-	str2[0] = '\0';
-	fullpath[0] = '\0';
-
-	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
-	if (game_title == NULL || strlen(game_title) == 0)
-	{
-		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
-		return;
-	}
-
-	char* path = malloc(256 * sizeof(char));
-	if (path == NULL)
-	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
-	}
-	get_path(game_title, path);
-
-	if(!check_path_exists(path)) {
-		msg_box((const char*)GetMBString(MSG_slavePathDoesntExist));
-		return;
-	}
-
-	sprintf(helperstr, (const char*)GetMBString(MSG_RunningGameTitle), game_title);
-	set(app->TX_Status, MUIA_Text_Contents, helperstr);
-
-	unsigned char* naked_path = malloc(256 * sizeof(char));
-	if (naked_path != NULL)
-		strip_path(path, (char*)naked_path);
-	else
-	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
-	}
-
-	char* slave = malloc(256 * sizeof(char));
-	if (slave != NULL)
-		slave = get_slave_from_path(slave, strlen(naked_path), path);
-	else
-	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
-	}
-	string_to_lower(slave);
-	if (strstr(slave, ".slave"))
-		whdload = 1;
-
-	const BPTR oldlock = Lock((CONST_STRPTR)PROGDIR, ACCESS_READ);
-	const BPTR lock = Lock(naked_path, ACCESS_READ);
-	if (lock)
-		CurrentDir(lock);
-	else
-	{
-		msg_box((const char*)GetMBString(MSG_DirectoryNotFound));
-		return;
-	}
-
-	if (whdload == 1)
-		sprintf(exec, "whdload ");
-	else
-	{
-		if (wbrun)
-			sprintf(exec, "C:WBRun \"%s\"", path);
-		else
-			sprintf(exec, "\"%s\"", path);
-	}
-
-	//tooltypes only for whdload games
-	if (whdload == 1)
-	{
-		if (IconBase)
-		{
-			//scan the .info files in the current dir.
-			//one of them should be the game's project icon.
-
-			/*  allocate space for a FileInfoBlock */
-			struct FileInfoBlock* m = (struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock), MEMF_CLEAR);
-
-			Examine(lock, m);
-			if (m->fib_DirEntryType <= 0)
-			{
-				/*  We don't allow "opta file", only "opta dir" */
-				return;
-			}
-
-			while ((success = ExNext(lock, m)))
-			{
-				if (strcasestr(m->fib_FileName, ".info"))
-				{
-					NameFromLock(lock, (unsigned char*)str2, 512);
-					sprintf(fullpath, "%s/%s", str2, m->fib_FileName);
-
-					//lose the .info
-					for (i = strlen(fullpath) - 1; i >= 0; i--)
-					{
-						if (fullpath[i] == '.')
-							break;
-					}
-					fullpath[i] = '\0';
-
-					if ((disk_obj = GetDiskObject((STRPTR)fullpath)))
-					{
-						if (MatchToolValue(FindToolType(disk_obj->do_ToolTypes, (unsigned char*)"SLAVE"), (STRPTR)slave)
-							|| MatchToolValue(FindToolType(disk_obj->do_ToolTypes, (unsigned char*)"slave"), (STRPTR)slave))
-						{
-							for (char** tool_types = (char **)disk_obj->do_ToolTypes; (tool_type = *tool_types); ++
-							     tool_types)
-							{
-								if (!strncmp(tool_type, "IM", 2)) continue;
-								if (tool_type[0] == ' ') continue;
-								if (tool_type[0] == '(') continue;
-								if (tool_type[0] == '*') continue;
-								if (tool_type[0] == ';') continue;
-								if (tool_type[0] == '\0') continue;
-								if (tool_type[0] == -69) continue; // »
-								if (tool_type[0] == -85) continue; // «
-								if (tool_type[0] == '.') continue;
-								if (tool_type[0] == '=') continue;
-								if (tool_type[0] == '#') continue;
-								if (tool_type[0] == '!') continue;
-
-								/* Add quotes to Execute.... ToolTypes for WHDLoad compatibility */
-								if (!strncmp(tool_type, "Execute", 7))
-								{
-									char** temp_tbl = my_split((char *)tool_type, "=");
-									if (temp_tbl == NULL) continue;
-									if (temp_tbl[1] != NULL)
-									{
-										sprintf(tool_type,"%s=\"%s\"", temp_tbl[0],temp_tbl[1]);
-									}
-									if (temp_tbl)
-										free(temp_tbl);
-								}
-
-								/* Must check here for numerical values */
-								/* Those (starting with $ should be transformed to dec from hex) */
-								char** temp_tbl = my_split((char *)tool_type, "=");
-								if (temp_tbl == NULL
-									|| temp_tbl[0] == NULL
-									|| !strcmp((char *)temp_tbl[0], " ")
-									|| !strcmp((char *)temp_tbl[0], ""))
-									continue;
-
-								if (temp_tbl[1] != NULL)
-								{
-									sprintf(to_check, "%s", temp_tbl[1]);
-									if (to_check[0] == '$')
-									{
-										const int dec_rep = hex2dec(to_check);
-										sprintf(tool_type, "%s=%d", temp_tbl[0], dec_rep);
-									}
-								}
-								if (temp_tbl)
-									free(temp_tbl);
-								//req: more free's
-
-								sprintf(exec, "%s %s", exec, tool_type);
-							}
-
-							FreeDiskObject(disk_obj);
-							break;
-						}
-						FreeDiskObject(disk_obj);
-					}
-				}
-			}
-		}
-
-		//if we're still here, and exec contains just whdload, add the slave and execute
-		if (!strcmp(exec, "whdload "))
-		{
-			sprintf(exec, "%s %s", exec, path);
-		}
-	}
-
-	// Cleanup the memory allocations
-	if (slave)
-		free(slave);
-	if (path)
-		free(path);
-	if (naked_path)
-		free(naked_path);
-
-	//set the counters for this game
-	for (item_games = games; item_games != NULL; item_games = item_games->next)
-	{
-		if (!strcmp(item_games->title, game_title))
-		{
-			item_games->last_played = 1;
-			item_games->times_played++;
-		}
-
-		if (item_games->last_played == 1 && strcmp(item_games->title, game_title))
-		{
-			item_games->last_played = 0;
-		}
-	}
-
-	if (!current_settings->save_stats_on_exit)
-		save_list(0);
-
-	success = Execute((unsigned char*)exec, 0, 0);
-
-	if (success == 0)
-		msg_box((const char*)GetMBString(MSG_ErrorExecutingWhdload));
-
-	CurrentDir(oldlock);
-	status_show_total();
-}
-
 static void showSlavesList(void)
 {
 	size_t cnt = 0;
@@ -1291,25 +1067,6 @@ void game_click(void)
 	}
 }
 
-// TODO: Seems unused
-/* Retrieves the Genre from the file, using the Title */
-// int get_genre(char* title, char* genre)
-// {
-// 	for (item_games = games; item_games != NULL; item_games = item_games->next)
-// 	{
-// 		if (item_games->deleted != 1)
-// 		{
-// 			if (!strcmp(title, item_games->title))
-// 			{
-// 				strcpy(genre, item_games->genre);
-// 				break;
-// 			}
-// 		}
-// 	}
-
-// 	return 0;
-// }
-
 /*
 * Adds a repository (path on the disk)
 * to the list of repositories
@@ -1524,11 +1281,11 @@ void app_stop(void)
 	memset(&fname[0], 0, sizeof fname);
 
 	// TODO: Free the new slaves list
-	if (games)
-	{
-		free(games);
-		games = NULL;
-	}
+	// if (games)
+	// {
+	// 	free(games);
+	// 	games = NULL;
+	// }
 	if (repos)
 	{
 		free(repos);
@@ -1580,91 +1337,91 @@ static int hex2dec(char* hexin)
 	return dec;
 }
 
-// TODO: This seems unused and maybe needs to be removed
-void game_duplicate(void)
-{
-	char* str = NULL;
-	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str);
+// TODO: This seems unused and maybe needs to be removed - Decide if needed as a feature
+// void game_duplicate(void)
+// {
+// 	char* str = NULL;
+// 	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str);
 
-	if (str == NULL || strlen(str) == 0)
-	{
-		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
-		return;
-	}
+// 	if (str == NULL || strlen(str) == 0)
+// 	{
+// 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
+// 		return;
+// 	}
 
-	int found = 0;
-	for (item_games = games; item_games != NULL; item_games = item_games->next)
-	{
-		if (!strcmp(str, item_games->title) && item_games->deleted != 1)
-		{
-			found = 1;
-			break;
-		}
-	}
+// 	int found = 0;
+// 	for (item_games = games; item_games != NULL; item_games = item_games->next)
+// 	{
+// 		if (!strcmp(str, item_games->title) && item_games->deleted != 1)
+// 		{
+// 			found = 1;
+// 			break;
+// 		}
+// 	}
 
-	if (!found)
-	{
-		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
-		return;
-	}
+// 	if (!found)
+// 	{
+// 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
+// 		return;
+// 	}
 
-	char title_copy[200];
-	char path_copy[256];
-	char genre_copy[100];
-	strcpy(title_copy, item_games->title);
-	strcat(title_copy, " copy");
-	strcpy(path_copy, item_games->path);
-	strcpy(genre_copy, item_games->genre);
+// 	char title_copy[200];
+// 	char path_copy[256];
+// 	char genre_copy[100];
+// 	strcpy(title_copy, item_games->title);
+// 	strcat(title_copy, " copy");
+// 	strcpy(path_copy, item_games->path);
+// 	strcpy(genre_copy, item_games->genre);
 
-	item_games = (games_list *)calloc(1, sizeof(games_list));
-	item_games->next = NULL;
-	item_games->index = 0;
-	item_games->exists = 0;
-	item_games->deleted = 0;
-	strcpy(item_games->title, title_copy);
-	strcpy(item_games->genre, genre_copy);
-	strcpy(item_games->path, path_copy);
-	item_games->favorite = 0;
-	item_games->times_played = 0;
-	item_games->last_played = 0;
-	item_games->hidden = 0;
+// 	item_games = (games_list *)calloc(1, sizeof(games_list));
+// 	item_games->next = NULL;
+// 	item_games->index = 0;
+// 	item_games->exists = 0;
+// 	item_games->deleted = 0;
+// 	strcpy(item_games->title, title_copy);
+// 	strcpy(item_games->genre, genre_copy);
+// 	strcpy(item_games->path, path_copy);
+// 	item_games->favorite = 0;
+// 	item_games->times_played = 0;
+// 	item_games->last_played = 0;
+// 	item_games->hidden = 0;
 
-	if (games == NULL)
-		games = item_games;
-	else
-	{
-		item_games->next = games;
-		games = item_games;
-	}
+// 	if (games == NULL)
+// 		games = item_games;
+// 	else
+// 	{
+// 		item_games->next = games;
+// 		games = item_games;
+// 	}
 
-	total_games++;
-	DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-	status_show_total();
-}
+// 	total_games++;
+// 	DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
+// 	status_show_total();
+// }
 
-void game_delete(void)
-{
-	char* str = NULL;
-	LONG id = MUIV_List_NextSelected_Start;
-	for (;;)
-	{
-		DoMethod(app->LV_GamesList, MUIM_List_NextSelected, &id);
-		if (id == MUIV_List_NextSelected_End) break;
+// void game_delete(void)
+// {
+// 	char* str = NULL;
+// 	LONG id = MUIV_List_NextSelected_Start;
+// 	for (;;)
+// 	{
+// 		DoMethod(app->LV_GamesList, MUIM_List_NextSelected, &id);
+// 		if (id == MUIV_List_NextSelected_End) break;
 
-		DoMethod(app->LV_GamesList, MUIM_List_GetEntry, id, &str);
-		for (item_games = games; item_games != NULL; item_games = item_games->next)
-		{
-			if (!strcmp(str, item_games->title))
-			{
-				item_games->deleted = 1;
-				break;
-			}
-		}
-		DoMethod(app->LV_GamesList, MUIM_List_Remove, id);
-		total_games--;
-	}
-	status_show_total();
-}
+// 		DoMethod(app->LV_GamesList, MUIM_List_GetEntry, id, &str);
+// 		for (item_games = games; item_games != NULL; item_games = item_games->next)
+// 		{
+// 			if (!strcmp(str, item_games->title))
+// 			{
+// 				item_games->deleted = 1;
+// 				break;
+// 			}
+// 		}
+// 		DoMethod(app->LV_GamesList, MUIM_List_Remove, id);
+// 		total_games--;
+// 	}
+// 	status_show_total();
+// }
 
 static LONG xget(Object* obj, ULONG attribute)
 {
@@ -1956,58 +1713,6 @@ void non_whdload_ok(void)
 	get(app->LV_GamesList, MUIA_List_InsertPosition, &newpos);
 	set(app->LV_GamesList, MUIA_List_Active, newpos);
 	set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
-}
-
-// TODO: Replaced by new non_whdload_ok() - OBSOLETE
-void non_whdload_ok_OBSOLETE(void)
-{
-	char *str, *str_title;
-	int genre = 0;
-
-	get(app->PA_AddGame, MUIA_String_Contents, &str);
-	get(app->STR_AddTitle, MUIA_String_Contents, &str_title);
-	get(app->CY_AddGameGenre, MUIA_Cycle_Active, &genre);
-
-	if (strlen(str_title) == 0)
-	{
-		msg_box((const char*)GetMBString(MSG_NoTitleSpecified));
-		return;
-	}
-	if (strlen(str) == 0)
-	{
-		msg_box((const char*)GetMBString(MSG_NoExecutableSpecified));
-		return;
-	}
-
-	//add the game to the list
-	item_games = (games_list *)calloc(1, sizeof(games_list));
-	item_games->next = NULL;
-	item_games->index = 0;
-	strcpy(item_games->title, (char *)str_title);
-	// strcpy(item_games->genre, app->CY_AddGameGenreContent[genre]);
-	strcpy(item_games->path, (char *)str);
-	item_games->favorite = 0;
-	item_games->times_played = 0;
-	item_games->last_played = 0;
-
-	if (games == NULL)
-	{
-		games = item_games;
-	}
-	else
-	{
-		item_games->next = games;
-		games = item_games;
-	}
-
-	//todo: Small bug. If the list is showing another genre, do not insert it.
-	DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-	total_games++;
-	status_show_total();
-
-	save_list(0);
-
-	set(app->WI_AddNonWHDLoad, MUIA_Window_Open, FALSE);
 }
 
 static void joy_left(void)

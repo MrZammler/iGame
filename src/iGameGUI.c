@@ -120,8 +120,8 @@ struct ObjApp *CreateApp(void)
 	);
 
 	APTR	MNMainOpenList, MNMainSaveList, MNMainSaveListAs;
-	APTR	MNMainMenuDuplicate;
-	APTR	MNMainDelete;
+	// APTR	MNMainMenuDuplicate;
+	// APTR	MNMainDelete;
 	APTR	GROUP_ROOT;
 	APTR	GR_Filter, LA_Filter, GR_main, Space_Gamelist;
 	APTR	GROUP_ROOT_1, GR_Genre, LA_PropertiesGenre, Space_Genre;
@@ -156,16 +156,16 @@ struct ObjApp *CreateApp(void)
 #else
 	static const struct Hook MenuSaveListAsHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)save_list_as, NULL };
 #endif
-#if defined(__amigaos4__)
-	static const struct Hook MenuDuplicateHook = { { NULL,NULL }, (HOOKFUNC)game_duplicate, NULL, NULL };
-#else
-	static const struct Hook MenuDuplicateHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_duplicate, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook MenuDeleteHook = { { NULL,NULL }, (HOOKFUNC)game_delete, NULL, NULL };
-#else
-	static const struct Hook MenuDeleteHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_delete, NULL };
-#endif
+// #if defined(__amigaos4__)
+// 	static const struct Hook MenuDuplicateHook = { { NULL,NULL }, (HOOKFUNC)game_duplicate, NULL, NULL };
+// #else
+// 	static const struct Hook MenuDuplicateHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_duplicate, NULL };
+// #endif
+// #if defined(__amigaos4__)
+// 	static const struct Hook MenuDeleteHook = { { NULL,NULL }, (HOOKFUNC)game_delete, NULL, NULL };
+// #else
+// 	static const struct Hook MenuDeleteHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_delete, NULL };
+// #endif
 #if defined(__amigaos4__)
 	static const struct Hook PropertiesOKButtonHook = { { NULL,NULL }, (HOOKFUNC)saveItemProperties, NULL, NULL };
 #else
@@ -427,14 +427,14 @@ struct ObjApp *CreateApp(void)
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainSaveListAs),
 		End;
 
-	MNMainMenuDuplicate = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNMainMenuDuplicate),
-		End;
+	// MNMainMenuDuplicate = MenuitemObject,
+	// 	MUIA_Menuitem_Title, GetMBString(MSG_MNMainMenuDuplicate),
+	// 	End;
 
-	MNMainDelete = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNMainDelete),
-		MUIA_Menuitem_Shortcut, MENU_DELETE_HOTKEY,
-		End;
+	// MNMainDelete = MenuitemObject,
+	// 	MUIA_Menuitem_Title, GetMBString(MSG_MNMainDelete),
+	// 	MUIA_Menuitem_Shortcut, MENU_DELETE_HOTKEY,
+	// 	End;
 
 	if (get_wb_version() < 44)
 	{
@@ -1046,19 +1046,19 @@ struct ObjApp *CreateApp(void)
 		MUIM_CallHook, &MenuSaveListAsHook
 	);
 
-	DoMethod(MNMainMenuDuplicate,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->App,
-		2,
-		MUIM_CallHook, &MenuDuplicateHook
-	);
+	// DoMethod(MNMainMenuDuplicate,
+	// 	MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+	// 	object->App,
+	// 	2,
+	// 	MUIM_CallHook, &MenuDuplicateHook
+	// );
 
-	DoMethod(MNMainDelete,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->App,
-		2,
-		MUIM_CallHook, &MenuDeleteHook
-	);
+	// DoMethod(MNMainDelete,
+	// 	MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+	// 	object->App,
+	// 	2,
+	// 	MUIM_CallHook, &MenuDeleteHook
+	// );
 
 	DoMethod(object->WI_MainWindow,
 		MUIM_Notify, MUIA_Window_Activate, TRUE,

@@ -94,21 +94,6 @@ typedef struct repos
 	struct repos* next;
 } repos_list;
 
-typedef struct games
-{
-	char title[200];
-	char genre[100];
-	int index;
-	char path[256];
-	int favorite;
-	int times_played;
-	int last_played; //indicates whether this one was the last game played
-	int exists; //indicates whether this game still exists after a scan
-	int hidden; //game is hidden from normal operation
-	int deleted; // indicates this entry should be deleted when the list is saved
-	struct games* next;
-} games_list;
-
 typedef struct slavesList
 {
 	char title[MAX_SLAVE_TITLE_SIZE];

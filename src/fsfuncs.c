@@ -63,7 +63,6 @@ struct FileRequester* request;
 
 /* global variables */
 extern char fname[255];
-extern games_list *item_games, *games;
 extern igame_settings *current_settings;
 
 // TODO: This is obsolete. Change it with getParentPath()
@@ -474,20 +473,20 @@ void open_current_dir(void)
 }
 
 // TODO: This is replaced by slavesListSearchByTitle() - OBSOLETE
-void get_path(char *title, char *path)
-{
-	for (item_games = games; item_games != NULL; item_games = item_games->next)
-	{
-		if (item_games->deleted != 1)
-		{
-			if (!strcmp(title, item_games->title))
-			{
-				strcpy(path, item_games->path);
-				break;
-			}
-		}
-	}
-}
+// void get_path(char *title, char *path)
+// {
+// 	for (item_games = games; item_games != NULL; item_games = item_games->next)
+// 	{
+// 		if (item_games->deleted != 1)
+// 		{
+// 			if (!strcmp(title, item_games->title))
+// 			{
+// 				strcpy(path, item_games->path);
+// 				break;
+// 			}
+// 		}
+// 	}
+// }
 
 // TODO: Check if this is used and rename it for partition
 BOOL isPathFolder(char *path)
