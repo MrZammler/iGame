@@ -32,7 +32,7 @@
 slavesList *slavesListHead = NULL;
 slavesList *slavesListBuffer = NULL;
 
-int isListEmpty(void *head)
+static int isListEmpty(void *head)
 {
 	return head == NULL;
 }
@@ -79,15 +79,28 @@ void slavesListAddTail(slavesList *node)
 	}
 }
 
+static BOOL slavesListRemoveHead(void) {
+
+	if (isListEmpty(slavesListHead)) {
+		return FALSE;
+	} else {
+		slavesList *nextPtr = slavesListHead->next;
+		free(slavesListHead);
+		slavesListHead = nextPtr;
+	}
+
+	return TRUE;
+}
+
 void slavesListPrint(void)
 {
 	size_t cnt = 0;
 	slavesList *currPtr = slavesListHead;
 	while (currPtr != NULL)
 	{
-		// printf("----> %d\t%s\t%s\n", currPtr->instance, currPtr->title, currPtr->genre);
-		// printf("----> %s\t%d\t%d\n", currPtr->path, currPtr->favourite, currPtr->times_played);
-		// printf("----> %d\t%d\t%s\n\n", currPtr->last_played, currPtr->hidden, currPtr->user_title);
+		printf("----> %d\t%s\t%s\n", currPtr->instance, currPtr->title, currPtr->genre);
+		printf("----> %s\t%d\t%d\n", currPtr->path, currPtr->favourite, currPtr->times_played);
+		printf("----> %d\t%d\t%s\n\n", currPtr->last_played, currPtr->hidden, currPtr->user_title);
 		currPtr = currPtr->next;
 		cnt++;
 	}
@@ -185,4 +198,10 @@ void setSlavesListBuffer(slavesList *node)
 slavesList *getSlavesListBuffer(void)
 {
 	return slavesListBuffer;
+}
+
+void emptySlavesList(void)
+{
+	while(slavesListRemoveHead())
+	{}
 }

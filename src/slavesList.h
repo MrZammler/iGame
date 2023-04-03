@@ -24,7 +24,6 @@
 #define _SLAVES_LIST_H
 
 
-int isListEmpty(void *);
 void slavesListAddHead(slavesList *);
 void slavesListAddTail(slavesList *);
 void slavesListPrint(void);
@@ -37,5 +36,6 @@ void slavesListCountInstancesByTitle(slavesList *);
 slavesList *getSlavesListHead(void);
 void setSlavesListBuffer(slavesList *);
 slavesList *getSlavesListBuffer(void);
+void emptySlavesList(void);
 
 #endif

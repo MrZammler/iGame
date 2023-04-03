@@ -1280,12 +1280,8 @@ void app_stop(void)
 
 	memset(&fname[0], 0, sizeof fname);
 
-	// TODO: Free the new slaves list
-	// if (games)
-	// {
-	// 	free(games);
-	// 	games = NULL;
-	// }
+	emptySlavesList();
+
 	if (repos)
 	{
 		free(repos);
