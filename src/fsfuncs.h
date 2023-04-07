@@ -23,7 +23,7 @@
 #ifndef _FS_FUNCS_H
 #define _FS_FUNCS_H
 
-void getParentPath(char *, char *);
+void getParentPath(char *, char *, int);
 void getNameFromPath(char *, char *, unsigned int);
 void getFullPath(const char *, char *);
 void strip_path(const char *, char *);
@@ -33,7 +33,7 @@ BOOL get_filename(const char *, const char *, const BOOL);
 void slavesListLoadFromCSV(char *);
 void slavesListSaveToCSV(const char *);
 int get_title_from_slave(char *, char *);
-void getTitleFromPath(char *, char *);
+void getTitleFromPath(char *, char *, int);
 const char *get_directory_name(const char *);
 char *get_executable_name(int, char **);
 void open_current_dir(void);

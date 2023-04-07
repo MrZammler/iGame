@@ -31,6 +31,7 @@
 #define iGame_NUMBERS
 #define iGame_ARRAY
 #include "iGame_strings.h"
+#include "iGameExtern.h"
 
 #include "strfuncs.h"
 
@@ -56,7 +57,7 @@ char *strcasestr(const char *haystack, const char *needle)
 
 	for (; *haystack; haystack++) {
 		if (tolower((unsigned char)*haystack) == c) {
-			for (size_t i = 0;;) {
+			for (int i = 0;;) {
 				if (needle[++i] == '\0')
 					return (char *)haystack;
 				if (tolower((unsigned char)haystack[i]) != tolower((unsigned char)needle[i]))
@@ -160,11 +161,11 @@ int get_delimiter_position(const char* str)
 
 // Add spaces to a string, based on letter capitalization and numbers
 // E.g. input "A10TankKiller2Disk" -> "A10 Tank Killer 2 Disk"
-const char* add_spaces_to_string(const char* input)
+void add_spaces_to_string(const char* input, char *result, int resultSize)
 {
-	char input_string[100];
+	char input_string[MAX_SLAVE_TITLE_SIZE];
 	strcpy(input_string, input);
-	char* output = (char*)malloc(sizeof input_string * 2);
+	char* output = (char*)malloc(sizeof(input_string) * 2);
 
 	// Special case for the first character, we don't touch it
 	output[0] = input_string[0];
@@ -176,7 +177,11 @@ const char* add_spaces_to_string(const char* input)
 	while (input_string[input_index])
 	{
 		if (isspace(input_string[input_index]))
-			return input;
+		{
+			strncpy(result, input, resultSize);
+			free(output);
+			return;
+		}
 
 		if (isdigit(input_string[input_index]))
 		{
@@ -206,13 +211,14 @@ const char* add_spaces_to_string(const char* input)
 	}
 	output[output_index] = '\0';
 
-	return output;
+	strncpy(result, output, resultSize);
+	free(output);
 }
 
 STRPTR substring(STRPTR string, int position, int length)
 {
 	STRPTR p;
-	size_t c;
+	unsigned int c;
 	if (position < 0) position = 0;
 	if (length < 0) length = strlen(string) + length;
 

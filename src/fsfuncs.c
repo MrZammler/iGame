@@ -85,13 +85,13 @@ void strip_path(const char *path, char *naked_path)
 /*
  * Get the path of the parent folder
  */
-void getParentPath(char *filename, char *result)
+void getParentPath(char *filename, char *result, int resultSize)
 {
 	BPTR fileLock = Lock(filename, SHARED_LOCK);
 	if (fileLock)
 	{
 		BPTR folderLock = ParentDir(fileLock);
-		NameFromLock(folderLock, result, sizeof(char) * MAX_PATH_SIZE);
+		NameFromLock(folderLock, result, resultSize);
 
 		UnLock(folderLock);
 		UnLock(fileLock);
@@ -101,7 +101,7 @@ void getParentPath(char *filename, char *result)
 /*
  * Get the filename of a folder/file from a path
  */
-void getNameFromPath(char *path, char *result, unsigned int size)
+void getNameFromPath(char *path, char *result, unsigned int resultSize)
 {
 	BPTR pathLock = Lock(path, SHARED_LOCK);
 	if (pathLock) {
@@ -109,7 +109,7 @@ void getNameFromPath(char *path, char *result, unsigned int size)
 
 		if (Examine(pathLock, FIblock))
 		{
-			strncpy(result, FIblock->fib_FileName, size);
+			strncpy(result, FIblock->fib_FileName, resultSize);
 			FreeVec(FIblock);
 		}
 		UnLock(pathLock);
@@ -135,9 +135,9 @@ void getFullPath(const char *path, char *result)
 	}
 
 	free(buf);
-	return ;
 }
 
+// TODO: This seems unused - OBSOLETE
 char* get_slave_from_path(char *slave, int start, char *path)
 {
 	int z = 0;
@@ -195,17 +195,17 @@ BOOL get_filename(const char *title, const char *positive_text, const BOOL save_
 
 void slavesListLoadFromCSV(char *filename)
 {
-	int bufSize = sizeof(char) * 1024;
+	int lineBufSize = sizeof(char) * 1024;
 
 	if (check_path_exists(filename))
 	{
 		const BPTR fpgames = Open((CONST_STRPTR) filename, MODE_OLDFILE);
 		if (fpgames)
 		{
-			char *lineBuf = AllocVec(bufSize, MEMF_CLEAR);
-			char *buf = AllocVec(MAX_PATH_SIZE, MEMF_CLEAR);
+			char *lineBuf = AllocVec(lineBufSize, MEMF_CLEAR);
+			char *buf = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
 
-			while (FGets(fpgames, lineBuf, bufSize) != NULL)
+			while (FGets(fpgames, lineBuf, lineBufSize) != NULL)
 			{
 				slavesList *node = malloc(sizeof(slavesList));
 
@@ -264,11 +264,9 @@ void slavesListLoadFromCSV(char *filename)
 			}
 			Close(fpgames);
 			// FreeVec(buf);
-			// FreeVec(lineBuf);
+			FreeVec(lineBuf);
 		}
 	}
-	// TODO: Remove this
-	// slavesListPrint();
 }
 
 void slavesListSaveToCSV(const char *filename)
@@ -384,26 +382,25 @@ int get_title_from_slave(char* slave, char* title)
 /*
  * Set the item title name based on the path on disk
  */
-void getTitleFromPath(char *path, char *title)
+void getTitleFromPath(char *path, char *result, int resultSize)
 {
 	int bufSize = sizeof(char) * MAX_PATH_SIZE;
 	char *buf = AllocVec(bufSize, MEMF_CLEAR);
+	char *itemFolderPath = AllocVec(bufSize, MEMF_CLEAR);
 
-	STRPTR itemFolderPath = AllocVec(bufSize, MEMF_CLEAR);
-	getParentPath(path, itemFolderPath);
+	getParentPath(path, itemFolderPath, bufSize);
 	if (itemFolderPath)
 	{
 		getNameFromPath(itemFolderPath, buf, bufSize);
 
 		if (current_settings->no_smart_spaces)
 		{
-			strcpy(title, buf);
+			strncpy(result, buf, resultSize);
 		}
 		else
 		{
-			strcpy(title, add_spaces_to_string(buf));
+			add_spaces_to_string(buf, result, resultSize);
 		}
-
 	}
 	FreeVec(itemFolderPath);
 	FreeVec(buf);
@@ -460,7 +457,7 @@ void open_current_dir(void)
 		return;
 	}
 
-	getParentPath(existingNode->path, buf);
+	getParentPath(existingNode->path, buf, bufSize);
 	if(!buf)
 	{
 		msg_box((const char*)GetMBString(MSG_DirectoryNotFound));
@@ -514,7 +511,8 @@ void getIconTooltypes(char *path, char *result)
 				if (!strncmp(buf, "*** DON'T EDIT", 14) || !strncmp(buf, "IM", 2))
 					continue;
 
-				sprintf(result, "%s%s\n", result, buf);
+				strcat(result, buf);
+				strcat(result, "\n");
 			}
 			FreeVec(buf);
 			FreeDiskObject(diskObj);
@@ -529,9 +527,9 @@ void setIconTooltypes(char *path, char *tooltypes)
 		struct DiskObject *diskObj = GetIconTags(path, TAG_DONE);
 		if(diskObj)
 		{
-			size_t oldToolTypesCnt = 0;
-			size_t cutPos = 0;
-			size_t newToolTypesCnt = 0;
+			int oldToolTypesCnt = 0;
+			int cutPos = 0;
+			int newToolTypesCnt = 0;
 
 			char *buf = AllocVec(sizeof(char) * MAX_TOOLTYPE_SIZE, MEMF_CLEAR);
 
@@ -556,7 +554,7 @@ void setIconTooltypes(char *path, char *tooltypes)
 			if (newToolTypes)
 			{
 				char **table2 = my_split(tooltypes, "\n");
-				size_t table2Cnt = 0;
+				int table2Cnt = 0;
 				for (table2; (buf = *table2); ++table2)
 				{
 					newToolTypes[table2Cnt] = buf;

@@ -334,7 +334,7 @@ struct ObjApp *CreateApp(void)
 				object->IM_GameImage_0 = MUI_NewObject(Dtpic_Classname,
 					MUIA_Dtpic_Name, DEFAULT_SCREENSHOT_FILE,
 					MUIA_Frame, MUIV_Frame_ImageButton,
-					End;
+				TAG_DONE);
 			}
 			else {
 				object->IM_GameImage_0 = GuigfxObject,
@@ -344,7 +344,7 @@ struct ObjApp *CreateApp(void)
 					MUIA_Frame, MUIV_Frame_ImageButton,
 					MUIA_FixHeight, current_settings->screenshot_height,
 					MUIA_FixWidth, current_settings->screenshot_width,
-					End;
+				End;
 			}
 		}
 

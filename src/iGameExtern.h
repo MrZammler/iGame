@@ -101,8 +101,8 @@ typedef struct slavesList
 	char path[MAX_PATH_SIZE];
 	char genre[MAX_GENRE_NAME_SIZE];
 
-	unsigned int instance;
-	unsigned int times_played;
+	int instance;
+	int times_played;
 
 	int favourite;// TODO: This could be a tag
 

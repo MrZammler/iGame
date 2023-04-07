@@ -187,6 +187,8 @@ igame_settings *load_settings(const char* filename)
 	if(prefsPath == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+
+		free(file_line);
 		return NULL;
 	}
 	getPrefsPath(prefsPath, (STRPTR)filename);
@@ -394,7 +396,7 @@ void app_start(void)
 	set(app->WI_MainWindow, MUIA_Window_Open, TRUE);
 
 	// Load the slaves list from the gameslist file
-	// TODO: Add a message at the status line of the window
+	setStatusText(GetMBString(MSG_LoadingSavedList));
 	set(app->WI_MainWindow, MUIA_Window_Sleep, TRUE);
 	slavesListLoadFromCSV(csvFilename);
 	showSlavesList();
@@ -521,7 +523,8 @@ static void prepareWHDExecution(slavesList *node, char *result)
 			if (temp_tbl)
 				free(temp_tbl);
 
-			sprintf(result, "%s %s", result, buf);
+			strcat(result, " ");
+			strcat(result, buf);
 		}
 
 		FreeDiskObject(diskObj);
@@ -535,7 +538,7 @@ static BOOL createRunGameScript(slavesList *node)
 	int bufSize = sizeof(char) * MAX_PATH_SIZE;
 	char *buf = AllocVec(bufSize, MEMF_CLEAR);
 
-	getParentPath(node->path, buf);
+	getParentPath(node->path, buf, bufSize);
 	FILE* runGameScript = fopen("T:rungame", "we");
 	if (!runGameScript)
 	{
@@ -543,7 +546,7 @@ static BOOL createRunGameScript(slavesList *node)
 		FreeVec(buf);
 		return FALSE;
 	}
-	getParentPath(node->path, buf);
+	getParentPath(node->path, buf, bufSize);
 	fprintf(runGameScript, "Cd \"%s\"\n", buf);
 	getNameFromPath(node->path, buf, bufSize);
 	fprintf(runGameScript, "Run >NIL: \"%s\"\n", buf);
@@ -558,7 +561,7 @@ static void launchSlave(slavesList *node)
 	int bufSize = sizeof(char) * MAX_PATH_SIZE;
 	char *buf = AllocVec(bufSize, MEMF_CLEAR);
 
-	getParentPath(node->path, buf);
+	getParentPath(node->path, buf, bufSize);
 	const BPTR pathLock = Lock(buf, SHARED_LOCK);
 
 	if (pathLock && IconBase)
@@ -700,7 +703,7 @@ void launch_game(void)
 
 static void showSlavesList(void)
 {
-	size_t cnt = 0;
+	int cnt = 0;
 	int bufSize = sizeof(char) * MAX_SLAVE_TITLE_SIZE;
 	char *buf = malloc(bufSize);
 	slavesList *currPtr = getSlavesListHead();
@@ -805,18 +808,18 @@ static void showSlavesList(void)
 /*
  * Generate a title name based on user settings and the path
  */
-static void generateItemName(char *path, char *result)
+static void generateItemName(char *path, char *result, int resultSize)
 {
 	if (current_settings->titles_from_dirs)
 	{
-		getTitleFromPath(path, result);
+		getTitleFromPath(path, result, resultSize);
 	}
 	else
 	{
 		get_title_from_slave(path, result);
 		if (!strncmp(result, "", sizeof(char) * MAX_SLAVE_TITLE_SIZE))
 		{
-			getTitleFromPath(path, result);
+			getTitleFromPath(path, result, resultSize);
 		}
 	}
 }
@@ -867,8 +870,7 @@ static void examineFolder(char *path)
 					// Slave file found
 					if (strcasestr(FIblock->fib_FileName, ".slave"))
 					{
-						slavesList *node = malloc(sizeof(slavesList));
-						slavesList *existingNode = malloc(sizeof(slavesList));
+						slavesList *existingNode = NULL;
 
 						if(!isPathFolder(path))
 						{
@@ -882,6 +884,7 @@ static void examineFolder(char *path)
 						// Find if already exists in the list and ignore it
 						if (!(existingNode = slavesListSearchByPath(buf, bufSize)))
 						{
+							slavesList *node = malloc(sizeof(slavesList));
 							node->instance = 0;
 							node->genre[0] = '\0';
 							node->user_title[0] = '\0';
@@ -896,7 +899,7 @@ static void examineFolder(char *path)
 							strncpy(node->path, buf, sizeof(node->path));
 
 							// Generate title and add in the list
-							generateItemName(node->path, node->title);
+							generateItemName(node->path, node->title, sizeof(node->title));
 
 							// Scan how many others with same title exist and increase a number at the end of the list (alt)
 							slavesListCountInstancesByTitle(node);
@@ -907,7 +910,7 @@ static void examineFolder(char *path)
 						else
 						{
 							// Generate title and add in the list
-							generateItemName(existingNode->path, existingNode->title);
+							generateItemName(existingNode->path, existingNode->title, sizeof(existingNode->title));
 
 							slavesListCountInstancesByTitle(existingNode);
 						}
@@ -930,10 +933,6 @@ void scan_repositories(void)
 	if (repos)
 	{
 		set(app->WI_MainWindow, MUIA_Window_Sleep, TRUE);
-		// This is necessary for counting the same title instance
-		// when the list is not empty (start/change of settings)
-		// slavesListClearTitles();
-
 		for (item_repos = repos; item_repos != NULL; item_repos = item_repos->next)
 		{
 			if(check_path_exists(item_repos->repo))
@@ -941,6 +940,7 @@ void scan_repositories(void)
 				examineFolder(item_repos->repo);
 			}
 		}
+		setStatusText(GetMBString(MSG_ScanCompletedUpdatingList));
 		showSlavesList();
 		set(app->WI_MainWindow, MUIA_Window_Sleep, FALSE);
 	}
@@ -970,7 +970,7 @@ static void show_screenshot(STRPTR screenshot_path)
 			app->IM_GameImage_1 = MUI_NewObject(Dtpic_Classname,
 						MUIA_Dtpic_Name,				screenshot_path,
 						MUIA_Frame, 					MUIV_Frame_ImageButton,
-			End;
+			TAG_DONE);
 		}
 		else
 		{
@@ -1007,7 +1007,7 @@ static void get_screenshot_path(char *game_title, char *result)
 	slavesList *existingNode = malloc(sizeof(slavesList));
 	if (existingNode = slavesListSearchByTitle(game_title, sizeof(char) * MAX_SLAVE_TITLE_SIZE))
 	{
-		getParentPath(existingNode->path, buf);
+		getParentPath(existingNode->path, buf, bufSize);
 
 		// Return the igame.iff from the game folder, if exists
 		snprintf(result, sizeof(char) * MAX_PATH_SIZE, "%s/igame.iff", buf);
@@ -1150,7 +1150,7 @@ void slaveProperties(void)
 		char *pathBuffer = malloc(pathBufferSize);
 		char *tooltypesBuffer = AllocVec(sizeof(char) * 1024, MEMF_CLEAR);
 		char timesPlayedStr[6];
-		size_t i;
+		int i;
 
 		setSlavesListBuffer(node);
 
@@ -1192,10 +1192,9 @@ void saveItemProperties(void)
 	int bufSize = sizeof(char) * MAX_PATH_SIZE;
 	char *buf = AllocVec(bufSize, MEMF_CLEAR);
 	ULONG newpos;
-	// char *tooltypesBuffer = AllocVec(sizeof(char) * 1024, MEMF_CLEAR);
 
 	slavesList *node = malloc(sizeof(slavesList));
-	node = getSlavesListBuffer();
+	node = getSlavesListBuffer(); // cppcheck-suppress memleak
 
 	get(app->STR_PropertiesGameTitle, MUIA_String_Contents, &buf);
 	if(strncmp(node->title, buf, sizeof(char) * MAX_SLAVE_TITLE_SIZE))
@@ -1326,7 +1325,7 @@ void open_list(void)
 //function to return the dec eq of a hex no.
 static int hex2dec(char* hexin)
 {
-	int dec;
+	unsigned int dec;
 	//lose the first $ character
 	hexin++;
 	sscanf(hexin, "%x", &dec);
@@ -1554,6 +1553,7 @@ void settings_save(void)
 	if(prefsPath == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+		free(file_line);
 		return;
 	}
 	getPrefsPath(prefsPath, (STRPTR)DEFAULT_SETTINGS_FILE);
@@ -1562,6 +1562,8 @@ void settings_save(void)
 	if (!fpsettings)
 	{
 		msg_box((const char*)"Could not save Settings file!");
+		FreeVec(prefsPath);
+		free(file_line);
 		return;
 	}
 
@@ -1692,11 +1694,13 @@ void non_whdload_ok(void)
 	if (isStringEmpty(title))
 	{
 		msg_box((const char*)GetMBString(MSG_NoTitleSpecified));
+		free(node);
 		return;
 	}
 	if (isStringEmpty(path))
 	{
 		msg_box((const char*)GetMBString(MSG_NoExecutableSpecified));
+		free(node);
 		return;
 	}
 

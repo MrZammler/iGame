@@ -28,7 +28,7 @@ char* strdup(const char *); // TODO: Possible obsolete. Maybe needed on some old
 void string_to_lower(char *);
 char** my_split(char *, char *);
 int get_delimiter_position(const char *);
-const char* add_spaces_to_string(const char *);
+void add_spaces_to_string(const char *, char *, int);
 STRPTR substring(STRPTR, int, int);
 STRPTR GetMBString(ULONG);
 BOOL isStringEmpty(char *);

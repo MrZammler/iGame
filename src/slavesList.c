@@ -94,7 +94,7 @@ static BOOL slavesListRemoveHead(void) {
 
 void slavesListPrint(void)
 {
-	size_t cnt = 0;
+	int cnt = 0;
 	slavesList *currPtr = slavesListHead;
 	while (currPtr != NULL)
 	{
@@ -104,7 +104,7 @@ void slavesListPrint(void)
 		currPtr = currPtr->next;
 		cnt++;
 	}
-	// printf("END OF LIST: %d items\n", cnt);
+	printf("END OF LIST: %d items\n", cnt);
 }
 
 /*
@@ -113,6 +113,25 @@ void slavesListPrint(void)
 *
 *	TODO: When we have the list sorted make this binary search
 */
+// BOOL slavesListSearchByPath(char *path, unsigned int pathSize, slavesList *node)
+// {
+// 	if (isListEmpty(slavesListHead))
+// 	{
+// 		// printf("DBG: isListEmpty\n");
+// 		// node->path[0] = '\0';
+// 		return FALSE;
+// 	}
+
+// 	node = slavesListHead;
+// 	while (node != NULL && strncmp(node->path, path, pathSize))
+// 	{
+// 		// printf("DBG:\t%s\t%s\n", node->path, path);
+// 		node = node->next;
+// 	}
+// 	if (node == NULL) return FALSE;
+// 	return TRUE; // Existing node found
+// }
+
 slavesList *slavesListSearchByPath(char *path, unsigned int pathSize)
 {
 	if (isListEmpty(slavesListHead))
@@ -168,22 +187,8 @@ void slavesListCountInstancesByTitle(slavesList *node)
 		}
 		currPtr = currPtr->next;
 	}
+	free(currPtr);
 }
-
-// void slavesListClearTitles(void)
-// {
-// 	if (isListEmpty(slavesListHead))
-// 	{
-// 		return;
-// 	}
-
-// 	slavesList *currPtr = slavesListHead;
-// 	while (currPtr != NULL)
-// 	{
-// 		currPtr->title[0] = '\0';
-// 		currPtr = currPtr->next;
-// 	}
-// }
 
 slavesList *getSlavesListHead(void)
 {
