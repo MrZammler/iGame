@@ -305,10 +305,11 @@ static void load_genres(const char* filename)
 		return;
 	}
 
-	int i;
 	const BPTR fpgenres = Open((CONST_STRPTR)filename, MODE_OLDFILE);
 	if (fpgenres)
 	{
+		int i;
+
 		no_of_genres = 0;
 		while (FGets(fpgenres, file_line, buffer_size))
 		{
@@ -498,8 +499,8 @@ static void prepareWHDExecution(slavesList *node, char *result)
 				{
 					sprintf(buf,"%s=\"%s\"", temp_tbl[0],temp_tbl[1]);
 				}
-				if (temp_tbl)
-					free(temp_tbl);
+
+				free(temp_tbl);
 			}
 
 			/* Must check here for numerical values */
@@ -520,8 +521,8 @@ static void prepareWHDExecution(slavesList *node, char *result)
 					sprintf(buf, "%s=%d", temp_tbl[0], dec_rep);
 				}
 			}
-			if (temp_tbl)
-				free(temp_tbl);
+
+			free(temp_tbl);
 
 			strcat(result, " ");
 			strcat(result, buf);
@@ -567,7 +568,6 @@ static void launchSlave(slavesList *node)
 	if (pathLock && IconBase)
 	{
 		struct FileInfoBlock *FIblock = (struct FileInfoBlock *)AllocVec(sizeof(struct FileInfoBlock), MEMF_CLEAR);
-		char *tooltypesBuffer = AllocVec(sizeof(char) * 1024, MEMF_CLEAR);
 
 		const BPTR oldLock = CurrentDir(pathLock);
 
@@ -676,7 +676,7 @@ void launch_game(void)
 		return;
 	}
 
-	slavesList *existingNode = malloc(sizeof(slavesList));
+	slavesList *existingNode = NULL;
 	if ((existingNode = slavesListSearchByTitle(game_title, sizeof(char) * MAX_SLAVE_TITLE_SIZE)) == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
@@ -1014,7 +1014,7 @@ static void get_screenshot_path(char *game_title, char *result)
 		return;
 	}
 
-	slavesList *existingNode = malloc(sizeof(slavesList));
+	slavesList *existingNode = NULL;
 	if (existingNode = slavesListSearchByTitle(game_title, sizeof(char) * MAX_SLAVE_TITLE_SIZE))
 	{
 		getParentPath(existingNode->path, buf, bufSize);
@@ -1153,7 +1153,7 @@ void slaveProperties(void)
 		return;
 	}
 
-	slavesList *node = malloc(sizeof(slavesList));
+	slavesList *node = NULL;
 	if (node = slavesListSearchByTitle(title, sizeof(char) * MAX_SLAVE_TITLE_SIZE))
 	{
 		int pathBufferSize = sizeof(char) * MAX_PATH_SIZE;
@@ -1203,7 +1203,7 @@ void saveItemProperties(void)
 	char *buf = AllocVec(bufSize, MEMF_CLEAR);
 	ULONG newpos;
 
-	slavesList *node = malloc(sizeof(slavesList));
+	slavesList *node = NULL;
 	node = getSlavesListBuffer(); // cppcheck-suppress memleak
 
 	get(app->STR_PropertiesGameTitle, MUIA_String_Contents, &buf);

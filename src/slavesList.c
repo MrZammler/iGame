@@ -32,7 +32,7 @@
 slavesList *slavesListHead = NULL;
 slavesList *slavesListBuffer = NULL;
 
-static int isListEmpty(void *head)
+static int isListEmpty(const void *head)
 {
 	return head == NULL;
 }
@@ -109,29 +109,10 @@ void slavesListPrint(void)
 
 /*
 *	Search the slavesList by item path.
-*	If found returns the node, otherwise returns NULL
+*	If found returns the node pointer, otherwise returns NULL
 *
-*	TODO: When we have the list sorted make this binary search
+*	TODO: When we have the list sorted make this binary search, if possible
 */
-// BOOL slavesListSearchByPath(char *path, unsigned int pathSize, slavesList *node)
-// {
-// 	if (isListEmpty(slavesListHead))
-// 	{
-// 		// printf("DBG: isListEmpty\n");
-// 		// node->path[0] = '\0';
-// 		return FALSE;
-// 	}
-
-// 	node = slavesListHead;
-// 	while (node != NULL && strncmp(node->path, path, pathSize))
-// 	{
-// 		// printf("DBG:\t%s\t%s\n", node->path, path);
-// 		node = node->next;
-// 	}
-// 	if (node == NULL) return FALSE;
-// 	return TRUE; // Existing node found
-// }
-
 slavesList *slavesListSearchByPath(char *path, unsigned int pathSize)
 {
 	if (isListEmpty(slavesListHead))

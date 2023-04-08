@@ -328,21 +328,21 @@ int get_title_from_slave(char* slave, char* title)
 
 	struct slave_info
 	{
-		unsigned long security;
-		char id[8];
+		unsigned long security; // cppcheck-suppress unusedStructMember
+		char id[8]; // cppcheck-suppress unusedStructMember
 		unsigned short version;
-		unsigned short flags;
-		unsigned long base_mem_size;
-		unsigned long exec_install;
-		unsigned short game_loader;
-		unsigned short current_dir;
-		unsigned short dont_cache;
-		char keydebug;
-		char keyexit;
-		unsigned long exp_mem;
+		unsigned short flags; // cppcheck-suppress unusedStructMember
+		unsigned long base_mem_size; // cppcheck-suppress unusedStructMember
+		unsigned long exec_install; // cppcheck-suppress unusedStructMember
+		unsigned short game_loader; // cppcheck-suppress unusedStructMember
+		unsigned short current_dir; // cppcheck-suppress unusedStructMember
+		unsigned short dont_cache; // cppcheck-suppress unusedStructMember
+		char keydebug; // cppcheck-suppress unusedStructMember
+		char keyexit; // cppcheck-suppress unusedStructMember
+		unsigned long exp_mem; // cppcheck-suppress unusedStructMember
 		unsigned short name;
-		unsigned short copy;
-		unsigned short info;
+		unsigned short copy; // cppcheck-suppress unusedStructMember
+		unsigned short info; // cppcheck-suppress unusedStructMember
 	};
 
 	struct slave_info sl;
@@ -460,7 +460,7 @@ void open_current_dir(void)
 		return;
 	}
 
-	slavesList *existingNode = malloc(sizeof(slavesList));
+	slavesList *existingNode = NULL;
 	if ((existingNode = slavesListSearchByTitle(game_title, sizeof(char) * MAX_SLAVE_TITLE_SIZE)) == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
@@ -478,22 +478,6 @@ void open_current_dir(void)
 	OpenWorkbenchObject(buf);
 	FreeVec(buf);
 }
-
-// TODO: This is replaced by slavesListSearchByTitle() - OBSOLETE
-// void get_path(char *title, char *path)
-// {
-// 	for (item_games = games; item_games != NULL; item_games = item_games->next)
-// 	{
-// 		if (item_games->deleted != 1)
-// 		{
-// 			if (!strcmp(title, item_games->title))
-// 			{
-// 				strcpy(path, item_games->path);
-// 				break;
-// 			}
-// 		}
-// 	}
-// }
 
 // TODO: Check if this is used and rename it for partition
 BOOL isPathFolder(char *path)
@@ -516,6 +500,8 @@ void getIconTooltypes(char *path, char *result)
 		if(diskObj)
 		{
 			char *buf = AllocVec(sizeof(char) * MAX_TOOLTYPE_SIZE, MEMF_CLEAR);
+
+			// cppcheck-suppress redundantInitialization
 			for (STRPTR *tool_types = diskObj->do_ToolTypes; (buf = *tool_types); ++tool_types)
 			{
 				if (!strncmp(buf, "*** DON'T EDIT", 14) || !strncmp(buf, "IM", 2))
@@ -537,18 +523,17 @@ void setIconTooltypes(char *path, char *tooltypes)
 		struct DiskObject *diskObj = GetIconTags(path, TAG_DONE);
 		if(diskObj)
 		{
-			int oldToolTypesCnt = 0;
-			int cutPos = 0;
-			int newToolTypesCnt = 0;
+			int toolTypesCnt = 0;
 
 			char *buf = AllocVec(sizeof(char) * MAX_TOOLTYPE_SIZE, MEMF_CLEAR);
 
 			// Get the number of the new tooltypes
 			char **table = my_split(tooltypes, "\n");
 			BOOL isLastLineEmpty = FALSE;
-			for (table; (buf = *table); ++table)
+
+			for (table; (buf = *table); ++table) // cppcheck-suppress redundantInitialization
 			{
-				newToolTypesCnt++;
+				toolTypesCnt++;
 				isLastLineEmpty = FALSE;
 				if (buf[0] == '\0')
 				{
@@ -557,10 +542,10 @@ void setIconTooltypes(char *path, char *tooltypes)
 			}
 			if (!isLastLineEmpty)
 			{
-				newToolTypesCnt++;
+				toolTypesCnt++;
 			}
 
-			unsigned char **newToolTypes = AllocVec(sizeof(char *) * newToolTypesCnt, MEMF_CLEAR);
+			unsigned char **newToolTypes = AllocVec(sizeof(char *) * toolTypesCnt, MEMF_CLEAR);
 			if (newToolTypes)
 			{
 				char **table2 = my_split(tooltypes, "\n");
@@ -571,7 +556,7 @@ void setIconTooltypes(char *path, char *tooltypes)
 					table2Cnt++;
 				}
 
-				newToolTypes[newToolTypesCnt-1] = NULL;
+				newToolTypes[toolTypesCnt-1] = NULL;
 
 				diskObj->do_ToolTypes = newToolTypes;
 
@@ -582,12 +567,10 @@ void setIconTooltypes(char *path, char *tooltypes)
 					ICONA_ErrorCode, &errorCode,
 				TAG_DONE);
 
-				// TODO: Add an error message to inform the user
-				// if(success == FALSE)
-				// {
-				// 	Printf("could not store default picture icon;\n");
-				// 	PrintFault(errorCode, NULL);
-				// }
+				if(success == FALSE)
+				{
+					msg_box((const char*)GetMBString(MSG_ICONPICTURESTORE_FAILED));
+				}
 
 				FreeVec(newToolTypes);
 			}

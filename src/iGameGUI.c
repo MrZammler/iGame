@@ -123,7 +123,7 @@ struct ObjApp *CreateApp(void)
 	// APTR	MNMainMenuDuplicate;
 	// APTR	MNMainDelete;
 	APTR	GROUP_ROOT;
-	APTR	GR_Filter, LA_Filter, GR_main, Space_Gamelist;
+	APTR	GR_Filter, LA_Filter, GR_main;
 	APTR	GROUP_ROOT_1, GR_Genre, LA_PropertiesGenre, Space_Genre;
 	APTR	GR_PropertiesChecks, obj_aux0, obj_aux1, Space_Properties, obj_aux2;
 	APTR	obj_aux3, GR_TimesPlayed, LA_PropertiesTimesPlayed, Space_TimesPlayed;
@@ -326,8 +326,6 @@ struct ObjApp *CreateApp(void)
 
 	if (!current_settings->hide_side_panel)
 	{
-		Space_Gamelist = HSpace(1);
-
 		if (!current_settings->hide_screenshots) {
 
 			if (current_settings->no_guigfx) {

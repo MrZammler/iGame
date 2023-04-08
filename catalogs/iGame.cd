@@ -321,3 +321,6 @@ Scan completed. Updating the list now.
 MSG_LoadingSavedList (//)
 Loading the saved list. Please wait.
 ;Loading the saved list. Please wait.
+MSG_ICONPICTURESTORE_FAILED (//)
+Could not store default picture icon
+;Could not store default picture icon
