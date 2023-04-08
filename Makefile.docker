@@ -133,7 +133,7 @@ src/iGameGUI_$(CPU).o: src/iGameGUI.c src/iGameGUI.h src/iGame_strings.h \
 
 src/iGameMain_$(CPU).o: src/iGameMain.c src/iGameExtern.h
 
-src/strfuncs_$(CPU).o: src/strfuncs.c src/strfuncs.h
+src/strfuncs_$(CPU).o: src/strfuncs.c src/iGameExtern.h src/strfuncs.h
 
 src/fsfuncs_$(CPU).o: src/fsfuncs.c src/fsfuncs.h src/funcs.h \
 	src/iGameExtern.h src/slavesList.h
