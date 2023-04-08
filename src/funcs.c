@@ -59,9 +59,6 @@
 
 extern struct ObjApp* app;
 extern struct Library *IconBase;
-#if defined(__morphos__)
-extern struct Library *IntuitionBase;
-#endif
 extern char* executable_name;
 
 /* global variables */
