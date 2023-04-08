@@ -5,6 +5,8 @@
 ### Changed
 - Now we compile iGame with NDK 3.2R4
 - Now the repositories path requester accepts only drawers
+- Memory footprint is now reduced and optimised as much as possible
+- iGame window appears first and then the list is loaded from the file. This makes the application appear faster, giving feedback to the user
 - When the user selects a relative path (ie. //Games), that changes to an absolute path.
 - Changed the way the same title slaves are counted. This will help for removing the multiple "Alt" words in the list
 - Changed the repository scanning for files. The code is simplified and now uses more functions from the system API, making it more compatible. Also, all the "Data" folders are skipped from scanning, so slaves that exist in those folders are not used. A lot of code was removed and optimised, so the scan is now around 37% faster on the same machine, scanning a folder with 3562 entries.
@@ -14,13 +16,16 @@
 - Now iGame requires icon.library v44+ for changing icon tooltypes. For systems that do include a new version, there is icon.library 46.4 on Aminet is free to download and use. Those that have older versions of the library will still be able to use iGame, but they won't be able to change the icon tooltypes. They will need to do it from Workbench
 - Now the filter string field is not disabled in the hidden list, allowing the user to filter the results based on the title or part of it
 - "Status" line, "Times played" and "Slave path" do not have a border anymore, since they are read-only fields
-- "No smart spaces" has a proper border now
+- "No smart spaces" checkbox has a proper border now
 - "Slave path" in the item properties window doesn't stretch its width anymore. If MUI 5 is used the text will be shortened, showing three dots in the middle of it.
 - If WBLoad exists in the C: folder, this is going to be used to start games/demos from WB, when they were added as extra items in the list
+- The "Last played" list holds more than one record, so that you can easily find the last games you played
 
 ### Fixed
 - When a user changes the tooltypes of a slave, the NewIcon keeps working. The previous versions of iGame were deleting the image information. Now they are dropped from the icon tooltypes, but the image keeps working fine. As a result, the .info file size is reduced almost to half.
-- Now it is possible to save the icon tooltypes even if it is used as an item screenshot
+- Now it is possible to save the icon tooltypes even if it is used as an item screenshot. In the previous versions the icon file was blocked and no change was possible
+- Fixed crashing on exit
+- Fixed low memory computer freeze while scanning a big list of items
 
 ## iGame 2.2.1 - [2023-01-30]
 ### Added

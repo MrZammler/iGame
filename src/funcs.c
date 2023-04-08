@@ -793,7 +793,7 @@ static void showSlavesList(void)
 				MUIV_List_Insert_Sorted);
 
 			cnt++;
-		nextItem:
+nextItem:
 		}
 
 		currPtr = currPtr->next;
@@ -824,14 +824,15 @@ static void generateItemName(char *path, char *result, int resultSize)
 	}
 }
 
-static void examineFolder(char *path)
+static BOOL examineFolder(char *path)
 {
+	BOOL success = TRUE;
 	int bufSize = sizeof(char) * MAX_PATH_SIZE;
 	char *buf = malloc(bufSize);
 	if(buf == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
+		return FALSE;
 	}
 
 	const BPTR lock = Lock(path, SHARED_LOCK);
@@ -861,7 +862,7 @@ static void examineFolder(char *path)
 
 						getFullPath(buf, buf);
 						setStatusText(buf);
-						examineFolder(buf);
+						if (!(success = examineFolder(buf))) break;
 					}
 				}
 
@@ -885,6 +886,15 @@ static void examineFolder(char *path)
 						if (!(existingNode = slavesListSearchByPath(buf, bufSize)))
 						{
 							slavesList *node = malloc(sizeof(slavesList));
+							if(node == NULL)
+							{
+								msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+								FreeVec(FIblock);
+								UnLock(lock);
+								free(buf);
+								return FALSE;
+							}
+
 							node->instance = 0;
 							node->genre[0] = '\0';
 							node->user_title[0] = '\0';
@@ -917,7 +927,6 @@ static void examineFolder(char *path)
 					}
 				}
 			}
-
 			FreeVec(FIblock);
 		}
 
@@ -925,6 +934,7 @@ static void examineFolder(char *path)
 	}
 
 	free(buf);
+	return success;
 }
 
 // Replaces scan_repositories_old()
@@ -937,7 +947,7 @@ void scan_repositories(void)
 		{
 			if(check_path_exists(item_repos->repo))
 			{
-				examineFolder(item_repos->repo);
+				if (!(examineFolder(item_repos->repo))) break;
 			}
 		}
 		setStatusText(GetMBString(MSG_ScanCompletedUpdatingList));
