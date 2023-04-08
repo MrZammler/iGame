@@ -88,6 +88,11 @@ void getNameFromPath(char *path, char *result, unsigned int resultSize)
 {
 	BPTR pathLock = Lock(path, SHARED_LOCK);
 	if (pathLock) {
+
+	#if defined(__amigaos4__)
+		struct ExamineData *data = ExamineObjectTags(EX_LockInput, pathLock, TAG_END);
+		strncpy(result, data->Name, resultSize);
+	#else
 		struct FileInfoBlock *FIblock = (struct FileInfoBlock *)AllocVec(sizeof(struct FileInfoBlock), MEMF_CLEAR);
 
 		if (Examine(pathLock, FIblock))
@@ -95,6 +100,7 @@ void getNameFromPath(char *path, char *result, unsigned int resultSize)
 			strncpy(result, FIblock->fib_FileName, resultSize);
 			FreeVec(FIblock);
 		}
+	#endif
 		UnLock(pathLock);
 	}
 }
