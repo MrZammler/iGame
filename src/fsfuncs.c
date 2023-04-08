@@ -65,23 +65,6 @@ struct FileRequester* request;
 extern char fname[255];
 extern igame_settings *current_settings;
 
-// TODO: This is obsolete. Change it with getParentPath()
-void strip_path(const char *path, char *naked_path)
-{
-	int i, k;
-	/* strip the path from the slave file and get the rest */
-	for (i = strlen(path) - 1; i >= 0; i--)
-	{
-		if (path[i] == '/')
-			break;
-	}
-
-	for (k = 0; k <= i - 1; k++)
-		naked_path[k] = path[k];
-	naked_path[k] = '\0';
-}
-
-
 /*
  * Get the path of the parent folder
  */
@@ -135,18 +118,6 @@ void getFullPath(const char *path, char *result)
 	}
 
 	free(buf);
-}
-
-// TODO: This seems unused - OBSOLETE
-char* get_slave_from_path(char *slave, int start, char *path)
-{
-	int z = 0;
-	for (int k = start + 1; k <= strlen(path); k++)
-	{
-		slave[z] = path[k];
-		z++;
-	}
-	return slave;
 }
 
 /*
@@ -479,7 +450,7 @@ void open_current_dir(void)
 	FreeVec(buf);
 }
 
-// TODO: Check if this is used and rename it for partition
+// Check if the path is a folder or a partition
 BOOL isPathFolder(char *path)
 {
 	if (path[strlen(path)-1] == ':')

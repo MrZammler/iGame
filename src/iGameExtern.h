@@ -104,12 +104,12 @@ typedef struct slavesList
 	int instance;
 	int times_played;
 
-	int favourite;// TODO: This could be a tag
+	int favourite;// TODO: IDEA - This could be a tag
 
 	int last_played; //indicates whether this one was the last game played
 
 	int exists; // indicates whether this game still exists after a scan
-				// TODO: Maybe needs to be removed when game deletion removes files as well
+				// TODO: IDEA - Maybe needs to be removed when game deletion removes files as well
 
 	int hidden; // game is hidden from normal operation
 				// TODO: This could be a tag

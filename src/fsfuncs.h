@@ -26,8 +26,6 @@
 void getParentPath(char *, char *, int);
 void getNameFromPath(char *, char *, unsigned int);
 void getFullPath(const char *, char *);
-void strip_path(const char *, char *);
-char *get_slave_from_path(char *, int, char *);
 BOOL check_path_exists(char *);
 BOOL get_filename(const char *, const char *, const BOOL);
 void slavesListLoadFromCSV(char *);

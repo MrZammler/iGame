@@ -24,7 +24,7 @@
 #define _STR_FUNCS_H
 
 char *strcasestr(const char *, const char *);
-char* strdup(const char *); // TODO: Possible obsolete. Maybe needed on some old tools. Better move it there
+char* strdup(const char *);
 void string_to_lower(char *);
 char** my_split(char *, char *);
 int get_delimiter_position(const char *);

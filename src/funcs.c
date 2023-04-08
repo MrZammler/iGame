@@ -65,22 +65,14 @@ extern struct Library *IntuitionBase;
 extern char* executable_name;
 
 /* global variables */
-int total_hidden = 0;
 int total_games;
 int no_of_genres;
-char* game_tooltypes;
 char fname[255];
-int IntroPic = 0;
-int wbrun = 0;
 
 /* function definitions */
 // int get_genre(char* title, char* genre);
 static int hex2dec(char* hexin);
-static void check_for_wbrun();
 static void showSlavesList(void);
-
-/* structures */
-struct EasyStruct msgbox;
 
 repos_list *item_repos = NULL, *repos = NULL;
 genres_list *item_genres = NULL, *genres = NULL;
@@ -380,9 +372,7 @@ void app_start(void)
 	add_default_filters();
 	load_genres(DEFAULT_GENRES_FILE);
 	apply_settings();
-	check_for_wbrun();
 
-	IntroPic = 1;
 
 	if (current_settings->start_with_favorites)
 	{
@@ -440,27 +430,6 @@ void filter_change(void)
 	else strncpy(filters.showGenre, genreSelection, sizeof(filters.showGenre));
 
 	showSlavesList();
-}
-
-/*
- * Checks if WBRun exists in C:
- */
-static void check_for_wbrun(void)
-{
-	// TODO: check these to use the check_path_exists() method
-	const BPTR oldlock = Lock((CONST_STRPTR)PROGDIR, ACCESS_READ);
-	const BPTR lock = Lock("C:WBRun", ACCESS_READ);
-
-	if (lock)
-	{
-		wbrun=1;
-	}
-	else
-	{
-		wbrun=0;
-	}
-
-	CurrentDir(oldlock);
 }
 
 static void prepareWHDExecution(slavesList *node, char *result)
@@ -588,7 +557,6 @@ static void launchSlave(slavesList *node)
 					char *exec = AllocVec(bufSize, MEMF_CLEAR);
 					prepareWHDExecution(node, exec);
 
-					// TODO: Need to make all the other items to 0
 					// Update statistics info
 					node->last_played = 1;
 					node->times_played++;
@@ -914,7 +882,7 @@ static BOOL examineFolder(char *path)
 							// Scan how many others with same title exist and increase a number at the end of the list (alt)
 							slavesListCountInstancesByTitle(node);
 
-							// TODO: Instead of adding at the tail insert it in sorted position
+							// TODO: IDEA - Instead of adding at the tail insert it in sorted position
 							slavesListAddTail(node);
 						}
 						else
@@ -1142,9 +1110,6 @@ void repo_stop(void)
 // Shows the Properties window populating the information fields
 void slaveProperties(void)
 {
-	// TODO: This needs to be cleared on Window close
-	// set(app->WI_MainWindow, MUIA_Window_Sleep, TRUE);
-
 	char* title = NULL;
 	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &title);
 	if(isStringEmpty(title))
@@ -1310,7 +1275,6 @@ void genres_click(void)
 
 void save_list(const int check_exists)
 {
-	// TODO: Maybe add here a message in status
 	slavesListSaveToCSV(DEFAULT_GAMESLIST_FILE);
 }
 
@@ -1342,92 +1306,6 @@ static int hex2dec(char* hexin)
 	return dec;
 }
 
-// TODO: This seems unused and maybe needs to be removed - Decide if needed as a feature
-// void game_duplicate(void)
-// {
-// 	char* str = NULL;
-// 	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &str);
-
-// 	if (str == NULL || strlen(str) == 0)
-// 	{
-// 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
-// 		return;
-// 	}
-
-// 	int found = 0;
-// 	for (item_games = games; item_games != NULL; item_games = item_games->next)
-// 	{
-// 		if (!strcmp(str, item_games->title) && item_games->deleted != 1)
-// 		{
-// 			found = 1;
-// 			break;
-// 		}
-// 	}
-
-// 	if (!found)
-// 	{
-// 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
-// 		return;
-// 	}
-
-// 	char title_copy[200];
-// 	char path_copy[256];
-// 	char genre_copy[100];
-// 	strcpy(title_copy, item_games->title);
-// 	strcat(title_copy, " copy");
-// 	strcpy(path_copy, item_games->path);
-// 	strcpy(genre_copy, item_games->genre);
-
-// 	item_games = (games_list *)calloc(1, sizeof(games_list));
-// 	item_games->next = NULL;
-// 	item_games->index = 0;
-// 	item_games->exists = 0;
-// 	item_games->deleted = 0;
-// 	strcpy(item_games->title, title_copy);
-// 	strcpy(item_games->genre, genre_copy);
-// 	strcpy(item_games->path, path_copy);
-// 	item_games->favorite = 0;
-// 	item_games->times_played = 0;
-// 	item_games->last_played = 0;
-// 	item_games->hidden = 0;
-
-// 	if (games == NULL)
-// 		games = item_games;
-// 	else
-// 	{
-// 		item_games->next = games;
-// 		games = item_games;
-// 	}
-
-// 	total_games++;
-// 	DoMethod(app->LV_GamesList, MUIM_List_InsertSingle, item_games->title, MUIV_List_Insert_Sorted);
-// 	status_show_total();
-// }
-
-// void game_delete(void)
-// {
-// 	char* str = NULL;
-// 	LONG id = MUIV_List_NextSelected_Start;
-// 	for (;;)
-// 	{
-// 		DoMethod(app->LV_GamesList, MUIM_List_NextSelected, &id);
-// 		if (id == MUIV_List_NextSelected_End) break;
-
-// 		DoMethod(app->LV_GamesList, MUIM_List_GetEntry, id, &str);
-// 		for (item_games = games; item_games != NULL; item_games = item_games->next)
-// 		{
-// 			if (!strcmp(str, item_games->title))
-// 			{
-// 				item_games->deleted = 1;
-// 				break;
-// 			}
-// 		}
-// 		DoMethod(app->LV_GamesList, MUIM_List_Remove, id);
-// 		total_games--;
-// 	}
-// 	status_show_total();
-// }
-
 static LONG xget(Object* obj, ULONG attribute)
 {
 	LONG x;
@@ -1439,12 +1317,6 @@ char* get_str(Object* obj)
 {
 	return (char *)xget(obj, MUIA_String_Contents);
 }
-
-// TODO: Seems unused
-// BOOL get_bool(Object* obj)
-// {
-// 	return (BOOL)xget(obj, MUIA_Selected);
-// }
 
 static int get_cycle_index(Object* obj)
 {
@@ -1619,6 +1491,8 @@ void setting_start_with_favorites_changed(void)
 
 void msg_box(const char* msg)
 {
+	struct EasyStruct msgbox;
+
 	msgbox.es_StructSize = sizeof msgbox;
 	msgbox.es_Flags = 0;
 	msgbox.es_Title = (UBYTE*)GetMBString(MSG_WI_MainWindow);
@@ -1626,47 +1500,6 @@ void msg_box(const char* msg)
 	msgbox.es_GadgetFormat = (UBYTE*)GetMBString(MSG_BT_AboutOK);
 
 	EasyRequest(NULL, &msgbox, NULL);
-}
-
-// TODO: This seems unused and possibly needs to be removed
-void get_screen_size(int *width, int *height)
-{
-	struct Screen* wbscreen;
-
-	if (IntuitionBase)
-	{
-		if (GfxBase)
-		{
-			if ((wbscreen = LockPubScreen((CONST_STRPTR)WB_PUBSCREEN_NAME)))
-			{
-				/* Using intuition.library/GetScreenDrawInfo(), we get the pen
-				* array we'll use for the screen clone the easy way. */
-				struct DrawInfo* drawinfo = GetScreenDrawInfo(wbscreen);
-
-				struct ViewPort* vp = &wbscreen->ViewPort;
-				/* Use graphics.library/GetVPModeID() to get the ModeID of the
-				* Workbench screen. */
-				if (GetVPModeID(vp) != (long)INVALID_ID)
-				{
-					*width = wbscreen->Width;
-					*height = wbscreen->Height;
-				}
-				else
-				{
-					*width = -1;
-					*height = -1;
-				}
-
-				FreeScreenDrawInfo(wbscreen, drawinfo);
-				UnlockPubScreen(NULL, wbscreen);
-			}
-			else
-			{
-				*width = -1;
-				*height = -1;
-			}
-		}
-	}
 }
 
 void add_non_whdload(void)

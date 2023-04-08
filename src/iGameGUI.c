@@ -157,11 +157,6 @@ struct ObjApp *CreateApp(void)
 	static const struct Hook MenuSaveListAsHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)save_list_as, NULL };
 #endif
 // #if defined(__amigaos4__)
-// 	static const struct Hook MenuDuplicateHook = { { NULL,NULL }, (HOOKFUNC)game_duplicate, NULL, NULL };
-// #else
-// 	static const struct Hook MenuDuplicateHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_duplicate, NULL };
-// #endif
-// #if defined(__amigaos4__)
 // 	static const struct Hook MenuDeleteHook = { { NULL,NULL }, (HOOKFUNC)game_delete, NULL, NULL };
 // #else
 // 	static const struct Hook MenuDeleteHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_delete, NULL };
