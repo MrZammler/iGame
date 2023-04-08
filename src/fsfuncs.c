@@ -204,10 +204,20 @@ void slavesListLoadFromCSV(char *filename)
 		{
 			char *lineBuf = AllocVec(lineBufSize, MEMF_CLEAR);
 			char *buf = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
+			if((buf == NULL) || (lineBuf == NULL))
+			{
+				msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+				return;
+			}
 
 			while (FGets(fpgames, lineBuf, lineBufSize) != NULL)
 			{
 				slavesList *node = malloc(sizeof(slavesList));
+				if(node == NULL)
+				{
+					msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+					return;
+				}
 
 				buf = strtok(lineBuf, ";");
 				node->instance = atoi(buf);
