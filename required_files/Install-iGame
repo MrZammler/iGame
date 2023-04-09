@@ -24,10 +24,12 @@
 ; Set languages
 
 (set #lang_english             0)
-(set #lang_greek               1)
-(set #lang_italiano            2)
-(set #lang_turkish             3)
-(set #lang_maximum             4)
+(set #lang_french              1)
+(set #lang_german              2)
+(set #lang_greek               3)
+(set #lang_italiano            4)
+(set #lang_turkish             5)
+(set #lang_maximum             6)
 
 ;=============================================================================
 ; Set defaults
@@ -62,7 +64,7 @@
 (set #supportedLanguages %00000000000000000)
 (foreach "catalogs" "#?"
     (set #i 0)
-    (while (<> @each-name (select #i "english" "greek" "italiano" @each-name))
+    (while (<> @each-name (select #i "english" "french" "german" "greek" "italiano" "turkish" @each-name))
         (set #i (+ #i 1))
     )
     (if (<> #lang_maximum #i)
@@ -83,6 +85,8 @@
                                  "detection of your system CPU:"))
         (set #lang_catalog  (cat "Which catalog file do you want to install?\n"
                                  "(English language is built-in)"))
+        (set #destdir  (cat "Please select the folder where you want iGame to be installed. "
+                            "A new folder will be created if it doesn't exist."))
         (set #done          (cat "\n"
                                  #appName " has been successfully installed.\n"
                                  "\n"
@@ -134,6 +138,8 @@
     ; AmigaOS 4.x uses english locale names only
     (
         (set #cat_name_english               "english")
+        (set #cat_name_french                "french")
+        (set #cat_name_german                "german")
         (set #cat_name_greek                 "greek")
         (set #cat_name_italiano              "italian")
         (set #cat_name_turkish               "turkish")
@@ -141,6 +147,8 @@
     ; all other systems use localized locale names
     (
         (set #cat_name_english               "english")
+        (set #cat_name_french                "français")
+        (set #cat_name_german                "deutsch")
         (set #cat_name_greek                 "greek")
         (set #cat_name_italiano              "italiano")
         (set #cat_name_turkish               "türkçe")
@@ -244,6 +252,14 @@
 		(choices
 			(if (in #supportedLanguages #lang_english)
 				(cat #prop "English")
+				("")
+			)
+			(if (in #supportedLanguages #lang_french)
+				(cat #prop "Français")
+				("")
+			)
+			(if (in #supportedLanguages #lang_german)
+				(cat #prop "Deutsch")
 				("")
 			)
 			(if (in #supportedLanguages #lang_greek)
@@ -382,6 +398,36 @@
 					(copyfiles
 						(source (tackon "catalogs/turkish" @each-name))
 						(dest (tackon #destination (tackon "catalogs" #cat_name_turkish)))
+						(help @copyfiles-help)
+					)
+				)
+			)
+		)
+
+		; french catalog file
+		(if (in #catalog_lang #lang_french)
+			(
+				(makedir (tackon #destination (tackon "catalogs" #cat_name_french)))
+
+				(foreach "catalogs/french" "#?.catalog"
+					(copyfiles
+						(source (tackon "catalogs/french" @each-name))
+						(dest (tackon #destination (tackon "catalogs" #cat_name_french)))
+						(help @copyfiles-help)
+					)
+				)
+			)
+		)
+
+		; german catalog file
+		(if (in #catalog_lang #lang_german)
+			(
+				(makedir (tackon #destination (tackon "catalogs" #cat_name_german)))
+
+				(foreach "catalogs/german" "#?.catalog"
+					(copyfiles
+						(source (tackon "catalogs/german" @each-name))
+						(dest (tackon #destination (tackon "catalogs" #cat_name_german)))
 						(help @copyfiles-help)
 					)
 				)
