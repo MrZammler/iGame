@@ -10,6 +10,7 @@
 ; $VER: Install-iGame 1.4 (09.04.2023)
 ;
 ; History:
+;   1.5   14.04.2023: Fixed an issue on v2.3.0 release with Icons copy
 ;   1.4   09.04.2023: Added French and German languages
 ;                     Added a header message on folder choice page
 ;   1.3   30.01.2023: Added Turkish language
@@ -296,18 +297,25 @@
 )
 
 ;=============================================================================
-; Create and copy Icons folder
+; Create and copy Extras folder
 (complete 50)
 
-(makedir (tackon #destination "Icons")
-	(prompt (cat "Extra icons will be installed at\n" (tackon #destination "Icons")))
+(makedir (tackon #destination "Extras")
+	(prompt (cat "Extra Extras will be installed at\n" (tackon #destination "Extras")))
 	(help @makedir-help)
 	(confirm "expert")
 )
-(foreach "Icons" "#?.info"
+(foreach "Extras" "#?.png"
 	(copyfiles
-		(source (tackon "Icons" @each-name))
-		(dest (tackon #destination "Icons"))
+		(source (tackon "Extras" @each-name))
+		(dest (tackon #destination "Extras"))
+		(help @copyfiles-help)
+	)
+)
+(foreach "Extras/Icons" "#?.info"
+	(copyfiles
+		(source (tackon "Extras/Icons" @each-name))
+		(dest (tackon #destination "Extras/Icons"))
 		(help @copyfiles-help)
 	)
 )
