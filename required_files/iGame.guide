@@ -61,10 +61,11 @@ iGame started in ~2004/5 as a way to learn a bit of MUI and general Amiga system
 Back in 2016 iGame became open source under the GPLv3 license. Since then, with the kind help of contributors, we did a lot of re-writing and added new features. These versions are now tagged as 2.0.
 
 Contributors:
-Dimitris Panokostas (midwan)
-George Sokianos (walkero)
-Chris Charabaruk (colcacid)
-Javier R. Santurde (T0lk13n)
+- Chris Charabaruk (coldacid)
+- Dimitris Panokostas (midwan)
+- George Sokianos (walkero)
+- Javier R. Santurde (T0lk13n)
+- Willem Drijver
 
 @ENDNODE
 @NODE "BUIL" "Building iGame"
@@ -340,10 +341,11 @@ We would like to thank:
 
 Contributors:
 Since iGame became open source a few people contributed with code. We would like to thank:
-- Chris "coldacid" Charabaruk
-- Dimitris "midwan" Panokostas
-- George "walkero" Sokianos
-- T0lk13n
+- Chris Charabaruk (coldacid)
+- Dimitris Panokostas (midwan)
+- George Sokianos (walkero)
+- Javier R. Santurde (T0lk13n)
+- Willem Drijver
 An extensive and more up to date list can be found at:
 https://github.com/MrZammler/iGame/graphs/contributors
 
