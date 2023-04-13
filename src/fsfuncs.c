@@ -201,16 +201,24 @@ void slavesListLoadFromCSV(char *filename)
 
 				buf = strtok(NULL, ";");
 				node->title[0] = '\0';
-				if (strncmp(buf, "\"\"", 2))
+				if (strcasestr(buf, "\""))
 				{
 					sprintf(node->title,"%s", substring(buf, 1, -2));
+				}
+				else
+				{
+					sprintf(node->title,"%s", buf);
 				}
 
 				buf = strtok(NULL, ";");
 				node->genre[0] = '\0';
-				if (strncmp(buf, "\"\"", 2))
+				if (strcasestr(buf, "\""))
 				{
 					sprintf(node->genre,"%s", substring(buf, 1, -2));
+				}
+				else
+				{
+					sprintf(node->genre,"%s", buf);
 				}
 				if(isStringEmpty(node->genre))
 				{
@@ -219,9 +227,13 @@ void slavesListLoadFromCSV(char *filename)
 
 				buf = strtok(NULL, ";");
 				node->path[0] = '\0';
-				if (strncmp(buf, "\"\"", 2))
+				if (strcasestr(buf, "\""))
 				{
 					sprintf(node->path,"%s", substring(buf, 1, -2));
+				}
+				else
+				{
+					sprintf(node->path,"%s", buf);
 				}
 
 				buf = strtok(NULL, ";");
@@ -239,12 +251,18 @@ void slavesListLoadFromCSV(char *filename)
 				buf = strtok(NULL, ";");
 				node->deleted = atoi(buf);
 
-				// TODO: Add here a check for the old CSV files
 				buf = strtok(NULL, ";");
 				node->user_title[0] = '\0';
-				if (strncmp(buf, "\"\"", 2))
+				if (buf)
 				{
-					sprintf(node->user_title,"%s", substring(buf, 1, -2));
+					if (strcasestr(buf, "\""))
+					{
+						sprintf(node->user_title,"%s", substring(buf, 1, -2));
+					}
+					else
+					{
+						sprintf(node->user_title,"%s", buf);
+					}
 				}
 
 				slavesListAddTail(node);
@@ -258,7 +276,6 @@ void slavesListLoadFromCSV(char *filename)
 
 void slavesListSaveToCSV(const char *filename)
 {
-	// return;
 	char csvFilename[32];
 	FILE *fpgames;
 
@@ -268,7 +285,7 @@ void slavesListSaveToCSV(const char *filename)
 	strcpy(csvFilename, (CONST_STRPTR)filename);
 	strcat(csvFilename, ".csv");
 
-	fpgames = fopen(csvFilename,"w");
+	fpgames = fopen(csvFilename, "w");
 	if (!fpgames)
 	{
 		msg_box((const char*)GetMBString(MSG_FailedOpeningGameslist));
