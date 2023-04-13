@@ -1,8 +1,8 @@
 /*
-  version.h
-  Version manipulation header for iGame
+  slavesList.h
+  slaves list functions header for iGame
 
-  Copyright (c) 2018, Emmanuel Vasilakis
+  Copyright (c) 2018-2022, Emmanuel Vasilakis
 
   This file is part of iGame.
 
@@ -20,24 +20,20 @@
   along with iGame. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MAJOR_VERS
-#define MAJOR_VERS 2
-#endif
+#ifndef _SLAVES_LIST_H
+#define _SLAVES_LIST_H
 
-#ifndef MINOR_VERS
-#define MINOR_VERS 3
-#endif
 
-#ifndef PATCH_VERS
-#define PATCH_VERS 0
-#endif
+void slavesListAddHead(slavesList *);
+void slavesListAddTail(slavesList *);
+void slavesListPrint(void);
+void slavesListClearTitles(void);
+slavesList *slavesListSearchByPath(char *, unsigned int);
+slavesList *slavesListSearchByTitle(char *, unsigned int);
+void slavesListCountInstancesByTitle(slavesList *);
+slavesList *getSlavesListHead(void);
+void setSlavesListBuffer(slavesList *);
+slavesList *getSlavesListBuffer(void);
+void emptySlavesList(void);
 
-#ifndef RELEASE_DATE
-#define RELEASE_DATE "2023"
-#endif
-
-#define COPY_END_YEAR 2023
-
-#ifndef VERSION
-#define VERSION "$VER: iGame v" STR(MAJOR_VERS) "." STR(MINOR_VERS) "." STR(PATCH_VERS) " for " STR(CPU_VERS) " (" STR(RELEASE_DATE) ")"
 #endif

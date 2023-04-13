@@ -25,7 +25,6 @@
 
 #define Dtpic_Classname "Dtpic.mui"
 #define MUIA_Dtpic_Name 0x80423d72
-#define TEMPLATE "SCREENSHOT/K"
 #define PROGDIR "PROGDIR:"
 #define DEFAULT_GAMESLIST_FILE "PROGDIR:gameslist"
 #define DEFAULT_REPOS_FILE "PROGDIR:repos.prefs"
@@ -63,6 +62,12 @@
 #define MENU_PROPERTIES_HOTKEY "P"
 #define MENU_DELETE_HOTKEY "D"
 
+#define MAX_SLAVE_TITLE_SIZE 128
+#define MAX_GENRE_NAME_SIZE 32
+#define MAX_PATH_SIZE 256
+#define MAX_EXEC_SIZE 256
+#define MAX_TOOLTYPE_SIZE 64
+
 typedef struct settings
 {
 	int filter_use_enter;
@@ -89,20 +94,38 @@ typedef struct repos
 	struct repos* next;
 } repos_list;
 
-typedef struct games
+typedef struct slavesList
 {
-	char title[200];
-	char genre[100];
-	int index;
-	char path[256];
-	int favorite;
+	char title[MAX_SLAVE_TITLE_SIZE];
+	char user_title[MAX_SLAVE_TITLE_SIZE];
+	char path[MAX_PATH_SIZE];
+	char genre[MAX_GENRE_NAME_SIZE];
+
+	int instance;
 	int times_played;
+
+	int favourite;// TODO: IDEA - This could be a tag
+
 	int last_played; //indicates whether this one was the last game played
-	int exists; //indicates whether this game still exists after a scan
-	int hidden; //game is hidden from normal operation
+
+	int exists; // indicates whether this game still exists after a scan
+				// TODO: IDEA - Maybe needs to be removed when game deletion removes files as well
+
+	int hidden; // game is hidden from normal operation
+				// TODO: This could be a tag
+
 	int deleted; // indicates this entry should be deleted when the list is saved
-	struct games* next;
-} games_list;
+
+	struct slavesList *next;
+} slavesList;
+
+typedef struct listFilters
+{
+	char title[MAX_SLAVE_TITLE_SIZE];
+	BOOL showHiddenOnly;
+	int showGroup;
+	char showGenre[MAX_GENRE_NAME_SIZE];
+} listFilters;
 
 enum {
 	MENU_ACTIONS=1,
@@ -119,6 +142,15 @@ enum {
 	MENU_REPOSITORIES,
 	MENU_MUISETTINGS,
 	MENU_LAST
+};
+
+enum {
+	GROUP_SHOWALL,
+	GROUP_FAVOURITES,
+	GROUP_LAST_PLAYED,
+	GROUP_MOST_PLAYED,
+	GROUP_NEVER_PLAYED,
+	GROUP_LAST
 };
 
 #endif

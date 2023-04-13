@@ -27,22 +27,15 @@
 /* Prototypes */
 #include <clib/alib_protos.h>
 #include <proto/wb.h>
-
-#if defined(__amigaos4__)
 #include <proto/exec.h>
 #include <proto/dos.h>
 #include <proto/icon.h>
 #include <proto/muimaster.h>
-#else
-#include <clib/exec_protos.h>
-#include <clib/dos_protos.h>
-#include <clib/icon_protos.h>
-#include <clib/muimaster_protos.h>
-#endif
+
+#include <workbench/icon.h>
 
 /* System */
 #if defined(__amigaos4__)
-// #include <dos/obsolete.h>
 #define ASL_PRE_V38_NAMES
 #endif
 #include <libraries/asl.h>
@@ -58,66 +51,79 @@
 #include "iGameGUI.h"
 #include "iGameExtern.h"
 #include "strfuncs.h"
+#include "slavesList.h"
 #include "funcs.h"
 #include "fsfuncs.h"
 
 extern struct ObjApp* app;
 extern char* executable_name;
-extern const int MAX_PATH_SIZE;
 
 /* structures */
 struct FileRequester* request;
 
 /* global variables */
 extern char fname[255];
-extern games_list *item_games, *games;
 extern igame_settings *current_settings;
 
-// TODO: This is obsolete. Change it with getParentPath()
-void strip_path(const char *path, char *naked_path)
+/*
+ * Get the path of the parent folder
+ */
+void getParentPath(char *filename, char *result, int resultSize)
 {
-	int i, k;
-	/* strip the path from the slave file and get the rest */
-	for (i = strlen(path) - 1; i >= 0; i--)
+	BPTR fileLock = Lock(filename, SHARED_LOCK);
+	if (fileLock)
 	{
-		if (path[i] == '/')
-			break;
-	}
+		BPTR folderLock = ParentDir(fileLock);
+		NameFromLock(folderLock, result, resultSize);
 
-	for (k = 0; k <= i - 1; k++)
-		naked_path[k] = path[k];
-	naked_path[k] = '\0';
+		UnLock(folderLock);
+		UnLock(fileLock);
+	}
 }
 
-STRPTR getParentPath(STRPTR filename)
+/*
+ * Get the filename of a folder/file from a path
+ */
+void getNameFromPath(char *path, char *result, unsigned int resultSize)
 {
-	STRPTR path = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
-	if (path)
-	{
-		BPTR fileLock = Lock(filename, SHARED_LOCK);
-		if (fileLock)
+	BPTR pathLock = Lock(path, SHARED_LOCK);
+	if (pathLock) {
+
+	#if defined(__amigaos4__)
+		struct ExamineData *data = ExamineObjectTags(EX_LockInput, pathLock, TAG_END);
+		strncpy(result, data->Name, resultSize);
+	#else
+		struct FileInfoBlock *FIblock = (struct FileInfoBlock *)AllocVec(sizeof(struct FileInfoBlock), MEMF_CLEAR);
+
+		if (Examine(pathLock, FIblock))
 		{
-			BPTR folderLock = ParentDir(fileLock);
-			NameFromLock(folderLock, path, sizeof(char) * MAX_PATH_SIZE);
-
-			UnLock(folderLock);
-			UnLock(fileLock);
-			return path;
+			strncpy(result, FIblock->fib_FileName, resultSize);
+			FreeVec(FIblock);
 		}
+	#endif
+		UnLock(pathLock);
 	}
-
-	return NULL;
 }
 
-char* get_slave_from_path(char *slave, int start, char *path)
+void getFullPath(const char *path, char *result)
 {
-	int z = 0;
-	for (int k = start + 1; k <= strlen(path); k++)
+	char *buf = malloc(sizeof(char) * MAX_PATH_SIZE);
+	strcpy(buf, path);
+	if (path[0] == '/')
 	{
-		slave[z] = path[k];
-		z++;
+		sprintf(buf, "PROGDIR:%s", path);
 	}
-	return slave;
+
+	BPTR pathLock = Lock(buf, SHARED_LOCK);
+	if (pathLock)
+	{
+		NameFromLock(pathLock, result, sizeof(char) * MAX_PATH_SIZE);
+		UnLock(pathLock);
+		free(buf);
+		return;
+	}
+
+	free(buf);
 }
 
 /*
@@ -142,11 +148,11 @@ BOOL get_filename(const char *title, const char *positive_text, const BOOL save_
 	if ((request = MUI_AllocAslRequest(ASL_FileRequest, NULL)) != NULL)
 	{
 		if (MUI_AslRequestTags(request,
-		                       ASLFR_TitleText, title,
-		                       ASLFR_PositiveText, positive_text,
-		                       ASLFR_DoSaveMode, save_mode,
-		                       ASLFR_InitialDrawer, PROGDIR,
-		                       TAG_DONE))
+						ASLFR_TitleText, title,
+						ASLFR_PositiveText, positive_text,
+						ASLFR_DoSaveMode, save_mode,
+						ASLFR_InitialDrawer, PROGDIR,
+						TAG_DONE))
 		{
 			memset(&fname[0], 0, sizeof fname);
 			strcat(fname, request->fr_Drawer);
@@ -164,77 +170,95 @@ BOOL get_filename(const char *title, const char *positive_text, const BOOL save_
 	return result;
 }
 
-void load_games_csv_list(const char *filename)
+void slavesListLoadFromCSV(char *filename)
 {
-	char *buf = malloc(256 * sizeof(char));
-	char *tmp;
+	int lineBufSize = sizeof(char) * 1024;
 
-	const BPTR fpgames = Open((CONST_STRPTR) filename, MODE_OLDFILE);
-	if (fpgames)
+	if (check_path_exists(filename))
 	{
-		if (games != NULL)
+		const BPTR fpgames = Open((CONST_STRPTR) filename, MODE_OLDFILE);
+		if (fpgames)
 		{
-			free(games);
-			games = NULL;
+			char *lineBuf = AllocVec(lineBufSize, MEMF_CLEAR);
+			char *buf = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
+			if((buf == NULL) || (lineBuf == NULL))
+			{
+				msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+				return;
+			}
+
+			while (FGets(fpgames, lineBuf, lineBufSize) != NULL)
+			{
+				slavesList *node = malloc(sizeof(slavesList));
+				if(node == NULL)
+				{
+					msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+					return;
+				}
+
+				buf = strtok(lineBuf, ";");
+				node->instance = atoi(buf);
+
+				buf = strtok(NULL, ";");
+				node->title[0] = '\0';
+				if (strncmp(buf, "\"\"", 2))
+				{
+					sprintf(node->title,"%s", substring(buf, 1, -2));
+				}
+
+				buf = strtok(NULL, ";");
+				node->genre[0] = '\0';
+				if (strncmp(buf, "\"\"", 2))
+				{
+					sprintf(node->genre,"%s", substring(buf, 1, -2));
+				}
+				if(isStringEmpty(node->genre))
+				{
+					sprintf(node->genre,"Unknown");
+				}
+
+				buf = strtok(NULL, ";");
+				node->path[0] = '\0';
+				if (strncmp(buf, "\"\"", 2))
+				{
+					sprintf(node->path,"%s", substring(buf, 1, -2));
+				}
+
+				buf = strtok(NULL, ";");
+				node->favourite = atoi(buf);
+
+				buf = strtok(NULL, ";");
+				node->times_played = atoi(buf);
+
+				buf = strtok(NULL, ";");
+				node->last_played = atoi(buf);
+
+				buf = strtok(NULL, ";");
+				node->hidden = atoi(buf);
+
+				buf = strtok(NULL, ";");
+				node->deleted = atoi(buf);
+
+				// TODO: Add here a check for the old CSV files
+				buf = strtok(NULL, ";");
+				node->user_title[0] = '\0';
+				if (strncmp(buf, "\"\"", 2))
+				{
+					sprintf(node->user_title,"%s", substring(buf, 1, -2));
+				}
+
+				slavesListAddTail(node);
+			}
+			Close(fpgames);
+			// FreeVec(buf);
+			FreeVec(lineBuf);
 		}
-
-		while (FGets(fpgames, buf, 255) != NULL)
-		{
-				item_games = (games_list *)calloc(1, sizeof(games_list));
-				item_games->next = NULL;
-
-			if (strlen(buf) > 1)
-			{
-				item_games->index = 0;
-				item_games->exists = 0;
-				item_games->deleted = 0;
-				item_games->hidden = 0;
-
-				tmp = strtok(buf, ";");
-
-				tmp = strtok(NULL, ";");
-				strcpy(item_games->title, tmp);
-
-				tmp = strtok(NULL, ";");
-				strcpy(item_games->genre, tmp);
-
-				tmp = strtok(NULL, ";");
-				strcpy(item_games->path, tmp);
-
-				tmp = strtok(NULL, ";");
-				item_games->favorite = atoi(tmp);
-
-				tmp = strtok(NULL, ";");
-				item_games->times_played = atoi(tmp);
-
-				tmp = strtok(NULL, ";");
-				item_games->last_played = atoi(tmp);
-
-				tmp = strtok(NULL, ";");
-				item_games->hidden = atoi(tmp);
-			}
-
-			if (games)
-			{
-				item_games->next = games;
-				games = item_games;
-			}
-			else
-			{
-				games = item_games;
-			}
-		}
-
-		add_games_to_listview();
-		Close(fpgames);
 	}
-
-	if (buf)
-		free(buf);
 }
 
-void save_to_csv(const char *filename, const int check_exists)
+void slavesListSaveToCSV(const char *filename)
 {
+	// return;
 	char csvFilename[32];
 	FILE *fpgames;
 
@@ -251,38 +275,21 @@ void save_to_csv(const char *filename, const int check_exists)
 		return;
 	}
 
-	for (item_games = games; item_games != NULL; item_games = item_games->next)
+	slavesList *currPtr = getSlavesListHead();
+
+	while (currPtr != NULL)
 	{
-		if (check_exists == 1)
-		{
-			if (item_games->exists == 1)
-			{
-				if (strlen(item_games->genre) == 0)
-					strcpy(item_games->genre, "Unknown");
-				fprintf(
-					fpgames,
-					"%d;%s;%s;%s;%d;%d;%d;%d\n",
-					item_games->index, item_games->title, item_games->genre, item_games->path,
-					item_games->favorite, item_games->times_played, item_games->last_played, item_games->hidden
-				);
-			}
-			else
-			{
-				strcpy(item_games->path, "");
-			}
-		}
-		else
-		{
-			if (strlen(item_games->genre) == 0)
-				strcpy(item_games->genre, "Unknown");
-			fprintf(
-				fpgames,
-				"%d;%s;%s;%s;%d;%d;%d;%d\n",
-				item_games->index, item_games->title, item_games->genre, item_games->path,
-				item_games->favorite, item_games->times_played, item_games->last_played, item_games->hidden
-			);
-		}
+		fprintf(
+			fpgames,
+			"%d;\"%s\";\"%s\";\"%s\";%d;%d;%d;%d;%d;\"%s\";\n",
+			currPtr->instance, currPtr->title,
+			currPtr->genre, currPtr->path, currPtr->favourite,
+			currPtr->times_played, currPtr->last_played, currPtr->hidden,
+			currPtr->deleted, currPtr->user_title
+		);
+		currPtr = currPtr->next;
 	}
+
 	fclose(fpgames);
 
 	status_show_total();
@@ -294,25 +301,25 @@ void save_to_csv(const char *filename, const int check_exists)
 */
 int get_title_from_slave(char* slave, char* title)
 {
-	char slave_title[100];
+	char slave_title[MAX_SLAVE_TITLE_SIZE];
 
 	struct slave_info
 	{
-		unsigned long security;
-		char id[8];
+		unsigned long security; // cppcheck-suppress unusedStructMember
+		char id[8]; // cppcheck-suppress unusedStructMember
 		unsigned short version;
-		unsigned short flags;
-		unsigned long base_mem_size;
-		unsigned long exec_install;
-		unsigned short game_loader;
-		unsigned short current_dir;
-		unsigned short dont_cache;
-		char keydebug;
-		char keyexit;
-		unsigned long exp_mem;
+		unsigned short flags; // cppcheck-suppress unusedStructMember
+		unsigned long base_mem_size; // cppcheck-suppress unusedStructMember
+		unsigned long exec_install; // cppcheck-suppress unusedStructMember
+		unsigned short game_loader; // cppcheck-suppress unusedStructMember
+		unsigned short current_dir; // cppcheck-suppress unusedStructMember
+		unsigned short dont_cache; // cppcheck-suppress unusedStructMember
+		char keydebug; // cppcheck-suppress unusedStructMember
+		char keyexit; // cppcheck-suppress unusedStructMember
+		unsigned long exp_mem; // cppcheck-suppress unusedStructMember
 		unsigned short name;
-		unsigned short copy;
-		unsigned short info;
+		unsigned short copy; // cppcheck-suppress unusedStructMember
+		unsigned short info; // cppcheck-suppress unusedStructMember
 	};
 
 	struct slave_info sl;
@@ -339,6 +346,7 @@ int get_title_from_slave(char* slave, char* title)
 
 	if (sl.version < 10)
 	{
+		fclose(fp);
 		return 1;
 	}
 
@@ -358,47 +366,31 @@ int get_title_from_slave(char* slave, char* title)
 	return 0;
 }
 
-// TODO: This seems OBSOLETE and can be replaced by getParentPath(). Needs investigation
-// Get the Directory part from a full path containing a file
-const char* get_directory_name(const char* str)
+/*
+ * Set the item title name based on the path on disk
+ */
+void getTitleFromPath(char *path, char *result, int resultSize)
 {
-	int pos1 = get_delimiter_position(str);
-	if (!pos1)
-		return NULL;
+	int bufSize = sizeof(char) * MAX_PATH_SIZE;
+	char *buf = AllocVec(bufSize, MEMF_CLEAR);
+	char *itemFolderPath = AllocVec(bufSize, MEMF_CLEAR);
 
-	char full_path[100];
-	strncpy(full_path, str, pos1);
-	full_path[pos1] = '\0';
-
-	const int pos2 = get_delimiter_position(full_path);
-	if (!pos2)
-		return NULL;
-
-	char* dir_name = malloc(sizeof full_path);
-	int c = 0;
-	for (unsigned int i = pos2 + 1; i <= sizeof full_path; i++)
+	getParentPath(path, itemFolderPath, bufSize);
+	if (itemFolderPath)
 	{
-		dir_name[c] = full_path[i];
-		c++;
+		getNameFromPath(itemFolderPath, buf, bufSize);
+
+		if (current_settings->no_smart_spaces)
+		{
+			strncpy(result, buf, resultSize);
+		}
+		else
+		{
+			add_spaces_to_string(buf, result, resultSize);
+		}
 	}
-	dir_name[c] = '\0';
-
-	return dir_name;
-}
-
-// TODO: This seems OBSOLETE and can be replaced by getParentPath(). Needs investigation
-// Get the complete directory path from a full path containing a file
-const char *get_directory_path(const char *str)
-{
-	int pos1 = get_delimiter_position(str);
-	if (!pos1)
-		return NULL;
-
-	char *dir_name = malloc(pos1 + 1);
-	strncpy(dir_name, str, pos1);
-	dir_name[pos1] = '\0';
-
-	return dir_name;
+	FreeVec(itemFolderPath);
+	FreeVec(buf);
 }
 
 // Get the application's executable name
@@ -424,12 +416,12 @@ char *get_executable_name(int argc, char **argv)
 	return executable_name;
 }
 
-// TODO: This can use the getParentPath()
+// This reveals the item window on Workbench
 void open_current_dir(void)
 {
-	// Allocate Memory for variables
+	int bufSize = sizeof(char) * MAX_PATH_SIZE;
+	char *buf = AllocVec(bufSize, MEMF_CLEAR);
 	char *game_title = NULL;
-	const char *path_only = NULL;
 
 	if (get_wb_version() < 44)
 	{
@@ -437,7 +429,7 @@ void open_current_dir(void)
 		return;
 	}
 
-	//set the elements on the window
+	// Get the selected item from the list
 	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
 	if (game_title == NULL || strlen(game_title) == 0)
 	{
@@ -445,36 +437,122 @@ void open_current_dir(void)
 		return;
 	}
 
-	const int found = title_exists(game_title);
-	if (!found)
+	slavesList *existingNode = NULL;
+	if ((existingNode = slavesListSearchByTitle(game_title, sizeof(char) * MAX_SLAVE_TITLE_SIZE)) == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
 		return;
 	}
 
-	path_only = get_directory_path(item_games->path);
-	if(!path_only)
+	getParentPath(existingNode->path, buf, bufSize);
+	if(!buf)
 	{
 		msg_box((const char*)GetMBString(MSG_DirectoryNotFound));
 		return;
 	}
 
-	//Open path directory
-	OpenWorkbenchObject((char *)path_only);
-	free(path_only); // get_directory_path uses malloc()
+	// Open path directory on workbench
+	OpenWorkbenchObject(buf);
+	FreeVec(buf);
 }
 
-void get_path(char *title, char *path)
+// Check if the path is a folder or a partition
+BOOL isPathFolder(char *path)
 {
-	for (item_games = games; item_games != NULL; item_games = item_games->next)
+	if (path[strlen(path)-1] == ':')
+		return FALSE;
+
+	return TRUE;
+}
+
+/*
+* Get the icon tooltypes and copies them in result
+* The path needs to be the full file path without .info at the end
+*/
+void getIconTooltypes(char *path, char *result)
+{
+	if (IconBase)
 	{
-		if (item_games->deleted != 1)
+		struct DiskObject *diskObj = GetDiskObjectNew(path);
+		if(diskObj)
 		{
-			if (!strcmp(title, item_games->title))
+			char *buf = AllocVec(sizeof(char) * MAX_TOOLTYPE_SIZE, MEMF_CLEAR);
+
+			// cppcheck-suppress redundantInitialization
+			for (STRPTR *tool_types = diskObj->do_ToolTypes; (buf = *tool_types); ++tool_types)
 			{
-				strcpy(path, item_games->path);
-				break;
+				if (!strncmp(buf, "*** DON'T EDIT", 14) || !strncmp(buf, "IM", 2))
+					continue;
+
+				strcat(result, buf);
+				strcat(result, "\n");
 			}
+			FreeVec(buf);
+			FreeDiskObject(diskObj);
+		}
+	}
+}
+
+void setIconTooltypes(char *path, char *tooltypes)
+{
+	if (IconBase)
+	{
+		struct DiskObject *diskObj = GetIconTags(path, TAG_DONE);
+		if(diskObj)
+		{
+			int toolTypesCnt = 0;
+
+			char *buf = AllocVec(sizeof(char) * MAX_TOOLTYPE_SIZE, MEMF_CLEAR);
+
+			// Get the number of the new tooltypes
+			char **table = my_split(tooltypes, "\n");
+			BOOL isLastLineEmpty = FALSE;
+
+			for (table; (buf = *table); ++table) // cppcheck-suppress redundantInitialization
+			{
+				toolTypesCnt++;
+				isLastLineEmpty = FALSE;
+				if (buf[0] == '\0')
+				{
+					isLastLineEmpty = TRUE;
+				}
+			}
+			if (!isLastLineEmpty)
+			{
+				toolTypesCnt++;
+			}
+
+			unsigned char **newToolTypes = AllocVec(sizeof(char *) * toolTypesCnt, MEMF_CLEAR);
+			if (newToolTypes)
+			{
+				char **table2 = my_split(tooltypes, "\n");
+				int table2Cnt = 0;
+				for (table2; (buf = *table2); ++table2)
+				{
+					newToolTypes[table2Cnt] = buf;
+					table2Cnt++;
+				}
+
+				newToolTypes[toolTypesCnt-1] = NULL;
+
+				diskObj->do_ToolTypes = newToolTypes;
+
+				LONG errorCode;
+				BOOL success;
+				success = PutIconTags(path, diskObj,
+					ICONPUTA_DropNewIconToolTypes, TRUE,
+					ICONA_ErrorCode, &errorCode,
+				TAG_DONE);
+
+				if(success == FALSE)
+				{
+					msg_box((const char*)GetMBString(MSG_ICONPICTURESTORE_FAILED));
+				}
+
+				FreeVec(newToolTypes);
+			}
+
+			FreeDiskObject(diskObj);
 		}
 	}
 }
