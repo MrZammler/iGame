@@ -1,6 +1,8 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Added
-- Some nonWHDLoad games require to be started from their own folder, otherwise they crash or fail to start. This is a problem mainly on systems that do not have WBRun or WBLoad (i.e. AmigaOS 3.1). Now, for all the added games/demos that are started on such systems a temporary script is created under T:.
+- Some nonWHDLoad games require to be started from their own folder, otherwise they crash or fail to start. This is a problem mainly on systems that do not have WBRun or WBLoad (i.e. AmigaOS 3.1). Now, for all the added games/demos that are started on such systems a temporary script is created under T:
+- Added German catalog and an alternative main image contributed by Martin Cornelius
+- Added French catalog contributed by AmiGuy
 
 ### Changed
 - Now we compile iGame with NDK 3.2R4
@@ -20,6 +22,8 @@
 - "Slave path" in the item properties window doesn't stretch its width anymore. If MUI 5 is used the text will be shortened, showing three dots in the middle of it.
 - If WBLoad exists in the C: folder, this is going to be used to start games/demos from WB, when they were added as extra items in the list
 - The "Last played" list holds more than one record, so that you can easily find the last games you played
+- Moved alt_icons under extras folder
+- Updated installer script to give some info to the user at the installation folder selection step
 
 ### Fixed
 - When a user changes the tooltypes of a slave, the NewIcon keeps working. The previous versions of iGame were deleting the image information. Now they are dropped from the icon tooltypes, but the image keeps working fine. As a result, the .info file size is reduced almost to half.

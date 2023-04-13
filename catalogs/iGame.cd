@@ -1,326 +1,327 @@
-#language english
-#version 0
+; $VER: igame.cd 2.3 (08.04.2023)
+;
+;
 MSG_AppDescription (//)
 A front-end to WHDLoad
-;A front-end to WHDLoad
+;
 MSG_AppCopyright (//)
 Emmanuel Vasilakis
-;Emmanuel Vasilakis
+;
 MSG_WI_MainWindow (//)
 iGame
-;iGame
+;
 MSG_MNlabel2Actions (//)
 Actions
-;Actions
+;
 MSG_MNlabelScan (//)
 Scan Repositories
-;Scan Repositories
+;
 MSG_MNlabelScanChar (//)
 R_
-;R_
+;
 MSG_MNMainAddnonWHDLoadgame (//)
 Add game...
-;Add game...
+;
 MSG_MNMainAddnonWHDLoadgameChar (//)
 A_
-;A_
+;
 MSG_MNMainMenuShowHidehiddenentries (//)
 Show hidden entries
-;Show hidden entries
+;
 MSG_MNMainOpenList (//)
 Open List...
-;Open List...
+;
 MSG_MNMainOpenListChar (//)
 O_
-;O_
+;
 MSG_MNMainSaveList (//)
 Save List
-;Save List
+;
 MSG_MNMainSaveListChar (//)
 S_
-;S_
+;
 MSG_MNMainSaveListAs (//)
 Save List As...
-;Save List As...
+;
 MSG_MNMainExportListtoTextfile (//)
 Export List to Text file...
-;Export List to Text file...
+;
 MSG_MNMainAbout (//)
 About...
-;About...
+;
 MSG_MNMainQuit (//)
 Quit
-;Quit
+;
 MSG_MNMainQuitChar (//)
 Q_
-;Q_
+;
 MSG_MNlabel2Game (//)
 Game
-;Game
+;
 MSG_MNMainMenuDuplicate (//)
 Duplicate...
-;Duplicate...
+;
 MSG_MNMainProperties (//)
 Properties...
-;Properties...
+;
 MSG_MNMainPropertiesChar (//)
 P_
-;P_
+;
 MSG_MNMainDelete (//)
 Delete
-;Delete
+;
 MSG_MNMainDeleteChar (//)
 D_
-;D_
+;
 MSG_MNlabel2Tools (//)
 Settings
-;Settings
+;
 MSG_MNMainiGameSettings (//)
 Settings...
-;Settings...
+;
 MSG_MNlabel2GameRepositories (//)
 Repositories...
-;Repositories...
+;
 MSG_MNMainMUISettings (//)
 MUI Settings...
-;MUI Settings...
+;
 MSG_LA_Filter (//)
 Filter:
-;Filter:
+;
 MSG_LV_GenresListTitle (//)
 Genres
-;Genres
+;
 MSG_WI_Properties (//)
 Game Properties
-;Game Properties
+;
 MSG_STR_PropertiesGameTitleTitle (//)
 Title
-;Title
+;
 MSG_LA_PropertiesGenre (//)
 Genre:
-;Genre:
+;
 MSG_CY_PropertiesGenre0 (//)
 Unknown
-;Unknown
+;
 MSG_CH_PropertiesFavorite (//)
 Favourite:
-;Favourite:
+;
 MSG_CH_PropertiesHidden (//)
 Hidden:
-;Hidden:
+;
 MSG_LA_PropertiesTimesPlayed (//)
 Times Played:
-;Times Played:
+;
 MSG_LA_PropertiesSlavePath (//)
 Slave Path:
-;Slave Path:
+;
 MSG_TX_PropertiesTooltypesTitle (//)
 Tooltypes
-;Tooltypes
+;
 MSG_BT_PropertiesOK (//)
 Save
-;Save
+;
 MSG_BT_PropertiesCancel (//)
 Cancel
-;Cancel
+;
 MSG_WI_GameRepositories (//)
 Game Repositories
-;Game Repositories
+;
 MSG_BT_AddRepo (//)
 Add
-;Add
+;
 MSG_BT_RemoveRepo (//)
 Remove
-;Remove
+;
 MSG_BT_CloseRepoWindow (//)
 Close
-;Close
+;
 MSG_WI_AddNonWHDLoad (//)
 Add a Game
-;Add a Game
+;
 MSG_LA_AddGameTitle (//)
 Title:
-;Title:
+;
 MSG_LA_AddGamePath (//)
 Path:
-;Path:
+;
 MSG_LA_AddGameGenre (//)
 Genre:
-;Genre:
+;
 MSG_CY_AddGameGenre0 (//)
 Unknown
-;Unknown
+;
 MSG_BT_AddGameOK (//)
 OK
-;OK
+;
 MSG_BT_AddGameCancel (//)
 Cancel
-;Cancel
+;
 MSG_WI_About (//)
 About iGame
-;About iGame
+;
 MSG_TX_About (//)
 Emmanuel Vasilakis (mrzammler@mm.st)\n& Contributors\n\n
-;Emmanuel Vasilakis (mrzammler@mm.st)\n& Contributors\n\n
+;
 MSG_BT_AboutOK (//)
 OK
-;OK
+;
 MSG_WI_Settings (//)
 iGame Settings
-;iGame Settings
+;
 MSG_LA_HideScreenshots (//)
 Hide Screenshots
-;Hide Screenshots
+;
 MSG_GR_ScreenshotsTitle (//)
 Screenshots
-;Screenshots
+;
 MSG_LA_NoGuiGfx (//)
 No GuiGfx
-;No GuiGfx
+;
 MSG_LA_ScreenshotSize (//)
 Screenshot Size:
-;Screenshot Size:
+;
 MSG_CY_ScreenshotSize0 (//)
 160x128
-;160x128
+;
 MSG_CY_ScreenshotSize1 (//)
 320x256
-;320x256
+;
 MSG_CY_ScreenshotSize2 (//)
 Custom
-;Custom
+;
 MSG_LA_Width (//)
 Width
-;Width
+;
 MSG_LA_Height (//)
 Height
-;Height
+;
 MSG_GR_TitlesTitle (//)
 Titles
-;Titles
+;
 MSG_RA_TitlesFromTitle (//)
 Titles From:
-;Titles From:
+;
 MSG_RA_TitlesFrom0 (//)
 Slave Contents
-;Slave Contents
+;
 MSG_RA_TitlesFrom1 (//)
 Directories
-;Directories
+;
 MSG_LA_SmartSpaces (//)
 No Smart Spaces
-;No Smart Spaces
+;
 MSG_GR_MiscTitle (//)
 Misc
-;Misc
+;
 MSG_LA_SaveStatsOnExit (//)
 Save stats on exit
-;Save stats on exit
+;
 MSG_LA_FilterUseEnter (//)
 Use enter to filter
-;Use enter to filter
+;
 MSG_LA_HideSidepanel (//)
 Hide side panel
-;Hide side panel
+;
 MSG_BT_SettingsSave (//)
 Save
-;Save
+;
 MSG_BT_SettingsUse (//)
 Use
-;Use
+;
 MSG_BT_SettingsCancel (//)
 Cancel
-;Cancel
+;
 MSG_SelectDir (//)
 Select path...
-;Select path...
+;
 MSG_GameExecutable (//)
 Select executable...
-;Select executable...
+;
 MSG_TotalNumberOfGames (//)
 Total %d games.
-;Total %d games.
+;
 MSG_UnknownGenre (//)
 Unknown
-;Unknown
+;
 MSG_FilterShowAll (//)
 --Show All--
-;--Show All--
+;
 MSG_FilterFavorites (//)
 --Favorites--
-;--Favorites--
+;
 MSG_FilterLastPlayed (//)
 --Last Played--
-;--Last Played--
+;
 MSG_FilterMostPlayed (//)
 --Most Played--
-;--Most Played--
+;
 MSG_FilterNeverPlayed (//)
 --Never Played--
-;--Never Played--
+;
 MSG_RunningGameTitle (//)
 Running %s...
-;Running %s...
+;
 MSG_ErrorExecutingWhdload (//)
 Error while executing the selected entry.\nPlease make sure WHDLoad is in your path.
-;Error while executing the selected entry.\nPlease make sure WHDLoad is in your path.
+;
 MSG_ScanningPleaseWait (//)
 Scanning [%s]. Please wait...
-;Scanning [%s]. Please wait...
+;
 MSG_CouldNotCreateReposFile (//)
 Could not create repos.prefs file!
-;Could not create repos.prefs file!
+;
 MSG_SelectGameFromList (//)
 Please select an entry from the list.
-;Please select an entry from the list.
+;
 MSG_TitleAlreadyExists (//)
 The title you selected, already exists.
-;The title you selected, already exists.
+;
 MSG_SavingGamelist (//)
 Please wait, saving gameslist...
-;Please wait, saving gameslist...
+;
 MSG_FailedOpeningGameslist (//)
 Could not open gameslist file!
-;Could not open gameslist file!
+;
 MSG_BadTooltype (//)
 Bad tooltype!
-;Bad tooltype
+;
 MSG_NoTitleSpecified (//)
 Please let me know the name of the game...
-;Please let me know the name of the game...
+;
 MSG_NoExecutableSpecified (//)
 Please pick the game executable...
-;Please pick the game executable...
+;
 MSG_NotEnoughMemory (//)
 Could not allocate memory! Aborting...
-;Could not allocate memory! Aborting...
+;
 MSG_DirectoryNotFound (//)
 Game Directory not found!
-;Game Directory not found!
+;
 MSG_LA_StartWithFavorites (//)
 Display favorites on start
-;Display favorites on start
+;
 MSG_MNMainOpenCurrentDir (//)
 Open game folder
-;Open game folder
+;
 MSG_MNMainOpenCurrentDirChar (//)
 W_
-;MUIB Menu ShortCut
+;
 MSG_slavePathDoesntExist (//)
 Slave path does not exist!
-;Slave path does not exist
+;
 MSG_compiledForAboutWin (//)
 compiled for
-;compiled for
+;
 MSG_MNMainPreferences (//)
 Preferences
-;Preferences
+;
 MSG_ScanCompletedUpdatingList (//)
 Scan completed. Updating the list now.
-;Scan completed. Updating the list now.
+;
 MSG_LoadingSavedList (//)
 Loading the saved list. Please wait.
-;Loading the saved list. Please wait.
+;
 MSG_ICONPICTURESTORE_FAILED (//)
 Could not store default picture icon
-;Could not store default picture icon
+;

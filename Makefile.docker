@@ -152,11 +152,10 @@ ifneq ($(origin DRONE_TAG),undefined)
 	sed -i "s/VERSION_TAG/$(DRONE_TAG)/" ./required_files/iGame.guide
 	sed -i "s/RELEASE_DATE/$(shell date "+%d.%m.%Y")/" ./required_files/iGame.guide
 endif
-	cp required_files iGame-$(DRONE_TAG) -r
-	cp alt_icons iGame-$(DRONE_TAG)/icons -r
+	cp -r required_files iGame-$(DRONE_TAG)
 	cp iGame-$(DRONE_TAG)/igame_drawer_3.0.info iGame-$(DRONE_TAG).info
-	mv iGame-$(DRONE_TAG)/igame_drawer_3.0.info iGame-$(DRONE_TAG)/icons
-	mv iGame-$(DRONE_TAG)/igame_drawer.info iGame-$(DRONE_TAG)/icons
+	mv iGame-$(DRONE_TAG)/igame_drawer_3.0.info iGame-$(DRONE_TAG)/extras/icons
+	mv iGame-$(DRONE_TAG)/igame_drawer.info iGame-$(DRONE_TAG)/extras/icons
 	mkdir iGame-$(DRONE_TAG)/catalogs
 	cp catalogs/iGame.cd iGame-$(DRONE_TAG)/catalogs/
 	cd iGame-$(DRONE_TAG) && mkdir $(catalog_dirs)
