@@ -1,5 +1,35 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Added
+- Some nonWHDLoad games require to be started from their own folder, otherwise they crash or fail to start. This is a problem mainly on systems that do not have WBRun or WBLoad (i.e. AmigaOS 3.1). Now, for all the added games/demos that are started on such systems a temporary script is created under T:.
+
+### Changed
+- Now we compile iGame with NDK 3.2R4
+- Now the repositories path requester accepts only drawers
+- Memory footprint is now reduced and optimised as much as possible
+- iGame window appears first and then the list is loaded from the file. This makes the application appear faster, giving feedback to the user
+- When the user selects a relative path (ie. //Games), that changes to an absolute path.
+- Changed the way the same title slaves are counted. This will help for removing the multiple "Alt" words in the list
+- Changed the repository scanning for files. The code is simplified and now uses more functions from the system API, making it more compatible. Also, all the "Data" folders are skipped from scanning, so slaves that exist in those folders are not used. A lot of code was removed and optimised, so the scan is now around 37% faster on the same machine, scanning a folder with 3562 entries.
+- Changed the way the multiple instances with the same title are shown. Now no "Alt" labels will be added. Instead, we introduced a number in square brackets that represent the different instances, i.e. 3DPool [1], 4DSportsDriving [2]. Not every record has these values, so expect to see them only when there are duplicates.
+- The gamelist.csv file changed by having double quotes around the string values, like the path and the title.
+- A new column was added in the gamelist.csv file which holds the custom name of the item. The old column remains unchanged. This helps in situations like a repository rescan, where the given name by the user doesn't change. The old second column should remain unchanged.
+- Now iGame requires icon.library v44+ for changing icon tooltypes. For systems that do include a new version, there is icon.library 46.4 on Aminet is free to download and use. Those that have older versions of the library will still be able to use iGame, but they won't be able to change the icon tooltypes. They will need to do it from Workbench
+- Now the filter string field is not disabled in the hidden list, allowing the user to filter the results based on the title or part of it
+- "Status" line, "Times played" and "Slave path" do not have a border anymore, since they are read-only fields
+- "No smart spaces" checkbox has a proper border now
+- "Slave path" in the item properties window doesn't stretch its width anymore. If MUI 5 is used the text will be shortened, showing three dots in the middle of it.
+- If WBLoad exists in the C: folder, this is going to be used to start games/demos from WB, when they were added as extra items in the list
+- The "Last played" list holds more than one record, so that you can easily find the last games you played
+
+### Fixed
+- When a user changes the tooltypes of a slave, the NewIcon keeps working. The previous versions of iGame were deleting the image information. Now they are dropped from the icon tooltypes, but the image keeps working fine. As a result, the .info file size is reduced almost to half.
+- Now it is possible to save the icon tooltypes even if it is used as an item screenshot. In the previous versions the icon file was blocked and no change was possible
+- Fixed crashing on exit
+- Fixed low memory computer freeze while scanning
+- Fixed low memory computer freeze when loading big list of entries
+
+## iGame 2.2.1 - [2023-01-30]
+### Added
 - Added Turkish catalog contributed by Serkan Dursun
 
 ### Fixed

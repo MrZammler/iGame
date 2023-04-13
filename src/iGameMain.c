@@ -32,6 +32,9 @@
 #include <proto/lowlevel.h>
 #include <proto/muimaster.h>
 
+/* ANSI C */
+#include <stdlib.h>
+
 #ifndef __amigaos4__
 #define __NOLIBBASE__
 #include <proto/locale.h>
@@ -164,7 +167,7 @@ int main(int argc, char **argv)
 				break;
 
 			case MENU_GAMEPROPERTIES:
-				game_properties();
+				slaveProperties();
 				break;
 
 			case MENU_GAMEFOLDER:
@@ -276,7 +279,7 @@ static int initLibraries(void)
 		if(!IIcon) return clean_exit("Can't open icon.library Interface");
 		#endif
 	}
-	else clean_exit("Can't open icon.library v37 or greater\n");
+	else return clean_exit("Can't open icon.library v37 or greater\n");
 
 	#ifndef __amigaos4__
 	if ((IntuitionBase = (struct IntuitionBase *)OpenLibrary("intuition.library", 37)))

@@ -56,7 +56,6 @@
 #define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
 #endif
 
-
 #define iGame_NUMBERS
 #include "iGame_strings.h"
 
@@ -121,10 +120,10 @@ struct ObjApp *CreateApp(void)
 	);
 
 	APTR	MNMainOpenList, MNMainSaveList, MNMainSaveListAs;
-	APTR	MNMainMenuDuplicate;
-	APTR	MNMainDelete;
+	// APTR	MNMainMenuDuplicate;
+	// APTR	MNMainDelete;
 	APTR	GROUP_ROOT;
-	APTR	GR_Filter, LA_Filter, GR_main, Space_Gamelist;
+	APTR	GR_Filter, LA_Filter, GR_main;
 	APTR	GROUP_ROOT_1, GR_Genre, LA_PropertiesGenre, Space_Genre;
 	APTR	GR_PropertiesChecks, obj_aux0, obj_aux1, Space_Properties, obj_aux2;
 	APTR	obj_aux3, GR_TimesPlayed, LA_PropertiesTimesPlayed, Space_TimesPlayed;
@@ -157,20 +156,15 @@ struct ObjApp *CreateApp(void)
 #else
 	static const struct Hook MenuSaveListAsHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)save_list_as, NULL };
 #endif
+// #if defined(__amigaos4__)
+// 	static const struct Hook MenuDeleteHook = { { NULL,NULL }, (HOOKFUNC)game_delete, NULL, NULL };
+// #else
+// 	static const struct Hook MenuDeleteHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_delete, NULL };
+// #endif
 #if defined(__amigaos4__)
-	static const struct Hook MenuDuplicateHook = { { NULL,NULL }, (HOOKFUNC)game_duplicate, NULL, NULL };
+	static const struct Hook PropertiesOKButtonHook = { { NULL,NULL }, (HOOKFUNC)saveItemProperties, NULL, NULL };
 #else
-	static const struct Hook MenuDuplicateHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_duplicate, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook MenuDeleteHook = { { NULL,NULL }, (HOOKFUNC)game_delete, NULL, NULL };
-#else
-	static const struct Hook MenuDeleteHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_delete, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook PropertiesOKButtonHook = { { NULL,NULL }, (HOOKFUNC)game_properties_ok, NULL, NULL };
-#else
-	static const struct Hook PropertiesOKButtonHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_properties_ok, NULL };
+	static const struct Hook PropertiesOKButtonHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)saveItemProperties, NULL };
 #endif
 #if defined(__amigaos4__)
 	static const struct Hook FilterChangeHook = { { NULL,NULL }, (HOOKFUNC)filter_change, NULL, NULL };
@@ -286,8 +280,6 @@ struct ObjApp *CreateApp(void)
 
 	object->CY_PropertiesGenreContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_PropertiesGenre0);
 	object->CY_PropertiesGenreContent[1] = NULL;
-	object->CY_AddGameGenreContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_AddGameGenre0);
-	object->CY_AddGameGenreContent[1] = NULL;
 	object->CY_ScreenshotSizeContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_ScreenshotSize0);
 	object->CY_ScreenshotSizeContent[1] = (CONST_STRPTR)GetMBString(MSG_CY_ScreenshotSize1);
 	object->CY_ScreenshotSizeContent[2] = (CONST_STRPTR)GetMBString(MSG_CY_ScreenshotSize2);
@@ -315,6 +307,9 @@ struct ObjApp *CreateApp(void)
 	object->LV_GamesList = ListObject,
 		MUIA_Frame, MUIV_Frame_InputList,
 		MUIA_List_Active, MUIV_List_Active_Top,
+		MUIA_List_Stripes, TRUE,
+		MUIA_List_ConstructHook, MUIV_List_ConstructHook_String,
+		MUIA_List_DestructHook, MUIV_List_DestructHook_String,
 		End;
 
 	object->LV_GamesList = ListviewObject,
@@ -326,15 +321,13 @@ struct ObjApp *CreateApp(void)
 
 	if (!current_settings->hide_side_panel)
 	{
-		Space_Gamelist = HSpace(1);
-
 		if (!current_settings->hide_screenshots) {
 
 			if (current_settings->no_guigfx) {
 				object->IM_GameImage_0 = MUI_NewObject(Dtpic_Classname,
 					MUIA_Dtpic_Name, DEFAULT_SCREENSHOT_FILE,
 					MUIA_Frame, MUIV_Frame_ImageButton,
-					End;
+				TAG_DONE);
 			}
 			else {
 				object->IM_GameImage_0 = GuigfxObject,
@@ -344,7 +337,7 @@ struct ObjApp *CreateApp(void)
 					MUIA_Frame, MUIV_Frame_ImageButton,
 					MUIA_FixHeight, current_settings->screenshot_height,
 					MUIA_FixWidth, current_settings->screenshot_width,
-					End;
+				End;
 			}
 		}
 
@@ -400,8 +393,7 @@ struct ObjApp *CreateApp(void)
 	}
 
 	object->TX_Status = TextObject,
-		MUIA_Background, MUII_TextBack,
-		MUIA_Frame, MUIV_Frame_Text,
+		MUIA_Frame, MUIV_Frame_None,
 		MUIA_Text_Contents, object->STR_TX_Status,
 		MUIA_Text_SetMin, TRUE,
 		End;
@@ -428,14 +420,14 @@ struct ObjApp *CreateApp(void)
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainSaveListAs),
 		End;
 
-	MNMainMenuDuplicate = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNMainMenuDuplicate),
-		End;
+	// MNMainMenuDuplicate = MenuitemObject,
+	// 	MUIA_Menuitem_Title, GetMBString(MSG_MNMainMenuDuplicate),
+	// 	End;
 
-	MNMainDelete = MenuitemObject,
-		MUIA_Menuitem_Title, GetMBString(MSG_MNMainDelete),
-		MUIA_Menuitem_Shortcut, MENU_DELETE_HOTKEY,
-		End;
+	// MNMainDelete = MenuitemObject,
+	// 	MUIA_Menuitem_Title, GetMBString(MSG_MNMainDelete),
+	// 	MUIA_Menuitem_Shortcut, MENU_DELETE_HOTKEY,
+	// 	End;
 
 	if (get_wb_version() < 44)
 	{
@@ -514,8 +506,7 @@ struct ObjApp *CreateApp(void)
 	Space_TimesPlayed = HSpace(1);
 
 	object->TX_PropertiesTimesPlayed = TextObject,
-		MUIA_Background, MUII_TextBack,
-		MUIA_Frame, MUIV_Frame_Text,
+		MUIA_Frame, MUIV_Frame_None,
 		MUIA_Text_Contents, object->STR_TX_PropertiesTimesPlayed,
 		MUIA_Text_SetMin, TRUE,
 		End;
@@ -535,10 +526,10 @@ struct ObjApp *CreateApp(void)
 	Space_Path = HSpace(1);
 
 	object->TX_PropertiesSlavePath = TextObject,
-		MUIA_Background, MUII_TextBack,
-		MUIA_Frame, MUIV_Frame_Text,
+		MUIA_Frame, MUIV_Frame_None,
 		MUIA_Text_Contents, object->STR_TX_PropertiesSlavePath,
-		MUIA_Text_SetMin, TRUE,
+		MUIA_Text_SetMin, FALSE,
+		MUIA_Text_Shorten, MUIV_Text_Shorten_ElideCenter,
 		End;
 
 	GR_SlavePath = GroupObject,
@@ -554,6 +545,7 @@ struct ObjApp *CreateApp(void)
 	object->TX_PropertiesTooltypes = TextEditorObject,
 		MUIA_Background, MUII_TextBack,
 		MUIA_Frame, MUIV_Frame_String,
+		MUIA_Disabled, IconBase->lib_Version < 44,
 		MUIA_FrameTitle, GetMBString(MSG_TX_PropertiesTooltypesTitle),
 		End;
 
@@ -606,6 +598,7 @@ struct ObjApp *CreateApp(void)
 		MUIA_Popstring_String, object->STR_PA_RepoPath,
 		MUIA_Popstring_Button, object->PA_RepoPath,
 		ASLFR_TitleText, GetMBString(MSG_SelectDir),
+		ASLFR_DrawersOnly, TRUE,
 		End;
 
 	object->BT_AddRepo = TextObject,
@@ -706,7 +699,7 @@ struct ObjApp *CreateApp(void)
 	object->CY_AddGameGenre = CycleObject,
 		MUIA_HelpNode, "CY_AddGameGenre",
 		MUIA_Frame, MUIV_Frame_Button,
-		MUIA_Cycle_Entries, object->CY_AddGameGenreContent,
+		MUIA_Cycle_Entries, object->CY_PropertiesGenreContent,
 		End;
 
 	GR_AddGameGenre = GroupObject,
@@ -864,14 +857,7 @@ struct ObjApp *CreateApp(void)
 
 	Space_TitlesFrom = VSpace(1);
 
-	object->CH_SmartSpaces = ImageObject,
-		MUIA_Disabled, TRUE,
-		MUIA_InputMode, MUIV_InputMode_Toggle,
-		MUIA_Image_Spec, MUII_CheckMark,
-		MUIA_Image_FreeVert, TRUE,
-		MUIA_Selected, FALSE,
-		MUIA_ShowSelState, FALSE,
-		End;
+	object->CH_SmartSpaces = CheckMark(FALSE);
 
 	Space_SmartSpaces = VSpace(1);
 
@@ -1053,19 +1039,19 @@ struct ObjApp *CreateApp(void)
 		MUIM_CallHook, &MenuSaveListAsHook
 	);
 
-	DoMethod(MNMainMenuDuplicate,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->App,
-		2,
-		MUIM_CallHook, &MenuDuplicateHook
-	);
+	// DoMethod(MNMainMenuDuplicate,
+	// 	MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+	// 	object->App,
+	// 	2,
+	// 	MUIM_CallHook, &MenuDuplicateHook
+	// );
 
-	DoMethod(MNMainDelete,
-		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
-		object->App,
-		2,
-		MUIM_CallHook, &MenuDeleteHook
-	);
+	// DoMethod(MNMainDelete,
+	// 	MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+	// 	object->App,
+	// 	2,
+	// 	MUIM_CallHook, &MenuDeleteHook
+	// );
 
 	DoMethod(object->WI_MainWindow,
 		MUIM_Notify, MUIA_Window_Activate, TRUE,

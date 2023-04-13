@@ -90,7 +90,6 @@ struct ObjApp
 	CONST_STRPTR STR_TX_PropertiesTooltypes;
 	CONST_STRPTR STR_TX_About;
 	CONST_STRPTR CY_PropertiesGenreContent[512];
-	CONST_STRPTR CY_AddGameGenreContent[512];
 	CONST_STRPTR CY_ScreenshotSizeContent[4];
 	CONST_STRPTR RA_TitlesFromContent[3];
 };

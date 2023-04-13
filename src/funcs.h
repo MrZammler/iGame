@@ -25,8 +25,6 @@
 
 void msg_box(const char *);
 void status_show_total(void);
-void get_screen_size(int *, int *);
-int title_exists(char *);
 void game_click(void);
 void joystick_input(ULONG);
 void app_stop(void);
@@ -35,14 +33,13 @@ ULONG get_wb_version(void);
 void scan_repositories(void);
 void open_list(void);
 void save_list_as(void);
-void game_duplicate(void);
 void game_delete(void);
-void game_properties_ok(void);
 void filter_change(void);
 void launch_game(void);
 void list_show_hidden(void);
 void app_start(void);
-void game_properties(void);
+void slaveProperties(void);
+void saveItemProperties(void);
 void add_non_whdload(void);
 void genres_click(void);
 void non_whdload_ok(void);
@@ -60,7 +57,6 @@ void settings_save(void);
 void setting_hide_side_panel_changed(void);
 void setting_start_with_favorites_changed(void);
 void settings_use(void);
-void add_games_to_listview(void);
 igame_settings *load_settings(const char *);
 
 #endif

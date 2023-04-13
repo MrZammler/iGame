@@ -7,7 +7,7 @@
 @{jcenter}
 iGame
 =============================================
-(c) 2005-2022 Emmanuel Vasilakis
+(c) 2005-2023 Emmanuel Vasilakis
 @{jleft}
 @{lindent 3}
 @{" Introduction    " LINK "INTR" 0} - About iGame
@@ -113,6 +113,7 @@ All the required software is available on Aminet for free download.
  - Kickstart 2.04 or higher
  - Workbench 2.1 or higher
  - MUI 3.8 or higher
+ - icon.library v37+ (v44+ Recommended)
  - guigfx.library
  - render.library
  - guigfx.mcc
@@ -330,12 +331,27 @@ http://eab.abime.net/showthread.php?t=94347
 @ENDNODE
 @NODE "INFO" "Author info"
 @{lindent 3}
-If you wish to contact the author of iGame, you can send an email at:
+If you wish to contact the original creator of iGame, you can send an email at:
 Emmanuel Vasilakis (mrzammler\@mm.st)
 
 We would like to thank:
 - Animagic and Emmanouela Panterh for designing the icons and the pics that come with iGame.
 - Carlo Spadoni for designing 3 PNG icons found in the icons folder (iGame-png-xx.info).
+
+Contributors:
+Since iGame became open source a few people contributed with code. We would like to thank:
+- Chris "coldacid" Charabaruk
+- Dimitris "midwan" Panokostas
+- George "walkero" Sokianos
+- T0lk13n
+An extensive and more up to date list can be found at:
+https://github.com/MrZammler/iGame/graphs/contributors
+
+Translators:
+iGame can be used in many different languages, which are included in every release:
+- Greek by George Sokianos
+- Italian by Samir Hawamdeh
+- Turkish by Serkan Dursun
 
 and of course, all of you who use iGame and support our beloved Amiga computer.
 
