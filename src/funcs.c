@@ -254,6 +254,8 @@ static void load_repos(const char* filename)
 	const BPTR fprepos = Open((CONST_STRPTR)filename, MODE_OLDFILE);
 	if (fprepos)
 	{
+		char *repo_path = malloc(sizeof(char) * MAX_PATH_SIZE);
+
 		while (FGets(fprepos, file_line, buffer_size))
 		{
 			if (file_line[strlen(file_line) - 1] == '\n') file_line[strlen(file_line) - 1] = '\0';
@@ -262,7 +264,9 @@ static void load_repos(const char* filename)
 
 			item_repos = (repos_list *)calloc(1, sizeof(repos_list));
 			item_repos->next = NULL;
-			strcpy(item_repos->repo, file_line);
+
+			getFullPath(file_line, repo_path);
+			strcpy(item_repos->repo, repo_path);
 
 			if (repos == NULL)
 			{
@@ -277,6 +281,7 @@ static void load_repos(const char* filename)
 			DoMethod(app->LV_GameRepositories, MUIM_List_InsertSingle, item_repos->repo, 1, MUIV_List_Insert_Bottom);
 		}
 
+		free(repo_path);
 		Close(fprepos);
 	}
 
