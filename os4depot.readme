@@ -53,6 +53,7 @@ Requirements:
 * Kickstart 2.04 or higher
 * Workbench 2.1 or higher
 * MUI 3.8 or higher
+* icon.library v37+ (v44+ Recommended)
 * guigfx.library
 * render.library
 * guigfx.mcc
