@@ -1,4 +1,8 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
+### Fixed
+- This is a hot fix release for the installer script that had a bug of not finding the icons folder
+
+## iGame 2.3.0 - [2023-04-13]
 ### Added
 - Some nonWHDLoad games require to be started from their own folder, otherwise they crash or fail to start. This is a problem mainly on systems that do not have WBRun or WBLoad (i.e. AmigaOS 3.1). Now, for all the added games/demos that are started on such systems a temporary script is created under T:
 - Added German catalog and an alternative main image contributed by Martin Cornelius
