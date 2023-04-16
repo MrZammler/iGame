@@ -1315,11 +1315,6 @@ static LONG xget(Object* obj, ULONG attribute)
 	return x;
 }
 
-char* get_str(Object* obj)
-{
-	return (char *)xget(obj, MUIA_String_Contents);
-}
-
 static int get_cycle_index(Object* obj)
 {
 	int index = 0;
@@ -1414,8 +1409,14 @@ void settings_use(void)
 	const int index = get_cycle_index(app->CY_ScreenshotSize);
 	if (index == 2)
 	{
-		current_settings->screenshot_width = (int)get_str(app->STR_Width);
-		current_settings->screenshot_height = (int)get_str(app->STR_Height);
+		char *width = NULL;
+		char *height = NULL;
+
+		get(app->STR_Width, MUIA_String_Contents, &width);
+		get(app->STR_Height, MUIA_String_Contents, &height);
+
+		current_settings->screenshot_width = atoi(width);
+		current_settings->screenshot_height = atoi(height);
 	}
 
 	set(app->WI_Settings, MUIA_Window_Open, FALSE);

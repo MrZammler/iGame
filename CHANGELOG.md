@@ -1,5 +1,9 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Fixed
+- The custom screenshot sizes were wrongly saved. This is now fixed (#190)
+
+## iGame 2.3.1 - [2023-04-14]
+### Fixed
 - This is a hot fix release for the installer script that had a bug of not finding the icons folder
 
 ## iGame 2.3.0 - [2023-04-13]
