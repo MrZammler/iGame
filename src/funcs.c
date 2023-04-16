@@ -68,7 +68,6 @@ char fname[255];
 
 /* function definitions */
 // int get_genre(char* title, char* genre);
-static int hex2dec(char* hexin);
 static void showSlavesList(void);
 
 repos_list *item_repos = NULL, *repos = NULL;
@@ -434,77 +433,6 @@ void filter_change(void)
 	showSlavesList();
 }
 
-static void prepareWHDExecution(slavesList *node, char *result)
-{
-	int bufSize = sizeof(char) * MAX_PATH_SIZE;
-	char *buf = AllocVec(bufSize, MEMF_CLEAR);
-
-	snprintf(buf, bufSize, "%s", substring(node->path, 0, -6));
-	struct DiskObject *diskObj = GetDiskObjectNew(buf);
-	if (diskObj)
-	{
-		char to_check[256];
-		sprintf(result, "whdload ");
-
-		for (STRPTR *tool_types = diskObj->do_ToolTypes; (buf = *tool_types); ++tool_types)
-		{
-			if (!strncmp(buf, "*** DON'T EDIT", 14) || !strncmp(buf, "IM", 2)) continue;
-			if (buf[0] == ' ') continue;
-			if (buf[0] == '(') continue;
-			if (buf[0] == '*') continue;
-			if (buf[0] == ';') continue;
-			if (buf[0] == '\0') continue;
-			if (buf[0] == -69) continue; // »
-			if (buf[0] == -85) continue; // «
-			if (buf[0] == '.') continue;
-			if (buf[0] == '=') continue;
-			if (buf[0] == '#') continue;
-			if (buf[0] == '!') continue;
-
-			/* Add quotes to Execute.... ToolTypes for WHDLoad compatibility */
-			if (!strncmp(buf, "Execute", 7))
-			{
-				char** temp_tbl = my_split((char *)buf, "=");
-				if (temp_tbl == NULL) continue;
-				if (temp_tbl[1] != NULL)
-				{
-					sprintf(buf,"%s=\"%s\"", temp_tbl[0],temp_tbl[1]);
-				}
-
-				free(temp_tbl);
-			}
-
-			/* Must check here for numerical values */
-			/* Those (starting with $ should be transformed to dec from hex) */
-			char** temp_tbl = my_split((char *)buf, "=");
-			if (temp_tbl == NULL
-				|| temp_tbl[0] == NULL
-				|| !strcmp((char *)temp_tbl[0], " ")
-				|| !strcmp((char *)temp_tbl[0], ""))
-				continue;
-
-			if (temp_tbl[1] != NULL)
-			{
-				sprintf(to_check, "%s", temp_tbl[1]);
-				if (to_check[0] == '$')
-				{
-					const int dec_rep = hex2dec(to_check);
-					sprintf(buf, "%s=%d", temp_tbl[0], dec_rep);
-				}
-			}
-
-			free(temp_tbl);
-
-			strcat(result, " ");
-			strcat(result, buf);
-		}
-
-		FreeDiskObject(diskObj);
-	}
-
-	FreeVec(buf);
-}
-
 static BOOL createRunGameScript(slavesList *node)
 {
 	int bufSize = sizeof(char) * MAX_PATH_SIZE;
@@ -542,36 +470,41 @@ static void launchSlave(slavesList *node)
 
 		const BPTR oldLock = CurrentDir(pathLock);
 
-		// Get the slave filename and replace extension
-		getNameFromPath(node->path, buf, bufSize);
-		snprintf(buf, bufSize, "%s.info", substring(buf, 0, -6));
-
 		if (Examine(pathLock, FIblock))
 		{
 			while (ExNext(pathLock, FIblock))
 			{
 				if (
 					(FIblock->fib_DirEntryType < 0) &&
-					(strcasestr(FIblock->fib_FileName, ".info")) &&
-					!strncmp(FIblock->fib_FileName, buf, sizeof(FIblock->fib_FileName))
+					(strcasestr(FIblock->fib_FileName, ".info"))
 				) {
-					int execSize = sizeof(char) * MAX_EXEC_SIZE;
-					char *exec = AllocVec(bufSize, MEMF_CLEAR);
-					prepareWHDExecution(node, exec);
+					char *infoPath = AllocVec(bufSize, MEMF_CLEAR);
+					getFullPath(FIblock->fib_FileName, infoPath);
+					snprintf(infoPath, bufSize, "%s", substring(infoPath, 0, -5));
 
-					// Update statistics info
-					node->last_played = 1;
-					node->times_played++;
+					// Get the slave filename
+					getNameFromPath(node->path, buf, bufSize);
+					if (checkSlaveInTooltypes(infoPath, buf))
+					{
+						int execSize = sizeof(char) * MAX_EXEC_SIZE;
+						char *exec = AllocVec(bufSize, MEMF_CLEAR);
+						prepareWHDExecution(infoPath, exec);
 
-					// Save stats
-					if (!current_settings->save_stats_on_exit)
-						save_list(0);
+						// Update statistics info
+						node->last_played = 1;
+						node->times_played++;
 
-					int success = Execute(exec, 0, 0);
-					if (success == 0)
-						msg_box((const char*)GetMBString(MSG_ErrorExecutingWhdload));
+						// Save stats
+						if (!current_settings->save_stats_on_exit)
+							save_list(0);
 
-					FreeVec(exec);
+						int success = Execute(exec, 0, 0);
+						if (success == 0)
+							msg_box((const char*)GetMBString(MSG_ErrorExecutingWhdload));
+
+						FreeVec(exec);
+					}
+					FreeVec(infoPath);
 				}
 			}
 
@@ -1299,7 +1232,7 @@ void open_list(void)
 }
 
 //function to return the dec eq of a hex no.
-static int hex2dec(char* hexin)
+int hex2dec(char *hexin)
 {
 	unsigned int dec;
 	//lose the first $ character

@@ -32,6 +32,7 @@ void save_list(const int);
 ULONG get_wb_version(void);
 void scan_repositories(void);
 void open_list(void);
+int hex2dec(char *);
 void save_list_as(void);
 void game_delete(void);
 void filter_change(void);

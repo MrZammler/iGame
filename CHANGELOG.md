@@ -1,5 +1,9 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Fixed
+- With v2.3.0 WHDLoad games that have different name on .info file againsta the slave file were not starting. I changed the way the necessary info file is discovered to be closer what v2.2.1 was doing and now it works fine
+
+## iGame 2.3.1 - [2023-04-14]
+### Fixed
 - This is a hot fix release for the installer script that had a bug of not finding the icons folder
 
 ## iGame 2.3.0 - [2023-04-13]

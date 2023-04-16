@@ -46,6 +46,10 @@ extern struct Catalog *Catalog;
 /*
  * strcasestr() implementation for AmigaOS
  *
+ * This function finds the first occurrence of the substring needle in the
+ * string haystack, ignoring the case of both arguments. The terminating
+ * null bytes ('\0') are not compared.
+ *
  * Cribbed from https://stackoverflow.com/a/45109082/5697 and renamed from
  * stristr() to strcasestr() to match GCC function of same name
  */

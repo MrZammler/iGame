@@ -573,3 +573,96 @@ void setIconTooltypes(char *path, char *tooltypes)
 		}
 	}
 }
+
+/*
+* Check if the needed slave file is set in .info tooltypes
+* The infoFile needs to be the full file path without .info at the end
+*/
+BOOL checkSlaveInTooltypes(char *infoFile, char *slaveName)
+{
+	struct DiskObject *diskObj = GetDiskObjectNew(infoFile);
+	if(diskObj)
+	{
+		if (FindToolType(diskObj->do_ToolTypes, "SLAVE"))
+		{
+			FreeDiskObject(diskObj);
+			return TRUE;
+		}
+		FreeDiskObject(diskObj);
+	}
+	return FALSE;
+}
+
+/*
+* Prepare the exec command based on icon tooltypes
+* The infoFile needs to be the full file path without .info at the end
+*/
+void prepareWHDExecution(char *infoFile, char *result)
+{
+	int bufSize = sizeof(char) * MAX_PATH_SIZE;
+	char *buf = AllocVec(bufSize, MEMF_CLEAR);
+
+	struct DiskObject *diskObj = GetDiskObjectNew(infoFile);
+	if (diskObj)
+	{
+		char to_check[256];
+		sprintf(result, "whdload ");
+
+		for (STRPTR *tool_types = diskObj->do_ToolTypes; (buf = *tool_types); ++tool_types)
+		{
+			if (!strncmp(buf, "*** DON'T EDIT", 14) || !strncmp(buf, "IM", 2)) continue;
+			if (buf[0] == ' ') continue;
+			if (buf[0] == '(') continue;
+			if (buf[0] == '*') continue;
+			if (buf[0] == ';') continue;
+			if (buf[0] == '\0') continue;
+			if (buf[0] == -69) continue; // »
+			if (buf[0] == -85) continue; // «
+			if (buf[0] == '.') continue;
+			if (buf[0] == '=') continue;
+			if (buf[0] == '#') continue;
+			if (buf[0] == '!') continue;
+
+			/* Add quotes to Execute.... ToolTypes for WHDLoad compatibility */
+			if (!strncmp(buf, "Execute", 7))
+			{
+				char** temp_tbl = my_split((char *)buf, "=");
+				if (temp_tbl == NULL) continue;
+				if (temp_tbl[1] != NULL)
+				{
+					sprintf(buf,"%s=\"%s\"", temp_tbl[0],temp_tbl[1]);
+				}
+
+				free(temp_tbl);
+			}
+
+			/* Must check here for numerical values */
+			/* Those (starting with $ should be transformed to dec from hex) */
+			char** temp_tbl = my_split((char *)buf, "=");
+			if (temp_tbl == NULL
+				|| temp_tbl[0] == NULL
+				|| !strcmp((char *)temp_tbl[0], " ")
+				|| !strcmp((char *)temp_tbl[0], ""))
+				continue;
+
+			if (temp_tbl[1] != NULL)
+			{
+				sprintf(to_check, "%s", temp_tbl[1]);
+				if (to_check[0] == '$')
+				{
+					const int dec_rep = hex2dec(to_check);
+					sprintf(buf, "%s=%d", temp_tbl[0], dec_rep);
+				}
+			}
+
+			free(temp_tbl);
+
+			strcat(result, " ");
+			strcat(result, buf);
+		}
+
+		FreeDiskObject(diskObj);
+	}
+
+	FreeVec(buf);
+}
