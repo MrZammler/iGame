@@ -2,6 +2,12 @@
 ### Fixed
 - The custom screenshot sizes were wrongly saved. This is now fixed (#190)
 
+### Changed
+- Added some spaces left and right of the screenshot. This helps to resize the sidebar as needed keeping the screenshot centred
+- Now, only the screenshot part of the GUI is updated on item selection and not the whole right side. This makes the GUI refresh faster on slow computers
+- If the screenshot is toggled (show/hide) in the settings window the GUI is updated without the need of restarting iGame
+- Now iGame doesn't fail to start even if any of the guigfx.library, render.library or Guigfx.mcc is missing. It falls back using the datatypes and the "No GuiGfx" checkbox is blocked in the settings
+
 ## iGame 2.3.1 - [2023-04-14]
 ### Fixed
 - This is a hot fix release for the installer script that had a bug of not finding the icons folder

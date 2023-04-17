@@ -67,6 +67,7 @@
 #include "iGameGUI.h"
 
 extern igame_settings *current_settings;
+extern blockGuiGfx;
 
 static void translateMenu(struct NewMenu *);
 static void flagMenuItem(struct NewMenu *, APTR, UWORD);
@@ -317,6 +318,7 @@ struct ObjApp *CreateApp(void)
 		MUIA_Listview_MultiSelect, MUIV_Listview_MultiSelect_None,
 		MUIA_Listview_DoubleClick, TRUE,
 		MUIA_Listview_List, object->LV_GamesList,
+		MUIA_Weight, 200,
 		End;
 
 	if (!current_settings->hide_side_panel)
@@ -339,27 +341,33 @@ struct ObjApp *CreateApp(void)
 					MUIA_FixWidth, current_settings->screenshot_width,
 				End;
 			}
+
+			object->GR_spacedScreenshot = HGroup, MUIA_Group_Spacing, 0,
+				Child, HSpace(0),
+				Child, object->IM_GameImage_0,
+				Child, HSpace(0),
+				End;
 		}
 
 		object->Space_Sidepanel = VSpace(1);
 
 		object->LV_GenresList = ListObject,
 			MUIA_Frame, MUIV_Frame_InputList,
-		        MUIA_List_Active, MUIV_List_Active_Top,
+			MUIA_List_Active, MUIV_List_Active_Top,
 			End;
 
 		object->LV_GenresList = ListviewObject,
 			MUIA_HelpNode, "LV_GenresList",
 			MUIA_FrameTitle, GetMBString(MSG_LV_GenresListTitle),
 			MUIA_Listview_List, object->LV_GenresList,
-			MUIA_MaxWidth, current_settings->screenshot_width,	//keep the same width as if there was a screenshot area
 			End;
 
 		if (!current_settings->hide_screenshots) {
 
 			object->GR_sidepanel = GroupObject,
 				MUIA_HelpNode, "GR_sidepanel",
-				Child, object->IM_GameImage_0,
+				MUIA_Weight, 100,
+				Child, object->GR_spacedScreenshot,
 				Child, object->Space_Sidepanel,
 				Child, object->LV_GenresList,
 				End;
@@ -368,6 +376,7 @@ struct ObjApp *CreateApp(void)
 
 			object->GR_sidepanel = GroupObject,
 				MUIA_HelpNode, "GR_sidepanel",
+				MUIA_Weight, 100,
 				Child, object->Space_Sidepanel,
 				Child, object->LV_GenresList,
 				End;
@@ -376,7 +385,7 @@ struct ObjApp *CreateApp(void)
 		GR_main = GroupObject,
 			MUIA_HelpNode, "GR_main",
 			MUIA_Group_Horiz, TRUE,
-			Child, object->LV_GamesList, MUIA_Weight, 60,
+			Child, object->LV_GamesList,
 			Child, BalanceObject,
 				MUIA_CycleChain, 1,
 				MUIA_ObjectID, MAKE_ID('B', 'A', 'L', 0),
@@ -767,6 +776,10 @@ struct ObjApp *CreateApp(void)
 	LA_HideScreenshots = Label(GetMBString(MSG_LA_HideScreenshots));
 
 	object->CH_NoGuiGfx = CheckMark(FALSE);
+	if (blockGuiGfx)
+	{
+		set(object->CH_NoGuiGfx, MUIA_Disabled, TRUE);
+	}
 
 	LA_NoGuiGfx = Label(GetMBString(MSG_LA_NoGuiGfx));
 

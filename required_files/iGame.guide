@@ -293,11 +293,11 @@ If you have different instances of iGame and you would like to keep the same pre
 The settings window has three separate sections:
 
 @{u}Screenshots@{uu}
-The first checkbox here, named "Hide Screenshots", disables the screenshot part of the main window. This change requires to restart iGame to be applied.
+The first checkbox here, named "Hide Screenshots", disables the screenshot part of the main window. iGame window will be refreshed to show/hide the screenshot as soon as you apply the changes.
 
-If screenshots are enabled you can select from the second checkbox if the GuiGfx library will be used. GuiGfx provides good scaling of the screenshot but it is a little bit tricky to set this up. You can find more info at @{" Installation " LINK "INST" 0} section. If this is checked iGame will not use the GuiGfx library.
+If screenshots are enabled you can select from the second checkbox if the GuiGfx library will be used. GuiGfx provides good scaling of the screenshot but it is a little bit tricky to set this up. You can find more info at @{" Installation " LINK "INST" 0} section. If this checkbox is selected that means that iGame will not use the GuiGfx library. If the library is not installed or the prerequisites are missing, then iGame will use datatypes to show the screenshot and this checkbox will be disabled.
 
-After that, there is a select box to choose the screenshot size. You can choose between 160x128 pixels, 320x256 pixels and custom, which lets you set the width and height manually, using the fields below the select box.
+Under that, there is a select box to choose the screenshot size. You can choose between 160x128 pixels, 320x256 pixels and custom, which lets you set the width and height manually, using the fields below the select box.
 
 @{u}Titles@{uu}
 The first two radio buttons set the way iGame gets the WHDLoad games/demos titles. These can be based on reading the slave files or by the game/demo parent folder name. If you choose the "Slave Contents" option the name can be more accurate, but the scanning is slower. The "Directories" option is way faster, but if the slave inside a folder is not the one the directory is named, then there is a risk to have the wrong game in the list. Have in mind that if iGame finds multiple slaves for the same game, their titles will be suffixed with the 'Alt' word.

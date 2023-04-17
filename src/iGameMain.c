@@ -89,6 +89,7 @@ struct Library			*WorkbenchBase;
 char *executable_name;   // TODO: Why global?
 
 igame_settings* iGameSettings = NULL;
+BOOL blockGuiGfx = FALSE;
 
 static int initLibraries(void);
 static void cleanupLibraries(void);
@@ -329,26 +330,13 @@ static int initLibraries(void)
 	// Load settings here, after we load the icon.library
 	iGameSettings = load_settings(DEFAULT_SETTINGS_FILE);
 
-	if (!iGameSettings->hide_screenshots && !iGameSettings->hide_side_panel)
-	{
-		if (!(RenderLibBase = OpenLibrary("render.library", 30)))
-		{
-			return clean_exit("Can't open render.library v30 or greater\n");
-		}
-
-		if (!iGameSettings->no_guigfx)
-		{
-
-			if (!(GuiGfxBase = OpenLibrary("guigfx.library", 17)))
-			{
-				return clean_exit("Can't open guigfx.library v17 or greater\n");
-			}
-
-			if (!(GuiGfxMCC = OpenLibrary("mui/Guigfx.mcc", 19)))
-			{
-				return clean_exit("Can't open Guigfx.mcc v19 or greater\n");
-			}
-		}
+	if (
+		!(RenderLibBase = OpenLibrary("render.library", 30)) ||
+		!(GuiGfxBase = OpenLibrary("guigfx.library", 17)) ||
+		!(GuiGfxMCC = OpenLibrary("mui/Guigfx.mcc", 19))
+	) {
+		iGameSettings->no_guigfx = 1;
+		blockGuiGfx = TRUE;
 	}
 
 	return RETURN_OK;
