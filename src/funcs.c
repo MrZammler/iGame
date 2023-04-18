@@ -62,7 +62,6 @@ extern struct Library *IconBase;
 extern char* executable_name;
 
 /* global variables */
-int total_games;
 int no_of_genres;
 char fname[255];
 
@@ -78,14 +77,6 @@ listFilters filters = {0};
 void setStatusText(char *text)
 {
 	set(app->TX_Status, MUIA_Text_Contents, text);
-}
-
-void status_show_total(void)
-{
-	char helper[200];
-	set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
-	sprintf(helper, (const char*)GetMBString(MSG_TotalNumberOfGames), total_games);
-	set(app->TX_Status, MUIA_Text_Contents, helper);
 }
 
 static void apply_settings()
@@ -472,13 +463,13 @@ static void launchSlave(slavesList *node)
 
 		if (Examine(pathLock, FIblock))
 		{
+			char *infoPath = AllocVec(bufSize, MEMF_CLEAR);
 			while (ExNext(pathLock, FIblock))
 			{
 				if (
 					(FIblock->fib_DirEntryType < 0) &&
 					(strcasestr(FIblock->fib_FileName, ".info"))
 				) {
-					char *infoPath = AllocVec(bufSize, MEMF_CLEAR);
 					getFullPath(FIblock->fib_FileName, infoPath);
 					snprintf(infoPath, bufSize, "%s", substring(infoPath, 0, -5));
 
@@ -487,7 +478,7 @@ static void launchSlave(slavesList *node)
 					if (checkSlaveInTooltypes(infoPath, buf))
 					{
 						int execSize = sizeof(char) * MAX_EXEC_SIZE;
-						char *exec = AllocVec(bufSize, MEMF_CLEAR);
+						char *exec = AllocVec(execSize, MEMF_CLEAR);
 						prepareWHDExecution(infoPath, exec);
 
 						// Update statistics info
@@ -503,11 +494,12 @@ static void launchSlave(slavesList *node)
 							msg_box((const char*)GetMBString(MSG_ErrorExecutingWhdload));
 
 						FreeVec(exec);
+						break;
 					}
-					FreeVec(infoPath);
 				}
 			}
 
+			FreeVec(infoPath);
 			FreeVec(FIblock);
 		}
 
@@ -703,7 +695,7 @@ nextItem:
 	}
 	set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
 
-	sprintf(buf, GetMBString(MSG_TotalNumberOfGames), cnt);
+	sprintf(buf, (const char *)GetMBString(MSG_TotalNumberOfGames), cnt);
 	setStatusText(buf);
 	free(buf);
 }
@@ -824,8 +816,6 @@ static BOOL examineFolder(char *path)
 						{
 							// Generate title and add in the list
 							generateItemName(existingNode->path, existingNode->title, sizeof(existingNode->title));
-
-							slavesListCountInstancesByTitle(existingNode);
 						}
 					}
 				}
@@ -846,6 +836,7 @@ void scan_repositories(void)
 	if (repos)
 	{
 		set(app->WI_MainWindow, MUIA_Window_Sleep, TRUE);
+
 		for (item_repos = repos; item_repos != NULL; item_repos = item_repos->next)
 		{
 			if(check_path_exists(item_repos->repo))

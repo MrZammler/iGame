@@ -24,7 +24,6 @@
 #define _FUNCS_H
 
 void msg_box(const char *);
-void status_show_total(void);
 void game_click(void);
 void joystick_input(ULONG);
 void app_stop(void);

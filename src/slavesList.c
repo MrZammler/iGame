@@ -83,12 +83,11 @@ static BOOL slavesListRemoveHead(void) {
 
 	if (isListEmpty(slavesListHead)) {
 		return FALSE;
-	} else {
-		slavesList *nextPtr = slavesListHead->next;
-		free(slavesListHead);
-		slavesListHead = nextPtr;
 	}
 
+	slavesList *nextPtr = slavesListHead->next;
+	free(slavesListHead);
+	slavesListHead = nextPtr;
 	return TRUE;
 }
 
