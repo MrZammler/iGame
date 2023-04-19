@@ -278,15 +278,13 @@ void slavesListLoadFromCSV(char *filename)
 void slavesListSaveToCSV(const char *filename)
 {
 	char csvFilename[32];
-	FILE *fpgames;
-
 	const char* saving_message = (const char*)GetMBString(MSG_SavingGamelist);
 	set(app->TX_Status, MUIA_Text_Contents, saving_message);
 
 	strcpy(csvFilename, (CONST_STRPTR)filename);
 	strcat(csvFilename, ".csv");
 
-	fpgames = fopen(csvFilename, "w");
+	FILE *fpgames = fopen(csvFilename, "w");
 	if (!fpgames)
 	{
 		msg_box((const char*)GetMBString(MSG_FailedOpeningGameslist));
@@ -625,9 +623,13 @@ void prepareWHDExecution(char *infoFile, char *result)
 			if (tmpTbl[1][0] == '$')
 			{
 				sprintf(buf, "%s=%d", tmpTbl[0], hex2dec((char *)tmpTbl[1]));
-			} else if (atoi(tmpTbl[1])) {
+			}
+			else if (isNumeric(tmpTbl[1]))
+			{
 				sprintf(buf, "%s=%s", tmpTbl[0], tmpTbl[1]);
-			} else {
+			}
+			else
+			{
 				sprintf(buf, "%s=\"%s\"", tmpTbl[0], tmpTbl[1]);
 			}
 		}

@@ -505,7 +505,6 @@ static void launchSlave(slavesList *node)
 
 		UnLock(pathLock);
 		CurrentDir(oldLock);
-		UnLock(oldLock);
 	}
 
 	FreeVec(buf);
