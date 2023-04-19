@@ -259,3 +259,14 @@ BOOL isStringEmpty(const char *string)
 {
 	return string[0] == '\0';
 }
+
+BOOL isNumeric(const char *string)
+{
+	while(*string)
+	{
+		if(*string < '0' || *string > '9')
+			return FALSE;
+		++string;
+	}
+	return TRUE;
+}

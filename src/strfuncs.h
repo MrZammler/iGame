@@ -32,5 +32,6 @@ void add_spaces_to_string(const char *, char *, int);
 STRPTR substring(STRPTR, int, int);
 STRPTR GetMBString(ULONG);
 BOOL isStringEmpty(const char *);
+BOOL isNumeric(const char *);
 
 #endif
