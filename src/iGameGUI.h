@@ -36,6 +36,7 @@ struct ObjApp
 	APTR MN_MainMenu;
 	APTR STR_Filter;
 	APTR GR_sidepanel;
+	APTR GR_spacedScreenshot;
 	APTR IM_GameImage_0;
 	APTR IM_GameImage_1;
 	APTR Space_Sidepanel;

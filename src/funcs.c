@@ -64,10 +64,11 @@ extern char* executable_name;
 /* global variables */
 int no_of_genres;
 char fname[255];
+BOOL sidepanelChanged = FALSE; // This is temporary until settings are revamped
 
 /* function definitions */
-// int get_genre(char* title, char* genre);
 static void showSlavesList(void);
+static LONG xget(Object *, ULONG);
 
 repos_list *item_repos = NULL, *repos = NULL;
 genres_list *item_genres = NULL, *genres = NULL;
@@ -849,17 +850,68 @@ void scan_repositories(void)
 	}
 }
 
-static void refresh_sidepanel()
+static void applySidePanelChange(void)
 {
-	DoMethod(app->GR_sidepanel, MUIM_Group_InitChange);
-	DoMethod(app->GR_sidepanel, OM_REMMEMBER, app->IM_GameImage_0);
-	DoMethod(app->GR_sidepanel, OM_REMMEMBER, app->Space_Sidepanel);
-	DoMethod(app->GR_sidepanel, OM_REMMEMBER, app->LV_GenresList);
-	MUI_DisposeObject(app->IM_GameImage_0);
-	DoMethod(app->GR_sidepanel, OM_ADDMEMBER, app->IM_GameImage_0 = app->IM_GameImage_1);
-	DoMethod(app->GR_sidepanel, OM_ADDMEMBER, app->Space_Sidepanel);
-	DoMethod(app->GR_sidepanel, OM_ADDMEMBER, app->LV_GenresList);
-	DoMethod(app->GR_sidepanel, MUIM_Group_ExitChange);
+	if (!current_settings->hide_side_panel)
+	{
+		DoMethod(app->GR_sidepanel, MUIM_Group_InitChange);
+		DoMethod(app->GR_sidepanel, OM_REMMEMBER, app->Space_Sidepanel);
+		DoMethod(app->GR_sidepanel, OM_REMMEMBER, app->LV_GenresList);
+
+		if (!current_settings->hide_screenshots) {
+			if (current_settings->no_guigfx) {
+				app->IM_GameImage_0 = MUI_NewObject(Dtpic_Classname,
+					MUIA_Dtpic_Name, DEFAULT_SCREENSHOT_FILE,
+					MUIA_Frame, MUIV_Frame_ImageButton,
+				TAG_DONE);
+			}
+			else {
+				app->IM_GameImage_0 = GuigfxObject,
+					MUIA_Guigfx_FileName, DEFAULT_SCREENSHOT_FILE,
+					MUIA_Guigfx_Quality, MUIV_Guigfx_Quality_Best,
+					MUIA_Guigfx_ScaleMode, NISMF_SCALEFREE | NISMF_KEEPASPECT_PICTURE,
+					MUIA_Frame, MUIV_Frame_ImageButton,
+					MUIA_FixHeight, current_settings->screenshot_height,
+					MUIA_FixWidth, current_settings->screenshot_width,
+				End;
+			}
+
+			DoMethod(app->GR_sidepanel, OM_REMMEMBER, app->GR_spacedScreenshot);
+			app->GR_spacedScreenshot = HGroup, MUIA_Group_Spacing, 0,
+				Child, HSpace(0),
+				Child, app->IM_GameImage_0,
+				Child, HSpace(0),
+				End;
+			DoMethod(app->GR_sidepanel, OM_ADDMEMBER, app->GR_spacedScreenshot);
+		}
+		else
+		{
+			DoMethod(app->GR_sidepanel, OM_REMMEMBER, app->GR_spacedScreenshot);
+		}
+
+		DoMethod(app->GR_sidepanel, OM_ADDMEMBER, app->Space_Sidepanel);
+		DoMethod(app->GR_sidepanel, OM_ADDMEMBER, app->LV_GenresList);
+		DoMethod(app->GR_sidepanel, MUIM_Group_ExitChange);
+	}
+	sidepanelChanged = FALSE;
+}
+
+static void replaceScreenshot(void)
+{
+	struct List *childsList = (struct List *)xget(app->GR_spacedScreenshot, MUIA_Group_ChildList);
+	Object *cstate = (Object *)childsList->lh_Head;
+	Object *child;
+
+	DoMethod(app->GR_spacedScreenshot, MUIM_Group_InitChange);
+	while ((child = (Object *)NextObject(&cstate)))
+	{
+		DoMethod(app->GR_spacedScreenshot, OM_REMMEMBER, child);
+		MUI_DisposeObject(child);
+	}
+	DoMethod(app->GR_spacedScreenshot, OM_ADDMEMBER, HSpace(0));
+	DoMethod(app->GR_spacedScreenshot, OM_ADDMEMBER, app->IM_GameImage_0 = app->IM_GameImage_1);
+	DoMethod(app->GR_spacedScreenshot, OM_ADDMEMBER, HSpace(0));
+	DoMethod(app->GR_spacedScreenshot, MUIM_Group_ExitChange);
 }
 
 static void show_screenshot(STRPTR screenshot_path)
@@ -890,7 +942,7 @@ static void show_screenshot(STRPTR screenshot_path)
 
 		if (app->IM_GameImage_1)
 		{
-			refresh_sidepanel();
+			replaceScreenshot();
 		}
 
 		strcpy(prvScreenshot, screenshot_path);
@@ -1238,11 +1290,6 @@ static LONG xget(Object* obj, ULONG attribute)
 	return x;
 }
 
-char* get_str(Object* obj)
-{
-	return (char *)xget(obj, MUIA_String_Contents);
-}
-
 static int get_cycle_index(Object* obj)
 {
 	int index = 0;
@@ -1289,6 +1336,7 @@ void setting_titles_from_changed(void)
 void setting_hide_screenshot_changed(void)
 {
 	current_settings->hide_screenshots = (BOOL)xget(app->CH_Screenshots, MUIA_Selected);
+	sidepanelChanged = TRUE;
 }
 
 void setting_no_guigfx_changed(void)
@@ -1337,9 +1385,18 @@ void settings_use(void)
 	const int index = get_cycle_index(app->CY_ScreenshotSize);
 	if (index == 2)
 	{
-		current_settings->screenshot_width = (int)get_str(app->STR_Width);
-		current_settings->screenshot_height = (int)get_str(app->STR_Height);
+		char *width = NULL;
+		char *height = NULL;
+
+		get(app->STR_Width, MUIA_String_Contents, &width);
+		get(app->STR_Height, MUIA_String_Contents, &height);
+
+		current_settings->screenshot_width = atoi(width);
+		current_settings->screenshot_height = atoi(height);
 	}
+
+	if (sidepanelChanged)
+		applySidePanelChange();
 
 	set(app->WI_Settings, MUIA_Window_Open, FALSE);
 }

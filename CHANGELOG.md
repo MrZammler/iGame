@@ -1,10 +1,17 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Fixed
-- With v2.3.0 WHDLoad games that have different names on .info file against the slave file was not starting. I changed the way the necessary info file is discovered to be closer to what v2.2.1 was doing and now it works fine
-- Fixed an error on status text after launching a game that showed total of zero games, introduced in v2.3.0
-- Refactored the Slave tooltype parsing on launching to fix a memory hit and potential crashes
+- The custom screenshot sizes were wrongly saved. This is now fixed (#190)
 - Fixed a duplication in slave names after the execution of a second scan in the same list, introduced in v2.3.0
 - Fixed a crash on systems that use AutoUpdateWB patch. **HUGE THANKS to mfilos** for his testing, feedback and support up to late at nights
+- Fixed an error on status text after launching a game that showed total of zero games, introduced in v2.3.0
+- Refactored the Slave tooltype parsing on launching to fix a memory hit and potential crashes
+
+### Changed
+- Added some spaces left and right of the screenshot. This helps to resize the sidebar as needed keeping the screenshot centred
+- Now, only the screenshot part of the GUI is updated on item selection and not the whole right side. This makes the GUI refresh faster on slow computers
+- If the screenshot is toggled (show/hide) in the settings window the GUI is updated without the need of restarting iGame
+- Now iGame doesn't fail to start even if any of the guigfx.library, render.library or Guigfx.mcc is missing. It falls back using the datatypes and the "No GuiGfx" checkbox is blocked in the settings
+- With v2.3.0 WHDLoad games that have different names on .info file against the slave file was not starting. I changed the way the necessary info file is discovered to be closer to what v2.2.1 was doing and now it works fine
 
 ## iGame 2.3.1 - [2023-04-14]
 ### Fixed
