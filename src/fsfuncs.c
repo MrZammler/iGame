@@ -44,6 +44,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #define iGame_NUMBERS
 #include "iGame_strings.h"
@@ -277,15 +278,13 @@ void slavesListLoadFromCSV(char *filename)
 void slavesListSaveToCSV(const char *filename)
 {
 	char csvFilename[32];
-	FILE *fpgames;
-
 	const char* saving_message = (const char*)GetMBString(MSG_SavingGamelist);
 	set(app->TX_Status, MUIA_Text_Contents, saving_message);
 
 	strcpy(csvFilename, (CONST_STRPTR)filename);
 	strcat(csvFilename, ".csv");
 
-	fpgames = fopen(csvFilename, "w");
+	FILE *fpgames = fopen(csvFilename, "w");
 	if (!fpgames)
 	{
 		msg_box((const char*)GetMBString(MSG_FailedOpeningGameslist));
@@ -308,8 +307,6 @@ void slavesListSaveToCSV(const char *filename)
 	}
 
 	fclose(fpgames);
-
-	status_show_total();
 }
 
 /*
@@ -572,4 +569,75 @@ void setIconTooltypes(char *path, char *tooltypes)
 			FreeDiskObject(diskObj);
 		}
 	}
+}
+
+/*
+* Check if the needed slave file is set in .info tooltypes
+* The infoFile needs to be the full file path without .info at the end
+*/
+BOOL checkSlaveInTooltypes(char *infoFile, char *slaveName)
+{
+	struct DiskObject *diskObj = GetDiskObjectNew(infoFile);
+	if(diskObj)
+	{
+		if (MatchToolValue(FindToolType(diskObj->do_ToolTypes, "SLAVE"), slaveName))
+		{
+			FreeDiskObject(diskObj);
+			return TRUE;
+		}
+		FreeDiskObject(diskObj);
+	}
+	return FALSE;
+}
+
+/*
+* Prepare the exec command based on icon tooltypes
+* The infoFile needs to be the full file path without .info at the end
+*/
+void prepareWHDExecution(char *infoFile, char *result)
+{
+	char *tooltypes = AllocVec(sizeof(char) * 1024, MEMF_CLEAR);
+	getIconTooltypes(infoFile, tooltypes);
+
+	char *buf = AllocVec(sizeof(char) * MAX_TOOLTYPE_SIZE, MEMF_CLEAR);
+	char **table = my_split(tooltypes, "\n");
+	strcpy(result, "whdload");
+	for (table; (buf = *table); ++table)  // cppcheck-suppress redundantInitialization
+	{
+		if (buf[0] == ' ') continue;
+		if (buf[0] == '(') continue;
+		if (buf[0] == '*') continue;
+		if (buf[0] == ';') continue;
+		if (buf[0] == '\0') continue;
+		if (buf[0] == -69) continue; // »
+		if (buf[0] == -85) continue; // «
+		if (buf[0] == 34) continue; // \"
+		if (buf[0] == '.') continue;
+		if (buf[0] == '=') continue;
+		if (buf[0] == '#') continue;
+		if (buf[0] == '!') continue;
+
+		char** tmpTbl = my_split(buf, "=");
+		if (tmpTbl[1] != NULL)
+		{
+			if (tmpTbl[1][0] == '$')
+			{
+				sprintf(buf, "%s=%d", tmpTbl[0], hex2dec((char *)tmpTbl[1]));
+			}
+			else if (isNumeric(tmpTbl[1]))
+			{
+				sprintf(buf, "%s=%s", tmpTbl[0], tmpTbl[1]);
+			}
+			else
+			{
+				sprintf(buf, "%s=\"%s\"", tmpTbl[0], tmpTbl[1]);
+			}
+		}
+
+		strcat(result, " ");
+		strcat(result, buf);
+	}
+
+	FreeVec(buf);
+	FreeVec(tooltypes);
 }

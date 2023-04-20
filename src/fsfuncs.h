@@ -39,5 +39,7 @@ void get_path(char *, char *);
 BOOL isPathFolder(char *);
 void getIconTooltypes(char *, char *);
 void setIconTooltypes(char *, char *);
+BOOL checkSlaveInTooltypes(char *, char *);
+void prepareWHDExecution(char *, char *);
 
 #endif

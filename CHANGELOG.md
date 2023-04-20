@@ -1,5 +1,13 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Fixed
+- With v2.3.0 WHDLoad games that have different names on .info file against the slave file was not starting. I changed the way the necessary info file is discovered to be closer to what v2.2.1 was doing and now it works fine
+- Fixed an error on status text after launching a game that showed total of zero games, introduced in v2.3.0
+- Refactored the Slave tooltype parsing on launching to fix a memory hit and potential crashes
+- Fixed a duplication in slave names after the execution of a second scan in the same list, introduced in v2.3.0
+- Fixed a crash on systems that use AutoUpdateWB patch. **HUGE THANKS to mfilos** for his testing, feedback and support up to late at nights
+
+## iGame 2.3.1 - [2023-04-14]
+### Fixed
 - This is a hot fix release for the installer script that had a bug of not finding the icons folder
 
 ## iGame 2.3.0 - [2023-04-13]
