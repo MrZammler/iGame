@@ -24,49 +24,50 @@
 #define IGAME_EXT_H
 
 #define Dtpic_Classname "Dtpic.mui"
-#define MUIA_Dtpic_Name 0x80423d72
+// #define MUIA_Dtpic_Name 0x80423d72
 #define PROGDIR "PROGDIR:"
 #define DEFAULT_GAMESLIST_FILE "PROGDIR:gameslist"
 #define DEFAULT_REPOS_FILE "PROGDIR:repos.prefs"
 #define DEFAULT_GENRES_FILE "PROGDIR:genres"
 #define DEFAULT_SCREENSHOT_FILE "PROGDIR:igame.iff"
 #define DEFAULT_SETTINGS_FILE "igame.prefs"
-#define SLAVE_STRING "slave"
-#define WB_PUBSCREEN_NAME "Workbench"
+// #define SLAVE_STRING "slave"
+// #define WB_PUBSCREEN_NAME "Workbench"
 
-#define FILENAME_HOTKEY 'f'
-#define QUALITY_HOTKEY 'q'
-#define QUALITY_DEFAULT MUIV_Guigfx_Quality_Low
-#define SCALEUP_HOTKEY 'u'
-#define SCALEUP_DEFAULT FALSE
-#define SCALEDOWN_HOTKEY 'd'
-#define SCALEDOWN_DEFAULT TRUE
-#define TRANSMASK_HOTKEY 'm'
-#define TRANSMASK_DEFAULT FALSE
-#define TRANSCOLOR_HOTKEY 'c'
-#define TRANSCOLOR_DEFAULT FALSE
-#define TRANSRGB_HOTKEY 'r'
-#define TRANSRGB_DEFAULT (0x0)
-#define PICASPECT_DEFAULT TRUE
-#define PICASPECT_HOTKEY 'a'
-#define SCREENASPECT_DEFAULT TRUE
-#define SCREENASPECT_HOTKEY 's'
-#define SCALEMODEMASK(u,d,p,s) (((u)?GGSMF_SCALEUP:0)|((d)?GGSMF_SCALEDOWN:0)|((p)?GGSMF_KEEPASPECT_PICTURE:0)|((s)?GGSMF_KEEPASPECT_SCREEN:0))
+// #define FILENAME_HOTKEY 'f'
+// #define QUALITY_HOTKEY 'q'
+// #define QUALITY_DEFAULT MUIV_Guigfx_Quality_Low
+// #define SCALEUP_HOTKEY 'u'
+// #define SCALEUP_DEFAULT FALSE
+// #define SCALEDOWN_HOTKEY 'd'
+// #define SCALEDOWN_DEFAULT TRUE
+// #define TRANSMASK_HOTKEY 'm'
+// #define TRANSMASK_DEFAULT FALSE
+// #define TRANSCOLOR_HOTKEY 'c'
+// #define TRANSCOLOR_DEFAULT FALSE
+// #define TRANSRGB_HOTKEY 'r'
+// #define TRANSRGB_DEFAULT (0x0)
+// #define PICASPECT_DEFAULT TRUE
+// #define PICASPECT_HOTKEY 'a'
+// #define SCREENASPECT_DEFAULT TRUE
+// #define SCREENASPECT_HOTKEY 's'
+// #define SCALEMODEMASK(u,d,p,s) (((u)?GGSMF_SCALEUP:0)|((d)?GGSMF_SCALEDOWN:0)|((p)?GGSMF_KEEPASPECT_PICTURE:0)|((s)?GGSMF_KEEPASPECT_SCREEN:0))
 
-#define MENU_SCANREPOS_HOTKEY "R"
-#define MENU_ADDNONWHDLOADGAME_HOTKEY "A"
+// #define MENU_SCANREPOS_HOTKEY "R"
+// #define MENU_ADDNONWHDLOADGAME_HOTKEY "A"
 #define MENU_OPENLIST_HOTKEY "O"
 #define MENU_SAVELIST_HOTKEY "S"
-#define MENU_ABOUT_HOTKEY "?"
-#define MENU_QUIT_HOTKEY "Q"
-#define MENU_PROPERTIES_HOTKEY "P"
-#define MENU_DELETE_HOTKEY "D"
+// #define MENU_ABOUT_HOTKEY "?"
+// #define MENU_QUIT_HOTKEY "Q"
+// #define MENU_PROPERTIES_HOTKEY "P"
+// #define MENU_DELETE_HOTKEY "D"
 
 #define MAX_SLAVE_TITLE_SIZE 128
 #define MAX_GENRE_NAME_SIZE 32
 #define MAX_PATH_SIZE 256
 #define MAX_EXEC_SIZE 256
 #define MAX_TOOLTYPE_SIZE 64
+#define MAX_ARGUMENTS_SIZE 64
 
 typedef struct settings
 {
@@ -100,6 +101,7 @@ typedef struct slavesList
 	char user_title[MAX_SLAVE_TITLE_SIZE];
 	char path[MAX_PATH_SIZE];
 	char genre[MAX_GENRE_NAME_SIZE];
+	char arguments[MAX_ARGUMENTS_SIZE];
 
 	int instance;
 	int times_played;
@@ -115,6 +117,9 @@ typedef struct slavesList
 				// TODO: This could be a tag
 
 	int deleted; // indicates this entry should be deleted when the list is saved
+
+	int year; // Year of release
+	int players; // Maximum number of players
 
 	struct slavesList *next;
 } slavesList;

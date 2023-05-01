@@ -1,4 +1,11 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
+### Added
+- Introduced the new igame.data files
+- iGame uses NList now with extra columns that are sortable
+### Changed
+- Now the MUI changes are loaded from envarc. With MUI v5 balance size and list columns are saved there and restored the next time iGame is started
+
+## iGame 2.3.2 - [2023-04-20]
 ### Fixed
 - The custom screenshot sizes were wrongly saved. This is now fixed (#190)
 - Fixed a duplication in slave names after the execution of a second scan in the same list, introduced in v2.3.0

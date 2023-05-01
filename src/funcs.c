@@ -24,6 +24,7 @@
 #include <libraries/mui.h>
 #include <mui/Guigfx_mcc.h>
 #include <mui/TextEditor_mcc.h>
+#include <mui/NListview_mcc.h>
 
 /* Prototypes */
 #include <clib/alib_protos.h>
@@ -374,7 +375,7 @@ void app_start(void)
 
 	DoMethod(app->App,
 		MUIM_Application_Load,
-		MUIV_Application_Load_ENV
+		MUIV_Application_Load_ENVARC
 	);
 
 	set(app->WI_MainWindow, MUIA_Window_Open, TRUE);
@@ -623,21 +624,21 @@ static void showSlavesList(void)
 				goto nextItem;
 			}
 
-			// Decide from where the item name will be taken
-			if(!isStringEmpty(currPtr->user_title))
-			{
-				snprintf(buf, bufSize, "%s", currPtr->user_title);
-			}
-			else if(isStringEmpty(currPtr->user_title) && (currPtr->instance > 0))
-			{
-				snprintf(currPtr->user_title, sizeof(currPtr->user_title),
-					"%s [%d]", currPtr->title, currPtr->instance);
-				snprintf(buf, bufSize, "%s", currPtr->user_title);
-			}
-			else
-			{
-				snprintf(buf, bufSize, "%s", currPtr->title);
-			}
+			// // Decide from where the item name will be taken
+			// if(!isStringEmpty(currPtr->user_title))
+			// {
+			// 	snprintf(buf, bufSize, "%s", currPtr->user_title);
+			// }
+			// else if(isStringEmpty(currPtr->user_title) && (currPtr->instance > 0))
+			// {
+			// 	snprintf(currPtr->user_title, sizeof(currPtr->user_title),
+			// 		"%s [%d]", currPtr->title, currPtr->instance);
+			// 	snprintf(buf, bufSize, "%s", currPtr->user_title);
+			// }
+			// else
+			// {
+			// 	snprintf(buf, bufSize, "%s", currPtr->title);
+			// }
 
 			// Filter list based on entered string
 			if (!isStringEmpty(filters.title) && !strcasestr(buf, filters.title))
@@ -660,16 +661,22 @@ static void showSlavesList(void)
 						{
 							if (currPtr->times_played < mostPlayedTimes)
 							{
+								// DoMethod(app->LV_GamesList,
+								// 	MUIM_List_InsertSingle, currPtr->title,
+								// 	MUIV_List_Insert_Bottom);
 								DoMethod(app->LV_GamesList,
-									MUIM_List_InsertSingle, currPtr->title,
-									MUIV_List_Insert_Bottom);
+									MUIM_NList_InsertSingle, currPtr,
+									MUIV_NList_Insert_Bottom);
 							}
 							else
 							{
 								mostPlayedTimes = currPtr->times_played;
+								// DoMethod(app->LV_GamesList,
+								// 	MUIM_List_InsertSingle, currPtr->title,
+								// 	MUIV_List_Insert_Top);
 								DoMethod(app->LV_GamesList,
-									MUIM_List_InsertSingle, currPtr->title,
-									MUIV_List_Insert_Top);
+									MUIM_NList_InsertSingle, currPtr,
+									MUIV_NList_Insert_Top);
 							}
 						}
 						goto nextItem;
@@ -684,8 +691,8 @@ static void showSlavesList(void)
 			}
 
 			DoMethod(app->LV_GamesList,
-				MUIM_List_InsertSingle, buf,
-				MUIV_List_Insert_Sorted);
+				MUIM_NList_InsertSingle, currPtr,
+				MUIV_NList_Insert_Sorted);
 
 			cnt++;
 nextItem:
@@ -791,6 +798,7 @@ static BOOL examineFolder(char *path)
 							}
 
 							node->instance = 0;
+							node->title[0] = '\0';
 							node->genre[0] = '\0';
 							node->user_title[0] = '\0';
 							node->times_played = 0;
@@ -799,12 +807,26 @@ static BOOL examineFolder(char *path)
 							node->exists = 1;
 							node->hidden = 0;
 							node->deleted = 0;
+							node->year = 0;
+							node->players = 0;
 
 							getFullPath(buf, buf);
 							strncpy(node->path, buf, sizeof(node->path));
 
+							// TODO: Add here if igame.data is enabled to be used in settings
+							char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
+							snprintf(igameDataPath, sizeof(char) * MAX_PATH_SIZE, "%s/igame.data", path);
+							if (check_path_exists(igameDataPath))
+							{
+								getIGameDataInfo(igameDataPath, node);
+							}
+
 							// Generate title and add in the list
-							generateItemName(node->path, node->title, sizeof(node->title));
+							// TODO: Run the following if igame.data is disabled or if the node->title is still empty
+							if (isStringEmpty(node->title))
+							{
+								generateItemName(node->path, node->title, sizeof(node->title));
+							}
 
 							// Scan how many others with same title exist and increase a number at the end of the list (alt)
 							slavesListCountInstancesByTitle(node);

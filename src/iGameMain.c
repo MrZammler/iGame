@@ -73,6 +73,7 @@ struct GraphicsIFace	*IGraphics;
 struct IconIFace		*IIcon;
 struct IntuitionIFace	*IIntuition;
 struct LocaleIFace		*ILocale;
+struct UtilityIFace		*IUtility;
 struct WorkbenchIFace	*IWorkbench;
 #endif
 struct Library			*DataTypesBase;
@@ -84,6 +85,7 @@ struct Library			*GuiGfxBase;
 struct Library			*LowLevelBase;
 struct Library			*RenderLibBase;
 struct Library			*TextEditorMCC;
+struct Library			*UtilityBase;
 struct Library			*WorkbenchBase;
 
 char *executable_name;   // TODO: Why global?
@@ -322,6 +324,15 @@ static int initLibraries(void)
 	}
 	else return clean_exit("Can't open datatypes.library v37 or greater\n");
 
+	if ((UtilityBase = OpenLibrary("utility.library", 37)))
+	{
+		#ifdef __amigaos4__
+		IUtility = (struct UtilityIFace *)GetInterface( UtilityBase, "main", 1, NULL );
+		if(!IUtility) return clean_exit("Can't open Utility.library Interface");
+		#endif
+	}
+	else return clean_exit("Can't open utility.library v37 or greater\n");
+
 	if (!initLocale())
 	{
 		return RETURN_ERROR;
@@ -351,6 +362,7 @@ static void cleanupLibraries(void)
 	if(IIcon)			DropInterface((struct Interface *) IIcon);
 	if(IIntuition)		DropInterface((struct Interface *) IIntuition);
 	if(ILocale)			DropInterface((struct Interface *) ILocale);
+	if(IUtility)		DropInterface((struct Interface *) IUtility);
 	if(IWorkbench)		DropInterface((struct Interface *) IWorkbench);
 	#endif
 
@@ -364,6 +376,7 @@ static void cleanupLibraries(void)
 	if (IconBase)		CloseLibrary(IconBase);
 	if (IntuitionBase)	CloseLibrary((struct Library *)IntuitionBase);
 	if (DataTypesBase)	CloseLibrary(DataTypesBase);
+	if (UtilityBase)	CloseLibrary(UtilityBase);
 	if (WorkbenchBase)	CloseLibrary(WorkbenchBase);
 
 	cleanupLocale();
