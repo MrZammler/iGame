@@ -85,6 +85,7 @@ struct Library			*GuiGfxBase;
 struct Library			*LowLevelBase;
 struct Library			*RenderLibBase;
 struct Library			*TextEditorMCC;
+struct Library			*NListviewMCC;
 struct Library			*UtilityBase;
 struct Library			*WorkbenchBase;
 
@@ -270,6 +271,11 @@ static int initLibraries(void)
 		return clean_exit("Can't open TextEditor.mcc v15 or greater\n");
 	}
 
+	if (!(NListviewMCC = OpenLibrary("mui/NListview.mcc", 19)))
+	{
+		return clean_exit("Can't open NListview.mcc v19 or greater\n");
+	}
+
 	if (!(LowLevelBase = OpenLibrary("lowlevel.library", 0)))
 	{
 		return clean_exit("Can't open lowlevel.library\n");
@@ -367,6 +373,7 @@ static void cleanupLibraries(void)
 	#endif
 
 	if (TextEditorMCC)	CloseLibrary(TextEditorMCC);
+	if (NListviewMCC)	CloseLibrary(NListviewMCC);
 	if (LowLevelBase)	CloseLibrary(LowLevelBase);
 	if (RenderLibBase)	CloseLibrary(RenderLibBase);
 	if (GfxBase)		CloseLibrary(GfxBase);
