@@ -770,6 +770,69 @@ static BOOL examineFolder(char *path)
 
 				if(FIblock->fib_DirEntryType < 0)
 				{
+
+					// igame.data found
+					if (!strcmp(FIblock->fib_FileName, DEFAULT_IGAMEDATA_FILE))
+					{
+						slavesList *node = malloc(sizeof(slavesList));
+						if(node == NULL)
+						{
+							msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+							FreeVec(FIblock);
+							UnLock(lock);
+							free(buf);
+							return FALSE;
+						}
+
+						// TODO: Clear that if possible
+						char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
+						if(!isPathFolder(path))
+						{
+							sprintf(igameDataPath, "%s%s", path, FIblock->fib_FileName);
+						}
+						else
+						{
+							sprintf(igameDataPath, "%s/%s", path, FIblock->fib_FileName);
+						}
+
+						node->instance = 0;
+						node->title[0] = '\0';
+						node->genre[0] = '\0';
+						node->user_title[0] = '\0';
+						node->arguments[0] = '\0';
+						node->times_played = 0;
+						node->favourite = 0;
+						node->last_played = 0;
+						node->exists = 1;
+						node->hidden = 0;
+						node->deleted = 0;
+						node->year = 0;
+						node->players = 0;
+
+						getIGameDataInfo(igameDataPath, node);
+						strncpy(buf, node->path, bufSize);
+						if(!isPathFolder(path))
+						{
+							snprintf(node->path, sizeof(char) * MAX_PATH_SIZE, "%s%s", path, buf);
+						}
+						else
+						{
+							snprintf(node->path, sizeof(char) * MAX_PATH_SIZE, "%s/%s", path, buf);
+						}
+
+						// Check the node->path and skip the save if the buf is empty, it is a slave or the file does not exist. Free the node before move on.
+						if (
+							isStringEmpty(buf) || !check_path_exists(node->path) ||
+							(slavesListSearchByPath(node->path, sizeof(char) * MAX_PATH_SIZE) != NULL)
+						) {
+							free(node);
+						}
+						else
+						{
+							slavesListAddTail(node);
+						}
+					}
+
 					// Slave file found
 					if (strcasestr(FIblock->fib_FileName, ".slave"))
 					{
@@ -815,7 +878,7 @@ static BOOL examineFolder(char *path)
 
 							// TODO: Add here if igame.data is enabled to be used in settings
 							char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
-							snprintf(igameDataPath, sizeof(char) * MAX_PATH_SIZE, "%s/igame.data", path);
+							snprintf(igameDataPath, sizeof(char) * MAX_PATH_SIZE, "%s/%s", path, DEFAULT_IGAMEDATA_FILE);
 							if (check_path_exists(igameDataPath))
 							{
 								getIGameDataInfo(igameDataPath, node);

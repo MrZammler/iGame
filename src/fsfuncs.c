@@ -679,6 +679,11 @@ void getIGameDataInfo(char *igameDataPath, slavesList *node)
 					strncpy(node->title, tmpTbl[1], MAX_SLAVE_TITLE_SIZE);
 				}
 
+				if(!strcmp(tmpTbl[0], "genre"))
+				{
+					strncpy(node->genre, tmpTbl[1], MAX_GENRE_NAME_SIZE);
+				}
+
 				if(!strcmp(tmpTbl[0], "year") && isNumeric(tmpTbl[1]))
 				{
 					node->year=atoi(tmpTbl[1]);
@@ -687,6 +692,11 @@ void getIGameDataInfo(char *igameDataPath, slavesList *node)
 				if(!strcmp(tmpTbl[0], "players") && isNumeric(tmpTbl[1]))
 				{
 					node->players=atoi(tmpTbl[1]);
+				}
+
+				if(!strcmp(tmpTbl[0], "exe") && !isStringEmpty(tmpTbl[1]) && !strcasestr(tmpTbl[1], ".slave"))
+				{
+					strncpy(node->path, tmpTbl[1], MAX_PATH_SIZE);
 				}
 			}
 		}
