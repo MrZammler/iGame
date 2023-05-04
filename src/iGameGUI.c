@@ -127,9 +127,9 @@ HOOKPROTONH(DisplayLI_TextFunc, LONG, char **array, struct Listentry *entry)
 	}
 	else
 	{
-		*array++ = (STRPTR)"Title";
-		*array++ = (STRPTR)"Year";
-		*array++ = (STRPTR)"Players";
+		*array++ = GetMBString(MSG_LV_GAMESLIST_TITLE);
+		*array++ = GetMBString(MSG_LV_GAMESLIST_YEAR);
+		*array++ = GetMBString(MSG_LV_GAMESLIST_PLAYERS);
 	}
 	return 0;
 }

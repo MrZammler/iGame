@@ -325,3 +325,12 @@ Loading the saved list. Please wait.
 MSG_ICONPICTURESTORE_FAILED (//)
 Could not store default picture icon
 ;
+MSG_LV_GAMESLIST_TITLE (//)
+Title
+;
+MSG_LV_GAMESLIST_YEAR (//)
+Year
+;
+MSG_LV_GAMESLIST_PLAYERS (//)
+Players
+;
