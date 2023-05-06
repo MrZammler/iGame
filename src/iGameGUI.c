@@ -28,6 +28,9 @@
 #include <mui/TextEditor_mcc.h>
 #include <mui/NListview_mcc.h>
 
+#ifdef __MORPHOS__
+#define SDI_TRAP_LIB
+#endif
 #include <SDI_hook.h>
 
 /* Prototypes */
