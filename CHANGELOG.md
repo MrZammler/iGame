@@ -1,4 +1,11 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
+### Added
+- Added again the saving of the list after a scan of the repositories, which was removed in the previous releases
+
+### Fixed
+- Fixed the status messages which were stack with saving list message and didn't show the number of games again.
+
+## iGame 2.3.2 - [2023-04-20]
 ### Fixed
 - The custom screenshot sizes were wrongly saved. This is now fixed (#190)
 - Fixed a duplication in slave names after the execution of a second scan in the same list, introduced in v2.3.0

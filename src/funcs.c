@@ -488,7 +488,7 @@ static void launchSlave(slavesList *node)
 
 						// Save stats
 						if (!current_settings->save_stats_on_exit)
-							save_list(0);
+							save_list();
 
 						int success = Execute(exec, 0, 0);
 						if (success == 0)
@@ -546,7 +546,7 @@ static void launchFromWB(slavesList *node)
 
 		// Save stats
 		if (!current_settings->save_stats_on_exit)
-			save_list(0);
+			save_list();
 
 		int success = Execute(exec, 0, 0);
 		if (success == 0)
@@ -594,6 +594,11 @@ void launch_game(void)
 	{
 		launchFromWB(existingNode);
 	}
+
+	sprintf(buf, (const char *)GetMBString(MSG_TotalNumberOfGames), slavesListNodeCount(-1));
+	setStatusText(buf);
+
+	FreeVec(buf);
 }
 
 static void showSlavesList(void)
@@ -695,7 +700,7 @@ nextItem:
 	}
 	set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
 
-	sprintf(buf, (const char *)GetMBString(MSG_TotalNumberOfGames), cnt);
+	sprintf(buf, (const char *)GetMBString(MSG_TotalNumberOfGames), slavesListNodeCount(cnt));
 	setStatusText(buf);
 	free(buf);
 }
@@ -830,7 +835,6 @@ static BOOL examineFolder(char *path)
 	return success;
 }
 
-// Replaces scan_repositories_old()
 void scan_repositories(void)
 {
 	if (repos)
@@ -845,6 +849,7 @@ void scan_repositories(void)
 			}
 		}
 		setStatusText(GetMBString(MSG_ScanCompletedUpdatingList));
+		save_list();
 		showSlavesList();
 		set(app->WI_MainWindow, MUIA_Window_Sleep, FALSE);
 	}
@@ -1227,7 +1232,7 @@ void list_show_hidden(void)
 void app_stop(void)
 {
 	if (current_settings->save_stats_on_exit)
-		save_list(0);
+		save_list();
 
 	memset(&fname[0], 0, sizeof fname);
 
@@ -1250,7 +1255,7 @@ void genres_click(void)
 	filter_change();
 }
 
-void save_list(const int check_exists)
+void save_list(void)
 {
 	slavesListSaveToCSV(DEFAULT_GAMESLIST_FILE);
 }

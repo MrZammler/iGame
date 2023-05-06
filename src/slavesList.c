@@ -190,3 +190,16 @@ void emptySlavesList(void)
 	while(slavesListRemoveHead())
 	{}
 }
+
+int slavesListNodeCount(int cnt)
+{
+	static int nodeCount = 0;
+
+	if (cnt == -1)
+	{
+		return nodeCount;
+	}
+
+	nodeCount = cnt;
+	return nodeCount;
+}
