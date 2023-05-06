@@ -274,6 +274,7 @@ struct ObjApp *CreateApp(void)
 	APTR	LA_NoGuiGfx, GR_ScreenshotSize, LA_ScreenshotSize;
 	APTR	Space_ScreenshotSize, GR_CustomSize, LA_Width, LA_Height, GR_Titles;
 	APTR	GR_TitlesFrom, Space_TitlesFrom, GR_SmartSpaces, Space_SmartSpaces;
+	APTR	LA_UseIgameDataTitle, GR_UseIgameDataTitle;
 	APTR	LA_SmartSpaces, GR_Misc;
 	APTR	LA_SaveStatsOnExit, LA_FilterUseEnter, LA_StartWithFavorites;
 	APTR	LA_HideSidepanel;
@@ -406,6 +407,7 @@ struct ObjApp *CreateApp(void)
 	static const struct Hook SettingsUseHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)settings_use, NULL };
 #endif
 
+MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 
 	if (!((object = AllocVec(sizeof(struct ObjApp), MEMF_PUBLIC | MEMF_CLEAR))))
 		return NULL;
@@ -1083,6 +1085,26 @@ struct ObjApp *CreateApp(void)
 		Child, LA_SmartSpaces,
 		End;
 
+	object->CH_UseIgameDataTitle = CheckMark(FALSE);
+
+	LA_UseIgameDataTitle = TextObject,
+		MUIA_Text_PreParse, "\033r",
+		MUIA_Text_Contents, GetMBString(MSG_LA_UseIgameDataTitle),
+		MUIA_Disabled, FALSE,
+		MUIA_InnerLeft, 0,
+		MUIA_InnerRight, 0,
+		End;
+
+	GR_UseIgameDataTitle = GroupObject,
+		MUIA_HelpNode, "GR_UseIgameDataTitle",
+		MUIA_Group_Horiz, TRUE,
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
+		Child, object->CH_UseIgameDataTitle,
+		Child, VSpace(1),
+		Child, LA_UseIgameDataTitle,
+		End;
+
 	GR_TitlesFrom = GroupObject,
 		MUIA_HelpNode, "GR_TitlesFrom",
 		MUIA_Group_HorizSpacing, 5,
@@ -1090,6 +1112,7 @@ struct ObjApp *CreateApp(void)
 		Child, object->RA_TitlesFrom,
 		Child, Space_TitlesFrom,
 		Child, GR_SmartSpaces,
+		Child, GR_UseIgameDataTitle,
 	End;
 
 	GR_Titles = GroupObject,
@@ -1543,6 +1566,13 @@ struct ObjApp *CreateApp(void)
 		MUIM_CallHook, &SettingSmartSpacesChangedHook
 	);
 
+	DoMethod(object->CH_UseIgameDataTitle,
+		MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &SettingUseIgameDataTitleHook
+	);
+
 	DoMethod(object->CH_SaveStatsOnExit,
 		MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
 		object->App,
@@ -1607,6 +1637,7 @@ struct ObjApp *CreateApp(void)
 		object->STR_Height,
 		object->RA_TitlesFrom,
 		object->CH_SmartSpaces,
+		object->CH_UseIgameDataTitle,
 		object->CH_SaveStatsOnExit,
 		object->CH_FilterUseEnter,
 		object->CH_HideSidepanel,

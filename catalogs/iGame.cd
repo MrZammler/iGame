@@ -334,3 +334,6 @@ Year
 MSG_LV_GAMESLIST_PLAYERS (//)
 Players
 ;
+MSG_LA_UseIgameDataTitle (//)
+Prefer igame.data
+;

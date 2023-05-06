@@ -674,7 +674,7 @@ void getIGameDataInfo(char *igameDataPath, slavesList *node)
 					tmpTbl[1][strlen(tmpTbl[1])] = '\0';
 				}
 
-				if(!strcmp(tmpTbl[0], "title"))
+				if(current_settings->useIgameDataTitle && !strcmp(tmpTbl[0], "title"))
 				{
 					strncpy(node->title, tmpTbl[1], MAX_SLAVE_TITLE_SIZE);
 				}

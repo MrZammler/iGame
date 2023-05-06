@@ -82,6 +82,7 @@ typedef struct settings
 	int hide_side_panel;
 	int no_guigfx;
 	int start_with_favorites;
+	int useIgameDataTitle;
 } igame_settings;
 
 typedef struct genres

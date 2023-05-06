@@ -305,7 +305,9 @@ Under that, there is a select box to choose the screenshot size. You can choose 
 @{u}Titles@{uu}
 The first two radio buttons set the way iGame gets the WHDLoad games/demos titles. These can be based on reading the slave files or by the game/demo parent folder name. If you choose the "Slave Contents" option the name can be more accurate, but the scanning is slower. The "Directories" option is way faster, but if the slave inside a folder is not the one the directory is named, then there is a risk to have the wrong game in the list. Have in mind that if iGame finds multiple slaves for the same game, their titles will be suffixed with the 'Alt' word.
 
-The "No Smart Spaces" disables the ability iGame to add extra spaces on the game/demo title, where it believes it is needed, i.e. before a version number.
+The "No Smart Spaces" disables the ability of iGame to add extra spaces on the game/demo title, where it believes it is needed, i.e. before a version number.
+
+If "Prefer igame.data" is enabled then iGame prefers to get the entry title from the igame.data file if that exists. If it doesn't exist or it is disabled then the previous settings are going to be used for WHDLoad based items. This doesn't have any effect on non-WHDLoad items.
 
 @{u}Misc@{uu}
 The "Save stats on exit" checkbox enables the save of the statistics (i.e. times played) for each game when iGame is closed instead of every time a game is double-clicked. This might be preferred if you don't want to have iGame writing many times on the hard disk.

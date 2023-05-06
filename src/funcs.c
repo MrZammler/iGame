@@ -122,6 +122,7 @@ static void apply_settings()
 		set(app->CH_SmartSpaces, MUIA_Disabled, TRUE);
 	}
 
+	set(app->CH_UseIgameDataTitle, MUIA_Selected, current_settings->useIgameDataTitle);
 	set(app->CH_SaveStatsOnExit, MUIA_Selected, current_settings->save_stats_on_exit);
 	set(app->CH_FilterUseEnter, MUIA_Selected, current_settings->filter_use_enter);
 	set(app->CH_HideSidepanel, MUIA_Selected, current_settings->hide_side_panel);
@@ -135,6 +136,7 @@ static void setDefaultSettings(igame_settings *settings)
 	current_settings->hide_side_panel		= FALSE;
 	current_settings->save_stats_on_exit	= TRUE;
 	current_settings->no_smart_spaces		= FALSE;
+	current_settings->useIgameDataTitle		= TRUE;
 	current_settings->titles_from_dirs		= TRUE;
 	current_settings->hide_screenshots		= TRUE;
 	current_settings->screenshot_width		= 160;
@@ -216,6 +218,8 @@ igame_settings *load_settings(const char* filename)
 					current_settings->screenshot_height = atoi((const char*)file_line + 18);
 				if (!strncmp(file_line, "start_with_favorites=", 21))
 					current_settings->start_with_favorites = atoi((const char*)file_line + 21);
+				if (!strncmp(file_line, "use_igame.data_title=", 21))
+					current_settings->useIgameDataTitle = atoi((const char*)file_line + 21);
 			}
 			while (1);
 
@@ -624,21 +628,21 @@ static void showSlavesList(void)
 				goto nextItem;
 			}
 
-			// // Decide from where the item name will be taken
-			// if(!isStringEmpty(currPtr->user_title))
-			// {
-			// 	snprintf(buf, bufSize, "%s", currPtr->user_title);
-			// }
-			// else if(isStringEmpty(currPtr->user_title) && (currPtr->instance > 0))
-			// {
-			// 	snprintf(currPtr->user_title, sizeof(currPtr->user_title),
-			// 		"%s [%d]", currPtr->title, currPtr->instance);
-			// 	snprintf(buf, bufSize, "%s", currPtr->user_title);
-			// }
-			// else
-			// {
-			// 	snprintf(buf, bufSize, "%s", currPtr->title);
-			// }
+			// Decide from where the item name will be taken
+			if(!isStringEmpty(currPtr->user_title))
+			{
+				snprintf(buf, bufSize, "%s", currPtr->user_title);
+			}
+			else if(isStringEmpty(currPtr->user_title) && (currPtr->instance > 0))
+			{
+				snprintf(currPtr->user_title, sizeof(currPtr->user_title),
+					"%s [%d]", currPtr->title, currPtr->instance);
+				snprintf(buf, bufSize, "%s", currPtr->user_title);
+			}
+			else
+			{
+				snprintf(buf, bufSize, "%s", currPtr->title);
+			}
 
 			// Filter list based on entered string
 			if (!isStringEmpty(filters.title) && !strcasestr(buf, filters.title))
@@ -1404,6 +1408,11 @@ void setting_smart_spaces_changed(void)
 	current_settings->no_smart_spaces = (BOOL)xget(app->CH_SmartSpaces, MUIA_Selected);
 }
 
+void settingUseIgameDataTitleChanged(void)
+{
+	current_settings->useIgameDataTitle = (BOOL)xget(app->CH_UseIgameDataTitle, MUIA_Selected);
+}
+
 void setting_titles_from_changed(void)
 {
 	const int index = get_radio_index(app->RA_TitlesFrom);
@@ -1535,6 +1544,8 @@ void settings_save(void)
 	snprintf(file_line, buffer_size, "screenshot_width=%d\n", current_settings->screenshot_width);
 	FPuts(fpsettings, (CONST_STRPTR)file_line);
 	snprintf(file_line, buffer_size, "screenshot_height=%d\n", current_settings->screenshot_height);
+	FPuts(fpsettings, (CONST_STRPTR)file_line);
+	snprintf(file_line, buffer_size, "use_igame.data_title=%d\n", current_settings->useIgameDataTitle);
 	FPuts(fpsettings, (CONST_STRPTR)file_line);
 
 	Close(fpsettings);
