@@ -1054,8 +1054,28 @@ void repo_add(void)
 
 void repo_remove(void)
 {
-	// TODO: If a repo is removed is not removed from the list
-	DoMethod(app->LV_GameRepositories, MUIM_List_Remove, MUIV_List_Remove_Active);
+	char *path = NULL;
+	DoMethod(app->LV_GameRepositories, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &path);
+
+	repos_list *prevRepo = NULL;
+	for (item_repos = repos; item_repos != NULL; item_repos = item_repos->next)
+	{
+		if (!strcmp(path, item_repos->repo))
+		{
+			if (prevRepo->repo)
+			{
+				prevRepo->next = item_repos->next;
+			}
+			else
+			{
+				repos = item_repos->next;
+			}
+			free(item_repos);
+			DoMethod(app->LV_GameRepositories, MUIM_List_Remove, MUIV_List_Remove_Active);
+			return;
+		}
+		prevRepo = item_repos;
+	}
 }
 
 /*
