@@ -106,8 +106,7 @@ static void cleanUp(void)
 
 	cleanupLibraries();
 
-	if(app)
-		DisposeApp(app);
+	DisposeApp(app);
 }
 
 static int clean_exit(STRPTR msg)

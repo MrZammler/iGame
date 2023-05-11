@@ -23,6 +23,7 @@
 
 /* MUI */
 #include <libraries/mui.h>
+#include <mui/NListview_mcc.h>
 
 /* Prototypes */
 #include <clib/alib_protos.h>
@@ -455,7 +456,7 @@ void open_current_dir(void)
 	}
 
 	// Get the selected item from the list
-	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
+	DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, MUIV_NList_GetEntry_Active, &game_title);
 	if (game_title == NULL || strlen(game_title) == 0)
 	{
 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));

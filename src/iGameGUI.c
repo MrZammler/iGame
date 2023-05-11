@@ -506,8 +506,8 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 			MUIA_NList_Title, TRUE,
 			MUIA_NList_EntryValueDependent, FALSE,
 			MUIA_NList_MinColSortable, 0,
-			MUIA_NList_Imports, MUIV_NList_Imports_All,
-			MUIA_NList_Exports, MUIV_NList_Exports_All,
+			MUIA_NList_Imports, MUIV_NList_Imports_Cols,
+			MUIA_NList_Exports, MUIV_NList_Exports_Cols,
 			End,
 		MUIA_NListview_Horiz_ScrollBar, MUIV_NListview_HSB_None,
 		MUIA_NListview_Vert_ScrollBar,  MUIV_NListview_VSB_FullAuto,
@@ -1324,14 +1324,14 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 	}
 
 	DoMethod(object->LV_GamesList,
-		MUIM_Notify, MUIA_List_Active, MUIV_EveryTime,
+		MUIM_Notify, MUIA_NList_Active, MUIV_EveryTime,
 		object->LV_GamesList,
 		2,
 		MUIM_CallHook, &GameClickHook
 	);
 
 	DoMethod(object->LV_GamesList,
-		MUIM_Notify, MUIA_Listview_DoubleClick, TRUE,
+		MUIM_Notify, MUIA_NList_DoubleClick, TRUE,
 		object->LV_GamesList,
 		2,
 		MUIM_CallHook, &LaunchGameHook
