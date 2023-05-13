@@ -2,7 +2,7 @@
 ## language greek
 ## codeset 10
 ;
-; $VER: igame.cd 2.3 (08.04.2023)
+; $VER: igame.cd 2.4 (06.05.2023)
 ;
 ;
 MSG_AppDescription
@@ -436,4 +436,28 @@ MSG_LoadingSavedList
 MSG_ICONPICTURESTORE_FAILED
 Αδύνατη η αποθήκευση της εικόνας στο εικόνιδιο
 ; Could not store default picture icon
+;
+MSG_LV_GAMESLIST_TITLE
+Τίτλος
+; Title
+;
+; ***NEW***
+;
+MSG_LV_GAMESLIST_YEAR
+Χρονιά
+; Year
+;
+; ***NEW***
+;
+MSG_LV_GAMESLIST_PLAYERS
+Παίκτες
+; Players
+;
+; ***NEW***
+;
+MSG_LA_UseIgameDataTitle
+Χρήση του igame.data
+; Prefer igame.data
+;
+; ***NEW***
 ;
