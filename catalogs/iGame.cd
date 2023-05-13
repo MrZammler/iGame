@@ -1,4 +1,4 @@
-; $VER: igame.cd 2.3 (08.04.2023)
+; $VER: igame.cd 2.4 (06.05.2023)
 ;
 ;
 MSG_AppDescription (//)
@@ -324,4 +324,16 @@ Loading the saved list. Please wait.
 ;
 MSG_ICONPICTURESTORE_FAILED (//)
 Could not store default picture icon
+;
+MSG_LV_GAMESLIST_TITLE (//)
+Title
+;
+MSG_LV_GAMESLIST_YEAR (//)
+Year
+;
+MSG_LV_GAMESLIST_PLAYERS (//)
+Players
+;
+MSG_LA_UseIgameDataTitle (//)
+Prefer igame.data
 ;

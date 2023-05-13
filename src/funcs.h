@@ -57,6 +57,7 @@ void settings_save(void);
 void setting_hide_side_panel_changed(void);
 void setting_start_with_favorites_changed(void);
 void settings_use(void);
+void settingUseIgameDataTitleChanged(void);
 igame_settings *load_settings(const char *);
 
 #endif

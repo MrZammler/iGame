@@ -26,6 +26,12 @@
 #include <libraries/mui.h>
 #include <mui/Guigfx_mcc.h>
 #include <mui/TextEditor_mcc.h>
+#include <mui/NListview_mcc.h>
+
+#ifdef __MORPHOS__
+#define SDI_TRAP_LIB
+#endif
+#include <SDI_hook.h>
 
 /* Prototypes */
 #include <clib/alib_protos.h>
@@ -35,6 +41,7 @@
 #include <proto/datatypes.h>
 #include <proto/dos.h>
 #include <proto/muimaster.h>
+#include <proto/utility.h>
 
 /* System */
 #include <libraries/gadtools.h> /* for Barlabel in MenuItem */
@@ -45,8 +52,8 @@
 #endif
 
 /* ANSI C */
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 #ifndef CPU_VERS
 #define CPU_VERS 68000
@@ -76,6 +83,12 @@ static void flagMenuItem(struct NewMenu *, APTR, UWORD);
 #define DIS  NM_ITEMDISABLED
 #define STR_ID(x) ( (STRPTR)(x) )
 
+#if defined(__amigaos4__)
+#define AllocVecShared(size, flags)  AllocVecTags((size), AVT_Type, MEMF_SHARED, AVT_Lock, FALSE, ((flags)&MEMF_CLEAR) ? AVT_ClearWithValue : TAG_IGNORE, 0, TAG_DONE)
+#else
+#define AllocVecShared(size, flags)  AllocVec((size), (flags))
+#endif
+
 static struct NewMenu MenuMainWin[] =
 {
 	{ NM_TITLE, STR_ID(MSG_MNlabel2Actions)							, 0 ,0 ,0			,(APTR)MENU_ACTIONS },
@@ -99,6 +112,130 @@ static struct NewMenu MenuMainWin[] =
 
 	{ NM_END,NULL,0,0,0,NULL }
 };
+
+static struct Listentry
+{
+	char title[MAX_SLAVE_TITLE_SIZE];
+	char year[5];
+	char players[3];
+} Listentry;
+
+HOOKPROTONH(DisplayLI_TextFunc, LONG, char **array, struct Listentry *entry)
+{
+	if (entry)
+	{
+		*array++ = entry->title;
+		*array++ = entry->year;
+		*array++ = entry->players;
+	}
+	else
+	{
+		*array++ = GetMBString(MSG_LV_GAMESLIST_TITLE);
+		*array++ = GetMBString(MSG_LV_GAMESLIST_YEAR);
+		*array++ = GetMBString(MSG_LV_GAMESLIST_PLAYERS);
+	}
+	return 0;
+}
+MakeStaticHook(DisplayLI_TextHook, DisplayLI_TextFunc);
+
+HOOKPROTONH(ConstructLI_TextFunc, APTR, APTR pool, struct slavesList *item)
+{
+	struct Listentry *newentry = AllocPooled(pool, sizeof(struct Listentry));
+
+	if (newentry)
+	{
+		// Decide from where the item name will be taken
+		if(!isStringEmpty(item->user_title))
+		{
+			snprintf(newentry->title, sizeof(newentry->title), "%s", item->user_title);
+		}
+		else if(isStringEmpty(item->user_title) && (item->instance > 0))
+		{
+			// snprintf(item->user_title, sizeof(item->user_title),
+				// "%s [%d]", item->title, item->instance);
+			snprintf(newentry->title, sizeof(newentry->title), "%s [%d]", item->title, item->instance);
+		}
+		else
+		{
+			snprintf(newentry->title, sizeof(newentry->title), "%s", item->title);
+		}
+
+		snprintf(newentry->year, sizeof(newentry->year), "%d", item->year);
+		snprintf(newentry->players, sizeof(newentry->players), "%d", item->players);
+
+		return newentry;
+	}
+
+	return NULL;
+}
+MakeStaticHook(ConstructLI_TextHook, ConstructLI_TextFunc);
+
+HOOKPROTONH(DestructLI_TextFunc, LONG, APTR pool, struct Listentry *entry)
+{
+	FreePooled(pool, entry, sizeof(struct Listentry));
+
+	return 0;
+}
+MakeStaticHook(DestructLI_TextHook, DestructLI_TextFunc);
+
+HOOKPROTONHNO(CompareLI_TextFunc, LONG, struct NList_CompareMessage *ncm)
+{
+	struct Listentry *entry1 = (struct Listentry *) ncm->entry1;
+	struct Listentry *entry2 = (struct Listentry *) ncm->entry2;
+	LONG column = ncm->sort_type & MUIV_NList_TitleMark_ColMask;
+	LONG result = 0;
+
+	if(ncm->sort_type == (LONG)MUIV_NList_SortType_None)
+	{
+		result = (LONG) Stricmp(entry1->title, entry2->title);
+		return result;
+	}
+
+	if (column == 0)
+	{
+		if (ncm->sort_type & MUIV_NList_TitleMark_TypeMask)
+			result = (LONG) Stricmp(entry2->title, entry1->title);
+		else
+			result = (LONG) Stricmp(entry1->title, entry2->title);
+	}
+	else if (column == 1)
+	{
+		if (ncm->sort_type & MUIV_NList_TitleMark_TypeMask)
+			result = (LONG) Stricmp(entry2->year, entry1->year);
+		else
+			result = (LONG) Stricmp(entry1->year, entry2->year);
+	}
+	else if (column == 2)
+	{
+		if (ncm->sort_type & MUIV_NList_TitleMark_TypeMask)
+			result = (LONG) Stricmp(entry2->players, entry1->players);
+		else
+			result = (LONG) Stricmp(entry1->players, entry2->players);
+	}
+
+//   if      (col1 == 0)
+//   { if (ncm->sort_type & MUIV_NList_TitleMark_TypeMask)
+//       result = entry2->num - entry1->num;
+//     else
+//       result = entry1->num - entry2->num;
+//   }
+//   else if (col1 == 1)
+//   { if (ncm->sort_type & MUIV_NList_TitleMark_TypeMask)
+//       result = (LONG) stricmp(entry2->str1,entry1->str1);
+//     else
+//       result = (LONG) stricmp(entry1->str1,entry2->str1);
+//   }
+//   else if (col1 == 2)
+//   { if (ncm->sort_type & MUIV_NList_TitleMark_TypeMask)
+//       result = (LONG) stricmp(entry2->str2,entry1->str2);
+//     else
+//       result = (LONG) stricmp(entry1->str2,entry2->str2);
+//   }
+
+	return result;
+}
+MakeHook(CompareLI_TextHook, CompareLI_TextFunc);
+
 
 struct ObjApp *CreateApp(void)
 {
@@ -137,11 +274,13 @@ struct ObjApp *CreateApp(void)
 	APTR	LA_NoGuiGfx, GR_ScreenshotSize, LA_ScreenshotSize;
 	APTR	Space_ScreenshotSize, GR_CustomSize, LA_Width, LA_Height, GR_Titles;
 	APTR	GR_TitlesFrom, Space_TitlesFrom, GR_SmartSpaces, Space_SmartSpaces;
+	APTR	LA_UseIgameDataTitle, GR_UseIgameDataTitle;
 	APTR	LA_SmartSpaces, GR_Misc;
 	APTR	LA_SaveStatsOnExit, LA_FilterUseEnter, LA_StartWithFavorites;
 	APTR	LA_HideSidepanel;
 	APTR	GR_SettingsButtons, Space_SettingsButtons1, Space_SettingsButtons2;
 
+// TODO: Change all the hooks to use SDI_Hook.h and MakeStaticHook()
 #if defined(__amigaos4__)
 	static const struct Hook MenuOpenListHook = { { NULL,NULL }, (HOOKFUNC)open_list, NULL, NULL };
 #else
@@ -268,6 +407,7 @@ struct ObjApp *CreateApp(void)
 	static const struct Hook SettingsUseHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)settings_use, NULL };
 #endif
 
+MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 
 	if (!((object = AllocVec(sizeof(struct ObjApp), MEMF_PUBLIC | MEMF_CLEAR))))
 		return NULL;
@@ -305,21 +445,74 @@ struct ObjApp *CreateApp(void)
 		Child, object->STR_Filter,
 		End;
 
-	object->LV_GamesList = ListObject,
-		MUIA_Frame, MUIV_Frame_InputList,
-		MUIA_List_Active, MUIV_List_Active_Top,
-		MUIA_List_Stripes, TRUE,
-		MUIA_List_ConstructHook, MUIV_List_ConstructHook_String,
-		MUIA_List_DestructHook, MUIV_List_DestructHook_String,
+	// static const char *titles[] =
+	// {
+	// 	"Title",
+	// 	"Year",
+	// 	"Players"
+	// };
+
+	// object->LV_GamesList = ListObject,
+	// 	InputListFrame,
+	// 	MUIA_List_Active, MUIV_List_Active_Top,
+	// 	MUIA_List_Stripes, TRUE,
+	// 	MUIA_List_Format, "SORTABLE BAR,SORTABLE BAR,SORTABLE",
+	// 	MUIA_List_MaxColumns, 3,
+	// 	MUIA_List_TitleArray, titles,
+	// 	MUIA_List_ConstructHook, &ConstructLI_TextHook, // MUIV_List_ConstructHook_StringArray,
+	// 	// MUIA_List_DestructHook, MUIV_List_DestructHook_StringArray,
+	// 	// MUIA_List_CompareHook, MUIV_List_CompareHook_StringArray,
+	// 	// MUIA_List_DisplayHook, MUIV_List_DisplayHook_StringArray,
+	// 	End;
+
+	// object->LV_GamesList = ListviewObject,
+	// 	MUIA_HelpNode, "LV_GamesList",
+	// 	MUIA_Listview_MultiSelect, MUIV_Listview_MultiSelect_None,
+	// 	MUIA_Listview_DoubleClick, TRUE,
+	// 	MUIA_Listview_List, object->LV_GamesList,
+	// 	MUIA_Weight, 200,
+	// 	End;
+
+	// object->LV_GamesList = NListObject,
+	// 	MUIA_ObjectID, MAKE_ID('N','L','0','1'),
+	// 	MUIA_NList_DefaultObjectOnClick, TRUE,
+	// 	MUIA_NList_MultiSelect, MUIV_NList_MultiSelect_None,
+	// 	MUIA_NList_DisplayHook2, &DisplayLI_TextHook,
+	// 	// MUIA_NList_CompareHook2, &CompareLI_TextHook,
+	// 	MUIA_NList_ConstructHook2, &ConstructLI_TextHook,
+	// 	// MUIA_NList_DestructHook2, &DestructLI_TextHook,
+	// 	MUIA_NList_Format, "BAR W=-1,BAR W=-1,BAR",
+	// 	// MUIA_NList_SourceArray, MainTextArray,
+	// 	MUIA_NList_AutoVisible, TRUE,
+	// 	MUIA_NList_TitleSeparator, TRUE,
+	// 	MUIA_NList_Title, TRUE,
+	// 	MUIA_NList_EntryValueDependent, TRUE,
+	// 	MUIA_NList_MinColSortable, 0,
+	// 	// MUIA_NList_Imports, MUIV_NList_Imports_All,
+	// 	// MUIA_NList_Exports, MUIV_NList_Exports_All,
+	// 	End;
+	object->LV_GamesList = NListviewObject,
+		MUIA_NListview_NList, NListObject,
+			MUIA_ObjectID, MAKE_ID('N','L','0','1'),
+			MUIA_NList_DefaultObjectOnClick, TRUE,
+			MUIA_NList_MultiSelect, MUIV_NList_MultiSelect_None,
+			MUIA_NList_DisplayHook, &DisplayLI_TextHook,
+			MUIA_NList_CompareHook2, &CompareLI_TextHook,
+			MUIA_NList_ConstructHook, &ConstructLI_TextHook,
+			MUIA_NList_DestructHook, &DestructLI_TextHook,
+			MUIA_NList_Format, "BAR W=70,BAR W=15,BAR W=15",
+			MUIA_NList_AutoVisible, TRUE,
+			MUIA_NList_TitleSeparator, TRUE,
+			MUIA_NList_Title, TRUE,
+			MUIA_NList_EntryValueDependent, FALSE,
+			MUIA_NList_MinColSortable, 0,
+			MUIA_NList_Imports, MUIV_NList_Imports_Cols,
+			MUIA_NList_Exports, MUIV_NList_Exports_Cols,
+			End,
+		MUIA_NListview_Horiz_ScrollBar, MUIV_NListview_HSB_None,
+		MUIA_NListview_Vert_ScrollBar,  MUIV_NListview_VSB_FullAuto,
 		End;
 
-	object->LV_GamesList = ListviewObject,
-		MUIA_HelpNode, "LV_GamesList",
-		MUIA_Listview_MultiSelect, MUIV_Listview_MultiSelect_None,
-		MUIA_Listview_DoubleClick, TRUE,
-		MUIA_Listview_List, object->LV_GamesList,
-		MUIA_Weight, 200,
-		End;
 
 	if (!current_settings->hide_side_panel)
 	{
@@ -892,6 +1085,26 @@ struct ObjApp *CreateApp(void)
 		Child, LA_SmartSpaces,
 		End;
 
+	object->CH_UseIgameDataTitle = CheckMark(FALSE);
+
+	LA_UseIgameDataTitle = TextObject,
+		MUIA_Text_PreParse, "\033r",
+		MUIA_Text_Contents, GetMBString(MSG_LA_UseIgameDataTitle),
+		MUIA_Disabled, FALSE,
+		MUIA_InnerLeft, 0,
+		MUIA_InnerRight, 0,
+		End;
+
+	GR_UseIgameDataTitle = GroupObject,
+		MUIA_HelpNode, "GR_UseIgameDataTitle",
+		MUIA_Group_Horiz, TRUE,
+		MUIA_Group_HorizSpacing, 5,
+		MUIA_Group_VertSpacing, 5,
+		Child, object->CH_UseIgameDataTitle,
+		Child, VSpace(1),
+		Child, LA_UseIgameDataTitle,
+		End;
+
 	GR_TitlesFrom = GroupObject,
 		MUIA_HelpNode, "GR_TitlesFrom",
 		MUIA_Group_HorizSpacing, 5,
@@ -899,6 +1112,7 @@ struct ObjApp *CreateApp(void)
 		Child, object->RA_TitlesFrom,
 		Child, Space_TitlesFrom,
 		Child, GR_SmartSpaces,
+		Child, GR_UseIgameDataTitle,
 	End;
 
 	GR_Titles = GroupObject,
@@ -1010,6 +1224,15 @@ struct ObjApp *CreateApp(void)
 		return NULL;
 	}
 
+	DoMethod(object->LV_GamesList, MUIM_Notify, MUIA_NList_TitleClick, MUIV_EveryTime,
+		object->LV_GamesList, 4, MUIM_NList_Sort3, MUIV_TriggerValue, MUIV_NList_SortTypeAdd_2Values, MUIV_NList_Sort3_SortType_Both);
+	DoMethod(object->LV_GamesList, MUIM_Notify, MUIA_NList_TitleClick2, MUIV_EveryTime,
+		object->LV_GamesList, 4, MUIM_NList_Sort3, MUIV_TriggerValue, MUIV_NList_SortTypeAdd_2Values, MUIV_NList_Sort3_SortType_2);
+	DoMethod(object->LV_GamesList, MUIM_Notify, MUIA_NList_SortType, MUIV_EveryTime,
+		object->LV_GamesList, 3, MUIM_Set, MUIA_NList_TitleMark, MUIV_TriggerValue);
+	DoMethod(object->LV_GamesList, MUIM_Notify, MUIA_NList_SortType2, MUIV_EveryTime,
+		object->LV_GamesList, 3, MUIM_Set, MUIA_NList_TitleMark2, MUIV_TriggerValue);
+
 	DoMethod(object->App,
 		MUIM_Notify, MUIA_Application_Active, TRUE,
 		object->WI_MainWindow,
@@ -1101,14 +1324,14 @@ struct ObjApp *CreateApp(void)
 	}
 
 	DoMethod(object->LV_GamesList,
-		MUIM_Notify, MUIA_List_Active, MUIV_EveryTime,
+		MUIM_Notify, MUIA_NList_Active, MUIV_EveryTime,
 		object->LV_GamesList,
 		2,
 		MUIM_CallHook, &GameClickHook
 	);
 
 	DoMethod(object->LV_GamesList,
-		MUIM_Notify, MUIA_Listview_DoubleClick, TRUE,
+		MUIM_Notify, MUIA_NList_DoubleClick, TRUE,
 		object->LV_GamesList,
 		2,
 		MUIM_CallHook, &LaunchGameHook
@@ -1343,6 +1566,13 @@ struct ObjApp *CreateApp(void)
 		MUIM_CallHook, &SettingSmartSpacesChangedHook
 	);
 
+	DoMethod(object->CH_UseIgameDataTitle,
+		MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &SettingUseIgameDataTitleHook
+	);
+
 	DoMethod(object->CH_SaveStatsOnExit,
 		MUIM_Notify, MUIA_Selected, MUIV_EveryTime,
 		object->App,
@@ -1407,6 +1637,7 @@ struct ObjApp *CreateApp(void)
 		object->STR_Height,
 		object->RA_TitlesFrom,
 		object->CH_SmartSpaces,
+		object->CH_UseIgameDataTitle,
 		object->CH_SaveStatsOnExit,
 		object->CH_FilterUseEnter,
 		object->CH_HideSidepanel,

@@ -1,4 +1,13 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
+### Added
+- Introduced the new igame.data files
+- iGame uses NList now with extra columns that are sortable
+- Added "Prefer igame.data" checkbox in preferences that let the user to set if the title is going to retrieved from the igame.data files or from the slave file or the folder name, like it used to work. This doesn't have any effect on non-WHDLoad items.
+
+### Changed
+- Now the MUI changes are loaded from envarc. With MUI v5 balance size and list columns are saved there and restored the next time iGame is started
+
+## iGame 2.3.2 - [2023-04-20]
 ### Fixed
 - The custom screenshot sizes were wrongly saved. This is now fixed (#190)
 - Fixed a duplication in slave names after the execution of a second scan in the same list, introduced in v2.3.0

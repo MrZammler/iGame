@@ -73,6 +73,7 @@ struct GraphicsIFace	*IGraphics;
 struct IconIFace		*IIcon;
 struct IntuitionIFace	*IIntuition;
 struct LocaleIFace		*ILocale;
+struct UtilityIFace		*IUtility;
 struct WorkbenchIFace	*IWorkbench;
 #endif
 struct Library			*DataTypesBase;
@@ -84,6 +85,8 @@ struct Library			*GuiGfxBase;
 struct Library			*LowLevelBase;
 struct Library			*RenderLibBase;
 struct Library			*TextEditorMCC;
+struct Library			*NListviewMCC;
+struct Library			*UtilityBase;
 struct Library			*WorkbenchBase;
 
 char *executable_name;   // TODO: Why global?
@@ -103,8 +106,7 @@ static void cleanUp(void)
 
 	cleanupLibraries();
 
-	if(app)
-		DisposeApp(app);
+	DisposeApp(app);
 }
 
 static int clean_exit(STRPTR msg)
@@ -268,6 +270,11 @@ static int initLibraries(void)
 		return clean_exit("Can't open TextEditor.mcc v15 or greater\n");
 	}
 
+	if (!(NListviewMCC = OpenLibrary("mui/NListview.mcc", 19)))
+	{
+		return clean_exit("Can't open NListview.mcc v19 or greater\n");
+	}
+
 	if (!(LowLevelBase = OpenLibrary("lowlevel.library", 0)))
 	{
 		return clean_exit("Can't open lowlevel.library\n");
@@ -322,6 +329,15 @@ static int initLibraries(void)
 	}
 	else return clean_exit("Can't open datatypes.library v37 or greater\n");
 
+	if ((UtilityBase = OpenLibrary("utility.library", 37)))
+	{
+		#ifdef __amigaos4__
+		IUtility = (struct UtilityIFace *)GetInterface( UtilityBase, "main", 1, NULL );
+		if(!IUtility) return clean_exit("Can't open Utility.library Interface");
+		#endif
+	}
+	else return clean_exit("Can't open utility.library v37 or greater\n");
+
 	if (!initLocale())
 	{
 		return RETURN_ERROR;
@@ -351,10 +367,12 @@ static void cleanupLibraries(void)
 	if(IIcon)			DropInterface((struct Interface *) IIcon);
 	if(IIntuition)		DropInterface((struct Interface *) IIntuition);
 	if(ILocale)			DropInterface((struct Interface *) ILocale);
+	if(IUtility)		DropInterface((struct Interface *) IUtility);
 	if(IWorkbench)		DropInterface((struct Interface *) IWorkbench);
 	#endif
 
 	if (TextEditorMCC)	CloseLibrary(TextEditorMCC);
+	if (NListviewMCC)	CloseLibrary(NListviewMCC);
 	if (LowLevelBase)	CloseLibrary(LowLevelBase);
 	if (RenderLibBase)	CloseLibrary(RenderLibBase);
 	if (GfxBase)		CloseLibrary(GfxBase);
@@ -364,6 +382,7 @@ static void cleanupLibraries(void)
 	if (IconBase)		CloseLibrary(IconBase);
 	if (IntuitionBase)	CloseLibrary((struct Library *)IntuitionBase);
 	if (DataTypesBase)	CloseLibrary(DataTypesBase);
+	if (UtilityBase)	CloseLibrary(UtilityBase);
 	if (WorkbenchBase)	CloseLibrary(WorkbenchBase);
 
 	cleanupLocale();
