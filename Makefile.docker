@@ -55,7 +55,8 @@ ifneq (,$(filter 000 030 040 060,$(CPU)))
 INCLUDES += -I$(NDK32_INC) -I$(MUI50_INC)
 endif
 ifneq (,$(filter OS4,$(CPU)))
-INCLUDES += -I$(AOS4_SDK_INC) -I$(MUI50_INC)
+INCLUDES += -I$(AOS4_SDK_INC) -I$(MUI50_INC) \
+	-I$(AOS4_SDK_INC)/../../local/common/include
 endif
 ifneq (,$(filter MOS,$(CPU)))
 INCLUDES += -I$(NDK_INC) -I$(MUI50_INC)

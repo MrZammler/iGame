@@ -78,6 +78,7 @@ struct ObjApp
 	APTR STR_Height;
 	APTR RA_TitlesFrom;
 	APTR CH_SmartSpaces;
+	APTR CH_UseIgameDataTitle;
 	APTR CH_SaveStatsOnExit;
 	APTR CH_FilterUseEnter;
 	APTR CH_HideSidepanel;

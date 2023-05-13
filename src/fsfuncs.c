@@ -23,6 +23,7 @@
 
 /* MUI */
 #include <libraries/mui.h>
+#include <mui/NListview_mcc.h>
 
 /* Prototypes */
 #include <clib/alib_protos.h>
@@ -266,6 +267,16 @@ void slavesListLoadFromCSV(char *filename)
 					}
 				}
 
+				buf = strtok(NULL, ";");
+				node->year = 0;
+				if (buf)
+					node->year = atoi(buf);
+
+				buf = strtok(NULL, ";");
+				node->players = 0;
+				if (buf)
+					node->players = atoi(buf);
+
 				slavesListAddTail(node);
 			}
 			Close(fpgames);
@@ -297,11 +308,12 @@ void slavesListSaveToCSV(const char *filename)
 	{
 		fprintf(
 			fpgames,
-			"%d;\"%s\";\"%s\";\"%s\";%d;%d;%d;%d;%d;\"%s\";\n",
+			"%d;\"%s\";\"%s\";\"%s\";%d;%d;%d;%d;%d;\"%s\";%d;%d;\n",
 			currPtr->instance, currPtr->title,
 			currPtr->genre, currPtr->path, currPtr->favourite,
 			currPtr->times_played, currPtr->last_played, currPtr->hidden,
-			currPtr->deleted, currPtr->user_title
+			currPtr->deleted, currPtr->user_title,
+			currPtr->year, currPtr->players
 		);
 		currPtr = currPtr->next;
 	}
@@ -444,7 +456,7 @@ void open_current_dir(void)
 	}
 
 	// Get the selected item from the list
-	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
+	DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, MUIV_NList_GetEntry_Active, &game_title);
 	if (game_title == NULL || strlen(game_title) == 0)
 	{
 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
@@ -640,4 +652,57 @@ void prepareWHDExecution(char *infoFile, char *result)
 
 	FreeVec(buf);
 	FreeVec(tooltypes);
+}
+
+void getIGameDataInfo(char *igameDataPath, slavesList *node)
+{
+	const BPTR fpigamedata = Open(igameDataPath, MODE_OLDFILE);
+	if (fpigamedata)
+	{
+		int lineSize = 64;
+		char *line = malloc(lineSize * sizeof(char));
+		while (FGets(fpigamedata, line, lineSize) != NULL)
+		{
+			char **tmpTbl = my_split(line, "=");
+			if (tmpTbl[1] != NULL)
+			{
+				if (tmpTbl[1][strlen(tmpTbl[1]) - 1] == '\n')
+				{
+					tmpTbl[1][strlen(tmpTbl[1]) - 1] = '\0';
+				}
+				else
+				{
+					tmpTbl[1][strlen(tmpTbl[1])] = '\0';
+				}
+
+				if(current_settings->useIgameDataTitle && !strcmp(tmpTbl[0], "title"))
+				{
+					strncpy(node->title, tmpTbl[1], MAX_SLAVE_TITLE_SIZE);
+				}
+
+				if(!strcmp(tmpTbl[0], "genre"))
+				{
+					strncpy(node->genre, tmpTbl[1], MAX_GENRE_NAME_SIZE);
+				}
+
+				if(!strcmp(tmpTbl[0], "year") && isNumeric(tmpTbl[1]))
+				{
+					node->year=atoi(tmpTbl[1]);
+				}
+
+				if(!strcmp(tmpTbl[0], "players") && isNumeric(tmpTbl[1]))
+				{
+					node->players=atoi(tmpTbl[1]);
+				}
+
+				if(!strcmp(tmpTbl[0], "exe") && !isStringEmpty(tmpTbl[1]) && !strcasestr(tmpTbl[1], ".slave"))
+				{
+					strncpy(node->path, tmpTbl[1], MAX_PATH_SIZE);
+				}
+			}
+		}
+
+		free(line);
+		Close(fpigamedata);
+	}
 }

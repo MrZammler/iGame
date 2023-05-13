@@ -24,6 +24,7 @@
 #include <libraries/mui.h>
 #include <mui/Guigfx_mcc.h>
 #include <mui/TextEditor_mcc.h>
+#include <mui/NListview_mcc.h>
 
 /* Prototypes */
 #include <clib/alib_protos.h>
@@ -121,6 +122,7 @@ static void apply_settings()
 		set(app->CH_SmartSpaces, MUIA_Disabled, TRUE);
 	}
 
+	set(app->CH_UseIgameDataTitle, MUIA_Selected, current_settings->useIgameDataTitle);
 	set(app->CH_SaveStatsOnExit, MUIA_Selected, current_settings->save_stats_on_exit);
 	set(app->CH_FilterUseEnter, MUIA_Selected, current_settings->filter_use_enter);
 	set(app->CH_HideSidepanel, MUIA_Selected, current_settings->hide_side_panel);
@@ -134,6 +136,7 @@ static void setDefaultSettings(igame_settings *settings)
 	current_settings->hide_side_panel		= FALSE;
 	current_settings->save_stats_on_exit	= TRUE;
 	current_settings->no_smart_spaces		= FALSE;
+	current_settings->useIgameDataTitle		= TRUE;
 	current_settings->titles_from_dirs		= TRUE;
 	current_settings->hide_screenshots		= TRUE;
 	current_settings->screenshot_width		= 160;
@@ -215,6 +218,8 @@ igame_settings *load_settings(const char* filename)
 					current_settings->screenshot_height = atoi((const char*)file_line + 18);
 				if (!strncmp(file_line, "start_with_favorites=", 21))
 					current_settings->start_with_favorites = atoi((const char*)file_line + 21);
+				if (!strncmp(file_line, "use_igame.data_title=", 21))
+					current_settings->useIgameDataTitle = atoi((const char*)file_line + 21);
 			}
 			while (1);
 
@@ -350,8 +355,8 @@ static void add_default_filters()
 // Clears the list of items
 static void clear_gameslist(void)
 {
-	DoMethod(app->LV_GamesList, MUIM_List_Clear);
-	set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
+	DoMethod(app->LV_GamesList, MUIM_NList_Clear);
+	set(app->LV_GamesList, MUIA_NList_Quiet, TRUE);
 }
 
 void app_start(void)
@@ -374,7 +379,7 @@ void app_start(void)
 
 	DoMethod(app->App,
 		MUIM_Application_Load,
-		MUIV_Application_Load_ENV
+		MUIV_Application_Load_ENVARC
 	);
 
 	set(app->WI_MainWindow, MUIA_Window_Open, TRUE);
@@ -564,7 +569,7 @@ void launch_game(void)
 	char *game_title = NULL;
 
 	// Get the selected item from the list
-	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
+	DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, MUIV_NList_GetEntry_Active, &game_title);
 	if (game_title == NULL || game_title[0] == '\0')
 	{
 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
@@ -665,16 +670,22 @@ static void showSlavesList(void)
 						{
 							if (currPtr->times_played < mostPlayedTimes)
 							{
+								// DoMethod(app->LV_GamesList,
+								// 	MUIM_List_InsertSingle, currPtr->title,
+								// 	MUIV_List_Insert_Bottom);
 								DoMethod(app->LV_GamesList,
-									MUIM_List_InsertSingle, currPtr->title,
-									MUIV_List_Insert_Bottom);
+									MUIM_NList_InsertSingle, currPtr,
+									MUIV_NList_Insert_Bottom);
 							}
 							else
 							{
 								mostPlayedTimes = currPtr->times_played;
+								// DoMethod(app->LV_GamesList,
+								// 	MUIM_List_InsertSingle, currPtr->title,
+								// 	MUIV_List_Insert_Top);
 								DoMethod(app->LV_GamesList,
-									MUIM_List_InsertSingle, currPtr->title,
-									MUIV_List_Insert_Top);
+									MUIM_NList_InsertSingle, currPtr,
+									MUIV_NList_Insert_Top);
 							}
 						}
 						goto nextItem;
@@ -689,8 +700,8 @@ static void showSlavesList(void)
 			}
 
 			DoMethod(app->LV_GamesList,
-				MUIM_List_InsertSingle, buf,
-				MUIV_List_Insert_Sorted);
+				MUIM_NList_InsertSingle, currPtr,
+				MUIV_NList_Insert_Sorted);
 
 			cnt++;
 nextItem:
@@ -698,7 +709,7 @@ nextItem:
 
 		currPtr = currPtr->next;
 	}
-	set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
+	set(app->LV_GamesList, MUIA_NList_Quiet, FALSE);
 
 	sprintf(buf, (const char *)GetMBString(MSG_TotalNumberOfGames), slavesListNodeCount(cnt));
 	setStatusText(buf);
@@ -768,6 +779,69 @@ static BOOL examineFolder(char *path)
 
 				if(FIblock->fib_DirEntryType < 0)
 				{
+
+					// igame.data found
+					if (!strcmp(FIblock->fib_FileName, DEFAULT_IGAMEDATA_FILE))
+					{
+						slavesList *node = malloc(sizeof(slavesList));
+						if(node == NULL)
+						{
+							msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+							FreeVec(FIblock);
+							UnLock(lock);
+							free(buf);
+							return FALSE;
+						}
+
+						// TODO: Clear that if possible
+						char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
+						if(!isPathFolder(path))
+						{
+							sprintf(igameDataPath, "%s%s", path, FIblock->fib_FileName);
+						}
+						else
+						{
+							sprintf(igameDataPath, "%s/%s", path, FIblock->fib_FileName);
+						}
+
+						node->instance = 0;
+						node->title[0] = '\0';
+						node->genre[0] = '\0';
+						node->user_title[0] = '\0';
+						node->arguments[0] = '\0';
+						node->times_played = 0;
+						node->favourite = 0;
+						node->last_played = 0;
+						node->exists = 1;
+						node->hidden = 0;
+						node->deleted = 0;
+						node->year = 0;
+						node->players = 0;
+
+						getIGameDataInfo(igameDataPath, node);
+						strncpy(buf, node->path, bufSize);
+						if(!isPathFolder(path))
+						{
+							snprintf(node->path, sizeof(char) * MAX_PATH_SIZE, "%s%s", path, buf);
+						}
+						else
+						{
+							snprintf(node->path, sizeof(char) * MAX_PATH_SIZE, "%s/%s", path, buf);
+						}
+
+						// Check the node->path and skip the save if the buf is empty, it is a slave or the file does not exist. Free the node before move on.
+						if (
+							isStringEmpty(buf) || !check_path_exists(node->path) ||
+							(slavesListSearchByPath(node->path, sizeof(char) * MAX_PATH_SIZE) != NULL)
+						) {
+							free(node);
+						}
+						else
+						{
+							slavesListAddTail(node);
+						}
+					}
+
 					// Slave file found
 					if (strcasestr(FIblock->fib_FileName, ".slave"))
 					{
@@ -796,6 +870,7 @@ static BOOL examineFolder(char *path)
 							}
 
 							node->instance = 0;
+							node->title[0] = '\0';
 							node->genre[0] = '\0';
 							node->user_title[0] = '\0';
 							node->times_played = 0;
@@ -804,12 +879,26 @@ static BOOL examineFolder(char *path)
 							node->exists = 1;
 							node->hidden = 0;
 							node->deleted = 0;
+							node->year = 0;
+							node->players = 0;
 
 							getFullPath(buf, buf);
 							strncpy(node->path, buf, sizeof(node->path));
 
+							// TODO: Add here if igame.data is enabled to be used in settings
+							char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
+							snprintf(igameDataPath, sizeof(char) * MAX_PATH_SIZE, "%s/%s", path, DEFAULT_IGAMEDATA_FILE);
+							if (check_path_exists(igameDataPath))
+							{
+								getIGameDataInfo(igameDataPath, node);
+							}
+
 							// Generate title and add in the list
-							generateItemName(node->path, node->title, sizeof(node->title));
+							// TODO: Run the following if igame.data is disabled or if the node->title is still empty
+							if (isStringEmpty(node->title))
+							{
+								generateItemName(node->path, node->title, sizeof(node->title));
+							}
 
 							// Scan how many others with same title exist and increase a number at the end of the list (alt)
 							slavesListCountInstancesByTitle(node);
@@ -1009,7 +1098,7 @@ void game_click(void)
 		return;
 
 	char *game_title = NULL;
-	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &game_title);
+	DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, MUIV_NList_GetEntry_Active, &game_title);
 
 	if (game_title) //for some reason, game_click is called and game_title is null??
 	{
@@ -1093,7 +1182,7 @@ void repo_stop(void)
 void slaveProperties(void)
 {
 	char* title = NULL;
-	DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &title);
+	DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, MUIV_NList_GetEntry_Active, &title);
 	if(isStringEmpty(title))
 	{
 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
@@ -1158,14 +1247,15 @@ void saveItemProperties(void)
 	{
 		strncpy(node->user_title, buf, sizeof(node->user_title));
 
-		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
-		DoMethod(app->LV_GamesList, MUIM_List_Remove, MUIV_List_Remove_Active);
+		// TODO: Reduce duplication with below block
+		set(app->LV_GamesList, MUIA_NList_Quiet, TRUE);
+		DoMethod(app->LV_GamesList, MUIM_NList_Remove, MUIV_NList_Remove_Active);
 		DoMethod(app->LV_GamesList,
-			MUIM_List_InsertSingle, node->user_title,
-			MUIV_List_Insert_Sorted);
-		get(app->LV_GamesList, MUIA_List_InsertPosition, &newpos);
-		set(app->LV_GamesList, MUIA_List_Active, newpos);
-		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
+			MUIM_NList_InsertSingle, node->user_title,
+			MUIV_NList_Insert_Sorted);
+		get(app->LV_GamesList, MUIA_NList_InsertPosition, &newpos);
+		set(app->LV_GamesList, MUIA_NList_Active, newpos);
+		set(app->LV_GamesList, MUIA_NList_Quiet, FALSE);
 	}
 
 	if(
@@ -1174,14 +1264,14 @@ void saveItemProperties(void)
 	) {
 		node->user_title[0] = '\0';
 
-		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
-		DoMethod(app->LV_GamesList, MUIM_List_Remove, MUIV_List_Remove_Active);
+		set(app->LV_GamesList, MUIA_NList_Quiet, TRUE);
+		DoMethod(app->LV_GamesList, MUIM_NList_Remove, MUIV_NList_Remove_Active);
 		DoMethod(app->LV_GamesList,
-			MUIM_List_InsertSingle, node->title,
-			MUIV_List_Insert_Sorted);
-		get(app->LV_GamesList, MUIA_List_InsertPosition, &newpos);
-		set(app->LV_GamesList, MUIA_List_Active, newpos);
-		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
+			MUIM_NList_InsertSingle, node->title,
+			MUIV_NList_Insert_Sorted);
+		get(app->LV_GamesList, MUIA_NList_InsertPosition, &newpos);
+		set(app->LV_GamesList, MUIA_NList_Active, newpos);
+		set(app->LV_GamesList, MUIA_NList_Quiet, FALSE);
 	}
 
 	// Get the Genre
@@ -1197,9 +1287,9 @@ void saveItemProperties(void)
 	if (node->hidden != hideSelection)
 	{
 		node->hidden = hideSelection;
-		set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
-		DoMethod(app->LV_GamesList, MUIM_List_Remove, MUIV_List_Remove_Active);
-		set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
+		set(app->LV_GamesList, MUIA_NList_Quiet, TRUE);
+		DoMethod(app->LV_GamesList, MUIM_NList_Remove, MUIV_NList_Remove_Active);
+		set(app->LV_GamesList, MUIA_NList_Quiet, FALSE);
 	}
 
 	// Save the tooltypes
@@ -1235,7 +1325,6 @@ void app_stop(void)
 		save_list();
 
 	memset(&fname[0], 0, sizeof fname);
-
 	emptySlavesList();
 
 	if (repos)
@@ -1322,6 +1411,11 @@ void setting_save_stats_on_exit_changed(void)
 void setting_smart_spaces_changed(void)
 {
 	current_settings->no_smart_spaces = (BOOL)xget(app->CH_SmartSpaces, MUIA_Selected);
+}
+
+void settingUseIgameDataTitleChanged(void)
+{
+	current_settings->useIgameDataTitle = (BOOL)xget(app->CH_UseIgameDataTitle, MUIA_Selected);
 }
 
 void setting_titles_from_changed(void)
@@ -1456,6 +1550,8 @@ void settings_save(void)
 	FPuts(fpsettings, (CONST_STRPTR)file_line);
 	snprintf(file_line, buffer_size, "screenshot_height=%d\n", current_settings->screenshot_height);
 	FPuts(fpsettings, (CONST_STRPTR)file_line);
+	snprintf(file_line, buffer_size, "use_igame.data_title=%d\n", current_settings->useIgameDataTitle);
+	FPuts(fpsettings, (CONST_STRPTR)file_line);
 
 	Close(fpsettings);
 
@@ -1536,13 +1632,13 @@ void non_whdload_ok(void)
 
 	slavesListAddTail(node);
 
-	set(app->LV_GamesList, MUIA_List_Quiet, TRUE);
+	set(app->LV_GamesList, MUIA_NList_Quiet, TRUE);
 	DoMethod(app->LV_GamesList,
-		MUIM_List_InsertSingle, node->title,
-		MUIV_List_Insert_Sorted);
-	get(app->LV_GamesList, MUIA_List_InsertPosition, &newpos);
-	set(app->LV_GamesList, MUIA_List_Active, newpos);
-	set(app->LV_GamesList, MUIA_List_Quiet, FALSE);
+		MUIM_NList_InsertSingle, node->title,
+		MUIV_NList_Insert_Sorted);
+	get(app->LV_GamesList, MUIA_NList_InsertPosition, &newpos);
+	set(app->LV_GamesList, MUIA_NList_Active, newpos);
+	set(app->LV_GamesList, MUIA_NList_Quiet, FALSE);
 }
 
 static void joy_left(void)
@@ -1550,22 +1646,22 @@ static void joy_left(void)
   char *curr_game = NULL, *prev_game = NULL, *last_game = NULL;
   int ind;
 
-  DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &curr_game);
-  get(app->LV_GamesList, MUIA_List_Active, &ind);
+  DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, MUIV_NList_GetEntry_Active, &curr_game);
+  get(app->LV_GamesList, MUIA_NList_Active, &ind);
 
   if (curr_game == NULL || strlen(curr_game) == 0)
     {
-      set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Top);
+      set(app->LV_GamesList, MUIA_NList_Active, MUIV_NList_Active_Top);
       return;
     }
 
-  DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
+  DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, ind--, &prev_game);
   if (prev_game == NULL)
 	return;
 
   while (toupper(curr_game[0]) == toupper(prev_game[0]))
     {
-      DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
+      DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, ind--, &prev_game);
       if (prev_game == NULL)
 	return;
     }
@@ -1574,12 +1670,12 @@ static void joy_left(void)
 
   while (toupper(last_game[0]) == toupper(prev_game[0]))
     {
-      DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind--, &prev_game);
+      DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, ind--, &prev_game);
       if (prev_game == NULL)
 	return;
     }
 
-  set(app->LV_GamesList, MUIA_List_Active, ind+2);
+  set(app->LV_GamesList, MUIA_NList_Active, ind+2);
 }
 
 static void joy_right(void)
@@ -1587,27 +1683,27 @@ static void joy_right(void)
   char *curr_game = NULL, *next_game = NULL;
   int ind;
 
-  DoMethod(app->LV_GamesList, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &curr_game);
-  get(app->LV_GamesList, MUIA_List_Active, &ind);
+  DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, MUIV_NList_GetEntry_Active, &curr_game);
+  get(app->LV_GamesList, MUIA_NList_Active, &ind);
 
   if (curr_game == NULL || strlen(curr_game) == 0)
     {
-      set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Top);
+      set(app->LV_GamesList, MUIA_NList_Active, MUIV_NList_Active_Top);
       return;
     }
 
-  DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind++, &next_game);
+  DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, ind++, &next_game);
   if (next_game == NULL)
 	return;
 
   while (toupper(curr_game[0]) == toupper(next_game[0]))
     {
-      DoMethod(app->LV_GamesList, MUIM_List_GetEntry, ind++, &next_game);
+      DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, ind++, &next_game);
       if (next_game == NULL)
 	return;
     }
 
-  set(app->LV_GamesList, MUIA_List_Active, ind-1);
+  set(app->LV_GamesList, MUIA_NList_Active, ind-1);
 
 }
 
@@ -1651,10 +1747,10 @@ static void joystick_buttons(ULONG val)
 static void joystick_directions(ULONG val)
 {
 	if (val & JPF_JOY_UP)
-		set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Up);
+		set(app->LV_GamesList, MUIA_NList_Active, MUIV_NList_Active_Up);
 
 	if (val & JPF_JOY_DOWN)
-		set(app->LV_GamesList, MUIA_List_Active, MUIV_List_Active_Down);
+		set(app->LV_GamesList, MUIA_NList_Active, MUIV_NList_Active_Down);
 
 	if (val & JPF_JOY_LEFT)
 	  joy_left();
