@@ -13,6 +13,10 @@
 
 ## iGame 2.3.2 - [2023-04-20]
 ### Fixed
+- Fixed a bug on repo removal, which remained in the repos list and was included in scans, unless the user restarted iGame
+
+ ## iGame 2.3.2 - [2023-04-20]
+### Fixed
 - The custom screenshot sizes were wrongly saved. This is now fixed (#190)
 - Fixed a duplication in slave names after the execution of a second scan in the same list, introduced in v2.3.0
 - Fixed a crash on systems that use AutoUpdateWB patch. **HUGE THANKS to mfilos** for his testing, feedback and support up to late at nights
