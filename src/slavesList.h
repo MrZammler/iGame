@@ -35,5 +35,6 @@ slavesList *getSlavesListHead(void);
 void setSlavesListBuffer(slavesList *);
 slavesList *getSlavesListBuffer(void);
 void emptySlavesList(void);
+int slavesListNodeCount(int);
 
 #endif

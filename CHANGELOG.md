@@ -1,8 +1,12 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Added
+- Added again the saving of the list after a scan of the repositories, which was removed in the previous releases
 - Introduced the new igame.data files
 - iGame uses NList now with extra columns that are sortable
 - Added "Prefer igame.data" checkbox in preferences that let the user to set if the title is going to retrieved from the igame.data files or from the slave file or the folder name, like it used to work. This doesn't have any effect on non-WHDLoad items.
+
+### Fixed
+- Fixed the status messages which were stack with saving list message and didn't show the number of games again.
 
 ### Changed
 - Now the MUI changes are loaded from envarc. With MUI v5 balance size and list columns are saved there and restored the next time iGame is started

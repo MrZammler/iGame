@@ -27,7 +27,7 @@ void msg_box(const char *);
 void game_click(void);
 void joystick_input(ULONG);
 void app_stop(void);
-void save_list(const int);
+void save_list(void);
 ULONG get_wb_version(void);
 void scan_repositories(void);
 void open_list(void);
