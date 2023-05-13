@@ -1,12 +1,12 @@
-## version $VER: iGame.catalog 2.3 (10.04.2023)
+## version $VER: igame.catalog  2.4 (06.05.2023)
 ## codeset 0
-## language deutsch
-; $VER: igame.cd 2.3 (08.04.2023)
+## language german
+; $VER: igame.cd 2.4 (06.05.2023)
 ;
 ;
 MSG_AppDescription
 eine GUI für WHDLoad
-; eine GUI für WHDLoad
+; A front-end to WHDLoad
 ;
 MSG_AppCopyright
 Emmanuel Vasilakis
@@ -18,11 +18,11 @@ iGame
 ;
 MSG_MNlabel2Actions
 Aktionen
-; Aktionen
+; Actions
 ;
 MSG_MNlabelScan
 Verzeichnis scannen
-; Verzeichnis scannen
+; Scan Repositories
 ;
 MSG_MNlabelScanChar
 R_
@@ -30,7 +30,7 @@ R_
 ;
 MSG_MNMainAddnonWHDLoadgame
 Spiel hinzufügen...
-; Spiel hinzufügen...
+; Add game...
 ;
 MSG_MNMainAddnonWHDLoadgameChar
 A_
@@ -38,11 +38,11 @@ A_
 ;
 MSG_MNMainMenuShowHidehiddenentries
 zeige versteckte Einträge
-; zeige versteckte Einträge
+; Show hidden entries
 ;
 MSG_MNMainOpenList
 Liste öffnen...
-; Liste öffnen...
+; Open List...
 ;
 MSG_MNMainOpenListChar
 O_
@@ -50,7 +50,7 @@ O_
 ;
 MSG_MNMainSaveList
 Liste speichern
-; Liste speichern
+; Save List
 ;
 MSG_MNMainSaveListChar
 S_
@@ -58,19 +58,19 @@ S_
 ;
 MSG_MNMainSaveListAs
 Liste speichern unter...
-; Liste speichern unter...
+; Save List As...
 ;
 MSG_MNMainExportListtoTextfile
 exportiere Liste als Textdatei...
-; exportiere Liste als Textdatei...
+; Export List to Text file...
 ;
 MSG_MNMainAbout
 Über...
-; Über...
+; About...
 ;
 MSG_MNMainQuit
 Beenden
-; Beenden
+; Quit
 ;
 MSG_MNMainQuitChar
 Q_
@@ -78,15 +78,15 @@ Q_
 ;
 MSG_MNlabel2Game
 Spiel
-; Spiel
+; Game
 ;
 MSG_MNMainMenuDuplicate
 Duplikat...
-; Duplikat...
+; Duplicate...
 ;
 MSG_MNMainProperties
 Eigenschaften...
-; Eigenschaften...
+; Properties...
 ;
 MSG_MNMainPropertiesChar
 P_
@@ -94,7 +94,7 @@ P_
 ;
 MSG_MNMainDelete
 löschen
-; löschen
+; Delete
 ;
 MSG_MNMainDeleteChar
 D_
@@ -102,19 +102,19 @@ D_
 ;
 MSG_MNlabel2Tools
 Einstellungen
-; Einstellungen
+; Settings
 ;
 MSG_MNMainiGameSettings
 Spiele Einstellungen...
-; Spiele Einstellungen...
+; Settings...
 ;
 MSG_MNlabel2GameRepositories
 Spieleverzeichnis...
-; Spieleverzeichnis...
+; Repositories...
 ;
 MSG_MNMainMUISettings
 MUI Einstellungen...
-; MUI Einstellungen...
+; MUI Settings...
 ;
 MSG_LA_Filter
 Filter:
@@ -126,11 +126,11 @@ Genres
 ;
 MSG_WI_Properties
 Spieleigenschaften
-; Spieleigenschaften
+; Game Properties
 ;
 MSG_STR_PropertiesGameTitleTitle
 Spieletitel
-; Spieletitel
+; Title
 ;
 MSG_LA_PropertiesGenre
 Genre:
@@ -138,23 +138,23 @@ Genre:
 ;
 MSG_CY_PropertiesGenre0
 Unbekannt
-; Unbekannt
+; Unknown
 ;
 MSG_CH_PropertiesFavorite
 Favoriten:
-; Favoriten:
+; Favourite:
 ;
 MSG_CH_PropertiesHidden
 ausgeblendet:
-; ausgeblendet:
+; Hidden:
 ;
 MSG_LA_PropertiesTimesPlayed
 gespielte Zeit:
-; gespielte Zeit:
+; Times Played:
 ;
 MSG_LA_PropertiesSlavePath
 Slave Pfad:
-; Slave Pfad:
+; Slave Path:
 ;
 MSG_TX_PropertiesTooltypesTitle
 Tooltypes
@@ -162,39 +162,39 @@ Tooltypes
 ;
 MSG_BT_PropertiesOK
 Speichern
-; Speichern
+; Save
 ;
 MSG_BT_PropertiesCancel
 abbrechen
-; abbrechen
+; Cancel
 ;
 MSG_WI_GameRepositories
 Spielverzeichnis
-; Spielverzeichnis
+; Game Repositories
 ;
 MSG_BT_AddRepo
 hinzufügen
-; hinzufügen
+; Add
 ;
 MSG_BT_RemoveRepo
 entfernen
-; entfernen
+; Remove
 ;
 MSG_BT_CloseRepoWindow
 schließen
-; schließen
+; Close
 ;
 MSG_WI_AddNonWHDLoad
 Spiel hinzufügen
-; Spiel hinzufügen
+; Add a Game
 ;
 MSG_LA_AddGameTitle
-Title:
+Titel:
 ; Title:
 ;
 MSG_LA_AddGamePath
 Pfad:
-; Pfad:
+; Path:
 ;
 MSG_LA_AddGameGenre
 Genre:
@@ -202,7 +202,7 @@ Genre:
 ;
 MSG_CY_AddGameGenre0
 Unbekannt
-; Unbekannt
+; Unknown
 ;
 MSG_BT_AddGameOK
 OK
@@ -210,11 +210,11 @@ OK
 ;
 MSG_BT_AddGameCancel
 Abbruch
-; Abbruch
+; Cancel
 ;
 MSG_WI_About
 über iGame
-; über iGame
+; About iGame
 ;
 MSG_TX_About
 Emmanuel Vasilakis (mrzammler@mm.st)\n& Contributors\n\n
@@ -226,11 +226,11 @@ OK
 ;
 MSG_WI_Settings
 iGame Einstellungen
-; iGame Einstellungen
+; iGame Settings
 ;
 MSG_LA_HideScreenshots
 Screenshots ausblenden
-; Screenshots ausblenden
+; Hide Screenshots
 ;
 MSG_GR_ScreenshotsTitle
 Screenshots
@@ -238,11 +238,11 @@ Screenshots
 ;
 MSG_LA_NoGuiGfx
 kein GuiGfx
-; kein GuiGfx
+; No GuiGfx
 ;
 MSG_LA_ScreenshotSize
 Screenshot Größe:
-; Screenshot Größe:
+; Screenshot Size:
 ;
 MSG_CY_ScreenshotSize0
 160x128
@@ -254,159 +254,159 @@ MSG_CY_ScreenshotSize1
 ;
 MSG_CY_ScreenshotSize2
 Benutzerdefiniert
-; Benutzerdefiniert
+; Custom
 ;
 MSG_LA_Width
 Breite
-; Breite
+; Width
 ;
 MSG_LA_Height
 Höhe
-; Höhe
+; Height
 ;
 MSG_GR_TitlesTitle
 Titel
-; Titel
+; Titles
 ;
 MSG_RA_TitlesFromTitle
 Titel von:
-; Titel von:
+; Titles From:
 ;
 MSG_RA_TitlesFrom0
 Slave Inhalt
-; Slave Inhalt
+; Slave Contents
 ;
 MSG_RA_TitlesFrom1
 Verzeichnisse
-; Verzeichnisse
+; Directories
 ;
 MSG_LA_SmartSpaces
 keine Smartspaces
-; keine Smartspaces
+; No Smart Spaces
 ;
 MSG_GR_MiscTitle
 Sonstiges
-; Sonstiges
+; Misc
 ;
 MSG_LA_SaveStatsOnExit
 Statistik beim beenden speichern
-; Statistik beim beenden speichern
+; Save stats on exit
 ;
 MSG_LA_FilterUseEnter
 zum filtern Enter drücken
-; zum filtern Enter drücken
+; Use enter to filter
 ;
 MSG_LA_HideSidepanel
 Seitenleiste ausblenden
-; Seitenleiste ausblenden
+; Hide side panel
 ;
 MSG_BT_SettingsSave
 Speichern
-; Speichern
+; Save
 ;
 MSG_BT_SettingsUse
 benutzen
-; benutzen
+; Use
 ;
 MSG_BT_SettingsCancel
 abbrechen
-; abbrechen
+; Cancel
 ;
 MSG_SelectDir
 wähle Pfad...
-; wähle Pfad...
+; Select path...
 ;
 MSG_GameExecutable
 Startdatei auswählen...
-; Startdatei auswählen...
+; Select executable...
 ;
 MSG_TotalNumberOfGames
 Insgesamt %d Spiele.
-; Insgesamt %d Spiele.
+; Total %d games.
 ;
 MSG_UnknownGenre
 Unbekannt
-; Unbekannt
+; Unknown
 ;
 MSG_FilterShowAll
 --zeige alles--
-; --zeige alles--
+; --Show All--
 ;
 MSG_FilterFavorites
 --Favoriten--
-; --Favoriten--
+; --Favorites--
 ;
 MSG_FilterLastPlayed
 --zuletzt gespielt--
-; --zuletzt gespielt--
+; --Last Played--
 ;
 MSG_FilterMostPlayed
 --am meisten gespielt--
-; --am meisten gespielt--
+; --Most Played--
 ;
 MSG_FilterNeverPlayed
 --nie gespielt--
-; --nie gespielt--
+; --Never Played--
 ;
 MSG_RunningGameTitle
 ausführen %s...
-; ausführen %s...
+; Running %s...
 ;
 MSG_ErrorExecutingWhdload
 Fehler beim Ausführen des ausgewählten Eintrags.\nstellen Sie sicher, dass sich WHDLoad in Ihrem Pfad befindet.
-; Fehler beim Ausführen des ausgewählten Eintrags.\nstellen Sie sicher, dass sich WHDLoad in Ihrem Pfad befindet.
+; Error while executing the selected entry.\nPlease make sure WHDLoad is in your path.
 ;
 MSG_ScanningPleaseWait
 Scannen [%s]. Bitte warten...
-; Scannen [%s]. Bitte warten...
+; Scanning [%s]. Please wait...
 ;
 MSG_CouldNotCreateReposFile
 Datei repos.prefs konnte nicht erstellt werden!
-; Datei repos.prefs konnte nicht erstellt werden!
+; Could not create repos.prefs file!
 ;
 MSG_SelectGameFromList
 Bitte Eintrag aus der Liste auswählen.
-; Bitte Eintrag aus der Liste auswählen.
+; Please select an entry from the list.
 ;
 MSG_TitleAlreadyExists
 ausgewählter Titel existiert bereits.
-; ausgewählter Titel existiert bereits.
+; The title you selected, already exists.
 ;
 MSG_SavingGamelist
 Bitte warten, Spielliste wird gespeichert...
-; Bitte warten, Spielliste wird gespeichert...
+; Please wait, saving gameslist...
 ;
 MSG_FailedOpeningGameslist
 Spielliste konnte nicht geöffnet werden!
-; Spielliste konnte nicht geöffnet werden!
+; Could not open gameslist file!
 ;
 MSG_BadTooltype
 falscher tooltype
-; falscher tooltype
+; Bad tooltype!
 ;
 MSG_NoTitleSpecified
 bitte Spielenamen angeben...
-; bitte Spielenamen angeben...
+; Please let me know the name of the game...
 ;
 MSG_NoExecutableSpecified
 bitte Spielstartdatei auswählen...
-; bitte Spielstartdatei auswählen...
+; Please pick the game executable...
 ;
 MSG_NotEnoughMemory
 nicht genügend Speicher! Abbruch...
-; nicht genügend Speicher! Abbruch...
+; Could not allocate memory! Aborting...
 ;
 MSG_DirectoryNotFound
 Spielverzeichnis nicht gefunden!
-; Spielverzeichnis nicht gefunden!
+; Game Directory not found!
 ;
 MSG_LA_StartWithFavorites
 Favoriten beim Start anzeigen
-; Favoriten beim Start anzeigen
+; Display favorites on start
 ;
 MSG_MNMainOpenCurrentDir
 öffne Spielverzeichnis
-; öffne Spielverzeichnis
+; Open game folder
 ;
 MSG_MNMainOpenCurrentDirChar
 W_
@@ -414,25 +414,41 @@ W_
 ;
 MSG_slavePathDoesntExist
 Slave-Pfad existiert nicht!
-; Slave-Pfad existiert nicht!
+; Slave path does not exist!
 ;
 MSG_compiledForAboutWin
 kompiliert für
-; kompiliert für
+; compiled for
 ;
 MSG_MNMainPreferences
 Einstellungen
-; Einstellungen
+; Preferences
 ;
 MSG_ScanCompletedUpdatingList
 Scan abgeschlossen.  Liste wird aktualisiert.
-; Scan abgeschlossen.  Liste wird aktualisiert.
+; Scan completed. Updating the list now.
 ;
 MSG_LoadingSavedList
 Laden der gespeicherten Liste.  Bitte warten.
-; Laden der gespeicherten Liste.  Bitte warten.
+; Loading the saved list. Please wait.
 ;
 MSG_ICONPICTURESTORE_FAILED
 Standardicon kann nicht gespeichert werden
-; Standardicon kann nicht gespeichert werden
+; Could not store default picture icon
+;
+MSG_LV_GAMESLIST_TITLE
+Titel
+; Title
+;
+MSG_LV_GAMESLIST_YEAR
+Jahr
+; Year
+;
+MSG_LV_GAMESLIST_PLAYERS
+Spieler
+; Players
+;
+MSG_LA_UseIgameDataTitle
+bevorzuge igame.data
+; Prefer igame.data
 ;

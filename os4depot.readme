@@ -58,6 +58,7 @@ Requirements:
 * render.library
 * guigfx.mcc
 * Texteditor.mcc
+* NListviews.mcc
 
 The project is open source and you can find the code at:
 https://github.com/MrZammler/iGame
@@ -69,4 +70,6 @@ https://github.com/MrZammler/iGame/issues
 
 Changelog
 -------------
-Please read the enclosed CHANGELOG.md file for all the changes.
+Please read the enclosed CHANGELOG.md file for all the changes, or find
+them online at:
+https://raw.githubusercontent.com/MrZammler/iGame/master/CHANGELOG.md
