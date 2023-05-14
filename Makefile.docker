@@ -66,7 +66,7 @@ endif
 # CFLAGS settings
 ##########################################################################
 
-CFLAGS = -c -dontwarn=-1 -O2 -c99 $(VERS_FLAGS) -g -hunkdebug
+CFLAGS = -c -dontwarn=-1 -O2 -c99 $(VERS_FLAGS)
 
 ifneq (,$(filter 000 030 040 060,$(CPU)))
 CFLAGS += +aos68k -cpu=68$(CPU) -DCPU_VERS=68$(CPU)
@@ -81,7 +81,7 @@ endif
 ##########################################################################
 # Linker settings
 ##########################################################################
-LIBFLAGS = -lamiga -g -Bamigahunk
+LIBFLAGS = -lamiga
 
 ifneq (,$(filter 000 030 040 060,$(CPU)))
 LIBFLAGS += +aos68k -o
