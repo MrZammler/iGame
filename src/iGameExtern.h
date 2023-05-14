@@ -85,11 +85,11 @@ typedef struct settings
 	int useIgameDataTitle;
 } igame_settings;
 
-typedef struct genres
+typedef struct genresList
 {
-	char genre[256];
-	struct genres* next;
-} genres_list;
+	char title[MAX_GENRE_NAME_SIZE];
+	struct genresList *next;
+} genresList;
 
 typedef struct repos
 {
