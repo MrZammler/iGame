@@ -1308,7 +1308,7 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 
 		DoMethod(object->STR_Filter,
 			MUIM_Notify, MUIA_String_Contents, MUIV_EveryTime,
-		object->App,
+			object->App,
 			2,
 			MUIM_CallHook, &FilterChangeHook
 		);

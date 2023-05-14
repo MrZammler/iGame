@@ -1,4 +1,8 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
+### Changed
+- When realtime filtering is enabled at least 3 characters are required so as to be initiated. Less than 3 characters are ignored, unless the filtering by pressing the enter button is enabled.
+
+## iGame 2.4.0 - [2023-05-13]
 ### Added
 - Added back the saving of the list after a scan of the repositories, which was removed in the previous releases
 - Introduced the new igame.data files

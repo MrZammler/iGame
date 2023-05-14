@@ -69,6 +69,7 @@
 #define MAX_EXEC_SIZE 256
 #define MAX_TOOLTYPE_SIZE 64
 #define MAX_ARGUMENTS_SIZE 64
+#define MIN_TITLE_FILTER_CHARS 3
 
 typedef struct settings
 {

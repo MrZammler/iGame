@@ -400,6 +400,10 @@ void filter_change(void)
 	filters.showGenre[0] = '\0';
 
 	get(app->STR_Filter, MUIA_String_Contents, &title);
+	if (!current_settings->filter_use_enter && strlen(title) > 0 && strlen(title) < MIN_TITLE_FILTER_CHARS) {
+		return;
+	}
+
 	DoMethod(app->LV_GenresList, MUIM_List_GetEntry,
 		MUIV_List_GetEntry_Active, &genreSelection);
 
