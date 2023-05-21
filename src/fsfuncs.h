@@ -42,5 +42,6 @@ void setIconTooltypes(char *, char *);
 BOOL checkSlaveInTooltypes(char *, char *);
 void prepareWHDExecution(char *, char *);
 void getIGameDataInfo(char *, slavesList *);
+void loadGenresFromFile(void);
 
 #endif

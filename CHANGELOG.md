@@ -1,5 +1,12 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Added
+- Now the Genre list is populated from the igame.data files and the genre file, if it exists, although it is not necessary. The genre filtering is working with these new values
+
+### Fixed
+- Fixed a hit when the entry properties are requested without having a selected entry
+
+## iGame 2.4.0 - [2023-05-13]
+### Added
 - Added back the saving of the list after a scan of the repositories, which was removed in the previous releases
 - Introduced the new igame.data files
 - iGame uses NList now with extra columns that are sortable

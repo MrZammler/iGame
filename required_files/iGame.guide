@@ -370,7 +370,7 @@ and of course, all of you who use iGame and support our beloved Amiga computer.
 @{lindent 3}
 @{b}Introducing igame.data files@{ub}
 
-iGame scans for a nd if found uses a custom file with the filename igame.data. These files let iGame know some crucial information for each entry (game/demo/application). Those files have a very specific structure and should be in the same folder of the WHDLoad items where the slave file exists, or in the same folder where an executable file exists.
+iGame scans for and if found uses a custom file with the filename igame.data. These files let iGame know some crucial information for each entry (game/demo/application). Those files have a very specific structure and should be in the same folder of the WHDLoad items where the slave file exists, or in the same folder where an executable file exists.
 
 igame.data information is meant to cover (non)WHDLoad items and Demos, including as much information as possible. Not all the information is going to be loaded in the memory, just those that are necessary for some features in iGame. Other information will be used only when the user requests to view it.
 

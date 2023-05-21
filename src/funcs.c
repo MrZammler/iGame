@@ -56,6 +56,7 @@
 #include "strfuncs.h"
 #include "fsfuncs.h"
 #include "slavesList.h"
+#include "genresList.h"
 #include "funcs.h"
 
 extern struct ObjApp* app;
@@ -63,16 +64,15 @@ extern struct Library *IconBase;
 extern char* executable_name;
 
 /* global variables */
-int no_of_genres;
 char fname[255];
 BOOL sidepanelChanged = FALSE; // This is temporary until settings are revamped
 
 /* function definitions */
+static void add_default_filters(void);
 static void showSlavesList(void);
 static LONG xget(Object *, ULONG);
 
 repos_list *item_repos = NULL, *repos = NULL;
-genres_list *item_genres = NULL, *genres = NULL;
 igame_settings *current_settings = NULL;
 listFilters filters = {0};
 
@@ -285,65 +285,39 @@ static void load_repos(const char* filename)
 		free(file_line);
 }
 
-static void load_genres(const char* filename)
+static void populateGenresList(void)
 {
-	const int buffer_size = 512;
-	STRPTR file_line = malloc(buffer_size * sizeof(char));
-	if (file_line == NULL)
+	DoMethod(app->LV_GenresList, MUIM_List_Clear);
+	set(app->LV_GenresList, MUIA_List_Quiet, TRUE);
+
+	add_default_filters();
+	loadGenresFromFile();
+	addGenreInList(GetMBString(MSG_UnknownGenre));
+
+	genresList *currPtr = getGenresListHead();
+
+	int cnt = 0;
+	while (currPtr != NULL)
 	{
-		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-		return;
+		DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, currPtr->title, MUIV_List_Insert_Sorted);
+
+		cnt++;
+		currPtr = currPtr->next;
 	}
 
-	const BPTR fpgenres = Open((CONST_STRPTR)filename, MODE_OLDFILE);
-	if (fpgenres)
+	int i = 0;
+	for (i = 0; i < genresListNodeCount(cnt); i++)
 	{
-		int i;
-
-		no_of_genres = 0;
-		while (FGets(fpgenres, file_line, buffer_size))
-		{
-			file_line[strlen(file_line) - 1] = '\0';
-			if (strlen(file_line) == 0)
-				break;
-
-			item_genres = (genres_list *)calloc(1, sizeof(genres_list));
-			item_genres->next = NULL;
-			strcpy(item_genres->genre, file_line);
-
-			if (genres == NULL)
-			{
-				genres = item_genres;
-			}
-			else
-			{
-				item_genres->next = genres;
-				genres = item_genres;
-			}
-
-			no_of_genres++;
-			DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, item_genres->genre, MUIV_List_Insert_Sorted);
-		}
-
-		DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, GetMBString(MSG_UnknownGenre), MUIV_List_Insert_Bottom);
-
-		for (i = 0; i < no_of_genres; i++)
-		{
-			DoMethod(app->LV_GenresList, MUIM_List_GetEntry, i + 5, &app->CY_PropertiesGenreContent[i]);
-		}
-
-		app->CY_PropertiesGenreContent[i] = (unsigned char*)GetMBString(MSG_UnknownGenre);
-		app->CY_PropertiesGenreContent[i + 1] = NULL;
-		set(app->CY_PropertiesGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
-		set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
-
-		Close(fpgenres);
+		DoMethod(app->LV_GenresList, MUIM_List_GetEntry, i+5, &app->CY_PropertiesGenreContent[i]);
 	}
-	if (file_line)
-		free(file_line);
+	app->CY_PropertiesGenreContent[i] = (unsigned char*)GetMBString(MSG_UnknownGenre);
+	app->CY_PropertiesGenreContent[i++] = NULL;
+	set(app->CY_PropertiesGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
+	set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
+	set(app->LV_GenresList, MUIA_List_Quiet, FALSE);
 }
 
-static void add_default_filters()
+static void add_default_filters(void)
 {
 	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, GetMBString(MSG_FilterShowAll), MUIV_List_Insert_Bottom);
 	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, GetMBString(MSG_FilterFavorites), MUIV_List_Insert_Bottom);
@@ -367,8 +341,6 @@ void app_start(void)
 	strcat(csvFilename, ".csv");
 
 	load_repos(DEFAULT_REPOS_FILE);
-	add_default_filters();
-	load_genres(DEFAULT_GENRES_FILE);
 	apply_settings();
 
 
@@ -389,6 +361,8 @@ void app_start(void)
 	set(app->WI_MainWindow, MUIA_Window_Sleep, TRUE);
 	slavesListLoadFromCSV(csvFilename);
 	showSlavesList();
+
+	populateGenresList();
 	set(app->WI_MainWindow, MUIA_Window_Sleep, FALSE);
 	set(app->WI_MainWindow, MUIA_Window_ActiveObject, app->LV_GamesList);
 }
@@ -839,6 +813,7 @@ static BOOL examineFolder(char *path)
 						else
 						{
 							slavesListAddTail(node);
+							addGenreInList(node->genre);
 						}
 					}
 
@@ -905,6 +880,7 @@ static BOOL examineFolder(char *path)
 
 							// TODO: IDEA - Instead of adding at the tail insert it in sorted position
 							slavesListAddTail(node);
+							addGenreInList(node->genre);
 						}
 						else
 						{
@@ -940,6 +916,7 @@ void scan_repositories(void)
 		setStatusText(GetMBString(MSG_ScanCompletedUpdatingList));
 		save_list();
 		showSlavesList();
+		populateGenresList();
 		set(app->WI_MainWindow, MUIA_Window_Sleep, FALSE);
 	}
 }
@@ -1201,9 +1178,8 @@ void repo_stop(void)
 // Shows the Properties window populating the information fields
 void slaveProperties(void)
 {
-	char* title = NULL;
-	DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, MUIV_NList_GetEntry_Active, &title);
-	if(isStringEmpty(title))
+	char *title;
+	if ((title = (char *)DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, MUIV_NList_GetEntry_Active, NULL)) == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
 		return;
@@ -1232,7 +1208,7 @@ void slaveProperties(void)
 
 		//set the genre
 		// TODO: Make this better when we have the new Genre lists
-		for (i = 0; i < no_of_genres; i++)
+		for (i = 0; i < genresListNodeCount(-1); i++)
 		{
 			if (!strcmp(app->CY_PropertiesGenreContent[i], node->genre))
 				break;
@@ -1346,16 +1322,12 @@ void app_stop(void)
 
 	memset(&fname[0], 0, sizeof fname);
 	emptySlavesList();
+	emptyGenresList();
 
 	if (repos)
 	{
 		free(repos);
 		repos = NULL;
-	}
-	if (genres)
-	{
-		free(genres);
-		genres = NULL;
 	}
 }
 

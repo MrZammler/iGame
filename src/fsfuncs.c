@@ -54,6 +54,7 @@
 #include "iGameExtern.h"
 #include "strfuncs.h"
 #include "slavesList.h"
+#include "genresList.h"
 #include "funcs.h"
 #include "fsfuncs.h"
 
@@ -203,39 +204,31 @@ void slavesListLoadFromCSV(char *filename)
 
 				buf = strtok(NULL, ";");
 				node->title[0] = '\0';
+				sprintf(node->title, "%s", buf);
 				if (strcasestr(buf, "\""))
 				{
 					sprintf(node->title,"%s", substring(buf, 1, -2));
 				}
-				else
-				{
-					sprintf(node->title,"%s", buf);
-				}
 
 				buf = strtok(NULL, ";");
 				node->genre[0] = '\0';
+				sprintf(node->genre, "%s", buf);
 				if (strcasestr(buf, "\""))
 				{
 					sprintf(node->genre,"%s", substring(buf, 1, -2));
-				}
-				else
-				{
-					sprintf(node->genre,"%s", buf);
 				}
 				if(isStringEmpty(node->genre))
 				{
 					sprintf(node->genre,"Unknown");
 				}
+				addGenreInList(node->genre);
 
 				buf = strtok(NULL, ";");
 				node->path[0] = '\0';
+				sprintf(node->path, "%s", buf);
 				if (strcasestr(buf, "\""))
 				{
-					sprintf(node->path,"%s", substring(buf, 1, -2));
-				}
-				else
-				{
-					sprintf(node->path,"%s", buf);
+					sprintf(node->path, "%s", substring(buf, 1, -2));
 				}
 
 				buf = strtok(NULL, ";");
@@ -257,13 +250,10 @@ void slavesListLoadFromCSV(char *filename)
 				node->user_title[0] = '\0';
 				if (buf)
 				{
+					sprintf(node->user_title, "%s", buf);
 					if (strcasestr(buf, "\""))
 					{
-						sprintf(node->user_title,"%s", substring(buf, 1, -2));
-					}
-					else
-					{
-						sprintf(node->user_title,"%s", buf);
+						sprintf(node->user_title, "%s", substring(buf, 1, -2));
 					}
 				}
 
@@ -704,5 +694,26 @@ void getIGameDataInfo(char *igameDataPath, slavesList *node)
 
 		free(line);
 		Close(fpigamedata);
+	}
+}
+
+void loadGenresFromFile(void)
+{
+	const BPTR fpgenres = Open(DEFAULT_GENRES_FILE, MODE_OLDFILE);
+	if (fpgenres)
+	{
+		int lineSize = MAX_GENRE_NAME_SIZE;
+		char *line = malloc(lineSize * sizeof(char));
+		while (FGets(fpgenres, line, lineSize) != NULL)
+		{
+			line[strlen(line) - 1] = '\0';
+			if (!isStringEmpty(line))
+			{
+				addGenreInList(line);
+			}
+		}
+
+		free(line);
+		Close(fpgenres);
 	}
 }
