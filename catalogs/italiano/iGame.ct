@@ -1,4 +1,4 @@
-## version $VER: iGame.catalog 2.1 (10.03.2021)
+## version $VER: iGame.catalog 2.4 (14.05.2023)
 ## codeset 0
 ## language italiano
 ## chunk AUTH Translated by Samir Hawamdeh
@@ -45,7 +45,7 @@ A_
 ;
 MSG_MNMainMenuShowHidehiddenentries
 Mostra/Nascondi voci
-; Show/Hide hidden entries
+; Show hidden entries
 ;
 MSG_MNMainOpenList
 Apri lista...
@@ -117,7 +117,7 @@ Impostazioni...
 ;
 MSG_MNlabel2GameRepositories
 Directory giochi...
-; Game Repositories...
+; Repositories...
 ;
 MSG_MNMainMUISettings
 Impostazioni MUI...
@@ -260,7 +260,7 @@ MSG_CY_ScreenshotSize1
 ; 320x256
 ;
 MSG_CY_ScreenshotSize2
-Predefinite
+Personalizzate
 ; Custom
 ;
 MSG_LA_Width
@@ -297,15 +297,15 @@ Varie
 ;
 MSG_LA_SaveStatsOnExit
 Salva statistiche all'uscita
-; Save Stats on Exit
+; Save stats on exit
 ;
 MSG_LA_FilterUseEnter
-Usa tasto Invio per filtrare
-; Use Enter to Filter
+Usa tasto invio per filtrare
+; Use enter to filter
 ;
 MSG_LA_HideSidepanel
 Nascondi pannello
-; Hide Side panel
+; Hide side panel
 ;
 MSG_BT_SettingsSave
 _Salva
@@ -320,12 +320,12 @@ _Annulla
 ; Cancel
 ;
 MSG_SelectDir
-Seleziona directory...
-; Select dir...
+Seleziona percorso...
+; Select path...
 ;
 MSG_GameExecutable
-Seleziona eseguibile del gioco...
-; Select Game executable...
+Seleziona eseguibile...
+; Select executable...
 ;
 MSG_TotalNumberOfGames
 Totale %d giochi
@@ -372,12 +372,12 @@ Impossibile creare il file repos.prefs!
 ; Could not create repos.prefs file!
 ;
 MSG_SelectGameFromList
-Per favore seleziona un gioco dalla lista
-; Please select a Game from the List.
+Per favore seleziona una voce dalla lista
+; Please select an entry from the list.
 ;
 MSG_TitleAlreadyExists
 Il titolo selezionato è già esistente!
-; The Title you selected, already exists.
+; The title you selected, already exists.
 ;
 MSG_SavingGamelist
 Salvataggio della lista giochi, attendere per favore...
@@ -404,7 +404,7 @@ Impossibile allocare la memoria!\nProcesso interrotto...
 ; Could not allocate memory! Aborting...
 ;
 MSG_DirectoryNotFound
-Directory del gioco non trovata!
+Directory di gioco non trovata!
 ; Game Directory not found!
 ;
 MSG_LA_StartWithFavorites
@@ -414,12 +414,52 @@ Mostra preferiti all'avvio
 ; MUIB Menu Title
 ;
 MSG_MNMainOpenCurrentDir
-Apri directory
-; Open Game Dir
+Apri cartella
+; Open game folder
 ;
 ; MUIB Menu ShortCut
 ;
 MSG_MNMainOpenCurrentDirChar
 W_
 ; W_
+;
+MSG_slavePathDoesntExist
+Il percorso slave non esiste!
+; Slave path does not exist!
+;
+MSG_compiledForAboutWin
+\nCompilato per
+; compiled for
+;
+MSG_MNMainPreferences
+Preferenze
+; Preferences
+;
+MSG_ScanCompletedUpdatingList
+Scansione completata. Aggiornamento lista
+; Scan completed. Updating the list now.
+;
+MSG_LoadingSavedList
+Caricamento della lista salvata. Attendere per favore
+; Loading the saved list. Please wait.
+;
+MSG_ICONPICTURESTORE_FAILED
+Impossibile memorizzare l'immagine icona predefinita
+; Could not store default picture icon
+;
+MSG_LV_GAMESLIST_TITLE
+Titolo
+; Title
+;
+MSG_LV_GAMESLIST_YEAR
+Anno
+; Year
+;
+MSG_LV_GAMESLIST_PLAYERS
+Giocatori
+; Players
+;
+MSG_LA_UseIgameDataTitle
+Preferisci igame.data
+; Prefer igame.data
 ;
