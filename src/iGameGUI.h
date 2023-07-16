@@ -35,12 +35,14 @@ struct ObjApp
 	APTR WI_MainWindow;
 	APTR MN_MainMenu;
 	APTR STR_Filter;
+	APTR GR_leftpanel;
 	APTR GR_sidepanel;
 	APTR GR_spacedScreenshot;
 	APTR IM_GameImage_0;
 	APTR IM_GameImage_1;
 	APTR Space_Sidepanel;
 	APTR LV_GamesList;
+	APTR CY_FilterList;
 	APTR LV_GenresList;
 	APTR TX_Status;
 	APTR WI_Properties;
@@ -94,6 +96,7 @@ struct ObjApp
 	CONST_STRPTR CY_PropertiesGenreContent[512];
 	CONST_STRPTR CY_ScreenshotSizeContent[4];
 	CONST_STRPTR RA_TitlesFromContent[3];
+	CONST_STRPTR CY_FilterListContent[6];
 };
 
 struct ObjApp *CreateApp(void);

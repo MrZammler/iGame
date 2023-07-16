@@ -421,13 +421,22 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 
 	object->CY_PropertiesGenreContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_PropertiesGenre0);
 	object->CY_PropertiesGenreContent[1] = NULL;
+
 	object->CY_ScreenshotSizeContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_ScreenshotSize0);
 	object->CY_ScreenshotSizeContent[1] = (CONST_STRPTR)GetMBString(MSG_CY_ScreenshotSize1);
 	object->CY_ScreenshotSizeContent[2] = (CONST_STRPTR)GetMBString(MSG_CY_ScreenshotSize2);
 	object->CY_ScreenshotSizeContent[3] = NULL;
+
 	object->RA_TitlesFromContent[0] = (CONST_STRPTR)GetMBString(MSG_RA_TitlesFrom0);
 	object->RA_TitlesFromContent[1] = (CONST_STRPTR)GetMBString(MSG_RA_TitlesFrom1);
 	object->RA_TitlesFromContent[2] = NULL;
+
+	object->CY_FilterListContent[0] = (CONST_STRPTR)GetMBString(MSG_FilterShowAll);
+	object->CY_FilterListContent[1] = (CONST_STRPTR)GetMBString(MSG_FilterFavorites);
+	object->CY_FilterListContent[2] = (CONST_STRPTR)GetMBString(MSG_FilterLastPlayed);
+	object->CY_FilterListContent[3] = (CONST_STRPTR)GetMBString(MSG_FilterMostPlayed);
+	object->CY_FilterListContent[4] = (CONST_STRPTR)GetMBString(MSG_FilterNeverPlayed);
+	object->CY_FilterListContent[5] = NULL;
 
 	LA_Filter = Label(GetMBString(MSG_LA_Filter));
 
@@ -544,6 +553,12 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 
 		object->Space_Sidepanel = VSpace(1);
 
+		object->CY_FilterList = CycleObject,
+			MUIA_HelpNode, "CY_FilterList",
+			MUIA_Frame, MUIV_Frame_Button,
+			MUIA_Cycle_Entries, object->CY_FilterListContent,
+			End;
+
 		object->LV_GenresList = ListObject,
 			MUIA_Frame, MUIV_Frame_InputList,
 			MUIA_List_Active, MUIV_List_Active_Top,
@@ -575,10 +590,16 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 				End;
 		}
 
+		object->GR_leftpanel = GroupObject,
+			MUIA_HelpNode, "GR_leftpanel",
+			Child, object->CY_FilterList,
+			Child, object->LV_GamesList,
+			End;
+
 		GR_main = GroupObject,
 			MUIA_HelpNode, "GR_main",
 			MUIA_Group_Horiz, TRUE,
-			Child, object->LV_GamesList,
+			Child, object->GR_leftpanel,
 			Child, BalanceObject,
 				MUIA_CycleChain, 1,
 				MUIA_ObjectID, MAKE_ID('B', 'A', 'L', 0),
@@ -1322,6 +1343,13 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 			MUIM_CallHook, &FilterChangeHook
 		);
 	}
+
+	DoMethod(object->CY_FilterList,
+		MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &GenreClickHook
+	);
 
 	DoMethod(object->LV_GamesList,
 		MUIM_Notify, MUIA_NList_Active, MUIV_EveryTime,
