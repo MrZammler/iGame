@@ -247,9 +247,13 @@ The entries list holds the entries (games, demos etc.) based on the filtering. W
 
 At the top right side, there is a screenshot of the selected entry. For the screenshot, iGame uses an image file, which must be in the same folder as the game/demo, named @{b}igame.iff@{ub}. If no screenshot is available then the entry icon is shown. You can disable the screenshots from the @{" Settings Window " LINK "WINSETS" 0}.
 
-Under the screenshot, there is the "Genres" list which helps you filter the games based on the "Genre". There is also an "Unknown" selection which shows the entries that do not have any Genre assigned.
+Under the screenshot, there is the Chipset cycle box. Using that the user can filter the games based on the required chipset, for example show only the AGA games.
+
+Then the "Genres" list helps the user to filter the games based on the "Genre". There is also an "Unknown" selection which shows the entries that do not have any Genre assigned.
 
 At the bottom, there is a read-only field which shows information about iGame, based on what you are doing. It is like a status bar, where useful information will be shown while you use iGame.
+
+The Genre and Chipset lists get the information from the @{b}gameslist.csv@{ub} file. It can be automatically populated if the @{" igame.data files " LINK "IGDF" 0} are used and this is enabled in the settings window.
 
 @ENDNODE
 @NODE "WINADDG" "Add a Game Window..."

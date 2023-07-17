@@ -41,7 +41,6 @@ void app_start(void);
 void slaveProperties(void);
 void saveItemProperties(void);
 void add_non_whdload(void);
-void genres_click(void);
 void non_whdload_ok(void);
 void repo_stop(void);
 void repo_add(void);
