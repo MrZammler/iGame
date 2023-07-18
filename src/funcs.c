@@ -357,6 +357,7 @@ void app_start(void)
 	if (current_settings->start_with_favorites)
 	{
 		filters.showGroup = GROUP_FAVOURITES;
+		set(app->CY_FilterList, MUIA_Cycle_Active, GROUP_FAVOURITES);
 	}
 
 	DoMethod(app->App,
