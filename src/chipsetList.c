@@ -1,6 +1,6 @@
 /*
-  genresList.c
-  genres list functions source for iGame
+  chipsetList.c
+  chipset list functions source for iGame
 
   Copyright (c) 2018-2023, Emmanuel Vasilakis
 
@@ -27,30 +27,30 @@
 #include <exec/types.h>
 
 #include "iGameExtern.h"
-#include "genresList.h"
+#include "chipsetList.h"
 #include "strfuncs.h"
 
-genresList *genresListHead = NULL;
+chipsetList *chipsetListHead = NULL;
 
 static int isListEmpty(const void *head)
 {
 	return head == NULL;
 }
 
-void genresListAddTail(genresList *node)
+void chipsetListAddTail(chipsetList *node)
 {
 	if (node != NULL)
 	{
 		node->next = NULL;
 
-		if (isListEmpty(genresListHead))
+		if (isListEmpty(chipsetListHead))
 		{
-			genresListHead = node;
+			chipsetListHead = node;
 		}
 		else
 		{
 			// find the last node
-			genresList *currPtr = genresListHead;
+			chipsetList *currPtr = chipsetListHead;
 			while (currPtr->next != NULL)
 			{
 				currPtr = currPtr->next;
@@ -61,22 +61,22 @@ void genresListAddTail(genresList *node)
 	}
 }
 
-static BOOL genresListRemoveHead(void) {
+static BOOL chipsetListRemoveHead(void) {
 
-	if (isListEmpty(genresListHead)) {
+	if (isListEmpty(chipsetListHead)) {
 		return FALSE;
 	}
 
-	genresList *nextPtr = genresListHead->next;
-	free(genresListHead);
-	genresListHead = nextPtr;
+	chipsetList *nextPtr = chipsetListHead->next;
+	free(chipsetListHead);
+	chipsetListHead = nextPtr;
 	return TRUE;
 }
 
-void genresListPrint(void)
+void chipsetListPrint(void)
 {
 	int cnt = 0;
-	genresList *currPtr = genresListHead;
+	chipsetList *currPtr = chipsetListHead;
 	while (currPtr != NULL)
 	{
 		printf("----> %s\n", currPtr->title);
@@ -86,14 +86,14 @@ void genresListPrint(void)
 	printf("END OF LIST: %d items\n", cnt);
 }
 
-genresList *genresListSearchByTitle(char *title, unsigned int titleSize)
+chipsetList *chipsetListSearchByTitle(char *title, unsigned int titleSize)
 {
-	if (isListEmpty(genresListHead))
+	if (isListEmpty(chipsetListHead))
 	{
 		return NULL;
 	}
 
-	genresList *currPtr = genresListHead;
+	chipsetList *currPtr = chipsetListHead;
 	while (
 		currPtr != NULL &&
 		strncmp(currPtr->title, title, titleSize)
@@ -104,18 +104,18 @@ genresList *genresListSearchByTitle(char *title, unsigned int titleSize)
 	return currPtr;
 }
 
-genresList *getGenresListHead(void)
+chipsetList *getChipsetListHead(void)
 {
-	return genresListHead;
+	return chipsetListHead;
 }
 
-void emptyGenresList(void)
+void emptyChipsetList(void)
 {
-	while(genresListRemoveHead())
+	while(chipsetListRemoveHead())
 	{}
 }
 
-int genresListNodeCount(int cnt)
+int chipsetListNodeCount(int cnt)
 {
 	static int nodeCount = 0;
 
@@ -128,19 +128,19 @@ int genresListNodeCount(int cnt)
 	return nodeCount;
 }
 
-void addGenreInList(char *title)
+void addChipsetInList(char *title)
 {
 	if (isStringEmpty(title))
 		return;
 
-	if (genresListSearchByTitle(title, sizeof(char) * MAX_GENRE_NAME_SIZE) == NULL)
+	if (chipsetListSearchByTitle(title, sizeof(char) * MAX_CHIPSET_SIZE) == NULL)
 	{
-		genresList *node = malloc(sizeof(genresList));
+		chipsetList *node = malloc(sizeof(chipsetList));
 		if(node == NULL)
 		{
 			return;
 		}
-		strncpy(node->title, title, sizeof(char) * MAX_GENRE_NAME_SIZE);
-		genresListAddTail(node);
+		strncpy(node->title, title, sizeof(char) * MAX_CHIPSET_SIZE);
+		chipsetListAddTail(node);
 	}
 }

@@ -327,9 +327,9 @@ struct ObjApp *CreateApp(void)
 	static const struct Hook GameClickHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_click, NULL };
 #endif
 #if defined(__amigaos4__)
-	static const struct Hook GenreClickHook = { { NULL,NULL }, (HOOKFUNC)genres_click, NULL, NULL };
+	static const struct Hook GenreClickHook = { { NULL,NULL }, (HOOKFUNC)filter_change, NULL, NULL };
 #else
-	static const struct Hook GenreClickHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)genres_click, NULL };
+	static const struct Hook GenreClickHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)filter_change, NULL };
 #endif
 #if defined(__amigaos4__)
 	static const struct Hook NonWHDLoadOKHook = { { NULL,NULL }, (HOOKFUNC)non_whdload_ok, NULL, NULL };
@@ -438,6 +438,9 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 	object->CY_FilterListContent[4] = (CONST_STRPTR)GetMBString(MSG_FilterNeverPlayed);
 	object->CY_FilterListContent[5] = NULL;
 
+	object->CY_ChipsetListContent[0] = (CONST_STRPTR)GetMBString(MSG_FilterShowAll);
+	object->CY_ChipsetListContent[1] = NULL;
+
 	LA_Filter = Label(GetMBString(MSG_LA_Filter));
 
 	object->STR_Filter = StringObject,
@@ -454,6 +457,7 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 		Child, object->STR_Filter,
 		End;
 
+	// TODO: Below comments need to be removed
 	// static const char *titles[] =
 	// {
 	// 	"Title",
@@ -559,6 +563,12 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 			MUIA_Cycle_Entries, object->CY_FilterListContent,
 			End;
 
+		object->CY_ChipsetList = CycleObject,
+			MUIA_HelpNode, "CY_ChipsetList",
+			MUIA_Frame, MUIV_Frame_Button,
+			MUIA_Cycle_Entries, object->CY_ChipsetListContent,
+			End;
+
 		object->LV_GenresList = ListObject,
 			MUIA_Frame, MUIV_Frame_InputList,
 			MUIA_List_Active, MUIV_List_Active_Top,
@@ -566,7 +576,6 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 
 		object->LV_GenresList = ListviewObject,
 			MUIA_HelpNode, "LV_GenresList",
-			MUIA_FrameTitle, GetMBString(MSG_LV_GenresListTitle),
 			MUIA_Listview_List, object->LV_GenresList,
 			End;
 
@@ -577,6 +586,7 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 				MUIA_Weight, 100,
 				Child, object->GR_spacedScreenshot,
 				Child, object->Space_Sidepanel,
+				Child, object->CY_ChipsetList,
 				Child, object->LV_GenresList,
 				End;
 		}
@@ -586,6 +596,7 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 				MUIA_HelpNode, "GR_sidepanel",
 				MUIA_Weight, 100,
 				Child, object->Space_Sidepanel,
+				Child, object->CY_ChipsetList,
 				Child, object->LV_GenresList,
 				End;
 		}
@@ -1345,6 +1356,13 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 	}
 
 	DoMethod(object->CY_FilterList,
+		MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &GenreClickHook
+	);
+
+	DoMethod(object->CY_ChipsetList,
 		MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
 		object->App,
 		2,

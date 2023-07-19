@@ -70,6 +70,7 @@
 #define MAX_TOOLTYPE_SIZE 64
 #define MAX_ARGUMENTS_SIZE 64
 #define MIN_TITLE_FILTER_CHARS 3
+#define MAX_CHIPSET_SIZE 16
 
 typedef struct settings
 {
@@ -92,6 +93,12 @@ typedef struct genresList
 	struct genresList *next;
 } genresList;
 
+typedef struct chipsetList
+{
+	char title[MAX_CHIPSET_SIZE];
+	struct chipsetList *next;
+} chipsetList;
+
 typedef struct repos
 {
 	char repo[256];
@@ -105,6 +112,7 @@ typedef struct slavesList
 	char path[MAX_PATH_SIZE];
 	char genre[MAX_GENRE_NAME_SIZE];
 	char arguments[MAX_ARGUMENTS_SIZE];
+	char chipset[MAX_CHIPSET_SIZE];
 
 	int instance;
 	int times_played;
@@ -133,6 +141,7 @@ typedef struct listFilters
 	BOOL showHiddenOnly;
 	int showGroup;
 	char showGenre[MAX_GENRE_NAME_SIZE];
+	char showChipset[MAX_CHIPSET_SIZE];
 } listFilters;
 
 enum {

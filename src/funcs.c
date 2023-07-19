@@ -57,6 +57,7 @@
 #include "fsfuncs.h"
 #include "slavesList.h"
 #include "genresList.h"
+#include "chipsetList.h"
 #include "funcs.h"
 
 extern struct ObjApp* app;
@@ -309,13 +310,30 @@ static void populateGenresList(void)
 	int i = 0;
 	for (i = 0; i < genresListNodeCount(cnt); i++)
 	{
-		DoMethod(app->LV_GenresList, MUIM_List_GetEntry, i+5, &app->CY_PropertiesGenreContent[i]);
+		DoMethod(app->LV_GenresList, MUIM_List_GetEntry, i+1, &app->CY_PropertiesGenreContent[i]);
 	}
 	app->CY_PropertiesGenreContent[i] = (unsigned char*)GetMBString(MSG_UnknownGenre);
 	app->CY_PropertiesGenreContent[i++] = NULL;
 	set(app->CY_PropertiesGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
 	set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
 	set(app->LV_GenresList, MUIA_List_Quiet, FALSE);
+}
+
+static void populateChipsetList(void)
+{
+	chipsetList *currPtr = getChipsetListHead();
+
+	int cnt = 1;
+	app->CY_ChipsetListContent[cnt] = (unsigned char*)GetMBString(MSG_FilterShowAll);
+	while (currPtr != NULL)
+	{
+		app->CY_ChipsetListContent[cnt] = currPtr->title;
+		cnt++;
+		currPtr = currPtr->next;
+	}
+
+	app->CY_ChipsetListContent[cnt++] = NULL;
+	set(app->CY_ChipsetList, MUIA_Cycle_Entries, app->CY_ChipsetListContent);
 }
 
 // Clears the list of items
@@ -339,6 +357,7 @@ void app_start(void)
 	if (current_settings->start_with_favorites)
 	{
 		filters.showGroup = GROUP_FAVOURITES;
+		set(app->CY_FilterList, MUIA_Cycle_Active, GROUP_FAVOURITES);
 	}
 
 	DoMethod(app->App,
@@ -352,9 +371,9 @@ void app_start(void)
 	setStatusText(GetMBString(MSG_LoadingSavedList));
 	set(app->WI_MainWindow, MUIA_Window_Sleep, TRUE);
 	slavesListLoadFromCSV(csvFilename);
-	showSlavesList();
 
 	populateGenresList();
+	populateChipsetList();
 	set(app->WI_MainWindow, MUIA_Window_Sleep, FALSE);
 	set(app->WI_MainWindow, MUIA_Window_ActiveObject, app->LV_GamesList);
 }
@@ -365,6 +384,7 @@ void filter_change(void)
 	char *genreSelection = NULL;
 	filters.showGenre[0] = '\0';
 	filters.showGroup = get_cycle_index(app->CY_FilterList);
+	filters.showChipset[0] = '\0';
 
 	get(app->STR_Filter, MUIA_String_Contents, &title);
 	if (!current_settings->filter_use_enter && strlen(title) > 0 && strlen(title) < MIN_TITLE_FILTER_CHARS) {
@@ -381,11 +401,17 @@ void filter_change(void)
 	}
 	else filters.title[0] = '\0';
 
-	if (!isStringEmpty(genreSelection))
+	if (genreSelection)
 		strncpy(filters.showGenre, genreSelection, sizeof(filters.showGenre));
 
-	if (genreSelection == NULL || !strcmp(genreSelection, GetMBString(MSG_FilterShowAll)))
+	if (!genreSelection || !strcmp(genreSelection, GetMBString(MSG_FilterShowAll)))
 		filters.showGenre[0] = '\0';
+
+	// Get selected chipset from the cycle box
+	int chipsetIndex = get_cycle_index(app->CY_ChipsetList);
+	strncpy(filters.showChipset, app->CY_ChipsetListContent[chipsetIndex], sizeof(filters.showChipset));
+	if (chipsetIndex == 0)
+		filters.showChipset[0] = '\0';
 
 	showSlavesList();
 }
@@ -593,6 +619,15 @@ static void showSlavesList(void)
 				goto nextItem;
 			}
 
+			// Filter the list by the selected chipset
+			if (
+				!isStringEmpty(filters.showChipset) &&
+				strncmp(filters.showChipset, currPtr->chipset, sizeof(currPtr->chipset))
+			)
+			{
+				goto nextItem;
+			}
+
 			// Decide from where the item name will be taken
 			if(!isStringEmpty(currPtr->user_title))
 			{
@@ -741,7 +776,7 @@ static BOOL examineFolder(char *path)
 				{
 
 					// igame.data found
-					if (!strcmp(FIblock->fib_FileName, DEFAULT_IGAMEDATA_FILE))
+					if (current_settings->useIgameDataTitle && !strcmp(FIblock->fib_FileName, DEFAULT_IGAMEDATA_FILE))
 					{
 						slavesList *node = malloc(sizeof(slavesList));
 						if(node == NULL)
@@ -769,6 +804,7 @@ static BOOL examineFolder(char *path)
 						node->genre[0] = '\0';
 						node->user_title[0] = '\0';
 						node->arguments[0] = '\0';
+						node->chipset[0] = '\0';
 						node->times_played = 0;
 						node->favourite = 0;
 						node->last_played = 0;
@@ -800,6 +836,7 @@ static BOOL examineFolder(char *path)
 						{
 							slavesListAddTail(node);
 							addGenreInList(node->genre);
+							addChipsetInList(node->chipset);
 						}
 					}
 
@@ -834,6 +871,7 @@ static BOOL examineFolder(char *path)
 							node->title[0] = '\0';
 							node->genre[0] = '\0';
 							node->user_title[0] = '\0';
+							node->chipset[0] = '\0';
 							node->times_played = 0;
 							node->favourite = 0;
 							node->last_played = 0;
@@ -846,16 +884,19 @@ static BOOL examineFolder(char *path)
 							getFullPath(buf, buf);
 							strncpy(node->path, buf, sizeof(node->path));
 
-							// TODO: Add here if igame.data is enabled to be used in settings
-							char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
-							snprintf(igameDataPath, sizeof(char) * MAX_PATH_SIZE, "%s/%s", path, DEFAULT_IGAMEDATA_FILE);
-							if (check_path_exists(igameDataPath))
+							// if igame.data is enabled in settings use it
+							if (current_settings->useIgameDataTitle)
 							{
-								getIGameDataInfo(igameDataPath, node);
+								char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
+								snprintf(igameDataPath, sizeof(char) * MAX_PATH_SIZE, "%s/%s", path, DEFAULT_IGAMEDATA_FILE);
+								if (check_path_exists(igameDataPath))
+								{
+									getIGameDataInfo(igameDataPath, node);
+								}
 							}
 
 							// Generate title and add in the list
-							// TODO: Run the following if igame.data is disabled or if the node->title is still empty
+							// Run the following if the node->title is empty
 							if (isStringEmpty(node->title))
 							{
 								generateItemName(node->path, node->title, sizeof(node->title));
@@ -867,9 +908,40 @@ static BOOL examineFolder(char *path)
 							// TODO: IDEA - Instead of adding at the tail insert it in sorted position
 							slavesListAddTail(node);
 							addGenreInList(node->genre);
+							addChipsetInList(node->chipset);
 						}
 						else
 						{
+							if (current_settings->useIgameDataTitle)
+							{
+								slavesList *node = malloc(sizeof(slavesList));
+								if(node == NULL)
+								{
+									msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+									FreeVec(FIblock);
+									UnLock(lock);
+									free(buf);
+									return FALSE;
+								}
+
+								char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
+								snprintf(igameDataPath, sizeof(char) * MAX_PATH_SIZE, "%s/%s", existingNode->path, DEFAULT_IGAMEDATA_FILE);
+								if (check_path_exists(igameDataPath))
+								{
+									getIGameDataInfo(igameDataPath, node);
+								}
+
+								if (!isStringEmpty(node->genre))
+									strncpy(existingNode->genre, node->genre, MAX_GENRE_NAME_SIZE);
+
+								if (!isStringEmpty(node->chipset))
+								strncpy(existingNode->chipset, node->chipset, MAX_CHIPSET_SIZE);
+
+								addGenreInList(node->genre);
+								addChipsetInList(node->chipset);
+								free(node);
+							}
+
 							// Generate title and add in the list
 							generateItemName(existingNode->path, existingNode->title, sizeof(existingNode->title));
 						}
@@ -903,6 +975,7 @@ void scan_repositories(void)
 		save_list();
 		showSlavesList();
 		populateGenresList();
+		populateChipsetList();
 		set(app->WI_MainWindow, MUIA_Window_Sleep, FALSE);
 	}
 }
@@ -913,6 +986,7 @@ static void applySidePanelChange(void)
 	{
 		DoMethod(app->GR_sidepanel, MUIM_Group_InitChange);
 		DoMethod(app->GR_sidepanel, OM_REMMEMBER, app->Space_Sidepanel);
+		DoMethod(app->GR_sidepanel, OM_REMMEMBER, app->CY_ChipsetList);
 		DoMethod(app->GR_sidepanel, OM_REMMEMBER, app->LV_GenresList);
 
 		if (!current_settings->hide_screenshots) {
@@ -947,6 +1021,7 @@ static void applySidePanelChange(void)
 		}
 
 		DoMethod(app->GR_sidepanel, OM_ADDMEMBER, app->Space_Sidepanel);
+		DoMethod(app->GR_sidepanel, OM_ADDMEMBER, app->CY_ChipsetList);
 		DoMethod(app->GR_sidepanel, OM_ADDMEMBER, app->LV_GenresList);
 		DoMethod(app->GR_sidepanel, MUIM_Group_ExitChange);
 	}
@@ -1315,11 +1390,6 @@ void app_stop(void)
 		free(repos);
 		repos = NULL;
 	}
-}
-
-void genres_click(void)
-{
-	filter_change();
 }
 
 void save_list(void)

@@ -55,6 +55,7 @@
 #include "strfuncs.h"
 #include "slavesList.h"
 #include "genresList.h"
+#include "chipsetList.h"
 #include "funcs.h"
 #include "fsfuncs.h"
 
@@ -267,6 +268,18 @@ void slavesListLoadFromCSV(char *filename)
 				if (buf)
 					node->players = atoi(buf);
 
+				buf = strtok(NULL, ";");
+				node->chipset[0] = '\0';
+				if (strncmp(buf, "\n", sizeof(char)))
+				{
+					sprintf(node->chipset, "%s", buf);
+				}
+				if (strcasestr(buf, "\""))
+				{
+					sprintf(node->chipset, "%s", substring(buf, 1, -2));
+				}
+				addChipsetInList(node->chipset);
+
 				slavesListAddTail(node);
 			}
 			Close(fpgames);
@@ -298,12 +311,12 @@ void slavesListSaveToCSV(const char *filename)
 	{
 		fprintf(
 			fpgames,
-			"%d;\"%s\";\"%s\";\"%s\";%d;%d;%d;%d;%d;\"%s\";%d;%d;\n",
+			"%d;\"%s\";\"%s\";\"%s\";%d;%d;%d;%d;%d;\"%s\";%d;%d;\"%s\";\n",
 			currPtr->instance, currPtr->title,
 			currPtr->genre, currPtr->path, currPtr->favourite,
 			currPtr->times_played, currPtr->last_played, currPtr->hidden,
 			currPtr->deleted, currPtr->user_title,
-			currPtr->year, currPtr->players
+			currPtr->year, currPtr->players, currPtr->chipset
 		);
 		currPtr = currPtr->next;
 	}
@@ -668,6 +681,11 @@ void getIGameDataInfo(char *igameDataPath, slavesList *node)
 				if(current_settings->useIgameDataTitle && !strcmp(tmpTbl[0], "title"))
 				{
 					strncpy(node->title, tmpTbl[1], MAX_SLAVE_TITLE_SIZE);
+				}
+
+				if(!strcmp(tmpTbl[0], "chipset"))
+				{
+					strncpy(node->chipset, tmpTbl[1], MAX_CHIPSET_SIZE);
 				}
 
 				if(!strcmp(tmpTbl[0], "genre"))

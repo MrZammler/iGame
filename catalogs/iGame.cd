@@ -248,7 +248,7 @@ MSG_FilterShowAll (//)
 --Show All--
 ;
 MSG_FilterFavorites (//)
---Favorites--
+--Favourites--
 ;
 MSG_FilterLastPlayed (//)
 --Last Played--
@@ -299,7 +299,7 @@ MSG_DirectoryNotFound (//)
 Game Directory not found!
 ;
 MSG_LA_StartWithFavorites (//)
-Display favorites on start
+Display favourites on start
 ;
 MSG_MNMainOpenCurrentDir (//)
 Open game folder

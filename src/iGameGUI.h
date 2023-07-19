@@ -44,6 +44,7 @@ struct ObjApp
 	APTR LV_GamesList;
 	APTR CY_FilterList;
 	APTR LV_GenresList;
+	APTR CY_ChipsetList;
 	APTR TX_Status;
 	APTR WI_Properties;
 	APTR STR_PropertiesGameTitle;
@@ -93,10 +94,11 @@ struct ObjApp
 	CONST_STRPTR STR_TX_PropertiesSlavePath;
 	CONST_STRPTR STR_TX_PropertiesTooltypes;
 	CONST_STRPTR STR_TX_About;
-	CONST_STRPTR CY_PropertiesGenreContent[512];
+	CONST_STRPTR CY_PropertiesGenreContent[128];
 	CONST_STRPTR CY_ScreenshotSizeContent[4];
 	CONST_STRPTR RA_TitlesFromContent[3];
 	CONST_STRPTR CY_FilterListContent[6];
+	CONST_STRPTR CY_ChipsetListContent[16];
 };
 
 struct ObjApp *CreateApp(void);
