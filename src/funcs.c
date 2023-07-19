@@ -401,10 +401,10 @@ void filter_change(void)
 	}
 	else filters.title[0] = '\0';
 
-	if (!isStringEmpty(genreSelection))
+	if (genreSelection)
 		strncpy(filters.showGenre, genreSelection, sizeof(filters.showGenre));
 
-	if (genreSelection == NULL || !strcmp(genreSelection, GetMBString(MSG_FilterShowAll)))
+	if (!genreSelection || !strcmp(genreSelection, GetMBString(MSG_FilterShowAll)))
 		filters.showGenre[0] = '\0';
 
 	// Get selected chipset from the cycle box
