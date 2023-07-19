@@ -371,7 +371,6 @@ void app_start(void)
 	setStatusText(GetMBString(MSG_LoadingSavedList));
 	set(app->WI_MainWindow, MUIA_Window_Sleep, TRUE);
 	slavesListLoadFromCSV(csvFilename);
-	showSlavesList();
 
 	populateGenresList();
 	populateChipsetList();
