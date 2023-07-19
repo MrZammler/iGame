@@ -1,10 +1,10 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
-### Changed
-- When realtime filtering is enabled at least 3 characters are required so as to be initiated. Less than 3 characters are ignored, unless the filtering by pressing the enter button is enabled.
-
-## iGame 2.4.0 - [2023-05-13]
 ### Added
 - Now the Genre list is populated from the igame.data files and the genre file, if it exists, although it is not necessary. The genre filtering is working with these new values
+
+### Changed
+- When realtime filtering is enabled at least 3 characters are required so as to be initiated. Less than 3 characters are ignored, unless the filtering by pressing the enter button is enabled.
+- Removed the filtering options from the Genre list and moved to its own select box above entries list
 
 ### Fixed
 - Fixed a hit when the entry properties are requested without having a selected entry

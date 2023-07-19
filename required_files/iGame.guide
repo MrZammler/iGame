@@ -17,7 +17,7 @@ iGame
 
 @{" Installation    " LINK "INST" 0} - How to install iGame
 @{" Usage           " LINK "USAG" 0} - Using iGame
-@{" igame.data      " LINK "IGDF" 0} - About igame.data files
+@{" igame.data file " LINK "IGDF" 0} - About igame.data files
 
 @{" Todo & Bugs     " LINK "TODO" 0} - Todo and known bugs
 @{" Author          " LINK "INFO" 0} - Author contact info
@@ -239,13 +239,15 @@ This menu opens the MUI Settings window, where you can change the look of MUI co
 @{lindent 3}
 The Main Window is what you see when you start iGame. It is pretty simple to use and it has only a few fields.
 
-At the top, there is the "Filter" field which is used to filter the list of entries, based on your input. iGame returns entries with a matching part in their title. For example, if you want to find all the games that have "Soccer" in their title, that's what you need to write. The search is not case-sensitive, so it doesn't matter if the part of the title is capitalized or not. From the iGame settings, you can set it when the search is initialized, while you type or after you press "Enter".
+At the top, there is the "Filter" field which is used to filter the list of entries, based on your input. iGame returns entries with a matching part in their title. For example, if you want to find all the games that have "Soccer" in their title, that's what you need to write. The search is not case-sensitive, so it doesn't matter if the part of the title is capitalized or not. From the iGame settings, you can set it when the search is initialized, while you type (3 minimum characters) or after you press "Enter".
 
-On the left side, there is the list, where all the entries (games, demos etc.) are shown. With a double click on an entry, it is executed. If you want to add some information on an entry using the "Game > Properties..." menu, that's the list where you have to select it first.
+On the left side, there are a filter select box and the entries list. The filter select box helps tp filter the entries by "Last played", "Favorites", "Most Played" and "Never Played".
 
-At the top right side, there is a screenshot of the selected entry. For the screenshot, iGame uses an image file, which must be in the same folder as the game/demo, named @{b}igame.iff@{ub}. If no screenshot is available then the game icon is shown. You can disable the screenshots from the @{" Settings Window " LINK "WINSETS" 0}.
+The entries list holds the entries (games, demos etc.) based on the filtering. With a double click on an entry, it is executed. If you want to add some information on an entry using the "Game > Properties..." menu, that's the list where you have to select it first. The list has 3 columns, where the first one has the title, the second one shows the year of release and the third column shows the maximum number of players that can play. iGame uses @{" igame.data files " LINK "IGDF" 0} to gather that information. By clicking on their title the sorting of the list can change.
 
-Under the screenshot, there is the "Genres" list which helps you filter the games based on the "Genre", as well as by "Last played", "Favorites", "Most Played" and "Never Played". There is also an "Unknown" selection which shows the entries that do not have any Genre assigned.
+At the top right side, there is a screenshot of the selected entry. For the screenshot, iGame uses an image file, which must be in the same folder as the game/demo, named @{b}igame.iff@{ub}. If no screenshot is available then the entry icon is shown. You can disable the screenshots from the @{" Settings Window " LINK "WINSETS" 0}.
+
+Under the screenshot, there is the "Genres" list which helps you filter the games based on the "Genre". There is also an "Unknown" selection which shows the entries that do not have any Genre assigned.
 
 At the bottom, there is a read-only field which shows information about iGame, based on what you are doing. It is like a status bar, where useful information will be shown while you use iGame.
 

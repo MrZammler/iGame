@@ -68,7 +68,7 @@ char fname[255];
 BOOL sidepanelChanged = FALSE; // This is temporary until settings are revamped
 
 /* function definitions */
-static void add_default_filters(void);
+static int get_cycle_index(Object *);
 static void showSlavesList(void);
 static LONG xget(Object *, ULONG);
 
@@ -290,7 +290,8 @@ static void populateGenresList(void)
 	DoMethod(app->LV_GenresList, MUIM_List_Clear);
 	set(app->LV_GenresList, MUIA_List_Quiet, TRUE);
 
-	add_default_filters();
+	// Add Show All in genres list
+	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, GetMBString(MSG_FilterShowAll), MUIV_List_Insert_Bottom);
 	loadGenresFromFile();
 	addGenreInList(GetMBString(MSG_UnknownGenre));
 
@@ -315,15 +316,6 @@ static void populateGenresList(void)
 	set(app->CY_PropertiesGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
 	set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
 	set(app->LV_GenresList, MUIA_List_Quiet, FALSE);
-}
-
-static void add_default_filters(void)
-{
-	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, GetMBString(MSG_FilterShowAll), MUIV_List_Insert_Bottom);
-	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, GetMBString(MSG_FilterFavorites), MUIV_List_Insert_Bottom);
-	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, GetMBString(MSG_FilterLastPlayed), MUIV_List_Insert_Bottom);
-	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, GetMBString(MSG_FilterMostPlayed), MUIV_List_Insert_Bottom);
-	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, GetMBString(MSG_FilterNeverPlayed), MUIV_List_Insert_Bottom);
 }
 
 // Clears the list of items
@@ -372,6 +364,7 @@ void filter_change(void)
 	char *title = NULL;
 	char *genreSelection = NULL;
 	filters.showGenre[0] = '\0';
+	filters.showGroup = get_cycle_index(app->CY_FilterList);
 
 	get(app->STR_Filter, MUIA_String_Contents, &title);
 	if (!current_settings->filter_use_enter && strlen(title) > 0 && strlen(title) < MIN_TITLE_FILTER_CHARS) {
@@ -388,22 +381,11 @@ void filter_change(void)
 	}
 	else filters.title[0] = '\0';
 
+	if (!isStringEmpty(genreSelection))
+		strncpy(filters.showGenre, genreSelection, sizeof(filters.showGenre));
+
 	if (genreSelection == NULL || !strcmp(genreSelection, GetMBString(MSG_FilterShowAll)))
-		filters.showGroup = GROUP_SHOWALL;
-
-	else if (!strcmp(genreSelection, GetMBString(MSG_FilterFavorites)))
-		filters.showGroup = GROUP_FAVOURITES;
-
-	else if (!strcmp(genreSelection, GetMBString(MSG_FilterLastPlayed)))
-		filters.showGroup = GROUP_LAST_PLAYED;
-
-	else if (!strcmp(genreSelection, GetMBString(MSG_FilterMostPlayed)))
-		filters.showGroup = GROUP_MOST_PLAYED;
-
-	else if (!strcmp(genreSelection, GetMBString(MSG_FilterNeverPlayed)))
-		filters.showGroup = GROUP_NEVER_PLAYED;
-
-	else strncpy(filters.showGenre, genreSelection, sizeof(filters.showGenre));
+		filters.showGenre[0] = '\0';
 
 	showSlavesList();
 }
