@@ -246,21 +246,21 @@ struct ObjApp *CreateApp(void)
 	struct ObjApp *object;
 	APTR strip;
 	static char about_text[512];
-	static char version_string[16];
+	static char version_string[30];
 
 #ifndef __MORPHOS__
 	translateMenu(MenuMainWin);
 #endif // ndef __MORPHOS__
 
 	snprintf(version_string, sizeof(version_string),
-		"%s v%d.%d.%d",
+		"%s %d.%d.%d (%s)",
 		GetMBString(MSG_WI_MainWindow),
-		MAJOR_VERS, MINOR_VERS, PATCH_VERS
+		MAJOR_VERS, MINOR_VERS, PATCH_VERS, STR(RELEASE_DATE)
 	);
 
 	snprintf(about_text, sizeof(about_text),
-		"%s (%s)\n%s %s\n\nCopyright 2005-%d\n%s"
-		, version_string, STR(RELEASE_DATE), GetMBString(MSG_compiledForAboutWin), STR(CPU_VERS), COPY_END_YEAR, GetMBString(MSG_TX_About)
+		"%s\n%s %s\n\nCopyright 2005-%d\n%s",
+		version_string, GetMBString(MSG_compiledForAboutWin), STR(CPU_VERS), COPY_END_YEAR, GetMBString(MSG_TX_About)
 	);
 
 #ifdef __MORPHOS__

@@ -1,6 +1,6 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Changed
-- Simplified the version string
+- Simplified the version string and added the release date in the screen title
 
 ### Fixed
 - Fixed the menus in MorphOS that were broken for some time now
