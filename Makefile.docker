@@ -132,7 +132,7 @@ src/funcs_$(CPU).o: src/funcs.c src/iGame_strings.h src/strfuncs.h \
 	src/chipsetList.h
 
 src/iGameGUI_$(CPU).o: src/iGameGUI.c src/iGameGUI.h src/iGame_strings.h \
-	src/fsfuncs.h src/iGameExtern.h
+	src/fsfuncs.h src/iGameExtern.h src/version.h
 
 src/iGameMain_$(CPU).o: src/iGameMain.c src/iGameExtern.h
 

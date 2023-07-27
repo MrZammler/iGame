@@ -76,12 +76,14 @@
 extern igame_settings *current_settings;
 extern blockGuiGfx;
 
+#ifndef __MORPHOS__
 static void translateMenu(struct NewMenu *);
 static void flagMenuItem(struct NewMenu *, APTR, UWORD);
 
 #define TICK (CHECKIT|MENUTOGGLE)
 #define DIS  NM_ITEMDISABLED
 #define STR_ID(x) ( (STRPTR)(x) )
+#endif // ndef __MORPHOS__
 
 #if defined(__amigaos4__)
 #define AllocVecShared(size, flags)  AllocVecTags((size), AVT_Type, MEMF_SHARED, AVT_Lock, FALSE, ((flags)&MEMF_CLEAR) ? AVT_ClearWithValue : TAG_IGNORE, 0, TAG_DONE)
@@ -89,6 +91,7 @@ static void flagMenuItem(struct NewMenu *, APTR, UWORD);
 #define AllocVecShared(size, flags)  AllocVec((size), (flags))
 #endif
 
+#ifndef __MORPHOS__
 static struct NewMenu MenuMainWin[] =
 {
 	{ NM_TITLE, STR_ID(MSG_MNlabel2Actions)							, 0 ,0 ,0			,(APTR)MENU_ACTIONS },
@@ -112,6 +115,7 @@ static struct NewMenu MenuMainWin[] =
 
 	{ NM_END,NULL,0,0,0,NULL }
 };
+#endif // ndef __MORPHOS__
 
 static struct Listentry
 {
@@ -244,7 +248,9 @@ struct ObjApp *CreateApp(void)
 	static char about_text[512];
 	static char version_string[16];
 
+#ifndef __MORPHOS__
 	translateMenu(MenuMainWin);
+#endif // ndef __MORPHOS__
 
 	snprintf(version_string, sizeof(version_string),
 		"%s v%d.%d.%d",
@@ -256,6 +262,14 @@ struct ObjApp *CreateApp(void)
 		"%s (%s)\n%s %s\n\nCopyright 2005-%d\n%s"
 		, version_string, STR(RELEASE_DATE), GetMBString(MSG_compiledForAboutWin), STR(CPU_VERS), COPY_END_YEAR, GetMBString(MSG_TX_About)
 	);
+
+#ifdef __MORPHOS__
+	APTR	MNlabel2Actions, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainMenuShowHidehiddenentries;
+	APTR	MNMainBarLabel0, MNMainAbout;
+	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Game, MNMainProperties, MNMainOpenCurrentDir;
+	APTR	MNlabel2Tools, MNMainiGameSettings;
+	APTR	MNlabel2GameRepositories, MNMainBarLabel2, MNMainMUISettings;
+#endif // ndef __MORPHOS__
 
 	APTR	MNMainOpenList, MNMainSaveList, MNMainSaveListAs;
 	// APTR	MNMainMenuDuplicate;
@@ -281,6 +295,14 @@ struct ObjApp *CreateApp(void)
 	APTR	GR_SettingsButtons, Space_SettingsButtons1, Space_SettingsButtons2;
 
 // TODO: Change all the hooks to use SDI_Hook.h and MakeStaticHook()
+#ifdef __MORPHOS__
+	static const struct Hook MenuScanHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)scan_repositories, NULL };
+	static const struct Hook MenuShowHideHiddenHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)list_show_hidden, NULL };
+	static const struct Hook MenuPropertiesHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)slaveProperties, NULL };
+	static const struct Hook MenuAddNonWhdloadHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)add_non_whdload, NULL };
+	static const struct Hook OpenCurrentDirHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)open_current_dir, NULL };
+#endif
+
 #if defined(__amigaos4__)
 	static const struct Hook MenuOpenListHook = { { NULL,NULL }, (HOOKFUNC)open_list, NULL, NULL };
 #else
@@ -640,6 +662,22 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 		Child, object->TX_Status,
 		End;
 
+#ifdef __MORPHOS__
+	MNlabelScan = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNlabelScan),
+		MUIA_Menuitem_Shortcut, MENU_SCANREPOS_HOTKEY,
+		End;
+
+	MNMainAddnonWHDLoadgame = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNMainAddnonWHDLoadgame),
+		MUIA_Menuitem_Shortcut, MENU_ADDNONWHDLOADGAME_HOTKEY,
+		End;
+
+	MNMainMenuShowHidehiddenentries = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNMainMenuShowHidehiddenentries),
+		End;
+#endif
+
 	MNMainOpenList = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainOpenList),
 		MUIA_Menuitem_Shortcut, MENU_OPENLIST_HOTKEY,
@@ -654,6 +692,47 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainSaveListAs),
 		End;
 
+#ifdef __MORPHOS__
+	MNMainBarLabel0 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
+
+	MNMainAbout = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNMainAbout),
+		MUIA_Menuitem_Shortcut, MENU_ABOUT_HOTKEY,
+		End;
+
+	MNMainBarLabel1 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
+
+	MNMainQuit = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNMainQuit),
+		MUIA_Menuitem_Shortcut, MENU_QUIT_HOTKEY,
+		End;
+
+	MNlabel2Actions = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Actions),
+		MUIA_Family_Child, MNlabelScan,
+		MUIA_Family_Child, MNMainAddnonWHDLoadgame,
+		MUIA_Family_Child, MNMainMenuShowHidehiddenentries,
+		/* MUIA_Family_Child, MNMainBarLabel5, */
+		/* MUIA_Family_Child, MNMainOpenList, */
+		/* MUIA_Family_Child, MNMainSaveList, */
+		/* MUIA_Family_Child, MNMainSaveListAs, */
+		MUIA_Family_Child, MNMainBarLabel0,
+		MUIA_Family_Child, MNMainAbout,
+		MUIA_Family_Child, MNMainBarLabel1,
+		MUIA_Family_Child, MNMainQuit,
+		End;
+
+	MNMainProperties = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNMainProperties),
+		MUIA_Menuitem_Shortcut, MENU_PROPERTIES_HOTKEY,
+		End;
+
+	MNMainOpenCurrentDir = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNMainOpenCurrentDir),
+		//MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainOpenCurrentDirChar),
+		End;
+#endif
+
 	// MNMainMenuDuplicate = MenuitemObject,
 	// 	MUIA_Menuitem_Title, GetMBString(MSG_MNMainMenuDuplicate),
 	// 	End;
@@ -663,15 +742,54 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 	// 	MUIA_Menuitem_Shortcut, MENU_DELETE_HOTKEY,
 	// 	End;
 
+#ifndef __MORPHOS__
 	if (get_wb_version() < 44)
 	{
 		flagMenuItem(MenuMainWin, (APTR)MENU_GAMEFOLDER, DIS);
 	}
+#else
+	MNlabel2Game = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Game),
+		MUIA_Family_Child, MNMainProperties,
+		End;
+
+	MNMainiGameSettings = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNMainiGameSettings),
+		End;
+
+	MNlabel2GameRepositories = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2GameRepositories),
+		End;
+
+	MNMainBarLabel2 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
+
+	MNMainMUISettings = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNMainMUISettings),
+		End;
+
+	MNlabel2Tools = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Tools),
+		MUIA_Family_Child, MNMainiGameSettings,
+		MUIA_Family_Child, MNlabel2GameRepositories,
+		MUIA_Family_Child, MNMainBarLabel2,
+		MUIA_Family_Child, MNMainMUISettings,
+		End;
+
+	object->MN_MainMenu = MenustripObject,
+		MUIA_Family_Child, MNlabel2Actions,
+		MUIA_Family_Child, MNlabel2Game,
+		MUIA_Family_Child, MNlabel2Tools,
+		End;
+#endif
 
 	object->WI_MainWindow = WindowObject,
 		MUIA_Window_ScreenTitle, version_string,
 		MUIA_Window_Title, GetMBString(MSG_WI_MainWindow),
+#ifndef __MORPHOS__
 		MUIA_Window_Menustrip, strip = MUI_MakeObject(MUIO_MenustripNM, MenuMainWin, 0),
+#else
+		MUIA_Window_Menustrip, object->MN_MainMenu,
+#endif
 		MUIA_Window_ID, MAKE_ID('0', 'I', 'G', 'A'),
 		MUIA_Window_AppWindow, TRUE,
 		WindowContents, GROUP_ROOT,
@@ -1692,6 +1810,78 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 		object->BT_SettingsCancel,
 		0
 	);
+
+#ifdef __MORPHOS__
+	DoMethod(MNlabelScan,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &MenuScanHook
+	);
+
+	DoMethod(MNMainAddnonWHDLoadgame,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &MenuAddNonWhdloadHook
+	);
+
+	DoMethod(MNMainMenuShowHidehiddenentries,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &MenuShowHideHiddenHook
+	);
+	DoMethod(MNMainAbout,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		object->WI_About,
+		3,
+		MUIM_Set, MUIA_Window_Open, TRUE
+	);
+
+	DoMethod(MNMainQuit,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit
+	);
+
+	DoMethod(MNMainProperties,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &MenuPropertiesHook
+	);
+
+	//OPEN CURRENT DIR
+	DoMethod(MNMainOpenCurrentDir,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &OpenCurrentDirHook
+	);
+
+	DoMethod(MNMainiGameSettings,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		object->WI_Settings,
+		3,
+		MUIM_Set, MUIA_Window_Open, TRUE
+	);
+
+	DoMethod(MNlabel2GameRepositories,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		object->WI_GameRepositories,
+		3,
+		MUIM_Set, MUIA_Window_Open, TRUE
+	);
+
+	DoMethod(MNMainMUISettings,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_Application_OpenConfigWindow, 0
+	);
+#endif
 
 	return object;
 }

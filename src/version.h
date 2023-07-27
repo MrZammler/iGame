@@ -39,5 +39,5 @@
 #define COPY_END_YEAR 2023
 
 #ifndef VERSION
-#define VERSION "$VER: iGame v" STR(MAJOR_VERS) "." STR(MINOR_VERS) "." STR(PATCH_VERS) " for " STR(CPU_VERS) " (" STR(RELEASE_DATE) ")"
+#define VERSION "$VER: iGame " STR(MAJOR_VERS) "." STR(MINOR_VERS) "." STR(PATCH_VERS) " (" STR(RELEASE_DATE) ")"
 #endif

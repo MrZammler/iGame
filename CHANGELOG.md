@@ -1,11 +1,18 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
+### Changed
+- Simplified the version string
+
+### Fixed
+- Fixed the menus in MorphOS that were broken for some time now
+
+## iGame 2.4.1 - [2023-07-19]
 ### Added
 - Now the Genre list is populated from the igame.data files and the genre file, if it exists, although it is not necessary. The genre filtering is working with these new values
-- Added a new cycle box that lets the user to filter the results based on the chipset. This requires in settings the "Prefer igame.data files" to be enabled
+- Added a new cycle box that lets the user filter the results based on the chipset. This requires in settings the "Prefer igame.data files" to be enabled
 
 ### Changed
-- When realtime filtering is enabled at least 3 characters are required so as to be initiated. Less than 3 characters are ignored, unless the filtering by pressing the enter button is enabled.
-- Removed the filtering options from the Genre list and moved to its own select box above entries list
+- When real-time filtering is enabled at least 3 characters are required so as to be initiated. Less than 3 characters are ignored, unless the filtering by pressing the enter button is enabled.
+- Removed the filtering options from the Genre list and moved them to their own select box above the entries list
 - Now, even if the list entries list is populated a new repository scan will update the Chipset and Genre information based on the data found in igame.data files.
 - If the "Prefer igame.data files" is not enabled those files are not used during the scan of repositories
 
