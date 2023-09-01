@@ -260,7 +260,7 @@ static int initLibraries(void)
 	{
 		#ifdef __amigaos4__
 		IMUIMaster = (struct MUIMasterIFace *)GetInterface(MUIMasterBase, "main", 1, NULL);
-		if(!IMUIMaster) return clean_exit("Can't open muimaster Interface");
+		if(!IMUIMaster) return clean_exit("Can't open muimaster Interface\n");
 		#endif
 	}
 	else return clean_exit("Can't open muimaster.library v19\n");
@@ -284,7 +284,7 @@ static int initLibraries(void)
 	{
 		#ifdef __amigaos4__
 		IIcon = (struct IconIFace *)GetInterface( IconBase, "main", 1, NULL );
-		if(!IIcon) return clean_exit("Can't open icon.library Interface");
+		if(!IIcon) return clean_exit("Can't open icon.library Interface\n");
 		#endif
 	}
 	else return clean_exit("Can't open icon.library v37 or greater\n");
@@ -297,7 +297,7 @@ static int initLibraries(void)
 	{
 		#ifdef __amigaos4__
 		IIntuition = (struct IntuitionIFace *)GetInterface( IntuitionBase, "main", 1, NULL );
-		if(!IIntuition) return clean_exit("Can't open intuition.library Interface");
+		if(!IIntuition) return clean_exit("Can't open intuition.library Interface\n");
 		#endif
 	}
 	else return clean_exit("Can't open intuition.library v37 or greater\n");
@@ -306,7 +306,7 @@ static int initLibraries(void)
 	{
 		#ifdef __amigaos4__
 		IGraphics = (struct GraphicsIFace *)GetInterface( GfxBase, "main", 1, NULL );
-		if(!IGraphics) return clean_exit("Can't open graphics.library Interface");
+		if(!IGraphics) return clean_exit("Can't open graphics.library Interface\n");
 		#endif
 	}
 	else return clean_exit("Can't open graphics.library v37 or greater\n");
@@ -315,7 +315,7 @@ static int initLibraries(void)
 	{
 		#ifdef __amigaos4__
 		IWorkbench = (struct WorkbenchIFace *)GetInterface( WorkbenchBase, "main", 1, NULL );
-		if(!IWorkbench) return clean_exit("Can't open workbench.library Interface");
+		if(!IWorkbench) return clean_exit("Can't open workbench.library Interface\n");
 		#endif
 	}
 	else return clean_exit("Can't open workbench.library v37 or greater\n");
@@ -324,7 +324,7 @@ static int initLibraries(void)
 	{
 		#ifdef __amigaos4__
 		IDataTypes = (struct DataTypesIFace *)GetInterface( DataTypesBase, "main", 1, NULL );
-		if(!IDataTypes) return clean_exit("Can't open datatypes.library Interface");
+		if(!IDataTypes) return clean_exit("Can't open datatypes.library Interface\n");
 		#endif
 	}
 	else return clean_exit("Can't open datatypes.library v37 or greater\n");
@@ -333,7 +333,7 @@ static int initLibraries(void)
 	{
 		#ifdef __amigaos4__
 		IUtility = (struct UtilityIFace *)GetInterface( UtilityBase, "main", 1, NULL );
-		if(!IUtility) return clean_exit("Can't open Utility.library Interface");
+		if(!IUtility) return clean_exit("Can't open Utility.library Interface\n");
 		#endif
 	}
 	else return clean_exit("Can't open utility.library v37 or greater\n");

@@ -1,4 +1,9 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
+### Fixed
+- Fixed memory leaks
+- Fixed the lists getting wrong values when overflow
+
+## iGame 2.4.2 - [2023-08-27]
 ### Changed
 - Simplified the version string and added the release date in the screen title
 
