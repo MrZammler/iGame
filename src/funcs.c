@@ -893,6 +893,7 @@ static BOOL examineFolder(char *path)
 								{
 									getIGameDataInfo(igameDataPath, node);
 								}
+								free(igameDataPath);
 							}
 
 							// Generate title and add in the list
@@ -930,6 +931,7 @@ static BOOL examineFolder(char *path)
 								{
 									getIGameDataInfo(igameDataPath, node);
 								}
+								free(igameDataPath);
 
 								if (!isStringEmpty(node->genre))
 									strncpy(existingNode->genre, node->genre, MAX_GENRE_NAME_SIZE);

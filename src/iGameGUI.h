@@ -94,7 +94,7 @@ struct ObjApp
 	CONST_STRPTR STR_TX_PropertiesSlavePath;
 	CONST_STRPTR STR_TX_PropertiesTooltypes;
 	CONST_STRPTR STR_TX_About;
-	CONST_STRPTR CY_PropertiesGenreContent[128];
+	CONST_STRPTR CY_PropertiesGenreContent[256];
 	CONST_STRPTR CY_ScreenshotSizeContent[4];
 	CONST_STRPTR RA_TitlesFromContent[3];
 	CONST_STRPTR CY_FilterListContent[6];
