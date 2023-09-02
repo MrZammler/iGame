@@ -788,7 +788,6 @@ static BOOL examineFolder(char *path)
 							return FALSE;
 						}
 
-						// TODO: Clear that if possible
 						char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
 						if(!isPathFolder(path))
 						{
@@ -815,6 +814,8 @@ static BOOL examineFolder(char *path)
 						node->players = 0;
 
 						getIGameDataInfo(igameDataPath, node);
+						free(igameDataPath);
+
 						strncpy(buf, node->path, bufSize);
 						if(!isPathFolder(path))
 						{
@@ -825,7 +826,8 @@ static BOOL examineFolder(char *path)
 							snprintf(node->path, sizeof(char) * MAX_PATH_SIZE, "%s/%s", path, buf);
 						}
 
-						// Check the node->path and skip the save if the buf is empty, it is a slave or the file does not exist. Free the node before move on.
+						// Check the node->path and skip the save if the buf is empty, it is a slave that aleady exists in the slaves list
+						// or there is no executable file defined. Free the node before move on.
 						if (
 							isStringEmpty(buf) || !check_path_exists(node->path) ||
 							(slavesListSearchByPath(node->path, sizeof(char) * MAX_PATH_SIZE) != NULL)
@@ -893,6 +895,7 @@ static BOOL examineFolder(char *path)
 								{
 									getIGameDataInfo(igameDataPath, node);
 								}
+								free(igameDataPath);
 							}
 
 							// Generate title and add in the list
@@ -925,20 +928,24 @@ static BOOL examineFolder(char *path)
 								}
 
 								char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
-								snprintf(igameDataPath, sizeof(char) * MAX_PATH_SIZE, "%s/%s", existingNode->path, DEFAULT_IGAMEDATA_FILE);
+								getParentPath(existingNode->path, igameDataPath, sizeof(char) * MAX_PATH_SIZE);
+								snprintf(igameDataPath, sizeof(char) * MAX_PATH_SIZE, "%s/%s", igameDataPath, DEFAULT_IGAMEDATA_FILE); // cppcheck-suppress sprintfOverlappingData
 								if (check_path_exists(igameDataPath))
 								{
 									getIGameDataInfo(igameDataPath, node);
 								}
+								free(igameDataPath);
 
 								if (!isStringEmpty(node->genre))
+								{
 									strncpy(existingNode->genre, node->genre, MAX_GENRE_NAME_SIZE);
-
+									addGenreInList(node->genre);
+								}
 								if (!isStringEmpty(node->chipset))
-								strncpy(existingNode->chipset, node->chipset, MAX_CHIPSET_SIZE);
-
-								addGenreInList(node->genre);
-								addChipsetInList(node->chipset);
+								{
+									strncpy(existingNode->chipset, node->chipset, MAX_CHIPSET_SIZE);
+									addChipsetInList(node->chipset);
+								}
 								free(node);
 							}
 
