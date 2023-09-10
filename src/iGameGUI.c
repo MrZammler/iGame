@@ -548,6 +548,11 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 		MUIA_NListview_Vert_ScrollBar,  MUIV_NListview_VSB_FullAuto,
 		End;
 
+	object->CY_FilterList = CycleObject,
+		MUIA_HelpNode, "CY_FilterList",
+		MUIA_Frame, MUIV_Frame_Button,
+		MUIA_Cycle_Entries, object->CY_FilterListContent,
+		End;
 
 	if (!current_settings->hide_side_panel)
 	{
@@ -578,12 +583,6 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 		}
 
 		object->Space_Sidepanel = VSpace(1);
-
-		object->CY_FilterList = CycleObject,
-			MUIA_HelpNode, "CY_FilterList",
-			MUIA_Frame, MUIV_Frame_Button,
-			MUIA_Cycle_Entries, object->CY_FilterListContent,
-			End;
 
 		object->CY_ChipsetList = CycleObject,
 			MUIA_HelpNode, "CY_ChipsetList",
@@ -644,6 +643,7 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 	{
 		GR_main = GroupObject,
 			MUIA_HelpNode, "GR_main",
+			Child, object->CY_FilterList,
 			Child, object->LV_GamesList,
 			End;
 	}

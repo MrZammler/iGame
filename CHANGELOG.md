@@ -5,6 +5,7 @@
 ### Fixed
 - Fixed the generated genre list titles after a rescan of the repository
 - Fixed more memory leaks
+- Fixed the load of the list of items when the side panel is hidden
 
 ## iGame 2.4.3 - [2023-09-01]
 ### Fixed

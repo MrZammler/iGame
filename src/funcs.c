@@ -372,8 +372,15 @@ void app_start(void)
 	set(app->WI_MainWindow, MUIA_Window_Sleep, TRUE);
 	slavesListLoadFromCSV(csvFilename);
 
-	populateGenresList();
-	populateChipsetList();
+	if (!current_settings->hide_side_panel)
+	{
+		populateGenresList();
+		populateChipsetList();
+	}
+	if (current_settings->hide_side_panel)
+	{
+		filter_change();
+	}
 	set(app->WI_MainWindow, MUIA_Window_Sleep, FALSE);
 	set(app->WI_MainWindow, MUIA_Window_ActiveObject, app->LV_GamesList);
 }
@@ -391,9 +398,6 @@ void filter_change(void)
 		return;
 	}
 
-	DoMethod(app->LV_GenresList, MUIM_List_GetEntry,
-		MUIV_List_GetEntry_Active, &genreSelection);
-
 	if (title && strlen(title) > 0)
 	{
 		string_to_lower(title);
@@ -401,17 +405,23 @@ void filter_change(void)
 	}
 	else filters.title[0] = '\0';
 
-	if (genreSelection)
-		strncpy(filters.showGenre, genreSelection, sizeof(filters.showGenre));
+	if (!current_settings->hide_side_panel)
+	{
+		DoMethod(app->LV_GenresList, MUIM_List_GetEntry,
+			MUIV_List_GetEntry_Active, &genreSelection);
 
-	if (!genreSelection || !strcmp(genreSelection, GetMBString(MSG_FilterShowAll)))
-		filters.showGenre[0] = '\0';
+		if (genreSelection)
+			strncpy(filters.showGenre, genreSelection, sizeof(filters.showGenre));
 
-	// Get selected chipset from the cycle box
-	int chipsetIndex = get_cycle_index(app->CY_ChipsetList);
-	strncpy(filters.showChipset, app->CY_ChipsetListContent[chipsetIndex], sizeof(filters.showChipset));
-	if (chipsetIndex == 0)
-		filters.showChipset[0] = '\0';
+		if (!genreSelection || !strcmp(genreSelection, GetMBString(MSG_FilterShowAll)))
+			filters.showGenre[0] = '\0';
+
+		// Get selected chipset from the cycle box
+		int chipsetIndex = get_cycle_index(app->CY_ChipsetList);
+		strncpy(filters.showChipset, app->CY_ChipsetListContent[chipsetIndex], sizeof(filters.showChipset));
+		if (chipsetIndex == 0)
+			filters.showChipset[0] = '\0';
+	}
 
 	showSlavesList();
 }
@@ -628,7 +638,7 @@ static void showSlavesList(void)
 				goto nextItem;
 			}
 
-			// Decide from where the item name will be taken
+			// Decide where the item name will be taken from
 			if(!isStringEmpty(currPtr->user_title))
 			{
 				snprintf(buf, bufSize, "%s", currPtr->user_title);
