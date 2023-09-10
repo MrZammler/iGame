@@ -666,48 +666,57 @@ void getIGameDataInfo(char *igameDataPath, slavesList *node)
 		char *line = malloc(lineSize * sizeof(char));
 		while (FGets(fpigamedata, line, lineSize) != NULL)
 		{
-			char **tmpTbl = my_split(line, "=");
-			if (tmpTbl[1] != NULL)
+			char **tokens = str_split(line, '=');
+			if (tokens)
 			{
-				if (tmpTbl[1][strlen(tmpTbl[1]) - 1] == '\n')
+				if (tokens[1] != NULL)
 				{
-					tmpTbl[1][strlen(tmpTbl[1]) - 1] = '\0';
-				}
-				else
-				{
-					tmpTbl[1][strlen(tmpTbl[1])] = '\0';
-				}
+					int tokenValueLen = strlen(tokens[1]);
+					if (tokens[1][tokenValueLen - 1] == '\n')
+					{
+						tokens[1][tokenValueLen - 1] = '\0';
+					}
+					else
+					{
+						tokens[1][tokenValueLen] = '\0';
+					}
 
-				if(current_settings->useIgameDataTitle && !strcmp(tmpTbl[0], "title"))
-				{
-					strncpy(node->title, tmpTbl[1], MAX_SLAVE_TITLE_SIZE);
-				}
+					if(current_settings->useIgameDataTitle && !strcmp(tokens[0], "title"))
+					{
+						strncpy(node->title, tokens[1], MAX_SLAVE_TITLE_SIZE);
+					}
 
-				if(!strcmp(tmpTbl[0], "chipset"))
-				{
-					strncpy(node->chipset, tmpTbl[1], MAX_CHIPSET_SIZE);
-				}
+					if(!strcmp(tokens[0], "chipset"))
+					{
+						strncpy(node->chipset, tokens[1], MAX_CHIPSET_SIZE);
+					}
 
-				if(!strcmp(tmpTbl[0], "genre"))
-				{
-					strncpy(node->genre, tmpTbl[1], MAX_GENRE_NAME_SIZE);
-				}
+					if(!strcmp(tokens[0], "genre"))
+					{
+						strncpy(node->genre, tokens[1], MAX_GENRE_NAME_SIZE);
+					}
 
-				if(!strcmp(tmpTbl[0], "year") && isNumeric(tmpTbl[1]))
-				{
-					node->year=atoi(tmpTbl[1]);
-				}
+					if(!strcmp(tokens[0], "year") && isNumeric(tokens[1]))
+					{
+						node->year=atoi(tokens[1]);
+					}
 
-				if(!strcmp(tmpTbl[0], "players") && isNumeric(tmpTbl[1]))
-				{
-					node->players=atoi(tmpTbl[1]);
-				}
+					if(!strcmp(tokens[0], "players") && isNumeric(tokens[1]))
+					{
+						node->players=atoi(tokens[1]);
+					}
 
-				if(!strcmp(tmpTbl[0], "exe") && !isStringEmpty(tmpTbl[1]) && !strcasestr(tmpTbl[1], ".slave"))
-				{
-					strncpy(node->path, tmpTbl[1], MAX_PATH_SIZE);
+					if(!strcmp(tokens[0], "exe") && !isStringEmpty(tokens[1]) && !strcasestr(tokens[1], ".slave"))
+					{
+						strncpy(node->path, tokens[1], MAX_PATH_SIZE);
+					}
 				}
-				free(tmpTbl);
+				int i;
+				for (i = 0; *(tokens + i); i++)
+				{
+					free(*(tokens + i));
+				}
+				free(tokens);
 			}
 		}
 
