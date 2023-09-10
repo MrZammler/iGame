@@ -78,10 +78,18 @@ ifneq (,$(filter MOS,$(CPU)))
 CFLAGS += +morphos -DCPU_VERS=MorphOS -D__morphos__
 endif
 
+ifeq ($(DEBUG), 1)
+CFLAGS += -g -hunkdebug
+endif
+
 ##########################################################################
 # Linker settings
 ##########################################################################
 LIBFLAGS = -lamiga
+
+ifeq ($(DEBUG), 1)
+LIBFLAGS += -g -Bamigahunk
+endif
 
 ifneq (,$(filter 000 030 040 060,$(CPU)))
 LIBFLAGS += +aos68k -o
@@ -92,6 +100,7 @@ endif
 ifneq (,$(filter MOS,$(CPU)))
 LIBFLAGS += +morphos -o
 endif
+
 
 ##########################################################################
 # Object files which are part of iGame

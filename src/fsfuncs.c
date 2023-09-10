@@ -707,6 +707,7 @@ void getIGameDataInfo(char *igameDataPath, slavesList *node)
 				{
 					strncpy(node->path, tmpTbl[1], MAX_PATH_SIZE);
 				}
+				free(tmpTbl);
 			}
 		}
 
