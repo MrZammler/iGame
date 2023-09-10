@@ -27,6 +27,7 @@ char *strcasestr(const char *, const char *);
 char* strdup(const char *);
 void string_to_lower(char *);
 char** my_split(char *, char *);
+char **str_split(char *, const char);
 int get_delimiter_position(const char *);
 void add_spaces_to_string(const char *, char *, int);
 STRPTR substring(STRPTR, int, int);
