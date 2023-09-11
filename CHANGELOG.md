@@ -1,4 +1,12 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
+### Changed
+- Now after the repository scans, any item that is not assigned to any genre gets the "Unknown" value by default
+
+### Fixed
+- Fixed the generated genre list titles after a rescan of the repository
+- Fixed more memory leaks
+
+## iGame 2.4.3 - [2023-09-01]
 ### Fixed
 - Fixed memory leaks
 - Fixed the lists getting wrong values when overflow

@@ -788,7 +788,6 @@ static BOOL examineFolder(char *path)
 							return FALSE;
 						}
 
-						// TODO: Clear that if possible
 						char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
 						if(!isPathFolder(path))
 						{
@@ -815,6 +814,8 @@ static BOOL examineFolder(char *path)
 						node->players = 0;
 
 						getIGameDataInfo(igameDataPath, node);
+						free(igameDataPath);
+
 						strncpy(buf, node->path, bufSize);
 						if(!isPathFolder(path))
 						{
@@ -825,7 +826,8 @@ static BOOL examineFolder(char *path)
 							snprintf(node->path, sizeof(char) * MAX_PATH_SIZE, "%s/%s", path, buf);
 						}
 
-						// Check the node->path and skip the save if the buf is empty, it is a slave or the file does not exist. Free the node before move on.
+						// Check the node->path and skip the save if the buf is empty, it is a slave that aleady exists in the slaves list
+						// or there is no executable file defined. Free the node before move on.
 						if (
 							isStringEmpty(buf) || !check_path_exists(node->path) ||
 							(slavesListSearchByPath(node->path, sizeof(char) * MAX_PATH_SIZE) != NULL)
@@ -870,6 +872,7 @@ static BOOL examineFolder(char *path)
 							node->instance = 0;
 							node->title[0] = '\0';
 							node->genre[0] = '\0';
+							sprintf(node->genre,"Unknown");
 							node->user_title[0] = '\0';
 							node->chipset[0] = '\0';
 							node->times_played = 0;
@@ -915,33 +918,58 @@ static BOOL examineFolder(char *path)
 						{
 							if (current_settings->useIgameDataTitle)
 							{
-								slavesList *node = malloc(sizeof(slavesList));
-								if(node == NULL)
+								char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
+								if(igameDataPath == NULL)
 								{
 									msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-									FreeVec(FIblock);
-									UnLock(lock);
-									free(buf);
 									return FALSE;
 								}
 
-								char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
-								snprintf(igameDataPath, sizeof(char) * MAX_PATH_SIZE, "%s/%s", existingNode->path, DEFAULT_IGAMEDATA_FILE);
+								getParentPath(existingNode->path, igameDataPath, sizeof(char) * MAX_PATH_SIZE);
+								snprintf(igameDataPath, sizeof(char) * MAX_PATH_SIZE, "%s/%s", igameDataPath, DEFAULT_IGAMEDATA_FILE); // cppcheck-suppress sprintfOverlappingData
 								if (check_path_exists(igameDataPath))
 								{
+									slavesList *node = malloc(sizeof(slavesList));
+									if(node == NULL)
+									{
+										msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+										FreeVec(FIblock);
+										UnLock(lock);
+										free(buf);
+										return FALSE;
+									}
+
+									node->instance = 0;
+									node->title[0] = '\0';
+									node->genre[0] = '\0';
+									sprintf(node->genre,"Unknown");
+									node->user_title[0] = '\0';
+									node->chipset[0] = '\0';
+									node->times_played = 0;
+									node->favourite = 0;
+									node->last_played = 0;
+									node->exists = 1;
+									node->hidden = 0;
+									node->deleted = 0;
+									node->year = 0;
+									node->players = 0;
+
 									getIGameDataInfo(igameDataPath, node);
+
+									if (!isStringEmpty(node->genre))
+									{
+										strncpy(existingNode->genre, node->genre, MAX_GENRE_NAME_SIZE);
+										addGenreInList(node->genre);
+									}
+									if (!isStringEmpty(node->chipset))
+									{
+										strncpy(existingNode->chipset, node->chipset, MAX_CHIPSET_SIZE);
+										addChipsetInList(node->chipset);
+									}
+									free(node);
 								}
+
 								free(igameDataPath);
-
-								if (!isStringEmpty(node->genre))
-									strncpy(existingNode->genre, node->genre, MAX_GENRE_NAME_SIZE);
-
-								if (!isStringEmpty(node->chipset))
-								strncpy(existingNode->chipset, node->chipset, MAX_CHIPSET_SIZE);
-
-								addGenreInList(node->genre);
-								addChipsetInList(node->chipset);
-								free(node);
 							}
 
 							// Generate title and add in the list
