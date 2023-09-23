@@ -1,5 +1,9 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Changed
+- Speedup the slavesListAddTail(), almost 200% faster. This has an impact on the slaves list creation during the scan and the loading from the file.
+
+## iGame 2.4.4 - [2023-09-11]
+### Changed
 - Now after the repository scans, any item that is not assigned to any genre gets the "Unknown" value by default
 
 ### Fixed
