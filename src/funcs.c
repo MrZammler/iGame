@@ -1279,8 +1279,9 @@ void repo_stop(void)
 // Shows the Properties window populating the information fields
 void slaveProperties(void)
 {
-	char *title;
-	if ((title = (char *)DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, MUIV_NList_GetEntry_Active, NULL)) == NULL)
+	char *title = NULL;
+	DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, MUIV_NList_GetEntry_Active, &title);
+	if(isStringEmpty(title))
 	{
 		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
 		return;
