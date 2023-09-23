@@ -1,4 +1,9 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
+### Fixed
+- Fixed the item (demo/game) renaming from the properties window
+- Fixed the addition of an item (demo/game) from the "Add game..." window. This was saved in a wrong way and was breaking the list
+
+## iGame 2.4.4 - [2023-09-11]
 ### Changed
 - Now after the repository scans, any item that is not assigned to any genre gets the "Unknown" value by default
 

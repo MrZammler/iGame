@@ -283,7 +283,6 @@ void slavesListLoadFromCSV(char *filename)
 				slavesListAddTail(node);
 			}
 			Close(fpgames);
-			// FreeVec(buf);
 			FreeVec(lineBuf);
 		}
 	}
