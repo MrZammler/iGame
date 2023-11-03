@@ -294,142 +294,37 @@ struct ObjApp *CreateApp(void)
 	APTR	LA_HideSidepanel;
 	APTR	GR_SettingsButtons, Space_SettingsButtons1, Space_SettingsButtons2;
 
-// TODO: Change all the hooks to use SDI_Hook.h and MakeStaticHook()
-#ifdef __MORPHOS__
-	static const struct Hook MenuScanHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)scan_repositories, NULL };
-	static const struct Hook MenuShowHideHiddenHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)list_show_hidden, NULL };
-	static const struct Hook MenuPropertiesHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)slaveProperties, NULL };
-	static const struct Hook MenuAddNonWhdloadHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)add_non_whdload, NULL };
-	static const struct Hook OpenCurrentDirHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)open_current_dir, NULL };
-#endif
-
-#if defined(__amigaos4__)
-	static const struct Hook MenuOpenListHook = { { NULL,NULL }, (HOOKFUNC)open_list, NULL, NULL };
-#else
-	static const struct Hook MenuOpenListHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)open_list, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook MenuSaveListHook = { { NULL,NULL }, (HOOKFUNC)save_list, NULL, NULL };
-#else
-	static const struct Hook MenuSaveListHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)save_list, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook MenuSaveListAsHook = { { NULL,NULL }, (HOOKFUNC)save_list_as, NULL, NULL };
-#else
-	static const struct Hook MenuSaveListAsHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)save_list_as, NULL };
-#endif
-// #if defined(__amigaos4__)
-// 	static const struct Hook MenuDeleteHook = { { NULL,NULL }, (HOOKFUNC)game_delete, NULL, NULL };
-// #else
-// 	static const struct Hook MenuDeleteHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_delete, NULL };
-// #endif
-#if defined(__amigaos4__)
-	static const struct Hook PropertiesOKButtonHook = { { NULL,NULL }, (HOOKFUNC)saveItemProperties, NULL, NULL };
-#else
-	static const struct Hook PropertiesOKButtonHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)saveItemProperties, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook FilterChangeHook = { { NULL,NULL }, (HOOKFUNC)filter_change, NULL, NULL };
-#else
-	static const struct Hook FilterChangeHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)filter_change, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook LaunchGameHook = { { NULL,NULL }, (HOOKFUNC)launch_game, NULL, NULL };
-#else
-	static const struct Hook LaunchGameHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)launch_game, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook AppStartHook = { { NULL,NULL }, (HOOKFUNC)app_start, NULL, NULL };
-#else
-	static const struct Hook AppStartHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)app_start, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook GameClickHook = { { NULL,NULL }, (HOOKFUNC)game_click, NULL, NULL };
-#else
-	static const struct Hook GameClickHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)game_click, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook GenreClickHook = { { NULL,NULL }, (HOOKFUNC)filter_change, NULL, NULL };
-#else
-	static const struct Hook GenreClickHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)filter_change, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook NonWHDLoadOKHook = { { NULL,NULL }, (HOOKFUNC)non_whdload_ok, NULL, NULL };
-#else
-	static const struct Hook NonWHDLoadOKHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)non_whdload_ok, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook RepoStopHook = { { NULL,NULL }, (HOOKFUNC)repo_stop, NULL, NULL };
-#else
-	static const struct Hook RepoStopHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)repo_stop, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook RepoAddHook = { { NULL,NULL }, (HOOKFUNC)repo_add, NULL, NULL };
-#else
-	static const struct Hook RepoAddHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)repo_add, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook RepoRemoveHook = { { NULL,NULL }, (HOOKFUNC)repo_remove, NULL, NULL };
-#else
-	static const struct Hook RepoRemoveHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)repo_remove, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook SettingFilterUseEnterChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_filter_use_enter_changed, NULL, NULL };
-#else
-	static const struct Hook SettingFilterUseEnterChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_filter_use_enter_changed, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook SettingSaveStatsOnExitChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_save_stats_on_exit_changed, NULL, NULL };
-#else
-	static const struct Hook SettingSaveStatsOnExitChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_save_stats_on_exit_changed, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook SettingSmartSpacesChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_smart_spaces_changed, NULL, NULL };
-#else
-	static const struct Hook SettingSmartSpacesChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_smart_spaces_changed, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook SettingTitlesFromChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_titles_from_changed, NULL, NULL };
-#else
-	static const struct Hook SettingTitlesFromChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_titles_from_changed, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook SettingHideScreenshotChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_hide_screenshot_changed, NULL, NULL };
-#else
-	static const struct Hook SettingHideScreenshotChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_hide_screenshot_changed, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook SettingNoGuiGfxChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_no_guigfx_changed, NULL, NULL };
-#else
-	static const struct Hook SettingNoGuiGfxChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_no_guigfx_changed, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook SettingScreenshotSizeChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_screenshot_size_changed, NULL, NULL };
-#else
-	static const struct Hook SettingScreenshotSizeChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_screenshot_size_changed, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook SettingsSaveHook = { { NULL,NULL }, (HOOKFUNC)settings_save, NULL, NULL };
-#else
-	static const struct Hook SettingsSaveHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)settings_save, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook SettingHideSidePanelChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_hide_side_panel_changed, NULL, NULL };
-#else
-	static const struct Hook SettingHideSidePanelChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_hide_side_panel_changed, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook SettingStartWithFavoritesChangedHook = { { NULL,NULL }, (HOOKFUNC)setting_start_with_favorites_changed, NULL, NULL };
-#else
-	static const struct Hook SettingStartWithFavoritesChangedHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)setting_start_with_favorites_changed, NULL };
-#endif
-#if defined(__amigaos4__)
-	static const struct Hook SettingsUseHook = { { NULL,NULL }, (HOOKFUNC)settings_use, NULL, NULL };
-#else
-	static const struct Hook SettingsUseHook = { { NULL,NULL }, HookEntry, (HOOKFUNC)settings_use, NULL };
-#endif
-
-MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
+	MakeStaticHook(MenuScanHook, scan_repositories);
+	MakeStaticHook(MenuShowHideHiddenHook, list_show_hidden);
+	MakeStaticHook(MenuPropertiesHook, slaveProperties);
+	MakeStaticHook(MenuAddNonWhdloadHook, add_non_whdload);
+	MakeStaticHook(OpenCurrentDirHook, open_current_dir);
+	MakeStaticHook(MenuOpenListHook, open_list);
+	MakeStaticHook(MenuSaveListHook, save_list);
+	MakeStaticHook(MenuSaveListAsHook, save_list_as);
+	// MakeStaticHook(MenuDeleteHook, game_delete);
+	MakeStaticHook(PropertiesOKButtonHook, saveItemProperties);
+	MakeStaticHook(FilterChangeHook, filter_change);
+	MakeStaticHook(LaunchGameHook, launch_game);
+	MakeStaticHook(AppStartHook, app_start);
+	MakeStaticHook(GameClickHook, game_click);
+	MakeStaticHook(GenreClickHook, filter_change);
+	MakeStaticHook(NonWHDLoadOKHook, non_whdload_ok);
+	MakeStaticHook(RepoStopHook, repo_stop);
+	MakeStaticHook(RepoAddHook, repo_add);
+	MakeStaticHook(RepoRemoveHook, repo_remove);
+	MakeStaticHook(SettingFilterUseEnterChangedHook, setting_filter_use_enter_changed);
+	MakeStaticHook(SettingSaveStatsOnExitChangedHook, setting_save_stats_on_exit_changed);
+	MakeStaticHook(SettingSmartSpacesChangedHook, setting_smart_spaces_changed);
+	MakeStaticHook(SettingTitlesFromChangedHook, setting_titles_from_changed);
+	MakeStaticHook(SettingHideScreenshotChangedHook, setting_hide_screenshot_changed);
+	MakeStaticHook(SettingNoGuiGfxChangedHook, setting_no_guigfx_changed);
+	MakeStaticHook(SettingScreenshotSizeChangedHook, setting_screenshot_size_changed);
+	MakeStaticHook(SettingsSaveHook, settings_save);
+	MakeStaticHook(SettingHideSidePanelChangedHook, setting_hide_side_panel_changed);
+	MakeStaticHook(SettingStartWithFavoritesChangedHook, setting_start_with_favorites_changed);
+	MakeStaticHook(SettingsUseHook, settings_use);
+	MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 
 	if (!((object = AllocVec(sizeof(struct ObjApp), MEMF_PUBLIC | MEMF_CLEAR))))
 		return NULL;
@@ -479,53 +374,6 @@ MakeStaticHook(SettingUseIgameDataTitleHook, settingUseIgameDataTitleChanged);
 		Child, object->STR_Filter,
 		End;
 
-	// TODO: Below comments need to be removed
-	// static const char *titles[] =
-	// {
-	// 	"Title",
-	// 	"Year",
-	// 	"Players"
-	// };
-
-	// object->LV_GamesList = ListObject,
-	// 	InputListFrame,
-	// 	MUIA_List_Active, MUIV_List_Active_Top,
-	// 	MUIA_List_Stripes, TRUE,
-	// 	MUIA_List_Format, "SORTABLE BAR,SORTABLE BAR,SORTABLE",
-	// 	MUIA_List_MaxColumns, 3,
-	// 	MUIA_List_TitleArray, titles,
-	// 	MUIA_List_ConstructHook, &ConstructLI_TextHook, // MUIV_List_ConstructHook_StringArray,
-	// 	// MUIA_List_DestructHook, MUIV_List_DestructHook_StringArray,
-	// 	// MUIA_List_CompareHook, MUIV_List_CompareHook_StringArray,
-	// 	// MUIA_List_DisplayHook, MUIV_List_DisplayHook_StringArray,
-	// 	End;
-
-	// object->LV_GamesList = ListviewObject,
-	// 	MUIA_HelpNode, "LV_GamesList",
-	// 	MUIA_Listview_MultiSelect, MUIV_Listview_MultiSelect_None,
-	// 	MUIA_Listview_DoubleClick, TRUE,
-	// 	MUIA_Listview_List, object->LV_GamesList,
-	// 	MUIA_Weight, 200,
-	// 	End;
-
-	// object->LV_GamesList = NListObject,
-	// 	MUIA_ObjectID, MAKE_ID('N','L','0','1'),
-	// 	MUIA_NList_DefaultObjectOnClick, TRUE,
-	// 	MUIA_NList_MultiSelect, MUIV_NList_MultiSelect_None,
-	// 	MUIA_NList_DisplayHook2, &DisplayLI_TextHook,
-	// 	// MUIA_NList_CompareHook2, &CompareLI_TextHook,
-	// 	MUIA_NList_ConstructHook2, &ConstructLI_TextHook,
-	// 	// MUIA_NList_DestructHook2, &DestructLI_TextHook,
-	// 	MUIA_NList_Format, "BAR W=-1,BAR W=-1,BAR",
-	// 	// MUIA_NList_SourceArray, MainTextArray,
-	// 	MUIA_NList_AutoVisible, TRUE,
-	// 	MUIA_NList_TitleSeparator, TRUE,
-	// 	MUIA_NList_Title, TRUE,
-	// 	MUIA_NList_EntryValueDependent, TRUE,
-	// 	MUIA_NList_MinColSortable, 0,
-	// 	// MUIA_NList_Imports, MUIV_NList_Imports_All,
-	// 	// MUIA_NList_Exports, MUIV_NList_Exports_All,
-	// 	End;
 	object->LV_GamesList = NListviewObject,
 		MUIA_NListview_NList, NListObject,
 			MUIA_ObjectID, MAKE_ID('N','L','0','1'),
