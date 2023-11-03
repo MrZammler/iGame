@@ -30,6 +30,7 @@
 #include "slavesList.h"
 
 slavesList *slavesListHead = NULL;
+slavesList *slavesListTail = NULL;
 slavesList *slavesListBuffer = NULL;
 
 static int isListEmpty(const void *head)
@@ -64,17 +65,12 @@ void slavesListAddTail(slavesList *node)
 		if (isListEmpty(slavesListHead))
 		{
 			slavesListHead = node;
+			slavesListTail = node;
 		}
 		else
 		{
-			// find the last node
-			slavesList *currPtr = slavesListHead;
-			while (currPtr->next != NULL)
-			{
-				currPtr = currPtr->next;
-			}
-
-			currPtr->next = node;
+			slavesListTail->next = node;
+			slavesListTail = node;
 		}
 	}
 }
