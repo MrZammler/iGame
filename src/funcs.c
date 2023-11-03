@@ -1345,11 +1345,11 @@ void saveItemProperties(void)
 	{
 		strncpy(node->user_title, buf, sizeof(node->user_title));
 
-		// TODO: Reduce duplication with below block
+		// TODO: Reduce duplication with the block below
 		set(app->LV_GamesList, MUIA_NList_Quiet, TRUE);
 		DoMethod(app->LV_GamesList, MUIM_NList_Remove, MUIV_NList_Remove_Active);
 		DoMethod(app->LV_GamesList,
-			MUIM_NList_InsertSingle, node->user_title,
+			MUIM_NList_InsertSingle, node,
 			MUIV_NList_Insert_Sorted);
 		get(app->LV_GamesList, MUIA_NList_InsertPosition, &newpos);
 		set(app->LV_GamesList, MUIA_NList_Active, newpos);
@@ -1365,7 +1365,7 @@ void saveItemProperties(void)
 		set(app->LV_GamesList, MUIA_NList_Quiet, TRUE);
 		DoMethod(app->LV_GamesList, MUIM_NList_Remove, MUIV_NList_Remove_Active);
 		DoMethod(app->LV_GamesList,
-			MUIM_NList_InsertSingle, node->title,
+			MUIM_NList_InsertSingle, node,
 			MUIV_NList_Insert_Sorted);
 		get(app->LV_GamesList, MUIA_NList_InsertPosition, &newpos);
 		set(app->LV_GamesList, MUIA_NList_Active, newpos);
@@ -1689,13 +1689,19 @@ void non_whdload_ok(void)
 	slavesList *node = malloc(sizeof(slavesList));
 
 	node->instance = 0;
+	node->title[0] = '\0';
 	node->user_title[0] = '\0';
+	node->genre[0] = '\0';
+	node->arguments[0] = '\0';
+	node->chipset[0] = '\0';
 	node->times_played = 0;
 	node->favourite = 0;
 	node->last_played = 0;
 	node->exists = 1;
 	node->hidden = 0;
 	node->deleted = 0;
+	node->year = 0;
+	node->players = 0;
 
 	get(app->PA_AddGame, MUIA_String_Contents, &path);
 	getFullPath(path, node->path);
@@ -1723,7 +1729,7 @@ void non_whdload_ok(void)
 
 	set(app->LV_GamesList, MUIA_NList_Quiet, TRUE);
 	DoMethod(app->LV_GamesList,
-		MUIM_NList_InsertSingle, node->title,
+		MUIM_NList_InsertSingle, node,
 		MUIV_NList_Insert_Sorted);
 	get(app->LV_GamesList, MUIA_NList_InsertPosition, &newpos);
 	set(app->LV_GamesList, MUIA_NList_Active, newpos);
