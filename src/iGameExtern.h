@@ -85,6 +85,14 @@ typedef struct settings
 	int no_guigfx;
 	int start_with_favorites;
 	int useIgameDataTitle;
+	uint8_t lastScanSetup;  // It keeps info of the settings on the last scan
+							// that influence the item data
+							// It is a bitfield with the following structure
+							//  ------------ no_smart_spaces
+							//  |  --------- titles_from_dirs
+							//  |  |  ------ useIgameDataTitle
+							//  |  |  |
+							//  0  0  0
 } igame_settings;
 
 typedef struct genresList
