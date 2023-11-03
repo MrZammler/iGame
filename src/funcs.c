@@ -747,9 +747,9 @@ static void generateItemName(char *path, char *result, int resultSize)
 	}
 }
 
-static uint8_t calcLastScanBitfield(void)
+static int calcLastScanBitfield(void)
 {
-	uint8_t scanBitfield = 0;
+	int scanBitfield = 0;
 	scanBitfield = 1 * current_settings->useIgameDataTitle;
 	scanBitfield += 2 * current_settings->titles_from_dirs;
 	if(current_settings->titles_from_dirs)
