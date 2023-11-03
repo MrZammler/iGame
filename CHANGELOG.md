@@ -1,4 +1,9 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
+### Fixed
+- Fixed the item (demo/game) renaming from the properties window
+- Fixed the addition of an item (demo/game) from the "Add game..." window. This was saved in a wrong way and was breaking the list
+
+## iGame 2.4.4 - [2023-09-11]
 ### Changed
 - Speedup the slavesListAddTail(), almost 200% faster. This has an impact on the slaves list creation during the scan and the loading from the file.
 
