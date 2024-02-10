@@ -323,6 +323,7 @@ static void populateGenresList(void)
 	app->CY_PropertiesGenreContent[i++] = NULL;
 	set(app->CY_PropertiesGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
 	set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
+	set(app->LV_GenresList, MUIA_List_Active, MUIV_List_Active_Top);
 	set(app->LV_GenresList, MUIA_List_Quiet, FALSE);
 }
 
@@ -360,7 +361,6 @@ void app_start(void)
 	load_repos(DEFAULT_REPOS_FILE);
 	apply_settings();
 
-
 	if (current_settings->start_with_favorites)
 	{
 		filters.showGroup = GROUP_FAVOURITES;
@@ -381,7 +381,7 @@ void app_start(void)
 
 	if (!current_settings->hide_side_panel)
 	{
-		populateGenresList();
+		populateGenresList(); // This calls the filter_change()
 		populateChipsetList();
 	}
 	if (current_settings->hide_side_panel)
@@ -682,9 +682,6 @@ static void showSlavesList(void)
 						{
 							if (currPtr->times_played < mostPlayedTimes)
 							{
-								// DoMethod(app->LV_GamesList,
-								// 	MUIM_List_InsertSingle, currPtr->title,
-								// 	MUIV_List_Insert_Bottom);
 								DoMethod(app->LV_GamesList,
 									MUIM_NList_InsertSingle, currPtr,
 									MUIV_NList_Insert_Bottom);
@@ -692,9 +689,7 @@ static void showSlavesList(void)
 							else
 							{
 								mostPlayedTimes = currPtr->times_played;
-								// DoMethod(app->LV_GamesList,
-								// 	MUIM_List_InsertSingle, currPtr->title,
-								// 	MUIV_List_Insert_Top);
+
 								DoMethod(app->LV_GamesList,
 									MUIM_NList_InsertSingle, currPtr,
 									MUIV_NList_Insert_Top);
@@ -1443,14 +1438,13 @@ void list_show_hidden(void)
 	{
 		set(app->LV_GenresList, MUIA_Disabled, TRUE);
 		filters.showHiddenOnly = TRUE;
-		showSlavesList();
 	}
 	else
 	{
 		set(app->LV_GenresList, MUIA_Disabled, FALSE);
 		filters.showHiddenOnly = FALSE;
-		showSlavesList();
 	}
+	showSlavesList();
 }
 
 void app_stop(void)
