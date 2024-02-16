@@ -388,7 +388,7 @@ struct ObjApp *CreateApp(void)
 			MUIA_NList_TitleSeparator, TRUE,
 			MUIA_NList_Title, TRUE,
 			MUIA_NList_EntryValueDependent, FALSE,
-			MUIA_NList_MinColSortable, 0,
+			MUIA_NList_MinColSortable, 100,
 			MUIA_NList_Imports, MUIV_NList_Imports_Cols,
 			MUIA_NList_Exports, MUIV_NList_Exports_Cols,
 			End,

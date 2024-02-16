@@ -308,7 +308,7 @@ static void populateGenresList(void)
 	int cnt = 0;
 	while (currPtr != NULL)
 	{
-		DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, currPtr->title, MUIV_List_Insert_Sorted);
+		DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, currPtr->title, MUIV_List_Insert_Bottom);
 
 		cnt++;
 		currPtr = currPtr->next;
@@ -324,6 +324,7 @@ static void populateGenresList(void)
 	set(app->CY_PropertiesGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
 	set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
 	set(app->LV_GenresList, MUIA_List_Active, MUIV_List_Active_Top);
+	DoMethod(app->LV_GenresList, MUIM_List_Sort);
 	set(app->LV_GenresList, MUIA_List_Quiet, FALSE);
 }
 
@@ -708,7 +709,7 @@ static void showSlavesList(void)
 
 			DoMethod(app->LV_GamesList,
 				MUIM_NList_InsertSingle, currPtr,
-				MUIV_NList_Insert_Sorted);
+				MUIV_NList_Insert_Bottom);
 
 			cnt++;
 nextItem:
@@ -716,6 +717,7 @@ nextItem:
 
 		currPtr = currPtr->next;
 	}
+	DoMethod(app->LV_GamesList, MUIM_NList_Sort);
 	set(app->LV_GamesList, MUIA_NList_Quiet, FALSE);
 
 	sprintf(buf, (const char *)GetMBString(MSG_TotalNumberOfGames), slavesListNodeCount(cnt));
@@ -1762,9 +1764,10 @@ void non_whdload_ok(void)
 	set(app->LV_GamesList, MUIA_NList_Quiet, TRUE);
 	DoMethod(app->LV_GamesList,
 		MUIM_NList_InsertSingle, node,
-		MUIV_NList_Insert_Sorted);
+		MUIV_NList_Insert_Bottom);
 	get(app->LV_GamesList, MUIA_NList_InsertPosition, &newpos);
 	set(app->LV_GamesList, MUIA_NList_Active, newpos);
+	DoMethod(app->LV_GamesList, MUIM_NList_Sort);
 	set(app->LV_GamesList, MUIA_NList_Quiet, FALSE);
 }
 
