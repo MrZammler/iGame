@@ -1,6 +1,6 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Changed
-- Some optimisation in list loading
+- Some optimisation in list loading reducing the time needed more than 42%
 
 ## iGame 2.4.4 - [2023-09-11]
 ### Changed
