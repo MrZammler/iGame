@@ -176,11 +176,11 @@ BOOL get_filename(const char *title, const char *positive_text, const BOOL save_
 
 void slavesListLoadFromCSV(char *filename)
 {
-	int lineBufSize = sizeof(char) * 1024;
+	int lineBufSize = sizeof(char) * 512;
 
 	if (check_path_exists(filename))
 	{
-		const BPTR fpgames = Open((CONST_STRPTR) filename, MODE_OLDFILE);
+		FILE *fpgames = fopen(filename, "r");
 		if (fpgames)
 		{
 			char *lineBuf = AllocVec(lineBufSize, MEMF_CLEAR);
@@ -188,10 +188,11 @@ void slavesListLoadFromCSV(char *filename)
 			if((buf == NULL) || (lineBuf == NULL))
 			{
 				msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+				fclose(fpgames);
 				return;
 			}
 
-			while (FGets(fpgames, lineBuf, lineBufSize) != NULL)
+			while (fgets(lineBuf, lineBufSize, fpgames) != NULL)
 			{
 				slavesList *node = malloc(sizeof(slavesList));
 				if(node == NULL)
@@ -282,7 +283,7 @@ void slavesListLoadFromCSV(char *filename)
 
 				slavesListAddTail(node);
 			}
-			Close(fpgames);
+			fclose(fpgames);
 			FreeVec(lineBuf);
 		}
 	}

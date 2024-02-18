@@ -308,7 +308,7 @@ static void populateGenresList(void)
 	int cnt = 0;
 	while (currPtr != NULL)
 	{
-		DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, currPtr->title, MUIV_List_Insert_Sorted);
+		DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, currPtr->title, MUIV_List_Insert_Bottom);
 
 		cnt++;
 		currPtr = currPtr->next;
@@ -323,6 +323,8 @@ static void populateGenresList(void)
 	app->CY_PropertiesGenreContent[i++] = NULL;
 	set(app->CY_PropertiesGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
 	set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
+	set(app->LV_GenresList, MUIA_List_Active, MUIV_List_Active_Top);
+	DoMethod(app->LV_GenresList, MUIM_List_Sort);
 	set(app->LV_GenresList, MUIA_List_Quiet, FALSE);
 }
 
@@ -360,7 +362,6 @@ void app_start(void)
 	load_repos(DEFAULT_REPOS_FILE);
 	apply_settings();
 
-
 	if (current_settings->start_with_favorites)
 	{
 		filters.showGroup = GROUP_FAVOURITES;
@@ -381,7 +382,7 @@ void app_start(void)
 
 	if (!current_settings->hide_side_panel)
 	{
-		populateGenresList();
+		populateGenresList(); // This calls the filter_change()
 		populateChipsetList();
 	}
 	if (current_settings->hide_side_panel)
@@ -682,9 +683,6 @@ static void showSlavesList(void)
 						{
 							if (currPtr->times_played < mostPlayedTimes)
 							{
-								// DoMethod(app->LV_GamesList,
-								// 	MUIM_List_InsertSingle, currPtr->title,
-								// 	MUIV_List_Insert_Bottom);
 								DoMethod(app->LV_GamesList,
 									MUIM_NList_InsertSingle, currPtr,
 									MUIV_NList_Insert_Bottom);
@@ -692,9 +690,7 @@ static void showSlavesList(void)
 							else
 							{
 								mostPlayedTimes = currPtr->times_played;
-								// DoMethod(app->LV_GamesList,
-								// 	MUIM_List_InsertSingle, currPtr->title,
-								// 	MUIV_List_Insert_Top);
+
 								DoMethod(app->LV_GamesList,
 									MUIM_NList_InsertSingle, currPtr,
 									MUIV_NList_Insert_Top);
@@ -713,7 +709,7 @@ static void showSlavesList(void)
 
 			DoMethod(app->LV_GamesList,
 				MUIM_NList_InsertSingle, currPtr,
-				MUIV_NList_Insert_Sorted);
+				MUIV_NList_Insert_Bottom);
 
 			cnt++;
 nextItem:
@@ -721,6 +717,7 @@ nextItem:
 
 		currPtr = currPtr->next;
 	}
+	DoMethod(app->LV_GamesList, MUIM_NList_Sort);
 	set(app->LV_GamesList, MUIA_NList_Quiet, FALSE);
 
 	sprintf(buf, (const char *)GetMBString(MSG_TotalNumberOfGames), slavesListNodeCount(cnt));
@@ -1443,14 +1440,13 @@ void list_show_hidden(void)
 	{
 		set(app->LV_GenresList, MUIA_Disabled, TRUE);
 		filters.showHiddenOnly = TRUE;
-		showSlavesList();
 	}
 	else
 	{
 		set(app->LV_GenresList, MUIA_Disabled, FALSE);
 		filters.showHiddenOnly = FALSE;
-		showSlavesList();
 	}
+	showSlavesList();
 }
 
 void app_stop(void)
@@ -1768,9 +1764,10 @@ void non_whdload_ok(void)
 	set(app->LV_GamesList, MUIA_NList_Quiet, TRUE);
 	DoMethod(app->LV_GamesList,
 		MUIM_NList_InsertSingle, node,
-		MUIV_NList_Insert_Sorted);
+		MUIV_NList_Insert_Bottom);
 	get(app->LV_GamesList, MUIA_NList_InsertPosition, &newpos);
 	set(app->LV_GamesList, MUIA_NList_Active, newpos);
+	DoMethod(app->LV_GamesList, MUIM_NList_Sort);
 	set(app->LV_GamesList, MUIA_NList_Quiet, FALSE);
 }
 

@@ -191,30 +191,30 @@ HOOKPROTONHNO(CompareLI_TextFunc, LONG, struct NList_CompareMessage *ncm)
 
 	if(ncm->sort_type == (LONG)MUIV_NList_SortType_None)
 	{
-		result = (LONG) Stricmp(entry1->title, entry2->title);
+		result = (LONG) strcmp(entry1->title, entry2->title);
 		return result;
 	}
 
 	if (column == 0)
 	{
 		if (ncm->sort_type & MUIV_NList_TitleMark_TypeMask)
-			result = (LONG) Stricmp(entry2->title, entry1->title);
+			result = (LONG) strcmp(entry2->title, entry1->title);
 		else
-			result = (LONG) Stricmp(entry1->title, entry2->title);
+			result = (LONG) strcmp(entry1->title, entry2->title);
 	}
 	else if (column == 1)
 	{
 		if (ncm->sort_type & MUIV_NList_TitleMark_TypeMask)
-			result = (LONG) Stricmp(entry2->year, entry1->year);
+			result = (LONG) strcmp(entry2->year, entry1->year);
 		else
-			result = (LONG) Stricmp(entry1->year, entry2->year);
+			result = (LONG) strcmp(entry1->year, entry2->year);
 	}
 	else if (column == 2)
 	{
 		if (ncm->sort_type & MUIV_NList_TitleMark_TypeMask)
-			result = (LONG) Stricmp(entry2->players, entry1->players);
+			result = (LONG) strcmp(entry2->players, entry1->players);
 		else
-			result = (LONG) Stricmp(entry1->players, entry2->players);
+			result = (LONG) strcmp(entry1->players, entry2->players);
 	}
 
 //   if      (col1 == 0)
@@ -388,7 +388,7 @@ struct ObjApp *CreateApp(void)
 			MUIA_NList_TitleSeparator, TRUE,
 			MUIA_NList_Title, TRUE,
 			MUIA_NList_EntryValueDependent, FALSE,
-			MUIA_NList_MinColSortable, 0,
+			MUIA_NList_MinColSortable, 100,
 			MUIA_NList_Imports, MUIV_NList_Imports_Cols,
 			MUIA_NList_Exports, MUIV_NList_Exports_Cols,
 			End,
@@ -440,7 +440,6 @@ struct ObjApp *CreateApp(void)
 
 		object->LV_GenresList = ListObject,
 			MUIA_Frame, MUIV_Frame_InputList,
-			MUIA_List_Active, MUIV_List_Active_Top,
 			End;
 
 		object->LV_GenresList = ListviewObject,

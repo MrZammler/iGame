@@ -1,5 +1,9 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Changed
+- Some optimisation in list loading reducing the time needed more than 42%
+
+## iGame 2.4.4 - [2023-09-11]
+### Changed
 - Speedup the slavesListAddTail(), almost 200% faster. This has an impact on the slaves list creation during the scan and the loading from the file.
 
 ### Fixed
