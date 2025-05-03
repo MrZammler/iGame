@@ -1,8 +1,8 @@
 /*
-  chipsetList.h
-  chipset list functions header for iGame
+  iGameGUI.h
+  GUI header file for iGame
 
-  Copyright (c) 2018-2025, Emmanuel Vasilakis
+  Copyright (c) 2018, Emmanuel Vasilakis
 
   This file is part of iGame.
 
@@ -20,15 +20,10 @@
   along with iGame. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _CHIPSET_LIST_H
-#define _CHIPSET_LIST_H
+#ifndef WIN_INFO_H
+#define WIN_INFO_H
 
-void chipsetListAddTail(chipsetList *);
-void chipsetListPrint(void);
-chipsetList *chipsetListSearchByTitle(char *, unsigned int);
-chipsetList *getChipsetListHead(void);
-void emptyChipsetList(void);
-int chipsetListNodeCount(int);
-void addChipsetInList(char *);
+APTR getInformationWindow(struct ObjApp *);
+void setInformationWindowMethods(struct ObjApp *);
 
 #endif

@@ -2,7 +2,7 @@
   chipsetList.c
   chipset list functions source for iGame
 
-  Copyright (c) 2018-2023, Emmanuel Vasilakis
+  Copyright (c) 2018-2025, Emmanuel Vasilakis
 
   This file is part of iGame.
 

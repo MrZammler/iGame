@@ -25,6 +25,7 @@
 #include <mui/Guigfx_mcc.h>
 #include <mui/TextEditor_mcc.h>
 #include <mui/NListview_mcc.h>
+#include <mui/Urltext_mcc.h>
 
 /* Prototypes */
 #include <clib/alib_protos.h>
@@ -321,7 +322,7 @@ static void populateGenresList(void)
 	}
 	app->CY_PropertiesGenreContent[i] = (unsigned char*)GetMBString(MSG_UnknownGenre);
 	app->CY_PropertiesGenreContent[i++] = NULL;
-	set(app->CY_PropertiesGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
+	set(app->CY_WI_Information_Genre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
 	set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
 	set(app->LV_GenresList, MUIA_List_Active, MUIV_List_Active_Top);
 	DoMethod(app->LV_GenresList, MUIM_List_Sort);
@@ -1326,37 +1327,23 @@ void slaveProperties(void)
 		int pathBufferSize = sizeof(char) * MAX_PATH_SIZE;
 		char *pathBuffer = malloc(pathBufferSize);
 		char *tooltypesBuffer = AllocVec(sizeof(char) * 1024, MEMF_CLEAR);
-		char timesPlayedStr[6];
-		int i;
 
 		setSlavesListBuffer(node);
 
-		set(app->STR_PropertiesGameTitle, MUIA_String_Contents, node->title);
+		set(app->STR_PropertiesGameTitle, MUIA_Text_Contents, node->title);
 		if(!isStringEmpty(node->user_title))
 		{
-			set(app->STR_PropertiesGameTitle, MUIA_String_Contents, node->user_title);
+			set(app->STR_PropertiesGameTitle, MUIA_Text_Contents, node->user_title);
 		}
 		set(app->TX_PropertiesSlavePath, MUIA_Text_Contents, node->path);
-
-		snprintf(timesPlayedStr, sizeof(char) * 5, "%d", node->times_played);
-		set(app->TX_PropertiesTimesPlayed, MUIA_Text_Contents, timesPlayedStr);
-
-		//set the genre
-		// TODO: Make this better when we have the new Genre lists
-		for (i = 0; i < genresListNodeCount(-1); i++)
-		{
-			if (!strcmp(app->CY_PropertiesGenreContent[i], node->genre))
-				break;
-		}
-		set(app->CY_PropertiesGenre, MUIA_Cycle_Active, i);
-
-		set(app->CH_PropertiesFavorite, MUIA_Selected, node->favourite);
-		set(app->CH_PropertiesHidden, MUIA_Selected, node->hidden);
 
 		// TODO: Check if this item is a slave. If not don't use the substring
 		snprintf(pathBuffer, sizeof(char) * MAX_PATH_SIZE, "%s", substring(node->path, 0, -6));
 		getIconTooltypes(pathBuffer, tooltypesBuffer);
 		set(app->TX_PropertiesTooltypes, MUIA_TextEditor_Contents, tooltypesBuffer);
+
+		// TODO: Should the pathBuffer be freed here?
+		// TODO: Should the tooltypesBuffer be freed here?
 
 		set(app->WI_Properties, MUIA_Window_Open, TRUE);
 	}
@@ -1372,56 +1359,6 @@ void saveItemProperties(void)
 
 	slavesList *node = NULL;
 	node = getSlavesListBuffer(); // cppcheck-suppress memleak
-
-	get(app->STR_PropertiesGameTitle, MUIA_String_Contents, &buf);
-	if(strncmp(node->title, buf, sizeof(char) * MAX_SLAVE_TITLE_SIZE))
-	{
-		strncpy(node->user_title, buf, sizeof(node->user_title));
-
-		// TODO: Reduce duplication with the block below
-		set(app->LV_GamesList, MUIA_NList_Quiet, TRUE);
-		DoMethod(app->LV_GamesList, MUIM_NList_Remove, MUIV_NList_Remove_Active);
-		DoMethod(app->LV_GamesList,
-			MUIM_NList_InsertSingle, node,
-			MUIV_NList_Insert_Sorted);
-		get(app->LV_GamesList, MUIA_NList_InsertPosition, &newpos);
-		set(app->LV_GamesList, MUIA_NList_Active, newpos);
-		set(app->LV_GamesList, MUIA_NList_Quiet, FALSE);
-	}
-
-	if(
-		!strncmp(node->title, buf, sizeof(char) * MAX_SLAVE_TITLE_SIZE) &&
-		strncmp(node->user_title, buf, sizeof(char) * MAX_SLAVE_TITLE_SIZE)
-	) {
-		node->user_title[0] = '\0';
-
-		set(app->LV_GamesList, MUIA_NList_Quiet, TRUE);
-		DoMethod(app->LV_GamesList, MUIM_NList_Remove, MUIV_NList_Remove_Active);
-		DoMethod(app->LV_GamesList,
-			MUIM_NList_InsertSingle, node,
-			MUIV_NList_Insert_Sorted);
-		get(app->LV_GamesList, MUIA_NList_InsertPosition, &newpos);
-		set(app->LV_GamesList, MUIA_NList_Active, newpos);
-		set(app->LV_GamesList, MUIA_NList_Quiet, FALSE);
-	}
-
-	// Get the Genre
-	get(app->CY_PropertiesGenre, MUIA_Cycle_Active, &genreId);
-	strncpy(node->genre,
-		app->CY_PropertiesGenreContent[genreId],
-		sizeof(node->genre)
-	);
-
-	get(app->CH_PropertiesFavorite, MUIA_Selected, &node->favourite);
-
-	get(app->CH_PropertiesHidden, MUIA_Selected, &hideSelection);
-	if (node->hidden != hideSelection)
-	{
-		node->hidden = hideSelection;
-		set(app->LV_GamesList, MUIA_NList_Quiet, TRUE);
-		DoMethod(app->LV_GamesList, MUIM_NList_Remove, MUIV_NList_Remove_Active);
-		set(app->LV_GamesList, MUIA_NList_Quiet, FALSE);
-	}
 
 	// Save the tooltypes
 	if (IconBase->lib_Version >= 44)
@@ -1908,5 +1845,221 @@ void joystick_input(ULONG val)
 	{
 		joystick_directions(val);
 		joystick_buttons(val);
+	}
+}
+
+// Shows the Properties window populating the information fields
+void getItemInformation(void)
+{
+	char *title = NULL;
+	DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, MUIV_NList_GetEntry_Active, &title);
+	if(isStringEmpty(title))
+	{
+		msg_box((const char*)GetMBString(MSG_SelectGameFromList));
+		return;
+	}
+
+	slavesList *node = NULL;
+	if (node = slavesListSearchByTitle(title, sizeof(char) * MAX_SLAVE_TITLE_SIZE))
+	{
+		char tmpStr[6];
+
+		char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
+		if(igameDataPath == NULL)
+		{
+			msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+			return;
+		}
+
+		// This is used when the item data change and gets saved
+		setSlavesListBuffer(node);
+
+		set(app->STR_WI_Information_Title, MUIA_String_Contents, node->title);
+		if(!isStringEmpty(node->user_title))
+		{
+			set(app->STR_WI_Information_Title, MUIA_String_Contents, node->user_title);
+		}
+
+		snprintf(tmpStr, sizeof(tmpStr), "%d", node->year);
+		set(app->TX_WI_Information_Year, MUIA_Text_Contents, tmpStr);
+
+		snprintf(tmpStr, sizeof(tmpStr), "%d", node->players);
+		set(app->TX_WI_Information_Players, MUIA_Text_Contents, tmpStr);
+
+		snprintf(tmpStr, sizeof(tmpStr), "%d", node->times_played);
+		set(app->TX_WI_Information_TimesPlayed, MUIA_Text_Contents, tmpStr);
+
+		set(app->TX_WI_Information_Chipset, MUIA_Text_Contents, node->chipset);
+
+		set(app->CH_WI_Information_Favourite, MUIA_Selected, node->favourite);
+
+		set(app->CH_WI_Information_Hidden, MUIA_Selected, node->hidden);
+
+
+		// Clear the igame.data fields first
+		set(app->TX_WI_Information_ReleasedBy, MUIA_Text_Contents, '\0');
+		set(app->URL_WI_Information_Lemonamiga, MUIA_Urltext_Url, '\0');
+		set(app->URL_WI_Information_Lemonamiga, MUIA_ShowMe, FALSE);
+		set(app->URL_WI_Information_HOL, MUIA_Urltext_Url, '\0');
+		set(app->URL_WI_Information_HOL, MUIA_ShowMe, FALSE);
+		set(app->URL_WI_Information_Pouet, MUIA_Urltext_Url, '\0');
+		set(app->URL_WI_Information_Pouet, MUIA_ShowMe, FALSE);
+
+		if (current_settings->show_url_links)
+		{
+			set(app->GR_WI_Information_Links, MUIA_ShowMe, FALSE);
+		}
+
+		// Get the info from the igame.data file if that exists
+		getParentPath(node->path, igameDataPath, sizeof(char) * MAX_PATH_SIZE);
+		snprintf(igameDataPath, sizeof(char) * MAX_PATH_SIZE, "%s/%s", igameDataPath, DEFAULT_IGAMEDATA_FILE); // cppcheck-suppress sprintfOverlappingData
+		if (check_path_exists(igameDataPath))
+		{
+			const BPTR fpigamedata = Open(igameDataPath, MODE_OLDFILE);
+			if (fpigamedata)
+			{
+				int lineSize = 64;
+				char *line = malloc(lineSize * sizeof(char));
+				while (FGets(fpigamedata, line, lineSize) != NULL)
+				{
+					char **tokens = str_split(line, '=');
+					if (tokens)
+					{
+						if (tokens[1] != NULL)
+						{
+							int tokenValueLen = strlen(tokens[1]);
+							if (tokens[1][tokenValueLen - 1] == '\n')
+							{
+								tokens[1][tokenValueLen - 1] = '\0';
+							}
+							else
+							{
+								tokens[1][tokenValueLen] = '\0';
+							}
+
+							if(!strcmp(tokens[0], "by"))
+							{
+								set(app->TX_WI_Information_ReleasedBy, MUIA_Text_Contents, tokens[1]);
+							}
+
+							// Check if the MCC_URLText is available and disable the following code
+							if (current_settings->show_url_links)
+							{
+								int urlBufferSize = sizeof(char) * 64;
+								char *urlBuffer = malloc(urlBufferSize);
+								int linksCnt = 0;
+
+								if(!strcmp(tokens[0], "lemon") && !isStringEmpty(tokens[1]) && isNumeric(tokens[1]))
+								{
+									snprintf(urlBuffer, urlBufferSize, DEFAULT_LEMONAMIGA_URL, tokens[1]);
+									set(app->URL_WI_Information_Lemonamiga, MUIA_Urltext_Url, urlBuffer);
+									set(app->URL_WI_Information_Lemonamiga, MUIA_ShowMe, TRUE);
+									linksCnt++;
+								}
+
+								if(!strcmp(tokens[0], "hol") && !isStringEmpty(tokens[1]) && isNumeric(tokens[1]))
+								{
+									snprintf(urlBuffer, urlBufferSize, DEFAULT_HOL_URL, tokens[1]);
+									set(app->URL_WI_Information_HOL, MUIA_Urltext_Url, urlBuffer);
+									set(app->URL_WI_Information_HOL, MUIA_ShowMe, TRUE);
+									linksCnt++;
+								}
+
+								if(!strcmp(tokens[0], "pouet") && !isStringEmpty(tokens[1]) && isNumeric(tokens[1]))
+								{
+									snprintf(urlBuffer, urlBufferSize, DEFAULT_POUET_URL, tokens[1]);
+									set(app->URL_WI_Information_Pouet, MUIA_Urltext_Url, urlBuffer);
+									set(app->URL_WI_Information_Pouet, MUIA_ShowMe, TRUE);
+									linksCnt++;
+								}
+
+								if (linksCnt > 0)
+								{
+									set(app->GR_WI_Information_Links, MUIA_ShowMe, TRUE);
+								}
+
+								free(urlBuffer);
+								urlBuffer = NULL;
+							}
+						}
+
+						for (int i = 0; *(tokens + i); i++)
+						{
+							free(*(tokens + i));
+						}
+						free(tokens);
+					}
+				}
+
+				free(line);
+				Close(fpigamedata);
+			}
+		}
+		free(igameDataPath);
+
+		//set the genre
+		// TODO: Make this better when we have the new Genre lists
+		int i;
+		for (i = 0; i < genresListNodeCount(-1); i++)
+		{
+			if (!strcmp(app->CY_PropertiesGenreContent[i], node->genre))
+				break;
+		}
+		set(app->CY_WI_Information_Genre, MUIA_Cycle_Active, i);
+		set(app->WI_Information, MUIA_Window_Open, TRUE);
+	}
+}
+
+void saveItemInformation(void)
+{
+	int genreId, hideSelection;
+	int bufSize = sizeof(char) * MAX_PATH_SIZE;
+	char *buf = AllocVec(bufSize, MEMF_CLEAR);
+	ULONG newpos;
+	slavesList *node = NULL;
+	node = getSlavesListBuffer(); // cppcheck-suppress memleak
+
+	// Update the title
+	get(app->STR_WI_Information_Title, MUIA_String_Contents, &buf);
+	if (strncmp(node->title, buf, sizeof(char) * MAX_SLAVE_TITLE_SIZE))
+	{
+		strncpy(node->user_title, buf, sizeof(node->user_title));
+	}
+	else if (strncmp(node->user_title, buf, sizeof(char) * MAX_SLAVE_TITLE_SIZE))
+	{
+		node->user_title[0] = '\0';
+	}
+
+	if (strncmp(node->title, buf, sizeof(char) * MAX_SLAVE_TITLE_SIZE) ||
+		strncmp(node->user_title, buf, sizeof(char) * MAX_SLAVE_TITLE_SIZE))
+	{
+		set(app->LV_GamesList, MUIA_NList_Quiet, TRUE);
+		DoMethod(app->LV_GamesList, MUIM_NList_Remove, MUIV_NList_Remove_Active);
+		DoMethod(app->LV_GamesList,
+			MUIM_NList_InsertSingle, node,
+			MUIV_NList_Insert_Sorted);
+		get(app->LV_GamesList, MUIA_NList_InsertPosition, &newpos);
+		set(app->LV_GamesList, MUIA_NList_Active, newpos);
+		set(app->LV_GamesList, MUIA_NList_Quiet, FALSE);
+	}
+
+	// Update the genre
+	get(app->CY_WI_Information_Genre, MUIA_Cycle_Active, &genreId);
+	strncpy(node->genre,
+		app->CY_PropertiesGenreContent[genreId],
+		sizeof(node->genre)
+	);
+
+	// Update favourite selection
+	get(app->CH_WI_Information_Favourite, MUIA_Selected, &node->favourite);
+
+	// Update hidden selection
+	get(app->CH_WI_Information_Hidden, MUIA_Selected, &hideSelection);
+	if (node->hidden != hideSelection)
+	{
+		node->hidden = hideSelection;
+		set(app->LV_GamesList, MUIA_NList_Quiet, TRUE);
+		DoMethod(app->LV_GamesList, MUIM_NList_Remove, MUIV_NList_Remove_Active);
+		set(app->LV_GamesList, MUIA_NList_Quiet, FALSE);
 	}
 }

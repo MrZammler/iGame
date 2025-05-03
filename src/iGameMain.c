@@ -85,6 +85,7 @@ struct Library			*GuiGfxBase;
 struct Library			*LowLevelBase;
 struct Library			*RenderLibBase;
 struct Library			*TextEditorMCC;
+struct Library			*UrltextMCC;
 struct Library			*NListviewMCC;
 struct Library			*UtilityBase;
 struct Library			*WorkbenchBase;
@@ -171,6 +172,10 @@ int main(int argc, char **argv)
 
 			case MENU_GAMEPROPERTIES:
 				slaveProperties();
+				break;
+
+			case MENU_ITEMINFO:
+				getItemInformation();
 				break;
 
 			case MENU_GAMEFOLDER:
@@ -346,6 +351,13 @@ static int initLibraries(void)
 	// Load settings here, after we load the icon.library
 	iGameSettings = load_settings(DEFAULT_SETTINGS_FILE);
 
+	// Check if MCC URLtext is installed. If not disable its usage
+	iGameSettings->show_url_links = TRUE;
+	if (!(UrltextMCC = OpenLibrary("mui/Urltext.mcc", 19)))
+	{
+		iGameSettings->show_url_links = FALSE;
+	}
+
 	if (
 		!(RenderLibBase = OpenLibrary("render.library", 30)) ||
 		!(GuiGfxBase = OpenLibrary("guigfx.library", 17)) ||
@@ -371,6 +383,7 @@ static void cleanupLibraries(void)
 	if(IWorkbench)		DropInterface((struct Interface *) IWorkbench);
 	#endif
 
+	if (UrltextMCC)		CloseLibrary(UrltextMCC);
 	if (TextEditorMCC)	CloseLibrary(TextEditorMCC);
 	if (NListviewMCC)	CloseLibrary(NListviewMCC);
 	if (LowLevelBase)	CloseLibrary(LowLevelBase);

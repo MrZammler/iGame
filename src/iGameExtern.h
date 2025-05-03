@@ -32,6 +32,10 @@
 #define DEFAULT_SCREENSHOT_FILE "PROGDIR:igame.iff"
 #define DEFAULT_SETTINGS_FILE "igame.prefs"
 #define DEFAULT_IGAMEDATA_FILE "igame.data"
+#define DEFAULT_LOCALHOST_URL "http://localhost"
+#define DEFAULT_LEMONAMIGA_URL "https://www.lemonamiga.com/games/details.php?id=%s"
+#define DEFAULT_HOL_URL "https://amiga.abime.net/games/view/game/id/%s"
+#define DEFAULT_POUET_URL "https://www.pouet.net/prod.php?which=%s"
 // #define SLAVE_STRING "slave"
 // #define WB_PUBSCREEN_NAME "Workbench"
 
@@ -61,6 +65,7 @@
 #define MENU_ABOUT_HOTKEY "?"
 #define MENU_QUIT_HOTKEY "Q"
 #define MENU_PROPERTIES_HOTKEY "P"
+#define MENU_INFORMATION_HOTKEY "I"
 #define MENU_DELETE_HOTKEY "D"
 
 #define MAX_SLAVE_TITLE_SIZE 128
@@ -71,6 +76,10 @@
 #define MAX_ARGUMENTS_SIZE 64
 #define MIN_TITLE_FILTER_CHARS 3
 #define MAX_CHIPSET_SIZE 16
+
+#ifndef MAKE_ID
+#define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
+#endif
 
 typedef struct settings
 {
@@ -85,6 +94,7 @@ typedef struct settings
 	int no_guigfx;
 	int start_with_favorites;
 	int useIgameDataTitle;
+	int show_url_links;
 	int lastScanSetup;  // It keeps info of the settings on the last scan
 							// that influence the item data
 							// It is a bitfield with the following structure
@@ -161,6 +171,7 @@ enum {
 	MENU_QUIT,
 	MENU_GAME,
 	MENU_GAMEPROPERTIES,
+	MENU_ITEMINFO,
 	MENU_GAMEFOLDER,
 	MENU_PREFERENCES,
 	MENU_SETTINGS,

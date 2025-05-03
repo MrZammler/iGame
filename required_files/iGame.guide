@@ -48,7 +48,7 @@ iGame can be found on many AmigaOS distributions like AmiKit XE and ApolloOS.
 
 iGame was initially developed on an Amiga 3000 with a CSMKII 68060 with 128MB RAM, using the Cubic IDE (gcc). Nowadays, we use mostly vbcc as a cross-compiler on a Linux system.
 
-iGame is open source and free software, licensed under the GPLv3, and you can find it at the following websites.
+iGame is open-source and free software, licensed under the GPLv3, and you can find it at the following websites.
 
 https://github.com/MrZammler/iGame
 http://winterland.no-ip.org/igame/index.html
@@ -58,9 +58,9 @@ http://winterland.no-ip.org/igame/index.html
 @{lindent 3}
 A bit of history
 
-iGame started in ~2004/5 as a way to learn a bit of MUI and general Amiga system coding. Through the years it's been updated with various new small features and bug fixes. After version 1.5, iGame was updated with internal version 1.6 which was never really officially released. Sorry; I wasn't very good at releasing versions or keeping a changelog.
+iGame started in ~2004/5 as a way to learn a bit of MUI and general Amiga system coding. Through the years, it's been updated with various small new features and bug fixes. After version 1.5, iGame was updated with internal version 1.6 which was never really officially released. Sorry; I wasn't very good at releasing versions or keeping a changelog.
 
-Back in 2016 iGame became open source under the GPLv3 license. Since then, with the kind help of contributors, we did a lot of re-writing and added new features. These versions are now tagged as 2.0.
+Back in 2016 iGame became open source under the GPLv3 licence. Since then, with the kind help of contributors, we did a lot of re-writing and added new features. These versions are now tagged as 2.0.
 
 Contributors:
 - Chris Charabaruk (coldacid)
@@ -72,7 +72,7 @@ Contributors:
 @ENDNODE
 @NODE "BUIL" "Building iGame"
 @{lindent 3}
-iGame is open source and free software, licensed under the GPLv3. This means you can have access to the source and compile it yourself. How to do it is described at the following URL, where various Operating Systems are covered.
+iGame is open-source and free software, licensed under the GPLv3. This means you can have access to the source and compile it yourself. How to do it is described at the following URL, where various Operating Systems are covered.
 
 https://github.com/MrZammler/iGame/wiki/2.-Compiling
 
@@ -107,25 +107,26 @@ The above times are measured when the scan checks the slave files to get the gam
 
 @{b}Software requirements@{ub}
 
-iGame uses Magic User Interface (MUI) and some third-party libraries. Depending on your configuration the software requirements might change. In any case, iGame will inform you about the missing required libraries if you run it from the shell.
+iGame uses Magic User Interface (MUI) and some third-party libraries. Depending on your configuration, the software requirements might change. In any case, iGame will inform you about the missing required libraries if you run it from the shell.
 
 All the required software is available on Aminet for free download.
 
-@{u}Minimum requirements@{uu}
+@{u}Requirements@{uu}
 
  - Kickstart 2.04 or higher
  - Workbench 2.1 or higher
  - MUI 3.8 or higher
  - icon.library v37+ (v44+ Recommended)
- - guigfx.library
- - render.library
- - guigfx.mcc
+ - guigfx.library (optional)
+ - render.library (optional)
+ - guigfx.mcc (optional)
  - Texteditor.mcc
  - NListviews.mcc
+ - Urltext.mcc (optional)
 
 If your Amiga has a 68000 CPU make sure that the libraries you have installed support it, i.e. there is a different MCC_TextEditor package for this processor. The same applies to CPUs that do not have FPU.
 
-The @{b}AmigaOS 4 version@{ub} should work fine on any AmigaOS 4.0 update 6 release and above. It might work on previous versions, but it is not tested.
+The @{b}AmigaOS 4 version@{ub} should work fine on any AmigaOS 4.0 update 6 releases and above. It might work on previous versions, but it is not tested.
 
 The @{b}MorphOS version@{ub} should work fine on any MorphOS 3.x release.
 @ENDNODE
@@ -139,7 +140,7 @@ Have in mind that the installer will not install any of the needed third-party l
 
 @{b}Manual Installation@{ub}
 
-You can install iGame manually if you prefer. To do that, you need to follow the following steps:
+You can install iGame manually if you prefer. To complete that, you need to follow the following steps:
 
 @{lindent 6}
 1. Unpack the archive wherever you want.
@@ -165,16 +166,16 @@ If you upgrade from a previous release, the only thing you need to do is to copy
 
 Make sure that render.library and guigfx.library are supported by your system and processor if you choose to use them. If iGame fails with a Guru Meditation 8000000B or similar on startup, double-check the libraries.
 
-If it persists, check http://winterland.no-ip.org/igame/files.html, where you will find an archive of these 2 libraries for systems with 020/no fpu (thanks to Jools 'buzz' Smyth for providing them!). These libraries might fix issues on 68030/882 systems as well.
+If it persists, check http://winterland.no-ip.org/igame/files.html, where you will find an archive of these 2 libraries for systems with 020/no fpu (thanks to Jools 'buzz' Smyth for providing them!). These libraries might resolve issues on 68030/882 systems as well.
 
 If the problem is not gone, select the "No GuiGfx" checkbox in the settings. This option will use MUI's internal datatypes loading routines (dtpic.mui) instead of guigfx.mcc's. If yu can't access the settings, then delete the igame.prefs file, which will make iGame return to its default values.
 
-If the GuiGfx library is not used there will be no scaling of the used screenshots. This means that all the screenshots should have the same height and width, so to keep the GUI consistent.
+If the GuiGfx library is not used, there will be no scaling of the used screenshots. This means that all the screenshots should have the same height and width, so to keep the GUI consistent.
 
 @ENDNODE
 @NODE "USAG" "Using iGame"
 @{lindent 3}
-If you are new to iGame and you would like a "fast first steps" guide then we recommend you follow the next bullets:
+If you are new to iGame, and you would like a "fast first steps" guide, then we recommend you follow the next bullets:
 
 - Select from the menu "Settings > Game Repositories"
 - Add to the list the folders where you keep your WHDLoad games
@@ -192,6 +193,7 @@ If you would like more details about all the available menus and windows, visit 
 @{" Settings Window          " LINK "WINSETS" 0}
 @{" Game Repositories Window " LINK "WINREPO" 0}
 @{" Properties Window        " LINK "WINPROP" 0}
+@{" Information Window       " LINK "WININFO" 0}
 
 @ENDNODE
 @NODE "MENUS" "Menus"
@@ -217,7 +219,10 @@ This menu item closes iGame.
 @{b}Game@{ub}
 @{lindent 6}
 @{u}Properties...@{uu}
-This menu opens the @{" Properties " LINK "WINPROP" 0} window, where you can set more information for the selected entry, like the category, set it as favourite etc. If no entry is selected an error message is shown.
+This menu opens the @{" Properties " LINK "WINPROP" 0} window, where you can set the icon properties. If no entry is selected, an error message is shown.
+
+@{u}Information...@{uu}
+This menu opens the @{" Information " LINK "WININFO" 0} window, where you can set more information for the selected entry, like the category, set it as favourite etc. If no entry is selected, an error message is shown.
 
 @{u}Open Game Dir@{uu}
 When you select "Open Game Dir", iGame will open a window on Workbench from the selected entry. This is useful when you need to check a manual or a guide that comes along with the game or demo.
@@ -226,10 +231,10 @@ When you select "Open Game Dir", iGame will open a window on Workbench from the 
 @{b}Settings@{ub}
 @{lindent 6}
 @{u}Settings...@{uu}
-This menu opens the @{" Settings " LINK "WINSETS" 0} window, where you can configure how iGame will work for you, i.e. you can set the size of the screenshots etc..
+This menu opens the @{" Settings " LINK "WINSETS" 0} window, where you can configure how iGame will work for you, i.e. you can set the size of the screenshots etc…
 
 @{u}Game Repositories...@{uu}
-This menu opens the @{" Game Repositories " LINK "WINREPO" 0} window, where you can add/remove paths from your hard disk, where you keep your games and demos stored. These paths are useful for iGame only if they contain WHDLoad games/demos, and they are used to automatically recognize and build a list of them. If you do any changes in this list you have to rescan the Game Repositories using the menu item "Actions > Scan Repositories".
+This menu opens the @{" Game Repositories " LINK "WINREPO" 0} window, where you can add/remove paths from your hard disk, where you keep your games and demos stored. These paths are useful for iGame only if they contain WHDLoad games/demos, and they are used to automatically recognize and build a list of them. If you make any changes to this list, you have to rescan the Game Repositories using the menu item "Actions > Scan Repositories".
 
 @{u}MUI Setting...@{uu}
 This menu opens the MUI Settings window, where you can change the look of MUI components for iGame.
@@ -241,15 +246,15 @@ The Main Window is what you see when you start iGame. It is pretty simple to use
 
 At the top, there is the "Filter" field which is used to filter the list of entries, based on your input. iGame returns entries with a matching part in their title. For example, if you want to find all the games that have "Soccer" in their title, that's what you need to write. The search is not case-sensitive, so it doesn't matter if the part of the title is capitalized or not. From the iGame settings, you can set it when the search is initialized, while you type (3 minimum characters) or after you press "Enter".
 
-On the left side, there are a filter select box and the entries list. The filter select box helps tp filter the entries by "Last played", "Favorites", "Most Played" and "Never Played".
+On the left side, there is a filter select box and the entries list. The filter select box helps to filter the entries by "Last played", "Favourites", "Most Played" and "Never Played".
 
-The entries list holds the entries (games, demos etc.) based on the filtering. With a double click on an entry, it is executed. If you want to add some information on an entry using the "Game > Properties..." menu, that's the list where you have to select it first. The list has 3 columns, where the first one has the title, the second one shows the year of release and the third column shows the maximum number of players that can play. iGame uses @{" igame.data files " LINK "IGDF" 0} to gather that information. By clicking on their title the sorting of the list can change.
+The entries list holds the entries (games, demos etc.) based on the filtering. With a double click on an entry, it is executed. If you want to add some information on an entry using the "Game > Properties..." menu, that's the list where you have to select it first. The list has 3 columns, where the first one has the title, the second one shows the year of release and the third column shows the maximum number of players that can play. iGame uses @{" igame.data files " LINK "IGDF" 0} to gather that information. By clicking on their title, the sorting of the list can change.
 
-At the top right side, there is a screenshot of the selected entry. For the screenshot, iGame uses an image file, which must be in the same folder as the game/demo, named @{b}igame.iff@{ub}. If no screenshot is available then the entry icon is shown. You can disable the screenshots from the @{" Settings Window " LINK "WINSETS" 0}.
+At the top-right side, there is a screenshot of the selected entry. For the screenshot, iGame uses an image file, which must be in the same folder as the game/demo, named @{b}igame.iff@{ub}. If no screenshot is available, then the entry icon is shown. You can disable the screenshots from the @{" Settings Window " LINK "WINSETS" 0}.
 
-Under the screenshot, there is the Chipset cycle box. Using that the user can filter the games based on the required chipset, for example show only the AGA games.
+Under the screenshot, there is the Chipset cycle box. Using that, the user can filter the games based on the supported chipset, for example, show only the AGA games.
 
-Then the "Genres" list helps the user to filter the games based on the "Genre". There is also an "Unknown" selection which shows the entries that do not have any Genre assigned.
+Then the "Genres" list helps the user to filter the games based on the "Genre". There is also an "Unknown" selection, which shows the entries that do not have any Genre assigned.
 
 At the bottom, there is a read-only field which shows information about iGame, based on what you are doing. It is like a status bar, where useful information will be shown while you use iGame.
 
@@ -258,16 +263,16 @@ The Genre and Chipset lists get the information from the @{b}gameslist.csv@{ub} 
 @ENDNODE
 @NODE "WINADDG" "Add a Game Window..."
 @{lindent 3}
-This window opens from the menu "Actions > Add a Game". This is useful in cases you want to add a WDHLoad game/demo or any other game/demo which can be started from Workbench/Shell. Depending the AmigaOS version it uses compatible methods to run the executable.
+This window opens from the menu "Actions > Add a Game". This is useful in cases you want to add a WDHLoad game/demo or any other game/demo which can be started from Workbench/Shell. Depending on the AmigaOS version, it uses compatible methods to run the executable.
 
-By this window you can set the "Title" of the game/demo, select the path on HD of the executable and set its "Genre".
+From this window, you can set the "Title" of the game/demo, select the path on HD of the executable and set its "Genre".
 
 Click OK if you are fine with your selections so that this new entry will be saved on the list. Click on "Cancel" if you changed your mind.
 
 @ENDNODE
 @NODE "WINREPO" "Game Repositories Window..."
 @{lindent 3}
-This window opens from the menu item "Settings > Game Repositories". There you can add your hard disk paths where you keep your WHDLoad games stored. These paths are going to be scanned when you select the menu item "Actions > Scan Repositories".
+This window opens from the menu item "Settings > Game Repositories". There you can add your hard disk paths where you keep your WHDLoad games stored. These paths will be scanned when you select the menu item "Actions > Scan Repositories".
 
 This window has a file field at the top. Click on the folder button to select the path from your hard disk, and then click the button list to add it to the list below. If you want to remove a path, select it from the list and click the "Remove" button at the bottom of the window.
 
@@ -276,35 +281,44 @@ When you finish the changes on the repositories list, click the "Close" button t
 @ENDNODE
 @NODE "WINPROP" "Properties Window..."
 @{lindent 3}
-This window opens from the menu item "Game > Properties". For this to work you have to have an entry selected at the games list on the main window, otherwise, an error message will show up. Through this window, you can change the properties of an entry.
+This window opens from the menu item "Game > Properties". For this to work you have to have an entry selected at the games list on the main window; otherwise, an error message will show up. Through this window, you can change the icon properties of an entry.
 
-From the top, the first field is the entry title, which you can change if you want.
-
-Next, you can set the Genre from the select list. This can be used from the Genres list on the right side of the main window.
-
-Following is a checkbox to set the entry as one of your favourites. To show your favourite games in the games list, select from the "Genre" list at the right side of the main window, the "--Favorites--" option.
-
-Beside that is a checkbox to set the entry as hidden. This entry is going to be removed from the games list. To list all the hidden entries you have to select the menu item "Actions > Show/Hide hidden entries" from the main window.
-
-The next field is the number of times this game was played. This is a read-only field and you can't change the value.
+From the top, the first string shows the title of the selected game/demo. This can be changed from the @{" Information " LINK "WININFO" 0} window.
 
 The full path of the slave file, in case this is a WHDLoad entry, or the full path of the executable of any entry as set from the "Actions > Add a Game", is shown in the next field. This is also a read-only field and you cannot modify it.
 
 After that, there is a big text area, showing the icon tooltypes. This is extremely useful in case you want to change something on the entry, especially if it is a WHDLoad one, where the tooltypes can change the way it works.
 
 @ENDNODE
+@NODE "WININFO" "Information Window..."
+@{lindent 3}
+This window opens from the menu item "Game > Information". For this to work you have to have an entry selected at the games list on the main window; otherwise, an error message will show up. Through this window, you can view and change some of the selected entry information.
+
+From the top, the first field is the entry title, which you can change if you like.
+
+Next, you can set the Genre from the select list. This can be used from the Genres list on the right side of the main window.
+
+Following, on the left side, there is some information that is not editable. There you will see the "Release year", the "Released by" entry that shows who released this game/demo, the required "Chipset", the "No. of players" that the game supports and the number of times this game was played.
+
+On the right side there is a checkbox to set the entry as one of your favourites. To show your favourite games in the games list, select from the select box above the main list the "--Favourites--" option.
+
+Below that, there is a checkbox to set the entry as hidden. This entry will be removed from the games list. To list all the hidden entries, you have to select the menu item "Actions > Show/Hide hidden entries" from the main window.
+
+After all the above, there is an area where related URL links are shown, linking to the Lemon Amiga, Hall Of Light or Pouet, if the information for these is found in the @{" igame.data files " LINK "IGDF" 0}. These URL links requires the Urltext.mcc to be installed; otherwise this area will not be visible.
+
+@ENDNODE
 @NODE "WINSETS" "Settings Window"
 @{lindent 3}
 The iGame settings window opens from the menu item "Settings > Settings...". These are saved on a text file named "igame.prefs", inside iGame folder. If this file is missing, iGame uses the default values which is optimal to work on any system.
 
-If you have different instances of iGame and you would like to keep the same preferences for all of them, then move the "igame.prefs" into ENVARC:. Since version 2.2.0 iGame checks for the "igame.prefs" file first in ENVARC: folder. If it is found then this is used instead of the one in its folder.
+If you have different instances of iGame, and you would like to keep the same preferences for all of them, then move the "igame.prefs" into ENVARC:. Since version 2.2.0 iGame checks for the "igame.prefs" file first in ENVARC: folder. If it is found, then this is used instead of the one in its folder.
 
 The settings window has three separate sections:
 
 @{u}Screenshots@{uu}
 The first checkbox here, named "Hide Screenshots", disables the screenshot part of the main window. iGame window will be refreshed to show/hide the screenshot as soon as you apply the changes.
 
-If screenshots are enabled you can select from the second checkbox if the GuiGfx library will be used. GuiGfx provides good scaling of the screenshot but it is a little bit tricky to set this up. You can find more info at @{" Installation " LINK "INST" 0} section. If this checkbox is selected that means that iGame will not use the GuiGfx library. If the library is not installed or the prerequisites are missing, then iGame will use datatypes to show the screenshot and this checkbox will be disabled.
+If screenshots are enabled, you can select from the second checkbox if the GuiGfx library will be used. GuiGfx provides good scaling of the screenshot, but it is a little bit tricky to set this up. You can find more info at @{" Installation " LINK "INST" 0} section. If this checkbox is selected, that means that iGame will not use the GuiGfx library. If the library is not installed or the prerequisites are missing, then iGame will use datatypes to show the screenshot and this checkbox will be disabled.
 
 Under that, there is a select box to choose the screenshot size. You can choose between 160x128 pixels, 320x256 pixels and custom, which lets you set the width and height manually, using the fields below the select box.
 
@@ -313,16 +327,16 @@ The first two radio buttons set the way iGame gets the WHDLoad games/demos title
 
 The "No Smart Spaces" disables the ability of iGame to add extra spaces on the game/demo title, where it believes it is needed, i.e. before a version number.
 
-If "Prefer igame.data" is enabled then iGame prefers to get the entry title from the igame.data file if that exists. If it doesn't exist or it is disabled then the previous settings are going to be used for WHDLoad based items. This doesn't have any effect on non-WHDLoad items.
+If "Prefer igame.data" is enabled, then iGame prefers to get the entry title from the igame.data file, if that exists. If it doesn't exist, or it is disabled, then the previous settings will be used for WHDLoad based items. This doesn't have any effect on non-WHDLoad items.
 
 @{u}Misc@{uu}
 The "Save stats on exit" checkbox enables the save of the statistics (i.e. times played) for each game when iGame is closed instead of every time a game is double-clicked. This might be preferred if you don't want to have iGame writing many times on the hard disk.
 
 The "Use enter to filter" checkbox changes the filter field on the main window to be initiated when you press the enter key. By default, as soon as you type something in this field, the filtering of the games list happens in real-time. On slow machines, this might be slow.
 
-The "Hide side panel" checkbox, if selected, hides the right side of the main window. This is useful if you don't need the screenshots and the filtering of the entries list by the options of the "Genres" list. This change requires to restart iGame to be applied.
+The "Hide side panel" checkbox, if selected, hides the right side of the main window. This is useful if you don't need the screenshots and the filtering of the entries list by the options of the "Genres" list. This change requires restarting iGame to be applied.
 
-"Display favourites on start" checkbox, if selected, iGame starts showing the games that are marked as "Favorite". This is useful when you have a big collection of games but you would like to start with your favourites ones, to select something for fast gaming.
+"Display favourites on start" checkbox, if selected, iGame starts showing the games that are marked as "Favourite". This is useful when you have a big collection of games, but you would like to start with your favourites ones, to select something for fast gaming.
 
 The "Save" button saves the settings in the configuration file.
 The "Use" button applies the settings, except the ones that require restart iGame, as mentioned above, but if you close iGame, those changes are lost.
@@ -331,7 +345,7 @@ The "Cancel" button closes the window and forgets the changes you did.
 @ENDNODE
 @NODE "TODO" "Todo & Bugs"
 @{lindent 3}
-Since iGame got open source we prefer to use GitHub to log all the issues and the features/changes we want to develop on the application. So, if you have a suggestion or an idea, or a problem with how iGame works, please open an issue at:
+Since iGame got open source, we prefer to use GitHub to log all the issues and the features/changes we want to develop on the application. So, if you have a suggestion or an idea, or a problem with how iGame works, please open an issue at:
 
 https://github.com/MrZammler/iGame/issues
 
@@ -351,13 +365,13 @@ We would like to thank:
 - Carlo Spadoni for designing 3 PNG icons found in the icons folder (iGame-png-xx.info).
 
 Contributors:
-Since iGame became open source a few people contributed with code. We would like to thank:
+Since iGame became open-source, a few people contributed with code. We would like to thank:
 - Chris Charabaruk (coldacid)
 - Dimitris Panokostas (midwan)
 - George Sokianos (walkero)
 - Javier R. Santurde (T0lk13n)
 - Willem Drijver
-An extensive and more up to date list can be found at:
+An extensive and more up-to-date list can be found at:
 https://github.com/MrZammler/iGame/graphs/contributors
 
 Translators:
@@ -378,7 +392,7 @@ and of course, all of you who use iGame and support our beloved Amiga computer.
 
 iGame scans for and if found uses a custom file with the filename igame.data. These files let iGame know some crucial information for each entry (game/demo/application). Those files have a very specific structure and should be in the same folder of the WHDLoad items where the slave file exists, or in the same folder where an executable file exists.
 
-igame.data information is meant to cover (non)WHDLoad items and Demos, including as much information as possible. Not all the information is going to be loaded in the memory, just those that are necessary for some features in iGame. Other information will be used only when the user requests to view it.
+igame.data information is meant to cover (non)WHDLoad items and Demos, including as much information as possible. Not all the information will be loaded in the memory, just those that are necessary for some features in iGame. Other information will be used only when the user requests to view it.
 
 There is no plan for now to edit the igame.data through iGame itself. This decision might change in the future.
 
@@ -386,11 +400,11 @@ There is no plan for now to edit the igame.data through iGame itself. This decis
 
 The benefits for the users of iGame will be the following, as long as these files exist and are populated:
 
-- The games/demos will get a title name that is going to be specific and not generated by iGame itself
+- The games/demos will get a title name that will be specific and not generated by iGame itself
 - The genre will be assigned automatically
 - Information like the year of release, the max number of players, the company that developed it and many more can be set for each entry and used inside iGame in various ways
 - Games/Demos that are not based on WHDLoad can also be scanned and automatically added to the list, ready to be launched
-- If igame.data files are included in community-maintained collections of games and demos the users will be benefited a lot, as they will have them categorised automatically and named correctly after a scan of the collection
+- If igame.data files are included in community-maintained collections of games and demos the users will be benefited a lot, as they will have them categorized automatically and named correctly after a scan of the collection
 - Other game launchers will be able to use that information as well
 
 @{b}How is the structure of igame.data file?@{ub}
@@ -409,27 +423,27 @@ lemon=735
 hol=2448
 pouet=
 
-- @{b}title@{ub}: This is going to be the title of the entry in iGame list. If two titles are the same then a number will be appended in square brackets, ie. Menace [1], the same happens in the latest versions of iGame. The user will be able to alter that title, but that is not going to be saved back to the igame.data file but in gameslist.csv file.
+- @{b}title@{ub}: This will be the title of the entry in iGame list. If two titles are the same, then a number will be appended in square brackets, i.e. Menace [1], the same happens in the latest versions of iGame. The user will be able to alter that title, but it will not be saved back to the igame.data file but in gameslist.csv file.
 
-- @{b}year@{ub}: The year of release. This is going to be used in the main list of iGame and the user will be able to sort the entries by that information.
+- @{b}year@{ub}: The year of release. This will be used in the main list of iGame and the user will be able to sort the entries by that information.
 
-- @{b}by@{ub}: The responsible company/group/programmer for the development of the entry. This going to be used as an extra field in the entry information window
+- @{b}by@{ub}: The responsible company/group/programmer for the development of the entry. This, going to be used as an extra field in the entry information window.
 
-- @{b}chipset@{ub}: This can take values about the supported chipset, ie. ECS, OCS, AGA, RTG etc. Multiple values can be separated with commas, ie. OCS,ECS. Those values are going to be used to filter the list the same way the genre is used in future versions of iGame.
+- @{b}chipset@{ub}: This can take values about the supported chipset, i.e. ECS, OCS, AGA, RTG etc. Multiple values can be separated with commas, i.e. OCS, ECS. Those values will be used to filter the list, the same way the genre is used in future versions of iGame.
 
-- @{b}genre@{ub}: This is the major genre of the game. This will not support multiple values but this decision might change in the future.
+- @{b}genre@{ub}: This is the major genre of the game. This will not support multiple values, but this decision might change in the future.
 
-- @{b}players@{ub}: This value refers to the maximum number of players. This is going to be used in the main list of iGame and the user will be able to sort the entries by that information.
+- @{b}players@{ub}: This value refers to the maximum number of players. This will be used in the main list of iGame and the user will be able to sort the entries by that information.
 
 - @{b}exe@{ub}: This refers to the executable filename when the item is not a WHDLoad games/demo, i.e. quake.
 
-- @{b}arguments@{ub}: This refers to the needed arguments that an item requires so as to run properly.
+- @{b}arguments@{ub}: This refers to the needed arguments that an item requires to run properly.
 
-- @{b}lemon@{ub}: This is the id of the game entry at https://www.lemonamiga.com/. There is a plan to use that id in the information window as a link, so as the user to visit that page using a web browser
+- @{b}lemon@{ub}: This is the ID of the game entry at https://www.lemonamiga.com/. There is a plan to use that ID in the information window as a link, so as the user to visit that page using a web browser
 
-- @{b}hol@{ub}: This is the id of the game entry at https://hol.abime.net/. There is a plan to use that id in the information window as a link, so as the user to visit that page using a web browser
+- @{b}hol@{ub}: This is the ID of the game entry at https://hol.abime.net/. There is a plan to use that ID in the information window as a link, so as the user to visit that page using a web browser
 
-- @{b}pouet@{ub}: This is the id of the demo entry at https://www.pouet.net/. There is a plan to use that id in the information window as a link, so as the user to visit that page using a web browser
+- @{b}pouet@{ub}: This is the ID of the demo entry at https://www.pouet.net/. There is a plan to use that ID in the information window as a link, so as the user to visit that page using a web browser
 
 @ENDNODE
 
