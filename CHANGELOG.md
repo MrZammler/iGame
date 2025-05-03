@@ -1,4 +1,9 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
+### Added
+- Added a new "Information" window that includes the "Released date", the "Released by", the "Chipset", the links to external websites and most of the fields from the properties window.
+
+### Changed
+- The "Properties" window has only the tooltypes of the selected item available to change.
 
 ## iGame 2.4.6 - [2024-02-18]
 ### Changed
