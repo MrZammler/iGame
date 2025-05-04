@@ -1233,7 +1233,8 @@ void game_click(void)
 */
 void repo_add(void)
 {
-	char *buf = malloc(sizeof(char) * MAX_PATH_SIZE);
+	int bufSize = sizeof(char) * MAX_PATH_SIZE;
+	char *buf = malloc(bufSize);
 	char* repo_path = NULL;
 	get(app->PA_RepoPath, MUIA_String_Contents, &repo_path);
 
@@ -1241,8 +1242,18 @@ void repo_add(void)
 	{
 		item_repos = (repos_list *)calloc(1, sizeof(repos_list));
 		item_repos->next = NULL;
+
+		if(repo_path[strlen(repo_path) - 1] == '/')
+		{
+			repo_path[strlen(repo_path) - 1] = '\0';
+		}
+
 		getFullPath(repo_path, buf);
 		strcpy(item_repos->repo, buf);
+		if (isPathOnAssign(repo_path))
+		{
+			strcpy(item_repos->repo, repo_path);
+		}
 
 		if (repos == NULL)
 			repos = item_repos;
