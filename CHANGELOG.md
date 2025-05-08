@@ -1,9 +1,13 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Added
 - Added a new "Information" window that includes the "Released date", the "Released by", the "Chipset", the links to external websites and most of the fields from the properties window.
+- Added the option to use repositories based on assigns (fixes #240)
 
 ### Changed
 - The "Properties" window has only the tooltypes of the selected item available to change.
+
+### Fixed
+- Fixed a potential crash on exit, happening mostly on AmigaOS 3.1 systems (fixes #239)
 
 ## iGame 2.4.6 - [2024-02-18]
 ### Changed
