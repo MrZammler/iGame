@@ -378,7 +378,6 @@ static void cleanupLibraries(void)
 	if (GfxBase)		CloseLibrary(GfxBase);
 	if (GuiGfxBase)		CloseLibrary(GuiGfxBase);
 	if (GuiGfxMCC)		CloseLibrary(GuiGfxMCC);
-	if (DataTypesBase)	CloseLibrary(DataTypesBase);
 	if (IconBase)		CloseLibrary(IconBase);
 	if (IntuitionBase)	CloseLibrary((struct Library *)IntuitionBase);
 	if (DataTypesBase)	CloseLibrary(DataTypesBase);
