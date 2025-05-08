@@ -48,10 +48,6 @@ struct ObjApp
 	APTR TX_Status;
 	APTR WI_Properties;
 	APTR STR_PropertiesGameTitle;
-	APTR CY_PropertiesGenre;
-	APTR CH_PropertiesFavorite;
-	APTR CH_PropertiesHidden;
-	APTR TX_PropertiesTimesPlayed;
 	APTR TX_PropertiesSlavePath;
 	APTR TX_PropertiesTooltypes;
 	APTR BT_PropertiesOK;
@@ -99,6 +95,23 @@ struct ObjApp
 	CONST_STRPTR RA_TitlesFromContent[3];
 	CONST_STRPTR CY_FilterListContent[6];
 	CONST_STRPTR CY_ChipsetListContent[16];
+	// Information Window
+	APTR WI_Information;
+	APTR STR_WI_Information_Title;
+	APTR TX_WI_Information_Year;
+	APTR TX_WI_Information_ReleasedBy;
+	APTR TX_WI_Information_Chipset;
+	APTR TX_WI_Information_Players;
+	APTR TX_WI_Information_TimesPlayed;
+	APTR CH_WI_Information_Favourite;
+	APTR CH_WI_Information_Hidden;
+	APTR CY_WI_Information_Genre;
+	APTR GR_WI_Information_Links;
+	APTR URL_WI_Information_Lemonamiga;
+	APTR URL_WI_Information_HOL;
+	APTR URL_WI_Information_Pouet;
+	APTR BT_WI_Information_Save;
+	APTR BT_WI_Information_Cancel;
 };
 
 struct ObjApp *CreateApp(void);

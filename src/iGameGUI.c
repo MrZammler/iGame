@@ -20,8 +20,6 @@
   along with iGame. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define MUI_OBSOLETE
-
 /* MUI */
 #include <libraries/mui.h>
 #include <mui/Guigfx_mcc.h>
@@ -59,10 +57,6 @@
 #define CPU_VERS 68000
 #endif
 
-#ifndef MAKE_ID
-#define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
-#endif
-
 #define iGame_NUMBERS
 #include "iGame_strings.h"
 
@@ -72,6 +66,7 @@
 #include "funcs.h"
 #include "strfuncs.h"
 #include "iGameGUI.h"
+#include "WinInfo.h"
 
 extern igame_settings *current_settings;
 extern blockGuiGfx;
@@ -105,6 +100,7 @@ static struct NewMenu MenuMainWin[] =
 
 	{ NM_TITLE, STR_ID(MSG_MNlabel2Game)							, 0 ,0 ,0			,(APTR)MENU_GAME },
 	{ NM_ITEM ,  STR_ID(MSG_MNMainProperties)						,"P",0 ,0			,(APTR)MENU_GAMEPROPERTIES },
+	{ NM_ITEM ,  STR_ID(MSG_MNMainIformation)						,"I",0 ,0			,(APTR)MENU_ITEMINFO },
 	{ NM_ITEM ,  STR_ID(MSG_MNMainOpenCurrentDir)					,"D",0 ,0			,(APTR)MENU_GAMEFOLDER },
 
 	{ NM_TITLE, STR_ID(MSG_MNMainPreferences)						, 0 ,0 ,0			,(APTR)MENU_PREFERENCES },
@@ -244,11 +240,11 @@ MakeHook(CompareLI_TextHook, CompareLI_TextFunc);
 struct ObjApp *CreateApp(void)
 {
 	struct ObjApp *object;
-	APTR strip;
 	static char about_text[512];
 	static char version_string[30];
 
 #ifndef __MORPHOS__
+	APTR strip;
 	translateMenu(MenuMainWin);
 #endif // ndef __MORPHOS__
 
@@ -266,7 +262,7 @@ struct ObjApp *CreateApp(void)
 #ifdef __MORPHOS__
 	APTR	MNlabel2Actions, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainMenuShowHidehiddenentries;
 	APTR	MNMainBarLabel0, MNMainAbout;
-	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Game, MNMainProperties, MNMainOpenCurrentDir;
+	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Game, MNMainProperties, MNMainIformation, MNMainOpenCurrentDir;
 	APTR	MNlabel2Tools, MNMainiGameSettings;
 	APTR	MNlabel2GameRepositories, MNMainBarLabel2, MNMainMUISettings;
 #endif // ndef __MORPHOS__
@@ -276,10 +272,8 @@ struct ObjApp *CreateApp(void)
 	// APTR	MNMainDelete;
 	APTR	GROUP_ROOT;
 	APTR	GR_Filter, LA_Filter, GR_main;
-	APTR	GROUP_ROOT_1, GR_Genre, LA_PropertiesGenre, Space_Genre;
-	APTR	GR_PropertiesChecks, obj_aux0, obj_aux1, Space_Properties, obj_aux2;
-	APTR	obj_aux3, GR_TimesPlayed, LA_PropertiesTimesPlayed, Space_TimesPlayed;
-	APTR	GR_SlavePath, LA_PropertiesSlavePath, Space_Path, GR_Tooltypes, GR_PropertiesButtons;
+	APTR	GROUP_ROOT_1, GR_PropertiesGameTitle;
+	APTR	GR_SlavePath, Space_Path, GR_Tooltypes, GR_PropertiesButtons;
 	APTR	Space_Buttons, GROUP_ROOT_2, GR_Path, GR_ReposButtons, GROUP_ROOT_3;
 	APTR	GR_AddGameTitle, LA_AddGameTitle, GR_AddGamePath, LA_AddGamePath;
 	APTR	GR_AddGameGenre, LA_AddGameGenre, Space_AddGame, GR_AddGameButtons;
@@ -297,6 +291,7 @@ struct ObjApp *CreateApp(void)
 	MakeStaticHook(MenuScanHook, scan_repositories);
 	MakeStaticHook(MenuShowHideHiddenHook, list_show_hidden);
 	MakeStaticHook(MenuPropertiesHook, slaveProperties);
+	MakeStaticHook(MenuItemInfoHook, getItemInformation);
 	MakeStaticHook(MenuAddNonWhdloadHook, add_non_whdload);
 	MakeStaticHook(OpenCurrentDirHook, open_current_dir);
 	MakeStaticHook(MenuOpenListHook, open_list);
@@ -574,11 +569,16 @@ struct ObjApp *CreateApp(void)
 		MUIA_Menuitem_Shortcut, MENU_PROPERTIES_HOTKEY,
 		End;
 
+	MNMainIformation = MenuitemObject,
+		MUIA_Menuitem_Title, GetMBString(MSG_MNMainIformation),
+		MUIA_Menuitem_Shortcut, MENU_INFORMATION_HOTKEY,
+		End;
+
 	MNMainOpenCurrentDir = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainOpenCurrentDir),
 		//MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainOpenCurrentDirChar),
 		End;
-#endif
+#endif // ndef __MORPHOS__
 
 	// MNMainMenuDuplicate = MenuitemObject,
 	// 	MUIA_Menuitem_Title, GetMBString(MSG_MNMainMenuDuplicate),
@@ -598,6 +598,7 @@ struct ObjApp *CreateApp(void)
 	MNlabel2Game = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Game),
 		MUIA_Family_Child, MNMainProperties,
+		MUIA_Family_Child, MNMainIformation,
 		End;
 
 	MNMainiGameSettings = MenuitemObject,
@@ -627,7 +628,7 @@ struct ObjApp *CreateApp(void)
 		MUIA_Family_Child, MNlabel2Game,
 		MUIA_Family_Child, MNlabel2Tools,
 		End;
-#endif
+#endif // ndef __MORPHOS__
 
 	object->WI_MainWindow = WindowObject,
 		MUIA_Window_ScreenTitle, version_string,
@@ -636,91 +637,25 @@ struct ObjApp *CreateApp(void)
 		MUIA_Window_Menustrip, strip = MUI_MakeObject(MUIO_MenustripNM, MenuMainWin, 0),
 #else
 		MUIA_Window_Menustrip, object->MN_MainMenu,
-#endif
+#endif // ndef __MORPHOS__
 		MUIA_Window_ID, MAKE_ID('0', 'I', 'G', 'A'),
 		MUIA_Window_AppWindow, TRUE,
 		WindowContents, GROUP_ROOT,
 		End;
 
-	object->STR_PropertiesGameTitle = StringObject,
-		MUIA_Frame, MUIV_Frame_String,
-		MUIA_FrameTitle, GetMBString(MSG_STR_PropertiesGameTitleTitle),
-		MUIA_HelpNode, "STR_PropertiesGameTitle",
-		End;
-
-	LA_PropertiesGenre = Label(GetMBString(MSG_LA_PropertiesGenre));
-
-	Space_Genre = HSpace(1);
-
-	object->CY_PropertiesGenre = CycleObject,
-		MUIA_HelpNode, "CY_PropertiesGenre",
-		MUIA_Frame, MUIV_Frame_Button,
-		MUIA_Cycle_Entries, object->CY_PropertiesGenreContent,
-		End;
-
-	GR_Genre = GroupObject,
-		MUIA_HelpNode, "GR_Genre",
+	GR_PropertiesGameTitle = GroupObject,
+		MUIA_HelpNode, "GR_SlavePath",
 		MUIA_Group_Horiz, TRUE,
 		MUIA_Group_HorizSpacing, 5,
 		MUIA_Group_VertSpacing, 5,
-		Child, LA_PropertiesGenre,
-		Child, Space_Genre,
-		Child, object->CY_PropertiesGenre,
+		Child, Label(GetMBString(MSG_STR_PropertiesGameTitleTitle)),
+		Child, HSpace(1),
+		Child, object->STR_PropertiesGameTitle = TextObject,
+			MUIA_Frame, MUIV_Frame_None,
+			MUIA_Text_SetMin, FALSE,
+			MUIA_Text_Shorten, MUIV_Text_Shorten_ElideCenter,
+			End,
 		End;
-
-	object->CH_PropertiesFavorite = CheckMark(FALSE);
-
-	obj_aux1 = Label2(GetMBString(MSG_CH_PropertiesFavorite));
-
-	obj_aux0 = GroupObject,
-		MUIA_Group_Columns, 2,
-		Child, obj_aux1,
-		Child, object->CH_PropertiesFavorite,
-		End;
-
-	Space_Properties = HVSpace;
-
-	object->CH_PropertiesHidden = CheckMark(FALSE);
-
-	obj_aux3 = Label2(GetMBString(MSG_CH_PropertiesHidden));
-
-	obj_aux2 = GroupObject,
-		MUIA_Group_Columns, 2,
-		Child, obj_aux3,
-		Child, object->CH_PropertiesHidden,
-		End;
-
-	GR_PropertiesChecks = GroupObject,
-		MUIA_HelpNode, "GR_PropertiesChecks",
-		MUIA_Group_Horiz, TRUE,
-		MUIA_Group_HorizSpacing, 5,
-		MUIA_Group_VertSpacing, 5,
-		Child, obj_aux0,
-		Child, Space_Properties,
-		Child, obj_aux2,
-		End;
-
-	LA_PropertiesTimesPlayed = Label(GetMBString(MSG_LA_PropertiesTimesPlayed));
-
-	Space_TimesPlayed = HSpace(1);
-
-	object->TX_PropertiesTimesPlayed = TextObject,
-		MUIA_Frame, MUIV_Frame_None,
-		MUIA_Text_Contents, object->STR_TX_PropertiesTimesPlayed,
-		MUIA_Text_SetMin, TRUE,
-		End;
-
-	GR_TimesPlayed = GroupObject,
-		MUIA_HelpNode, "GR_TimesPlayed",
-		MUIA_Group_Horiz, TRUE,
-		MUIA_Group_HorizSpacing, 5,
-		MUIA_Group_VertSpacing, 5,
-		Child, LA_PropertiesTimesPlayed,
-		Child, Space_TimesPlayed,
-		Child, object->TX_PropertiesTimesPlayed,
-		End;
-
-	LA_PropertiesSlavePath = Label(GetMBString(MSG_LA_PropertiesSlavePath));
 
 	Space_Path = HSpace(1);
 
@@ -736,7 +671,7 @@ struct ObjApp *CreateApp(void)
 		MUIA_Group_Horiz, TRUE,
 		MUIA_Group_HorizSpacing, 5,
 		MUIA_Group_VertSpacing, 5,
-		Child, LA_PropertiesSlavePath,
+		Child, Label(GetMBString(MSG_LA_PropertiesSlavePath)),
 		Child, Space_Path,
 		Child, object->TX_PropertiesSlavePath,
 		End;
@@ -772,10 +707,7 @@ struct ObjApp *CreateApp(void)
 	GROUP_ROOT_1 = GroupObject,
 		MUIA_Group_HorizSpacing, 5,
 		MUIA_Group_VertSpacing, 5,
-		Child, object->STR_PropertiesGameTitle,
-		Child, GR_Genre,
-		Child, GR_PropertiesChecks,
-		Child, GR_TimesPlayed,
+		Child, GR_PropertiesGameTitle,
 		Child, GR_SlavePath,
 		Child, GR_Tooltypes,
 		Child, GR_PropertiesButtons,
@@ -1212,14 +1144,16 @@ struct ObjApp *CreateApp(void)
 		SubWindow, object->WI_AddNonWHDLoad,
 		SubWindow, object->WI_About,
 		SubWindow, object->WI_Settings,
+		SubWindow, object->WI_Information = getInformationWindow(object),
 		End;
-
 
 	if (!object->App)
 	{
 		FreeVec(object);
 		return NULL;
 	}
+
+	setInformationWindowMethods(object);
 
 	DoMethod(object->LV_GamesList, MUIM_Notify, MUIA_NList_TitleClick, MUIV_EveryTime,
 		object->LV_GamesList, 4, MUIM_NList_Sort3, MUIV_TriggerValue, MUIV_NList_SortTypeAdd_2Values, MUIV_NList_Sort3_SortType_Both);
@@ -1384,7 +1318,7 @@ struct ObjApp *CreateApp(void)
 	);
 
 	DoMethod(object->BT_PropertiesCancel,
-		MUIM_Notify, MUIA_Pressed, TRUE,
+		MUIM_Notify, MUIA_Pressed, FALSE,
 		object->WI_Properties,
 		3,
 		MUIM_Set, MUIA_Window_Open, FALSE
@@ -1392,9 +1326,6 @@ struct ObjApp *CreateApp(void)
 
 	DoMethod(object->WI_Properties,
 		MUIM_Window_SetCycleChain, object->STR_PropertiesGameTitle,
-		object->CY_PropertiesGenre,
-		object->CH_PropertiesFavorite,
-		object->CH_PropertiesHidden,
 		object->BT_PropertiesOK,
 		object->BT_PropertiesCancel,
 		0
@@ -1698,6 +1629,13 @@ struct ObjApp *CreateApp(void)
 		object->App,
 		2,
 		MUIM_CallHook, &MenuPropertiesHook
+	);
+
+	DoMethod(MNMainIformation,
+		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
+		object->App,
+		2,
+		MUIM_CallHook, &MenuItemInfoHook
 	);
 
 	//OPEN CURRENT DIR

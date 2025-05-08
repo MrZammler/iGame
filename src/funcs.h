@@ -58,5 +58,7 @@ void setting_start_with_favorites_changed(void);
 void settings_use(void);
 void settingUseIgameDataTitleChanged(void);
 igame_settings *load_settings(const char *);
+void getItemInformation(void);
+void saveItemInformation(void);
 
 #endif

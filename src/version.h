@@ -33,10 +33,10 @@
 #endif
 
 #ifndef RELEASE_DATE
-#define RELEASE_DATE "2023"
+#define RELEASE_DATE "2025"
 #endif
 
-#define COPY_END_YEAR 2023
+#define COPY_END_YEAR 2025
 
 #ifndef VERSION
 #define VERSION "$VER: iGame " STR(MAJOR_VERS) "." STR(MINOR_VERS) "." STR(PATCH_VERS) " (" STR(RELEASE_DATE) ")"

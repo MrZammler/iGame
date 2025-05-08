@@ -1,4 +1,4 @@
-; $VER: igame.cd 2.4 (06.05.2023)
+; $VER: igame.cd 2.5 (03.05.2025)
 ;
 ;
 MSG_AppDescription (//)
@@ -95,7 +95,7 @@ MSG_WI_Properties (//)
 Game Properties
 ;
 MSG_STR_PropertiesGameTitleTitle (//)
-Title
+Title:
 ;
 MSG_LA_PropertiesGenre (//)
 Genre:
@@ -336,4 +336,34 @@ Players
 ;
 MSG_LA_UseIgameDataTitle (//)
 Prefer igame.data
+;
+MSG_WI_Information (//)
+Item information
+;
+MSG_MNMainIformation (//)
+Information...
+;
+MSG_LA_ReleaseYear (//)
+Release year:
+;
+MSG_LA_ReleasedBy (//)
+Released by:
+;
+MSG_LA_Chipset (//)
+Chipset:
+;
+MSG_LA_NoOfPlayers (//)
+No of players:
+;
+MSG_LA_TimesPlayed (//)
+Times played:
+;
+MSG_LA_Favourite (//)
+Favourite
+;
+MSG_LA_Hidden (//)
+Hidden
+;
+MSG_GR_LinksTitle (//)
+Links
 ;

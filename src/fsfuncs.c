@@ -292,8 +292,7 @@ void slavesListLoadFromCSV(char *filename)
 void slavesListSaveToCSV(const char *filename)
 {
 	char csvFilename[32];
-	const char* saving_message = (const char*)GetMBString(MSG_SavingGamelist);
-	set(app->TX_Status, MUIA_Text_Contents, saving_message);
+	set(app->TX_Status, MUIA_Text_Contents, (const char*)GetMBString(MSG_SavingGamelist));
 
 	strcpy(csvFilename, (CONST_STRPTR)filename);
 	strcat(csvFilename, ".csv");
