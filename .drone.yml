@@ -15,7 +15,7 @@ steps:
     AWS_SECRET_ACCESS_KEY:
       from_secret: AWS_SECRET_ACCESS_KEY
   commands:
-    - aws ec2 start-instances --region eu-north-1 --instance-ids i-01e3d598710a23947
+    - aws ec2 start-instances --region eu-north-1 --instance-ids i-07474e4fe80f14754
 
 trigger:
   branch:

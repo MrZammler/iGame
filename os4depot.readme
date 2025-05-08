@@ -54,11 +54,12 @@ Requirements:
 * Workbench 2.1 or higher
 * MUI 3.8 or higher
 * icon.library v37+ (v44+ Recommended)
-* guigfx.library
-* render.library
-* guigfx.mcc
+* guigfx.library (optional)
+* render.library (optional)
+* guigfx.mcc (optional)
 * Texteditor.mcc
 * NListviews.mcc
+* Urltext.mcc (optional)
 
 The project is open source and you can find the code at:
 https://github.com/MrZammler/iGame
