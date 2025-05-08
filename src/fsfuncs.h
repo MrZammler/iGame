@@ -43,5 +43,6 @@ BOOL checkSlaveInTooltypes(char *, char *);
 void prepareWHDExecution(char *, char *);
 void getIGameDataInfo(char *, slavesList *);
 void loadGenresFromFile(void);
+BOOL isPathOnAssign(const char *);
 
 #endif

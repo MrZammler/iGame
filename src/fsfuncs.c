@@ -744,3 +744,36 @@ void loadGenresFromFile(void)
 		Close(fpgenres);
 	}
 }
+
+BOOL isPathOnAssign(const char *path)
+{
+	if ((path == NULL) || (path[0] == '/'))
+		return FALSE;
+
+	int bufSize = sizeof(char) * MAX_PATH_SIZE;
+	char *volume = malloc(bufSize);
+	for (int i = 0; i < strlen(path) - 1; i++) {
+		if (path[i] != ':') {
+			volume[i] = path[i];
+		}
+		else
+		{
+			volume[i] = ':';
+			volume[i+1] = '\0';
+			break;
+		}
+	}
+
+	char *buf = malloc(bufSize);
+	getFullPath(volume, buf);
+	if (!strcmp(volume, buf))
+	{
+		free(volume);
+		free(buf);
+		return FALSE;
+	}
+
+	free(buf);
+	free(volume);
+	return TRUE;
+}

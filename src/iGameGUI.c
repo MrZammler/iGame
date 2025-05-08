@@ -721,13 +721,11 @@ struct ObjApp *CreateApp(void)
 
 	object->STR_PA_RepoPath = String("", 80);
 
-	object->PA_RepoPath = PopButton(MUII_PopDrawer);
-
 	object->PA_RepoPath = PopaslObject,
 		MUIA_HelpNode, "PA_RepoPath",
 		MUIA_Popasl_Type, 0,
 		MUIA_Popstring_String, object->STR_PA_RepoPath,
-		MUIA_Popstring_Button, object->PA_RepoPath,
+		MUIA_Popstring_Button, PopButton(MUII_PopDrawer),
 		ASLFR_TitleText, GetMBString(MSG_SelectDir),
 		ASLFR_DrawersOnly, TRUE,
 		End;
