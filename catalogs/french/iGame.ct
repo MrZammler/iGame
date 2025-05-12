@@ -1,7 +1,7 @@
-## version $VER: iGame.catalog 1.2 (07.05.2023)
+## version $VER: iGame.catalog 1.3 (10.05.2025)
 ## codeset 0
-## language français
-; $VER: igame.cd 2.4 (06.05.2023)
+## language french
+; $VER: igame.cd 2.5 (03.05.2025)
 ;
 ;
 MSG_AppDescription
@@ -9,15 +9,15 @@ Un client pour WHDLoad
 ; A front-end to WHDLoad
 ;
 MSG_AppCopyright
-Emmanuel Vasilakis
+
 ; Emmanuel Vasilakis
 ;
 MSG_WI_MainWindow
-iGame
+
 ; iGame
 ;
 MSG_MNlabel2Actions
-Actions
+
 ; Actions
 ;
 MSG_MNlabelScan
@@ -25,7 +25,7 @@ Scanner les répertoires
 ; Scan Repositories
 ;
 MSG_MNlabelScanChar
-R_
+
 ; R_
 ;
 MSG_MNMainAddnonWHDLoadgame
@@ -33,7 +33,7 @@ Ajouter un jeu...
 ; Add game...
 ;
 MSG_MNMainAddnonWHDLoadgameChar
-A_
+
 ; A_
 ;
 MSG_MNMainMenuShowHidehiddenentries
@@ -45,7 +45,7 @@ Ouvrir liste...
 ; Open List...
 ;
 MSG_MNMainOpenListChar
-O_
+
 ; O_
 ;
 MSG_MNMainSaveList
@@ -53,7 +53,7 @@ Sauvegarder liste
 ; Save List
 ;
 MSG_MNMainSaveListChar
-S_
+
 ; S_
 ;
 MSG_MNMainSaveListAs
@@ -73,7 +73,7 @@ Quitter
 ; Quit
 ;
 MSG_MNMainQuitChar
-Q_
+
 ; Q_
 ;
 MSG_MNlabel2Game
@@ -89,7 +89,7 @@ Propriétés...
 ; Properties...
 ;
 MSG_MNMainPropertiesChar
-P_
+
 ; P_
 ;
 MSG_MNMainDelete
@@ -97,7 +97,7 @@ Supprimer
 ; Delete
 ;
 MSG_MNMainDeleteChar
-D_
+
 ; D_
 ;
 MSG_MNlabel2Tools
@@ -130,7 +130,7 @@ Propriétés du jeu
 ;
 MSG_STR_PropertiesGameTitleTitle
 Titre
-; Title
+; Title:
 ;
 MSG_LA_PropertiesGenre
 Type :
@@ -250,7 +250,7 @@ MSG_CY_ScreenshotSize0
 ; 160x128
 ;
 MSG_CY_ScreenshotSize1
-320x256
+
 ; 320x256
 ;
 MSG_CY_ScreenshotSize2
@@ -335,7 +335,7 @@ MSG_FilterShowAll
 ;
 MSG_FilterFavorites
 --Favoris--
-; --Favorites--
+; --Favourites--
 ;
 MSG_FilterLastPlayed
 --Dernier joué--
@@ -403,14 +403,14 @@ Répertoire de jeux introuvable !
 ;
 MSG_LA_StartWithFavorites
 Afficher les favoris au départ
-; Display favorites on start
+; Display favourites on start
 ;
 MSG_MNMainOpenCurrentDir
 Ouvrir le répertoire du jeu
 ; Open game folder
 ;
 MSG_MNMainOpenCurrentDirChar
-W_
+
 ; W_
 ;
 MSG_slavePathDoesntExist
@@ -452,4 +452,44 @@ Joueurs
 MSG_LA_UseIgameDataTitle
 igame.data préféré
 ; Prefer igame.data
+;
+MSG_WI_Information
+Information sur l'élément
+; Item information
+;
+MSG_MNMainIformation
+
+; Information...
+;
+MSG_LA_ReleaseYear
+Année de version :
+; Release year:
+;
+MSG_LA_ReleasedBy
+Version par :
+; Released by:
+;
+MSG_LA_Chipset
+Chipset :
+; Chipset:
+;
+MSG_LA_NoOfPlayers
+Nbr de joueurs :
+; No of players:
+;
+MSG_LA_TimesPlayed
+Temps joué :
+; Times played:
+;
+MSG_LA_Favourite
+Favoris
+; Favourite
+;
+MSG_LA_Hidden
+Caché
+; Hidden
+;
+MSG_GR_LinksTitle
+Liens
+; Links
 ;

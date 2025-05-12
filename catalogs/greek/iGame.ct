@@ -1,8 +1,8 @@
-## version $VER: igame.catalog 2.3 (08.04.2023)
+## version $VER: igame.catalog 2.5 (03.05.2025)
 ## language greek
 ## codeset 10
 ;
-; $VER: igame.cd 2.4 (06.05.2023)
+; $VER: igame.cd 2.5 (03.05.2025)
 ;
 ;
 MSG_AppDescription
@@ -130,8 +130,8 @@ MSG_WI_Properties
 ; Game Properties
 ;
 MSG_STR_PropertiesGameTitleTitle
-Τίτλος
-; Title
+Τίτλος:
+; Title:
 ;
 MSG_LA_PropertiesGenre
 Είδος:
@@ -335,7 +335,7 @@ MSG_FilterShowAll
 ;
 MSG_FilterFavorites
 --Αγαπημένα--
-; --Favorites--
+; --Favourites--
 ;
 MSG_FilterLastPlayed
 --Τελευταία παιγμένα--
@@ -403,7 +403,7 @@ MSG_DirectoryNotFound
 ;
 MSG_LA_StartWithFavorites
 Εμφάνιση αγαπημένων κατά την έναρξη
-; Display favorites on start
+; Display favourites on start
 ;
 MSG_MNMainOpenCurrentDir
 ¶νοιγμα φακέλου
@@ -441,23 +441,75 @@ MSG_LV_GAMESLIST_TITLE
 Τίτλος
 ; Title
 ;
-; ***NEW***
-;
 MSG_LV_GAMESLIST_YEAR
 Χρονιά
 ; Year
-;
-; ***NEW***
 ;
 MSG_LV_GAMESLIST_PLAYERS
 Παίκτες
 ; Players
 ;
-; ***NEW***
-;
 MSG_LA_UseIgameDataTitle
 Χρήση του igame.data
 ; Prefer igame.data
+;
+MSG_WI_Information
+Πληροφορίες
+; Item information
+;
+; ***NEW***
+;
+MSG_MNMainIformation
+Πληροφορίες...
+; Information...
+;
+; ***NEW***
+;
+MSG_LA_ReleaseYear
+Έτος κυκλοφορίας:
+; Release year:
+;
+; ***NEW***
+;
+MSG_LA_ReleasedBy
+Κυκλοφόρησε από:
+; Released by:
+;
+; ***NEW***
+;
+MSG_LA_Chipset
+Chip Γραφικών:
+; Chipset:
+;
+; ***NEW***
+;
+MSG_LA_NoOfPlayers
+Αριθμός παικτών:
+; No of players:
+;
+; ***NEW***
+;
+MSG_LA_TimesPlayed
+Φορές που παίχτηκε:
+; Times played:
+;
+; ***NEW***
+;
+MSG_LA_Favourite
+Αγαπημένο
+; Favourite
+;
+; ***NEW***
+;
+MSG_LA_Hidden
+Κρυφό
+; Hidden
+;
+; ***NEW***
+;
+MSG_GR_LinksTitle
+Σύνδεσμοι
+; Links
 ;
 ; ***NEW***
 ;
