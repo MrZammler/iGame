@@ -1341,10 +1341,10 @@ void slaveProperties(void)
 
 		setSlavesListBuffer(node);
 
-		set(app->STR_PropertiesGameTitle, MUIA_Text_Contents, node->title);
+		set(app->TX_PropertiesGameTitle, MUIA_Text_Contents, node->title);
 		if(!isStringEmpty(node->user_title))
 		{
-			set(app->STR_PropertiesGameTitle, MUIA_Text_Contents, node->user_title);
+			set(app->TX_PropertiesGameTitle, MUIA_Text_Contents, node->user_title);
 		}
 		set(app->TX_PropertiesSlavePath, MUIA_Text_Contents, node->path);
 

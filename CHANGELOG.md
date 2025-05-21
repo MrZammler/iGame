@@ -1,4 +1,9 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
+
+### Changed
+- Moved the properties window code to its own files
+
+## iGame 2.5.0 - [2025-05-12]
 ### Added
 - Added a new "Information" window that includes the "Released date", the "Released by", the "Chipset", the links to external websites and most of the fields from the properties window.
 - Added the option to use repositories based on assigns (fixes #240)
