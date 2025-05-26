@@ -576,7 +576,7 @@ struct ObjApp *CreateApp(void)
 
 	MNMainOpenCurrentDir = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainOpenCurrentDir),
-		//MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainOpenCurrentDirChar),
+		MUIA_Menuitem_Shortcut, MENU_DELETE_HOTKEY,
 		End;
 #endif // ndef __MORPHOS__
 
@@ -599,6 +599,7 @@ struct ObjApp *CreateApp(void)
 		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Game),
 		MUIA_Family_Child, MNMainProperties,
 		MUIA_Family_Child, MNMainIformation,
+		MUIA_Family_Child, MNMainOpenCurrentDir,
 		End;
 
 	MNMainiGameSettings = MenuitemObject,
