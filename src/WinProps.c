@@ -32,18 +32,42 @@
 /* Prototypes */
 #include <clib/alib_protos.h>
 #include <proto/muimaster.h>
+#include <proto/asl.h>
 #include <proto/icon.h>
+
+#include <string.h>
+#include <stdlib.h>
 
 #define iGame_NUMBERS
 #include "iGame_strings.h"
 
 #include "iGameExtern.h"
 #include "funcs.h"
+#include "fsfuncs.h"
 #include "strfuncs.h"
 #include "iGameGUI.h"
 #include "WinProps.h"
 
 extern igame_settings *current_settings;
+
+HOOKPROTO(StopHookFunc, void, Object *strObj, const struct FileRequester *req)
+{
+	if (req && req->fr_File)
+	{
+		int pathSize = sizeof(char) * MAX_PATH_SIZE;
+		char *buf = malloc(pathSize);
+
+		strlcpy(buf, req->fr_Drawer, pathSize);
+		if (buf[strlen(buf) - 1] != '/')
+			strlcat(buf, "/", pathSize);
+		strlcat(buf, req->fr_File, pathSize);
+		set(strObj, MUIA_String_Contents, buf);
+		updateToolTypesText(buf);
+
+		free(buf);
+	}
+}
+MakeStaticHook(PopaslStopHook, StopHookFunc);
 
 APTR getPropertiesWindow(struct ObjApp *object)
 {
@@ -72,10 +96,12 @@ APTR getPropertiesWindow(struct ObjApp *object)
 					MUIA_InnerLeft, 0,
 					MUIA_InnerRight, 0,
 				End,
-				Child, object->TX_PropertiesSlavePath = TextObject,
-					MUIA_Frame, MUIV_Frame_None,
-					MUIA_Text_SetMin, FALSE,
-					MUIA_Text_Shorten, MUIV_Text_Shorten_ElideCenter,
+				Child, object->PA_PropertiesSlavePath = PopaslObject,
+					MUIA_Popasl_Type, 0,
+					MUIA_Popstring_String, String("", 80),
+					MUIA_Popstring_Button, PopButton(MUII_PopFile),
+					MUIA_Popasl_StopHook, &PopaslStopHook,
+					ASLFR_TitleText, GetMBString(MSG_ItemExecutableOrSlave),
 				End,
 			End,
 			Child, object->TX_PropertiesTooltypes = TextEditorObject,

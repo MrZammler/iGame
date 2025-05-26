@@ -34,5 +34,7 @@ STRPTR substring(STRPTR, int, int);
 STRPTR GetMBString(ULONG);
 BOOL isStringEmpty(const char *);
 BOOL isNumeric(const char *);
+int strlcpy(char *, const char *, int);
+int strlcat(char *, const char *, int);
 
 #endif

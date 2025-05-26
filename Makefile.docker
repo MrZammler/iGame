@@ -162,7 +162,7 @@ src/WinInfo_$(CPU).o: src/WinInfo.c src/WinInfo.h src/iGameExtern.h \
 	src/iGameGUI.h src/iGame_strings.h src/funcs.h
 
 src/WinProps_$(CPU).o: src/WinProps.c src/WinProps.h src/iGameExtern.h \
-	src/iGameGUI.h src/iGame_strings.h src/funcs.h
+	src/iGameGUI.h src/iGame_strings.h src/funcs.h src/fsfuncs.h
 
 ##########################################################################
 # generic rules

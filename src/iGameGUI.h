@@ -49,7 +49,7 @@ struct ObjApp
 	// Properties Window
 	APTR WI_Properties;
 	APTR TX_PropertiesGameTitle;
-	APTR TX_PropertiesSlavePath;
+	APTR PA_PropertiesSlavePath;
 	APTR TX_PropertiesTooltypes;
 	APTR BT_PropertiesOK;
 	APTR BT_PropertiesCancel;
