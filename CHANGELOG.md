@@ -2,6 +2,9 @@
 ### Added
 - Added the "Open game folder" menu in the MorphOS version, that was missing
 
+### Changed
+- Disabled the gamepad usage on MorphOS because it was reported giving problems while playing a game
+
 ### Fixed
 - Fixed starting WHDLoad games in MorphOS using WHDLoadopener
 
