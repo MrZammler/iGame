@@ -26,7 +26,7 @@
 #include <mui/TextEditor_mcc.h>
 #include <mui/NListview_mcc.h>
 
-#ifdef __MORPHOS__
+#ifdef __morphos__
 #define SDI_TRAP_LIB
 #endif
 #include <SDI_hook.h>
@@ -71,14 +71,14 @@
 extern igame_settings *current_settings;
 extern blockGuiGfx;
 
-#ifndef __MORPHOS__
+#ifndef __morphos__
 static void translateMenu(struct NewMenu *);
 static void flagMenuItem(struct NewMenu *, APTR, UWORD);
 
 #define TICK (CHECKIT|MENUTOGGLE)
 #define DIS  NM_ITEMDISABLED
 #define STR_ID(x) ( (STRPTR)(x) )
-#endif // ndef __MORPHOS__
+#endif // ndef __morphos__
 
 #if defined(__amigaos4__)
 #define AllocVecShared(size, flags)  AllocVecTags((size), AVT_Type, MEMF_SHARED, AVT_Lock, FALSE, ((flags)&MEMF_CLEAR) ? AVT_ClearWithValue : TAG_IGNORE, 0, TAG_DONE)
@@ -86,7 +86,7 @@ static void flagMenuItem(struct NewMenu *, APTR, UWORD);
 #define AllocVecShared(size, flags)  AllocVec((size), (flags))
 #endif
 
-#ifndef __MORPHOS__
+#ifndef __morphos__
 static struct NewMenu MenuMainWin[] =
 {
 	{ NM_TITLE, STR_ID(MSG_MNlabel2Actions)							, 0 ,0 ,0			,(APTR)MENU_ACTIONS },
@@ -111,7 +111,7 @@ static struct NewMenu MenuMainWin[] =
 
 	{ NM_END,NULL,0,0,0,NULL }
 };
-#endif // ndef __MORPHOS__
+#endif // ndef __morphos__
 
 static struct Listentry
 {
@@ -243,10 +243,10 @@ struct ObjApp *CreateApp(void)
 	static char about_text[512];
 	static char version_string[30];
 
-#ifndef __MORPHOS__
+#ifndef __morphos__
 	APTR strip;
 	translateMenu(MenuMainWin);
-#endif // ndef __MORPHOS__
+#endif // ndef __morphos__
 
 	snprintf(version_string, sizeof(version_string),
 		"%s %d.%d.%d (%s)",
@@ -259,13 +259,13 @@ struct ObjApp *CreateApp(void)
 		version_string, GetMBString(MSG_compiledForAboutWin), STR(CPU_VERS), COPY_END_YEAR, GetMBString(MSG_TX_About)
 	);
 
-#ifdef __MORPHOS__
+#ifdef __morphos__
 	APTR	MNlabel2Actions, MNlabelScan, MNMainAddnonWHDLoadgame, MNMainMenuShowHidehiddenentries;
 	APTR	MNMainBarLabel0, MNMainAbout;
 	APTR	MNMainBarLabel1, MNMainQuit, MNlabel2Game, MNMainProperties, MNMainIformation, MNMainOpenCurrentDir;
 	APTR	MNlabel2Tools, MNMainiGameSettings;
 	APTR	MNlabel2GameRepositories, MNMainBarLabel2, MNMainMUISettings;
-#endif // ndef __MORPHOS__
+#endif // ndef __morphos__
 
 	APTR	MNMainOpenList, MNMainSaveList, MNMainSaveListAs;
 	// APTR	MNMainMenuDuplicate;
@@ -504,7 +504,7 @@ struct ObjApp *CreateApp(void)
 		Child, object->TX_Status,
 		End;
 
-#ifdef __MORPHOS__
+#ifdef __morphos__
 	MNlabelScan = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNlabelScan),
 		MUIA_Menuitem_Shortcut, MENU_SCANREPOS_HOTKEY,
@@ -534,7 +534,7 @@ struct ObjApp *CreateApp(void)
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainSaveListAs),
 		End;
 
-#ifdef __MORPHOS__
+#ifdef __morphos__
 	MNMainBarLabel0 = MUI_MakeObject(MUIO_Menuitem, NM_BARLABEL, 0, 0, 0);
 
 	MNMainAbout = MenuitemObject,
@@ -576,9 +576,9 @@ struct ObjApp *CreateApp(void)
 
 	MNMainOpenCurrentDir = MenuitemObject,
 		MUIA_Menuitem_Title, GetMBString(MSG_MNMainOpenCurrentDir),
-		//MUIA_Menuitem_Shortcut, GetMBString(MSG_MNMainOpenCurrentDirChar),
+		MUIA_Menuitem_Shortcut, MENU_DELETE_HOTKEY,
 		End;
-#endif // ndef __MORPHOS__
+#endif // ndef __morphos__
 
 	// MNMainMenuDuplicate = MenuitemObject,
 	// 	MUIA_Menuitem_Title, GetMBString(MSG_MNMainMenuDuplicate),
@@ -589,7 +589,7 @@ struct ObjApp *CreateApp(void)
 	// 	MUIA_Menuitem_Shortcut, MENU_DELETE_HOTKEY,
 	// 	End;
 
-#ifndef __MORPHOS__
+#ifndef __morphos__
 	if (get_wb_version() < 44)
 	{
 		flagMenuItem(MenuMainWin, (APTR)MENU_GAMEFOLDER, DIS);
@@ -599,6 +599,7 @@ struct ObjApp *CreateApp(void)
 		MUIA_Menuitem_Title, GetMBString(MSG_MNlabel2Game),
 		MUIA_Family_Child, MNMainProperties,
 		MUIA_Family_Child, MNMainIformation,
+		MUIA_Family_Child, MNMainOpenCurrentDir,
 		End;
 
 	MNMainiGameSettings = MenuitemObject,
@@ -628,16 +629,16 @@ struct ObjApp *CreateApp(void)
 		MUIA_Family_Child, MNlabel2Game,
 		MUIA_Family_Child, MNlabel2Tools,
 		End;
-#endif // ndef __MORPHOS__
+#endif // ndef __morphos__
 
 	object->WI_MainWindow = WindowObject,
 		MUIA_Window_ScreenTitle, version_string,
 		MUIA_Window_Title, GetMBString(MSG_WI_MainWindow),
-#ifndef __MORPHOS__
+#ifndef __morphos__
 		MUIA_Window_Menustrip, strip = MUI_MakeObject(MUIO_MenustripNM, MenuMainWin, 0),
 #else
 		MUIA_Window_Menustrip, object->MN_MainMenu,
-#endif // ndef __MORPHOS__
+#endif // ndef __morphos__
 		MUIA_Window_ID, MAKE_ID('0', 'I', 'G', 'A'),
 		MUIA_Window_AppWindow, TRUE,
 		WindowContents, GROUP_ROOT,
@@ -1587,7 +1588,7 @@ struct ObjApp *CreateApp(void)
 		0
 	);
 
-#ifdef __MORPHOS__
+#ifdef __morphos__
 	DoMethod(MNlabelScan,
 		MUIM_Notify, MUIA_Menuitem_Trigger, MUIV_EveryTime,
 		object->App,

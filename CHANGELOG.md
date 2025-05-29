@@ -1,5 +1,15 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Added
+- Added the "Open game folder" menu in the MorphOS version, that was missing
+
+### Changed
+- Disabled the gamepad usage on MorphOS because it was reported giving problems while playing a game
+
+### Fixed
+- Fixed starting WHDLoad games in MorphOS using WHDLoadopener
+
+## iGame 2.5.0 - [2025-05-12]
+### Added
 - Added a new "Information" window that includes the "Released date", the "Released by", the "Chipset", the links to external websites and most of the fields from the properties window.
 - Added the option to use repositories based on assigns (fixes #240)
 

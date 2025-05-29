@@ -24,7 +24,7 @@
 #include <libraries/mui.h>
 #include <mui/Urltext_mcc.h>
 
-#ifdef __MORPHOS__
+#ifdef __morphos__
 #define SDI_TRAP_LIB
 #endif
 #include <SDI_hook.h>
