@@ -46,12 +46,14 @@ struct ObjApp
 	APTR LV_GenresList;
 	APTR CY_ChipsetList;
 	APTR TX_Status;
+	// Properties Window
 	APTR WI_Properties;
-	APTR STR_PropertiesGameTitle;
-	APTR TX_PropertiesSlavePath;
+	APTR TX_PropertiesGameTitle;
+	APTR PA_PropertiesSlavePath;
 	APTR TX_PropertiesTooltypes;
 	APTR BT_PropertiesOK;
 	APTR BT_PropertiesCancel;
+	// Repositories Window
 	APTR WI_GameRepositories;
 	APTR PA_RepoPath;
 	APTR STR_PA_RepoPath;

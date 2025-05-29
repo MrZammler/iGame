@@ -109,7 +109,7 @@ endif
 igame_OBJS	= src/funcs_$(CPU).o src/iGameGUI_$(CPU).o \
 	src/iGameMain_$(CPU).o src/strfuncs_$(CPU).o src/fsfuncs_$(CPU).o \
 	src/slavesList_$(CPU).o src/genresList_$(CPU).o \
-	src/chipsetList_$(CPU).o src/WinInfo_$(CPU).o
+	src/chipsetList_$(CPU).o src/WinInfo_$(CPU).o src/WinProps_$(CPU).o
 
 ##########################################################################
 # Rule for building
@@ -141,7 +141,7 @@ src/funcs_$(CPU).o: src/funcs.c src/iGame_strings.h src/strfuncs.h \
 	src/chipsetList.h
 
 src/iGameGUI_$(CPU).o: src/iGameGUI.c src/iGameGUI.h src/iGame_strings.h \
-	src/fsfuncs.h src/iGameExtern.h src/version.h src/WinInfo.h
+	src/fsfuncs.h src/iGameExtern.h src/version.h src/WinInfo.h src/WinProps.h
 
 src/iGameMain_$(CPU).o: src/iGameMain.c src/iGameExtern.h
 
@@ -160,6 +160,9 @@ src/chipsetList_$(CPU).o: src/chipsetList.c src/chipsetList.h src/strfuncs.h
 
 src/WinInfo_$(CPU).o: src/WinInfo.c src/WinInfo.h src/iGameExtern.h \
 	src/iGameGUI.h src/iGame_strings.h src/funcs.h
+
+src/WinProps_$(CPU).o: src/WinProps.c src/WinProps.h src/iGameExtern.h \
+	src/iGameGUI.h src/iGame_strings.h src/funcs.h src/fsfuncs.h
 
 ##########################################################################
 # generic rules

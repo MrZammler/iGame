@@ -1,7 +1,7 @@
-## version $VER: xxxxxx.catalog 1.0 (11.05.2025)
+## version $VER: xxxxxx.catalog 1.1 (28.05.2025)
 ## codeset 0
 ## language german
-; $VER: igame.cd 2.5 (03.05.2025)
+; $VER: igame.cd 2.5 (28.05.2025)
 ;
 ;
 MSG_AppDescription
@@ -491,4 +491,8 @@ Versteckt
 MSG_GR_LinksTitle
 Links
 ; Links
+;
+MSG_ItemExecutableOrSlave
+Wählen Sie die slave oder die ausführbare Datei
+;Select the slave or the executable file
 ;

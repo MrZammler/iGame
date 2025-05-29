@@ -509,11 +509,16 @@ BOOL isPathFolder(char *path)
 */
 void getIconTooltypes(char *path, char *result)
 {
-	if (IconBase)
+	if (IconBase && (IconBase->lib_Version >= 44))
 	{
 		struct DiskObject *diskObj = GetDiskObjectNew(path);
 		if(diskObj)
 		{
+			if (diskObj->do_ToolTypes == NULL)
+			{
+				FreeDiskObject(diskObj);
+				return;
+			}
 			char *buf = AllocVec(sizeof(char) * MAX_TOOLTYPE_SIZE, MEMF_CLEAR);
 
 			// cppcheck-suppress redundantInitialization
@@ -533,7 +538,7 @@ void getIconTooltypes(char *path, char *result)
 
 void setIconTooltypes(char *path, char *tooltypes)
 {
-	if (IconBase)
+	if (IconBase && (IconBase->lib_Version >= 44))
 	{
 		struct DiskObject *diskObj = GetIconTags(path, TAG_DONE);
 		if(diskObj)
@@ -565,7 +570,7 @@ void setIconTooltypes(char *path, char *tooltypes)
 			{
 				char **table2 = my_split(tooltypes, "\n");
 				int table2Cnt = 0;
-				for (table2; (buf = *table2); ++table2)
+				for (table2; (buf = *table2); ++table2) // cppcheck-suppress redundantInitialization
 				{
 					newToolTypes[table2Cnt] = buf;
 					table2Cnt++;

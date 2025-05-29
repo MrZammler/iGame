@@ -7,7 +7,7 @@
 @{jcenter}
 iGame
 =============================================
-(c) 2005-2023 Emmanuel Vasilakis
+(c) 2005-2025 Emmanuel Vasilakis
 @{jleft}
 @{lindent 3}
 @{" Introduction    " LINK "INTR" 0} - About iGame
@@ -285,9 +285,9 @@ This window opens from the menu item "Game > Properties". For this to work you h
 
 From the top, the first string shows the title of the selected game/demo. This can be changed from the @{" Information " LINK "WININFO" 0} window.
 
-The full path of the slave file, in case this is a WHDLoad entry, or the full path of the executable of any entry as set from the "Actions > Add a Game", is shown in the next field. This is also a read-only field and you cannot modify it.
+The full path of the slave file, in case this is a WHDLoad entry, or the full path of the executable of any entry as set from the "Actions > Add a Game", is shown in the next field. This can be modified by the user, is situations where a different .slave file is needed to be used.
 
-After that, there is a big text area, showing the icon tooltypes. This is extremely useful in case you want to change something on the entry, especially if it is a WHDLoad one, where the tooltypes can change the way it works.
+After that, there is a big text area, showing the icon tooltypes. This is extremely useful in case you want to change something on the entry, especially if it is a WHDLoad one, where the tooltypes can change the way it works. This field can get disabled if the selected file on the previous field, is not a WHDLoad slave file. Also, if you change the path, the contents of this field will be updated to reflect the newly selected file.
 
 @ENDNODE
 @NODE "WININFO" "Information Window..."

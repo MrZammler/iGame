@@ -1343,26 +1343,16 @@ void slaveProperties(void)
 	slavesList *node = NULL;
 	if (node = slavesListSearchByTitle(title, sizeof(char) * MAX_SLAVE_TITLE_SIZE))
 	{
-		int pathBufferSize = sizeof(char) * MAX_PATH_SIZE;
-		char *pathBuffer = malloc(pathBufferSize);
-		char *tooltypesBuffer = AllocVec(sizeof(char) * 1024, MEMF_CLEAR);
-
 		setSlavesListBuffer(node);
 
-		set(app->STR_PropertiesGameTitle, MUIA_Text_Contents, node->title);
+		set(app->TX_PropertiesGameTitle, MUIA_Text_Contents, node->title);
 		if(!isStringEmpty(node->user_title))
 		{
-			set(app->STR_PropertiesGameTitle, MUIA_Text_Contents, node->user_title);
+			set(app->TX_PropertiesGameTitle, MUIA_Text_Contents, node->user_title);
 		}
-		set(app->TX_PropertiesSlavePath, MUIA_Text_Contents, node->path);
+		set(app->PA_PropertiesSlavePath, MUIA_String_Contents, node->path);
 
-		// TODO: Check if this item is a slave. If not don't use the substring
-		snprintf(pathBuffer, sizeof(char) * MAX_PATH_SIZE, "%s", substring(node->path, 0, -6));
-		getIconTooltypes(pathBuffer, tooltypesBuffer);
-		set(app->TX_PropertiesTooltypes, MUIA_TextEditor_Contents, tooltypesBuffer);
-
-		// TODO: Should the pathBuffer be freed here?
-		// TODO: Should the tooltypesBuffer be freed here?
+		updateToolTypesText(node->path);
 
 		set(app->WI_Properties, MUIA_Window_Open, TRUE);
 	}
@@ -1371,23 +1361,53 @@ void slaveProperties(void)
 // Save item properties when the user clicks on Save button
 void saveItemProperties(void)
 {
-	int genreId, hideSelection;
 	int bufSize = sizeof(char) * MAX_PATH_SIZE;
 	char *buf = AllocVec(bufSize, MEMF_CLEAR);
-	ULONG newpos;
-
+	ULONG tooltypesEnabled = 0;
 	slavesList *node = NULL;
 	node = getSlavesListBuffer(); // cppcheck-suppress memleak
 
-	// Save the tooltypes
-	if (IconBase->lib_Version >= 44)
+	get(app->PA_PropertiesSlavePath, MUIA_String_Contents, &buf);
+	strncpy(node->path, buf, sizeof(node->path));
+
+	get(app->TX_PropertiesTooltypes, MUIA_Disabled, &tooltypesEnabled);
+	if (IconBase && (IconBase->lib_Version >= 44) && (tooltypesEnabled == 0))
 	{
+		// Save the tooltypes
 		showDefaultScreenshot();
 		STRPTR tooltypesBuffer = (STRPTR)DoMethod(app->TX_PropertiesTooltypes, MUIM_TextEditor_ExportText);
 		snprintf(buf, sizeof(node->path), "%s", substring(node->path, 0, -6));
 		setIconTooltypes(buf, tooltypesBuffer);
 		game_click();
 	}
+}
+
+void updateToolTypesText(const char *buf)
+{
+	int pathSize = sizeof(char) * MAX_PATH_SIZE;
+	char *pathBuffer = calloc(1, pathSize);
+	char *tooltypesBuffer = calloc(1, sizeof(char) * 1024);
+	if (pathBuffer == NULL || tooltypesBuffer == NULL)
+	{
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+		return;
+	}
+
+	strlcpy(pathBuffer, buf, pathSize);
+	if (strcasestr(buf, ".slave"))
+	{
+		strlcpy(pathBuffer, substring(pathBuffer, 0, -6), pathSize); // Remove the .slave extension
+		getIconTooltypes(pathBuffer, tooltypesBuffer);
+		set(app->TX_PropertiesTooltypes, MUIA_Disabled, FALSE);
+		set(app->TX_PropertiesTooltypes, MUIA_TextEditor_Contents, tooltypesBuffer);
+	}
+	else
+	{
+		set(app->TX_PropertiesTooltypes, MUIA_TextEditor_Contents, "");
+		set(app->TX_PropertiesTooltypes, MUIA_Disabled, TRUE);
+	}
+	free(pathBuffer);
+	free(tooltypesBuffer);
 }
 
 void list_show_hidden(void)

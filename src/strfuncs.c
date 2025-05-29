@@ -320,3 +320,64 @@ BOOL isNumeric(const char *string)
 	}
 	return TRUE;
 }
+
+#include <stddef.h>
+
+// strlcpy implementation
+int strlcpy(char *dst, const char *src, int dstsize)
+{
+	const char *s = src;
+	int n = dstsize;
+
+	// Copy as many bytes as will fit
+	if (n != 0) {
+		while (--n != 0) {
+			if ((*dst++ = *src++) == '\0') {
+				break;
+			}
+		}
+	}
+
+	// Not enough room in dst; add NUL
+	if (n == 0) {
+		if (dstsize != 0) {
+			*dst = '\0'; // NULL-terminate
+		}
+		while (*src++){}  // Traverse remaining source characters
+	}
+
+	return src - s - 1; // Return strlen(src)
+}
+
+// strlcat implementation
+int strlcat(char *dst, const char *src, int dstsize)
+{
+	const char *s = src;
+	char *d = dst;
+	int n = dstsize;
+	int dlen;
+
+	// Find the end of dst and adjust bytes left but don't go past end
+	while (n-- != 0 && *d != '\0') {
+		d++;
+	}
+
+	dlen = d - dst;
+	n = dstsize - dlen;
+
+	if (n == 0) {
+		return dlen + strlen(src);
+	}
+
+	while (*src != '\0') {
+		if (n != 1) {
+			*d++ = *src;
+			n--;
+		}
+		src++;
+	}
+
+	*d = '\0'; // Null-terminate
+
+	return dlen + (src - s); // Total length of string tried to create
+}

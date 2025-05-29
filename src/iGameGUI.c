@@ -67,6 +67,7 @@
 #include "strfuncs.h"
 #include "iGameGUI.h"
 #include "WinInfo.h"
+#include "WinProps.h"
 
 extern igame_settings *current_settings;
 extern blockGuiGfx;
@@ -272,9 +273,7 @@ struct ObjApp *CreateApp(void)
 	// APTR	MNMainDelete;
 	APTR	GROUP_ROOT;
 	APTR	GR_Filter, LA_Filter, GR_main;
-	APTR	GROUP_ROOT_1, GR_PropertiesGameTitle;
-	APTR	GR_SlavePath, Space_Path, GR_Tooltypes, GR_PropertiesButtons;
-	APTR	Space_Buttons, GROUP_ROOT_2, GR_Path, GR_ReposButtons, GROUP_ROOT_3;
+	APTR	GROUP_ROOT_2, GR_Path, GR_ReposButtons, GROUP_ROOT_3;
 	APTR	GR_AddGameTitle, LA_AddGameTitle, GR_AddGamePath, LA_AddGamePath;
 	APTR	GR_AddGameGenre, LA_AddGameGenre, Space_AddGame, GR_AddGameButtons;
 	APTR	GROUP_ROOT_4, GROUP_ROOT_Settings, GR_Settings;
@@ -298,7 +297,6 @@ struct ObjApp *CreateApp(void)
 	MakeStaticHook(MenuSaveListHook, save_list);
 	MakeStaticHook(MenuSaveListAsHook, save_list_as);
 	// MakeStaticHook(MenuDeleteHook, game_delete);
-	MakeStaticHook(PropertiesOKButtonHook, saveItemProperties);
 	MakeStaticHook(FilterChangeHook, filter_change);
 	MakeStaticHook(LaunchGameHook, launch_game);
 	MakeStaticHook(AppStartHook, app_start);
@@ -642,82 +640,6 @@ struct ObjApp *CreateApp(void)
 		MUIA_Window_ID, MAKE_ID('0', 'I', 'G', 'A'),
 		MUIA_Window_AppWindow, TRUE,
 		WindowContents, GROUP_ROOT,
-		End;
-
-	GR_PropertiesGameTitle = GroupObject,
-		MUIA_HelpNode, "GR_SlavePath",
-		MUIA_Group_Horiz, TRUE,
-		MUIA_Group_HorizSpacing, 5,
-		MUIA_Group_VertSpacing, 5,
-		Child, Label(GetMBString(MSG_STR_PropertiesGameTitleTitle)),
-		Child, HSpace(1),
-		Child, object->STR_PropertiesGameTitle = TextObject,
-			MUIA_Frame, MUIV_Frame_None,
-			MUIA_Text_SetMin, FALSE,
-			MUIA_Text_Shorten, MUIV_Text_Shorten_ElideCenter,
-			End,
-		End;
-
-	Space_Path = HSpace(1);
-
-	object->TX_PropertiesSlavePath = TextObject,
-		MUIA_Frame, MUIV_Frame_None,
-		MUIA_Text_Contents, object->STR_TX_PropertiesSlavePath,
-		MUIA_Text_SetMin, FALSE,
-		MUIA_Text_Shorten, MUIV_Text_Shorten_ElideCenter,
-		End;
-
-	GR_SlavePath = GroupObject,
-		MUIA_HelpNode, "GR_SlavePath",
-		MUIA_Group_Horiz, TRUE,
-		MUIA_Group_HorizSpacing, 5,
-		MUIA_Group_VertSpacing, 5,
-		Child, Label(GetMBString(MSG_LA_PropertiesSlavePath)),
-		Child, Space_Path,
-		Child, object->TX_PropertiesSlavePath,
-		End;
-
-	object->TX_PropertiesTooltypes = TextEditorObject,
-		MUIA_Background, MUII_TextBack,
-		MUIA_Frame, MUIV_Frame_String,
-		MUIA_Disabled, IconBase->lib_Version < 44,
-		MUIA_FrameTitle, GetMBString(MSG_TX_PropertiesTooltypesTitle),
-		End;
-
-	GR_Tooltypes = GroupObject,
-		MUIA_HelpNode, "GR_Tooltypes",
-		Child, object->TX_PropertiesTooltypes,
-		End;
-
-	object->BT_PropertiesOK = SimpleButton(GetMBString(MSG_BT_PropertiesOK));
-
-	Space_Buttons = VSpace(1);
-
-	object->BT_PropertiesCancel = SimpleButton(GetMBString(MSG_BT_PropertiesCancel));
-
-	GR_PropertiesButtons = GroupObject,
-		MUIA_HelpNode, "GR_PropertiesButtons",
-		MUIA_Group_Horiz, TRUE,
-		MUIA_Group_HorizSpacing, 5,
-		MUIA_Group_VertSpacing, 5,
-		Child, object->BT_PropertiesOK,
-		Child, Space_Buttons,
-		Child, object->BT_PropertiesCancel,
-		End;
-
-	GROUP_ROOT_1 = GroupObject,
-		MUIA_Group_HorizSpacing, 5,
-		MUIA_Group_VertSpacing, 5,
-		Child, GR_PropertiesGameTitle,
-		Child, GR_SlavePath,
-		Child, GR_Tooltypes,
-		Child, GR_PropertiesButtons,
-		End;
-
-	object->WI_Properties = WindowObject,
-		MUIA_Window_Title, GetMBString(MSG_WI_Properties),
-		MUIA_Window_ID, MAKE_ID('1', 'I', 'G', 'A'),
-		WindowContents, GROUP_ROOT_1,
 		End;
 
 	object->STR_PA_RepoPath = String("", 80);
@@ -1138,7 +1060,7 @@ struct ObjApp *CreateApp(void)
 		MUIA_Application_HelpFile, "iGame.guide",
 		MUIA_Application_DiskObject, GetDiskObject("PROGDIR:iGame"),
 		SubWindow, object->WI_MainWindow,
-		SubWindow, object->WI_Properties,
+		SubWindow, object->WI_Properties = getPropertiesWindow(object),
 		SubWindow, object->WI_GameRepositories,
 		SubWindow, object->WI_AddNonWHDLoad,
 		SubWindow, object->WI_About,
@@ -1153,6 +1075,7 @@ struct ObjApp *CreateApp(void)
 	}
 
 	setInformationWindowMethods(object);
+	setPropertiesWindowMethods(object);
 
 	DoMethod(object->LV_GamesList, MUIM_Notify, MUIA_NList_TitleClick, MUIV_EveryTime,
 		object->LV_GamesList, 4, MUIM_NList_Sort3, MUIV_TriggerValue, MUIV_NList_SortTypeAdd_2Values, MUIV_NList_Sort3_SortType_Both);
@@ -1292,41 +1215,6 @@ struct ObjApp *CreateApp(void)
 		MUIM_Window_SetCycleChain, object->STR_Filter,
 		object->LV_GamesList,
 		object->LV_GenresList,
-		0
-	);
-
-	DoMethod(object->WI_Properties,
-		MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
-		object->WI_Properties,
-		3,
-		MUIM_Set, MUIA_Window_Open, FALSE
-	);
-
-	DoMethod(object->BT_PropertiesOK,
-		MUIM_Notify, MUIA_Pressed, FALSE,
-		object->App,
-		2,
-		MUIM_CallHook, &PropertiesOKButtonHook
-	);
-
-	DoMethod(object->BT_PropertiesOK,
-		MUIM_Notify, MUIA_Pressed, FALSE,
-		object->WI_Properties,
-		3,
-		MUIM_Set, MUIA_Window_Open, FALSE
-	);
-
-	DoMethod(object->BT_PropertiesCancel,
-		MUIM_Notify, MUIA_Pressed, FALSE,
-		object->WI_Properties,
-		3,
-		MUIM_Set, MUIA_Window_Open, FALSE
-	);
-
-	DoMethod(object->WI_Properties,
-		MUIM_Window_SetCycleChain, object->STR_PropertiesGameTitle,
-		object->BT_PropertiesOK,
-		object->BT_PropertiesCancel,
 		0
 	);
 

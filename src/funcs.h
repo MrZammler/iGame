@@ -40,6 +40,7 @@ void list_show_hidden(void);
 void app_start(void);
 void slaveProperties(void);
 void saveItemProperties(void);
+void updateToolTypesText(const char *);
 void add_non_whdload(void);
 void non_whdload_ok(void);
 void repo_stop(void);

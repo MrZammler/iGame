@@ -1,9 +1,9 @@
-## version $VER: iGame.catalog 2.5 (11.05.2025)
+## version $VER: iGame.catalog 2.5.1 (29.05.2025)
 ## codeset 0
 ## language italiano
 ## chunk AUTH Translated by Samir Hawamdeh
 ;
-; $VER: igame.cd 2.5 (03.05.2025)
+; $VER: igame.cd 2.5.1 (26.05.2025)
 ;
 ; ATO Italia
 ; Compiled with FlexCat 2.18 PPC (AmigaOS4)
@@ -406,7 +406,7 @@ Impossibile allocare la memoria!\nProcesso interrotto...
 ; Could not allocate memory! Aborting...
 ;
 MSG_DirectoryNotFound
-Directory di gioco non trovata!
+Directory del gioco non trovata!
 ; Game Directory not found!
 ;
 MSG_LA_StartWithFavorites
@@ -426,7 +426,7 @@ W_
 ; W_
 ;
 MSG_slavePathDoesntExist
-Il percorso slave non esiste!
+Il percorso dello slave non esiste!
 ; Slave path does not exist!
 ;
 MSG_compiledForAboutWin
@@ -438,11 +438,11 @@ Preferenze
 ; Preferences
 ;
 MSG_ScanCompletedUpdatingList
-Scansione completata. Aggiornamento lista
+Scansione completata.\nAggiornamento lista
 ; Scan completed. Updating the list now.
 ;
 MSG_LoadingSavedList
-Caricamento della lista salvata. Attendere per favore
+Caricamento della lista salvata.\nAttendere per favore
 ; Loading the saved list. Please wait.
 ;
 MSG_ICONPICTURESTORE_FAILED
@@ -504,4 +504,8 @@ Nascosto
 MSG_GR_LinksTitle
 Collegamenti
 ; Links
+;
+MSG_ItemExecutableOrSlave
+Seleziona lo slave o il file eseguibile
+; Select the slave or the executable file
 ;
