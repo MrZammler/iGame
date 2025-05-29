@@ -1,6 +1,6 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Added
-- Added a file requester in the Properties window which can be used to set a different WHDLoad slave file for an item. This is useful when a game/demo changed place in the hard disk. (#174)
+- Added a file requester in the Properties window, which can be used to set a different WHDLoad slave file for an item. This is useful when a game/demo changed place on the hard disk. (#174)
 - Based on the selected file by the new field, the tooltypes text is updated, enabled/disabled, based if the selected file is a WHDLoad slave one.
 
 ### Changed
