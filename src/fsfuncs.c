@@ -451,11 +451,13 @@ void open_current_dir(void)
 	char *buf = AllocVec(bufSize, MEMF_CLEAR);
 	char *game_title = NULL;
 
+#if !defined(__morphos__)
 	if (get_wb_version() < 44)
 	{
 		// workbench.library doesn't support OpenWorkbenchObjectA yet
 		return;
 	}
+#endif
 
 	// Get the selected item from the list
 	DoMethod(app->LV_GamesList, MUIM_NList_GetEntry, MUIV_NList_GetEntry_Active, &game_title);
@@ -480,7 +482,15 @@ void open_current_dir(void)
 	}
 
 	// Open path directory on workbench
+#if defined(__morphos__)
+	int execSize = sizeof(char) * MAX_EXEC_SIZE;
+	char *exec = AllocVec(execSize, MEMF_CLEAR);
+	snprintf(exec, execSize, "open %s", buf);
+	Execute(exec, 0, 0);
+	FreeVec(exec);
+#else
 	OpenWorkbenchObject(buf);
+#endif
 	FreeVec(buf);
 }
 

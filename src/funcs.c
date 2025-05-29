@@ -486,12 +486,18 @@ static void launchSlave(slavesList *node)
 
 					// Get the slave filename
 					getNameFromPath(node->path, buf, bufSize);
+#if !defined(__morphos__)
 					if (checkSlaveInTooltypes(infoPath, buf))
 					{
+#endif
 						int execSize = sizeof(char) * MAX_EXEC_SIZE;
 						char *exec = AllocVec(execSize, MEMF_CLEAR);
-						prepareWHDExecution(infoPath, exec);
 
+#if defined(__morphos__)
+						snprintf(exec, execSize, "open %s", buf);
+#else
+						prepareWHDExecution(infoPath, exec);
+#endif
 						// Update statistics info
 						node->last_played = 1;
 						node->times_played++;
@@ -506,7 +512,9 @@ static void launchSlave(slavesList *node)
 
 						FreeVec(exec);
 						break;
+#if !defined(__morphos__)
 					}
+#endif
 				}
 			}
 

@@ -200,7 +200,7 @@ int main(int argc, char **argv)
 		}
 
 		// TODO: This doesn't work on AmigaOS 4. Needs to be updated with compatible code
-		#if !defined(__amigaos4__)
+		#if !defined(__amigaos4__) && !defined(__morphos__)
 		if (LowLevelBase)
 		{
 			const ULONG new = ReadJoyPort(unit);
@@ -263,7 +263,7 @@ static int initLibraries(void)
 {
 	if ((MUIMasterBase = OpenLibrary(MUIMASTER_NAME, 19)))
 	{
-		#ifdef __amigaos4__
+		#if defined(__amigaos4__)
 		IMUIMaster = (struct MUIMasterIFace *)GetInterface(MUIMasterBase, "main", 1, NULL);
 		if(!IMUIMaster) return clean_exit("Can't open muimaster Interface\n");
 		#endif

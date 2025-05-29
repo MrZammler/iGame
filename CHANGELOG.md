@@ -1,10 +1,15 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Added
-- Added a file requester in the Properties window which can be used to set a different WHDLoad slave file for an item. This is useful when a game/demo changed place in the hard disk.
+- Added a file requester in the Properties window which can be used to set a different WHDLoad slave file for an item. This is useful when a game/demo changed place in the hard disk. (#174)
 - Based on the selected file by the new field, the tooltypes text is updated, enabled/disabled, based if the selected file is a WHDLoad slave one.
 
 ### Changed
 - Moved the Properties window code to its own files
+- Added the "Open game folder" menu in the MorphOS version, that was missing
+- Disabled the gamepad usage on MorphOS because it was reported giving problems while playing a game
+
+### Fixed
+- Fixed starting WHDLoad games in MorphOS using WHDLoadopener (#253)
 
 ## iGame 2.5.0 - [2025-05-12]
 ### Added
