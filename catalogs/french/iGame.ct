@@ -1,7 +1,7 @@
-## version $VER: iGame.catalog 1.3 (10.05.2025)
+## version $VER: iGame.catalog 1.4 (29.05.2025)
 ## codeset 0
 ## language french
-; $VER: igame.cd 2.5 (03.05.2025)
+; $VER: igame.cd 2.5 (26.05.2025)
 ;
 ;
 MSG_AppDescription
@@ -493,3 +493,6 @@ MSG_GR_LinksTitle
 Liens
 ; Links
 ;
+MSG_ItemExecutableOrSlave
+Choisir un fichier Slave ou exécutable
+; Select the slave or the executable file
