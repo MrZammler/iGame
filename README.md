@@ -1,3 +1,4 @@
+[![Translation status](https://translate.igame.rocks/widget/igame/igame-app/status-badge.png)](https://translate.igame.rocks/engage/igame/)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/0c890051ba05476f8ea4f9e4ad846a7c)](https://www.codacy.com/gh/walkero-gr/iGame/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=walkero-gr/iGame&amp;utm_campaign=Badge_Grade)
 
 ## Description
@@ -31,6 +32,12 @@ Please check the [Wiki](https://github.com/MrZammler/iGame/wiki/Compiling-iGame)
 ## Contributing
 
 Please do :-)
+
+iGame is being translated using Weblate, a web tool designed to ease translating for both developers and translators. If you would like to contribute to translation of iGame, you need to register on [https://translate.igame.rocks](https://translate.igame.rocks). Once you have activated your account, proceed to the translation section.
+
+[![Translation status](https://translate.igame.rocks/widget/igame/igame-app/287x66-grey.png)](https://translate.igame.rocks/engage/igame/)
+
+If you would like to contribute with code, please create pull requests to this repository.
 
 ## Usage
 
