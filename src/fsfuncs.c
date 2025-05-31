@@ -509,7 +509,7 @@ BOOL isPathFolder(char *path)
 */
 void getIconTooltypes(char *path, char *result)
 {
-	if (IconBase && (IconBase->lib_Version >= 44))
+	if (IconBase)
 	{
 		struct DiskObject *diskObj = GetDiskObjectNew(path);
 		if(diskObj)
