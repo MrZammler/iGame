@@ -125,8 +125,8 @@ iGame: $(igame_OBJS)
 
 include make_includes/catalogs.inc
 
-catalogs/%/iGame.catalog: catalogs/%/iGame.ct catalogs/iGame.cd
-	flexcat catalogs/iGame.cd $< CATALOG $@ FILL QUIET || exit 0
+catalogs/%/iGame.catalog: catalogs/po/%.po catalogs/iGame.cd
+	flexcat POFILE $< CATALOG $@ FILL QUIET || exit 0
 
 ##########################################################################
 # build rules
