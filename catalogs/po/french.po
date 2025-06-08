@@ -14,13 +14,16 @@ msgstr ""
 "Project-Id-Version: $VER: iGame.catalog 1.4 (29.05.2025)\n"
 "Report-Msgid-Bugs-To: http://URL/\n"
 "POT-Creation-Date: 2025-05-29 18:03+0000\n"
-"PO-Revision-Date: 2025-05-29 18:03+0000\n"
-"Last-Translator: \n"
-"Language-Team: french\n"
+"PO-Revision-Date: 2025-06-09 08:05+0000\n"
+"Last-Translator: amiguy <amiguy@gmx.fr>\n"
+"Language-Team: French <https://translate.igame.rocks/projects/igame/"
+"igame-app/fr/>\n"
+"Language: french\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 5.11.4\n"
 
 msgctxt "MSG_AppDescription (//)"
 msgid "A front-end to WHDLoad"
@@ -28,15 +31,15 @@ msgstr "Un client pour WHDLoad"
 
 msgctxt "MSG_AppCopyright (//)"
 msgid "Emmanuel Vasilakis"
-msgstr ""
+msgstr "Emmanuel Vasilakis"
 
 msgctxt "MSG_WI_MainWindow (//)"
 msgid "iGame"
-msgstr ""
+msgstr "iGame"
 
 msgctxt "MSG_MNlabel2Actions (//)"
 msgid "Actions"
-msgstr ""
+msgstr "Actions"
 
 msgctxt "MSG_MNlabelScan (//)"
 msgid "Scan Repositories"
@@ -44,7 +47,7 @@ msgstr "Scanner les répertoires"
 
 msgctxt "MSG_MNlabelScanChar (//)"
 msgid "R_"
-msgstr ""
+msgstr "R_"
 
 msgctxt "MSG_MNMainAddnonWHDLoadgame (//)"
 msgid "Add game..."
@@ -52,7 +55,7 @@ msgstr "Ajouter un jeu..."
 
 msgctxt "MSG_MNMainAddnonWHDLoadgameChar (//)"
 msgid "A_"
-msgstr ""
+msgstr "A_"
 
 msgctxt "MSG_MNMainMenuShowHidehiddenentries (//)"
 msgid "Show hidden entries"
@@ -64,7 +67,7 @@ msgstr "Ouvrir liste..."
 
 msgctxt "MSG_MNMainOpenListChar (//)"
 msgid "O_"
-msgstr ""
+msgstr "O_"
 
 msgctxt "MSG_MNMainSaveList (//)"
 msgid "Save List"
@@ -72,7 +75,7 @@ msgstr "Sauvegarder liste"
 
 msgctxt "MSG_MNMainSaveListChar (//)"
 msgid "S_"
-msgstr ""
+msgstr "S_"
 
 msgctxt "MSG_MNMainSaveListAs (//)"
 msgid "Save List As..."
@@ -92,7 +95,7 @@ msgstr "Quitter"
 
 msgctxt "MSG_MNMainQuitChar (//)"
 msgid "Q_"
-msgstr ""
+msgstr "Q_"
 
 msgctxt "MSG_MNlabel2Game (//)"
 msgid "Game"
@@ -108,7 +111,7 @@ msgstr "Propriétés..."
 
 msgctxt "MSG_MNMainPropertiesChar (//)"
 msgid "P_"
-msgstr ""
+msgstr "P_"
 
 msgctxt "MSG_MNMainDelete (//)"
 msgid "Delete"
@@ -116,7 +119,7 @@ msgstr "Supprimer"
 
 msgctxt "MSG_MNMainDeleteChar (//)"
 msgid "D_"
-msgstr ""
+msgstr "D_"
 
 msgctxt "MSG_MNlabel2Tools (//)"
 msgid "Settings"
@@ -148,7 +151,7 @@ msgstr "Propriétés du jeu"
 
 msgctxt "MSG_STR_PropertiesGameTitleTitle (//)"
 msgid "Title:"
-msgstr "Titre"
+msgstr "Titre :"
 
 msgctxt "MSG_LA_PropertiesGenre (//)"
 msgid "Genre:"
@@ -180,7 +183,7 @@ msgstr "Types d'outils"
 
 msgctxt "MSG_BT_PropertiesOK (//)"
 msgid "Save"
-msgstr "D'accord"
+msgstr "Sauvegarder"
 
 msgctxt "MSG_BT_PropertiesCancel (//)"
 msgid "Cancel"
@@ -268,7 +271,7 @@ msgstr "168x128"
 
 msgctxt "MSG_CY_ScreenshotSize1 (//)"
 msgid "320x256"
-msgstr ""
+msgstr "320x256"
 
 msgctxt "MSG_CY_ScreenshotSize2 (//)"
 msgid "Custom"
@@ -428,7 +431,7 @@ msgstr "Ouvrir le répertoire du jeu"
 
 msgctxt "MSG_MNMainOpenCurrentDirChar (//)"
 msgid "W_"
-msgstr ""
+msgstr "W_"
 
 msgctxt "MSG_slavePathDoesntExist (//)"
 msgid "Slave path does not exist!"
@@ -476,7 +479,7 @@ msgstr "Information sur l'élément"
 
 msgctxt "MSG_MNMainIformation (//)"
 msgid "Information..."
-msgstr ""
+msgstr "Information..."
 
 msgctxt "MSG_LA_ReleaseYear (//)"
 msgid "Release year:"
