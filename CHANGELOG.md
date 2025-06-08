@@ -1,4 +1,9 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
+### Changed
+- Added a requester to show the errors occure when iGame is started and a library is missing
+- Now the iGame icon is set back to start by Workbench
+
+## iGame 2.5.2 - [2025-05-31]
 ### Fixed
 - Fixed the execution of whdload that broke on v2.5.1 for those that use an old icon library
 
