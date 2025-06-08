@@ -294,39 +294,47 @@ static void load_repos(const char* filename)
 		free(file_line);
 }
 
-static void populateGenresList(void)
+static void populateGenresLists(void)
 {
-	DoMethod(app->LV_GenresList, MUIM_List_Clear);
-	set(app->LV_GenresList, MUIA_List_Quiet, TRUE);
+	if (!current_settings->hide_side_panel)
+	{
+		nnset(app->LV_GenresList, MUIA_List_Quiet, TRUE);
 
-	// Add Show All in genres list
-	DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, GetMBString(MSG_FilterShowAll), MUIV_List_Insert_Bottom);
+		// Add Show All in genres list
+		DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, GetMBString(MSG_FilterShowAll), MUIV_List_Insert_Bottom);
+	}
+
 	loadGenresFromFile();
 	addGenreInList(GetMBString(MSG_UnknownGenre));
+	sortGenresList();
 
 	genresList *currPtr = getGenresListHead();
 
 	int cnt = 0;
 	while (currPtr != NULL)
 	{
-		DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, currPtr->title, MUIV_List_Insert_Bottom);
+		if (!current_settings->hide_side_panel)
+		{
+			DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, currPtr->title, MUIV_List_Insert_Bottom);
+		}
+		app->GenresContent[cnt] = currPtr->title;
+
+		DoMethod(app->LV_WI_Information_Genre, MUIM_List_InsertSingle, currPtr->title, MUIV_List_Insert_Bottom);
 
 		cnt++;
 		currPtr = currPtr->next;
 	}
 
-	int i = 0;
-	for (i = 0; i < genresListNodeCount(cnt); i++)
+	genresListNodeCount(cnt);
+	app->GenresContent[cnt] = (unsigned char*)GetMBString(MSG_UnknownGenre);
+	app->GenresContent[cnt++] = NULL;
+
+	nnset(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->GenresContent);
+	if (!current_settings->hide_side_panel)
 	{
-		DoMethod(app->LV_GenresList, MUIM_List_GetEntry, i+1, &app->CY_PropertiesGenreContent[i]);
+		nnset(app->LV_GenresList, MUIA_List_Active, MUIV_List_Active_Top);
+		nnset(app->LV_GenresList, MUIA_List_Quiet, FALSE);
 	}
-	app->CY_PropertiesGenreContent[i] = (unsigned char*)GetMBString(MSG_UnknownGenre);
-	app->CY_PropertiesGenreContent[i++] = NULL;
-	set(app->CY_WI_Information_Genre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
-	set(app->CY_AddGameGenre, MUIA_Cycle_Entries, app->CY_PropertiesGenreContent);
-	set(app->LV_GenresList, MUIA_List_Active, MUIV_List_Active_Top);
-	DoMethod(app->LV_GenresList, MUIM_List_Sort);
-	set(app->LV_GenresList, MUIA_List_Quiet, FALSE);
 }
 
 static void populateChipsetList(void)
@@ -381,15 +389,12 @@ void app_start(void)
 	set(app->WI_MainWindow, MUIA_Window_Sleep, TRUE);
 	slavesListLoadFromCSV(csvFilename);
 
+	populateGenresLists(); // This calls the filter_change()
 	if (!current_settings->hide_side_panel)
 	{
-		populateGenresList(); // This calls the filter_change()
 		populateChipsetList();
 	}
-	if (current_settings->hide_side_panel)
-	{
-		filter_change();
-	}
+	filter_change();
 	set(app->WI_MainWindow, MUIA_Window_Sleep, FALSE);
 	set(app->WI_MainWindow, MUIA_Window_ActiveObject, app->LV_GamesList);
 }
@@ -1055,7 +1060,15 @@ void scan_repositories(void)
 		setStatusText(GetMBString(MSG_ScanCompletedUpdatingList));
 		save_list();
 		showSlavesList();
-		populateGenresList();
+
+		// Clear the genres lists before populating them again
+		if (!current_settings->hide_side_panel)
+		{
+			DoMethod(app->LV_GenresList, MUIM_List_Clear);
+		}
+		DoMethod(app->LV_WI_Information_Genre, MUIM_List_Clear);
+		populateGenresLists();
+
 		populateChipsetList();
 		setLastScanBitfield();
 		set(app->WI_MainWindow, MUIA_Window_Sleep, FALSE);
@@ -1720,7 +1733,7 @@ void non_whdload_ok(void)
 	strncpy(node->title, title, sizeof(node->title));
 
 	get(app->CY_AddGameGenre, MUIA_Cycle_Active, &genreId);
-	strncpy(node->genre, app->CY_PropertiesGenreContent[genreId], sizeof(node->genre));
+	strncpy(node->genre, app->GenresContent[genreId], sizeof(node->genre));
 
 	if (isStringEmpty(title))
 	{
@@ -2037,14 +2050,8 @@ void getItemInformation(void)
 		free(igameDataPath);
 
 		//set the genre
-		// TODO: Make this better when we have the new Genre lists
-		int i;
-		for (i = 0; i < genresListNodeCount(-1); i++)
-		{
-			if (!strcmp(app->CY_PropertiesGenreContent[i], node->genre))
-				break;
-		}
-		set(app->CY_WI_Information_Genre, MUIA_Cycle_Active, i);
+		set(app->STR_WI_Information_Genre, MUIA_String_Contents, node->genre);
+
 		set(app->WI_Information, MUIA_Window_Open, TRUE);
 	}
 }
@@ -2082,12 +2089,18 @@ void saveItemInformation(void)
 		set(app->LV_GamesList, MUIA_NList_Quiet, FALSE);
 	}
 
-	// Update the genre
-	get(app->CY_WI_Information_Genre, MUIA_Cycle_Active, &genreId);
-	strncpy(node->genre,
-		app->CY_PropertiesGenreContent[genreId],
-		sizeof(node->genre)
-	);
+	// Update the genre and if it is a new one, add it to the genres list
+	get(app->STR_WI_Information_Genre, MUIA_String_Contents, &buf);
+	strlcpy(node->genre, buf, sizeof(node->genre));
+	genresList *newGenrePtr = addGenreInList(buf)
+	if (newGenrePtr != NULL)
+	{
+		if (!current_settings->hide_side_panel)
+		{
+			DoMethod(app->LV_GenresList, MUIM_List_InsertSingle, newGenrePtr->title, MUIV_List_Insert_Sorted);
+		}
+		DoMethod(app->LV_WI_Information_Genre, MUIM_List_InsertSingle, newGenrePtr->title, MUIV_List_Insert_Sorted);
+	}
 
 	// Update favourite selection
 	get(app->CH_WI_Information_Favourite, MUIA_Selected, &node->favourite);
