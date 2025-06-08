@@ -2092,7 +2092,7 @@ void saveItemInformation(void)
 	// Update the genre and if it is a new one, add it to the genres list
 	get(app->STR_WI_Information_Genre, MUIA_String_Contents, &buf);
 	strlcpy(node->genre, buf, sizeof(node->genre));
-	genresList *newGenrePtr = addGenreInList(buf)
+	genresList *newGenrePtr = addGenreInList(buf);
 	if (newGenrePtr != NULL)
 	{
 		if (!current_settings->hide_side_panel)

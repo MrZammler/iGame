@@ -1,6 +1,6 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Added
-- By changing the Genre select box to a PopupString, it is now possible to edit the Genre title and create new ones, which will be added in the Genre lists
+- By changing the Genre select box to a PopupString, it is now possible to edit the Genre title and create new ones, which will be added to the Genre lists
 
 ### Changed
 - The genres in the Information window changed to a PopupString. Now, it takes less space to choose a genre, making it possible even on small resolutions.
