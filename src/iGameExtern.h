@@ -30,6 +30,7 @@
 #define DEFAULT_REPOS_FILE "PROGDIR:repos.prefs"
 #define DEFAULT_GENRES_FILE "PROGDIR:genres"
 #define DEFAULT_SCREENSHOT_FILE "PROGDIR:igame.iff"
+#define DEFAULT_LOGO_FILE "PROGDIR:logo.iff"
 #define DEFAULT_SETTINGS_FILE "igame.prefs"
 #define DEFAULT_IGAMEDATA_FILE "igame.data"
 #define DEFAULT_LOCALHOST_URL "http://localhost"

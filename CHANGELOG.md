@@ -1,4 +1,9 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
+### Changed
+- Revamped the About window, adding a new logo and links
+- Changed the main image in the repository
+
+## iGame 2.5.2 - [2025-05-31]
 ### Fixed
 - Fixed the execution of whdload that broke on v2.5.1 for those that use an old icon library
 

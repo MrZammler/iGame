@@ -68,9 +68,6 @@ struct ObjApp
 	APTR CY_AddGameGenre;
 	APTR BT_AddGameOK;
 	APTR BT_AddGameCancel;
-	APTR WI_About;
-	APTR TX_About;
-	APTR BT_AboutOK;
 	APTR WI_Settings;
 	APTR CH_Screenshots;
 	APTR CH_NoGuiGfx;
@@ -114,6 +111,11 @@ struct ObjApp
 	APTR URL_WI_Information_Pouet;
 	APTR BT_WI_Information_Save;
 	APTR BT_WI_Information_Cancel;
+	// About Window
+	APTR WI_About;
+	APTR GR_WI_About_Links;
+	APTR TX_About;
+	APTR BT_AboutOK;
 };
 
 struct ObjApp *CreateApp(void);
