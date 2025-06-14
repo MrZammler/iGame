@@ -25,10 +25,11 @@
 
 void genresListAddTail(genresList *);
 void genresListPrint(void);
-genresList *genresListSearchByTitle(char *, unsigned int);
+genresList *genresListSearchByTitle(const char *, unsigned int);
 genresList *getGenresListHead(void);
 void emptyGenresList(void);
 int genresListNodeCount(int);
-void addGenreInList(char *);
+genresList *addGenreInList(const char *);
+void sortGenresList(void);
 
 #endif

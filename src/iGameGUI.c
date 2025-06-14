@@ -330,8 +330,8 @@ struct ObjApp *CreateApp(void)
 
 	object->STR_TX_About = about_text;
 
-	object->CY_PropertiesGenreContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_PropertiesGenre0);
-	object->CY_PropertiesGenreContent[1] = NULL;
+	object->GenresContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_PropertiesGenre0);
+	object->GenresContent[1] = NULL;
 
 	object->CY_ScreenshotSizeContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_ScreenshotSize0);
 	object->CY_ScreenshotSizeContent[1] = (CONST_STRPTR)GetMBString(MSG_CY_ScreenshotSize1);
@@ -752,7 +752,6 @@ struct ObjApp *CreateApp(void)
 	object->CY_AddGameGenre = CycleObject,
 		MUIA_HelpNode, "CY_AddGameGenre",
 		MUIA_Frame, MUIV_Frame_Button,
-		MUIA_Cycle_Entries, object->CY_PropertiesGenreContent,
 		End;
 
 	GR_AddGameGenre = GroupObject,
@@ -1141,7 +1140,6 @@ struct ObjApp *CreateApp(void)
 
 	//call whenever the string is changed
 	if (!current_settings->filter_use_enter) {
-
 		DoMethod(object->STR_Filter,
 			MUIM_Notify, MUIA_String_Contents, MUIV_EveryTime,
 			object->App,
@@ -1189,7 +1187,7 @@ struct ObjApp *CreateApp(void)
 
 	DoMethod(object->LV_GenresList,
 		MUIM_Notify, MUIA_List_Active, MUIV_EveryTime,
-		object->LV_GenresList,
+		MUIV_Notify_Self,
 		2,
 		MUIM_CallHook, &GenreClickHook
 	);
