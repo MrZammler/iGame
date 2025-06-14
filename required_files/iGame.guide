@@ -296,7 +296,7 @@ This window opens from the menu item "Game > Information". For this to work you 
 
 From the top, the first field is the entry title, which you can change if you like.
 
-Next, you can set the Genre from the select list. This can be used from the Genres list on the right side of the main window.
+Next, you can select the Genre from the selection list or you can create a new one. If the selected genre does not exist in the genres lists, a new option will be added. This can be used from the genres list on the right side of the main window and in the "Information" and the "Add game" windows.
 
 Following, on the left side, there is some information that is not editable. There you will see the "Release year", the "Released by" entry that shows who released this game/demo, the required "Chipset", the "No. of players" that the game supports and the number of times this game was played.
 
