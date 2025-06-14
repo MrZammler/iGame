@@ -127,6 +127,7 @@ iGame: $(igame_OBJS)
 include make_includes/catalogs.inc
 
 catalogs/%/iGame.catalog: catalogs/po/%.po catalogs/iGame.cd
+	mkdir -p $(dir $@)
 	flexcat POFILE $< CATALOG $@ FILL QUIET || exit 0
 
 ##########################################################################
