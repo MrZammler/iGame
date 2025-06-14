@@ -7,9 +7,10 @@
 ; | | |__| | (_| | | | | | |  __/
 ; |_|\_____|\__,_|_| |_| |_|\___|
 ;
-; $VER: Install-iGame 1.4 (09.04.2023)
+; $VER: Install-iGame 1.6 (14.06.2025)
 ;
 ; History:
+;   1.6   14.06.2025: Added Portuguese language
 ;   1.5   14.04.2023: Fixed an issue on v2.3.0 release with Icons copy
 ;   1.4   09.04.2023: Added French and German languages
 ;                     Added a header message on folder choice page
@@ -31,8 +32,9 @@
 (set #lang_german              2)
 (set #lang_greek               3)
 (set #lang_italiano            4)
-(set #lang_turkish             5)
-(set #lang_maximum             6)
+(set #lang_portuguese          5)
+(set #lang_turkish             6)
+(set #lang_maximum             7)
 
 ;=============================================================================
 ; Set defaults
@@ -67,7 +69,7 @@
 (set #supportedLanguages %00000000000000000)
 (foreach "catalogs" "#?"
     (set #i 0)
-    (while (<> @each-name (select #i "english" "french" "german" "greek" "italiano" "turkish" @each-name))
+    (while (<> @each-name (select #i "english" "french" "german" "greek" "italiano" "portuguese" "turkish" @each-name))
         (set #i (+ #i 1))
     )
     (if (<> #lang_maximum #i)
@@ -145,16 +147,18 @@
         (set #cat_name_german                "german")
         (set #cat_name_greek                 "greek")
         (set #cat_name_italiano              "italian")
+        (set #cat_name_portuguese            "portuguese")
         (set #cat_name_turkish               "turkish")
     )
     ; all other systems use localized locale names
     (
         (set #cat_name_english               "english")
-        (set #cat_name_french                "français")
+        (set #cat_name_french                "franï¿½ais")
         (set #cat_name_german                "deutsch")
         (set #cat_name_greek                 "greek")
         (set #cat_name_italiano              "italiano")
-        (set #cat_name_turkish               "türkçe")
+        (set #cat_name_portuguese            "portuguese")
+        (set #cat_name_turkish               "tï¿½rkï¿½e")
     )
 )
 
@@ -258,7 +262,7 @@
 				("")
 			)
 			(if (in #supportedLanguages #lang_french)
-				(cat #prop "Français")
+				(cat #prop "Franï¿½ais")
 				("")
 			)
 			(if (in #supportedLanguages #lang_german)
@@ -273,8 +277,12 @@
 				(cat #prop "Italiano")
 				("")
 			)
+			(if (in #supportedLanguages #lang_portuguese)
+				(cat #prop "Portuguese")
+				("")
+			)
 			(if (in #supportedLanguages #lang_turkish)
-				(cat #prop "Türkçe")
+				(cat #prop "Tï¿½rkï¿½e")
 				("")
 			)
 		)
@@ -321,7 +329,7 @@
 )
 
 ;=============================================================================
-; Copy Guide files
+; Copy Guide files and logo
 (complete 60)
 
 (copyfiles
@@ -333,6 +341,11 @@
 )
 (copyfiles
 	(source "iGame.guide.info")
+	(dest #destination)
+	(help @copyfiles-help)
+)
+(copyfiles
+	(source "logo.iff")
 	(dest #destination)
 	(help @copyfiles-help)
 )
@@ -393,6 +406,21 @@
 					(copyfiles
 						(source (tackon "catalogs/italiano" @each-name))
 						(dest (tackon #destination (tackon "catalogs" #cat_name_italiano)))
+						(help @copyfiles-help)
+					)
+				)
+			)
+		)
+
+		; portuguese catalog file
+		(if (in #catalog_lang #lang_portuguese)
+			(
+				(makedir (tackon #destination (tackon "catalogs" #cat_name_portuguese)))
+
+				(foreach "catalogs/portuguese" "#?.catalog"
+					(copyfiles
+						(source (tackon "catalogs/portuguese" @each-name))
+						(dest (tackon #destination (tackon "catalogs" #cat_name_portuguese)))
 						(help @copyfiles-help)
 					)
 				)

@@ -10,7 +10,7 @@ else
 		flexcat iGame.cd ../src/iGame_strings.h=CatComp_h.sd
 endif
 
-catalog_files := $(patsubst %/iGame.ct,%/iGame.catalog,$(wildcard catalogs/*/iGame.ct))
+catalog_files := $(patsubst catalogs/po/%.po,catalogs/%/iGame.catalog,$(wildcard catalogs/po/*.po))
 catalog_dirs := $(dir $(catalog_files))
 
 catalogs: $(catalog_files)

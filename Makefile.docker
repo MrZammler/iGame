@@ -127,6 +127,7 @@ iGame: $(igame_OBJS)
 include make_includes/catalogs.inc
 
 catalogs/%/iGame.catalog: catalogs/po/%.po catalogs/iGame.cd
+	mkdir -p $(dir $@)
 	flexcat POFILE $< CATALOG $@ FILL QUIET || exit 0
 
 ##########################################################################
@@ -178,29 +179,29 @@ clean:
 
 release: $(catalog_files)
 ifneq ($(origin DRONE_TAG),undefined)
-	sed -i "s/VERSION_TAG/$(DRONE_TAG)/" ./required_files/iGame.guide
-	sed -i "s/RELEASE_DATE/$(shell date "+%d.%m.%Y")/" ./required_files/iGame.guide
+	@sed -i "s/VERSION_TAG/$(DRONE_TAG)/" ./required_files/iGame.guide
+	@sed -i "s/RELEASE_DATE/$(shell date "+%d.%m.%Y")/" ./required_files/iGame.guide
 endif
-	cp -r required_files iGame-$(DRONE_TAG)
-	cp iGame-$(DRONE_TAG)/igame_drawer_3.0.info iGame-$(DRONE_TAG).info
-	mv iGame-$(DRONE_TAG)/igame_drawer_3.0.info iGame-$(DRONE_TAG)/extras/icons
-	mv iGame-$(DRONE_TAG)/igame_drawer.info iGame-$(DRONE_TAG)/extras/icons
-	mkdir iGame-$(DRONE_TAG)/catalogs
-	cp catalogs/iGame.cd iGame-$(DRONE_TAG)/catalogs/
-	cd iGame-$(DRONE_TAG) && mkdir $(catalog_dirs)
-	for c in $(catalog_files); do cp $$c iGame-$(DRONE_TAG)/$$(dirname $$c)/; done
+	@cp -r required_files iGame-$(DRONE_TAG)
+	@cp iGame-$(DRONE_TAG)/igame_drawer_3.0.info iGame-$(DRONE_TAG).info
+	@mv iGame-$(DRONE_TAG)/igame_drawer_3.0.info iGame-$(DRONE_TAG)/extras/icons
+	@mv iGame-$(DRONE_TAG)/igame_drawer.info iGame-$(DRONE_TAG)/extras/icons
+	@mkdir iGame-$(DRONE_TAG)/catalogs
+	@cp catalogs/iGame.cd iGame-$(DRONE_TAG)/catalogs/
+	@cd iGame-$(DRONE_TAG) && mkdir $(catalog_dirs)
+	@for c in $(catalog_files); do cp $$c iGame-$(DRONE_TAG)/$$(dirname $$c)/; done
 ifneq ($(origin DRONE_TAG),undefined)
-	sed -i "s/VERSION_TAG/$(DRONE_TAG)/" ./CHANGELOG.md
-	sed -i "s/RELEASE_DATE/$(shell date "+%Y-%m-%d")/" ./CHANGELOG.md
+	@sed -i "s/VERSION_TAG/$(DRONE_TAG)/" ./CHANGELOG.md
+	@sed -i "s/RELEASE_DATE/$(shell date "+%Y-%m-%d")/" ./CHANGELOG.md
 endif
-	cp CHANGELOG.md iGame-$(DRONE_TAG)/
-	if [ -f "iGame.000" ]; then cp iGame.000 iGame-$(DRONE_TAG)/iGame; fi
-	if [ -f "iGame.030" ]; then cp iGame.030 iGame-$(DRONE_TAG)/; fi
-	if [ -f "iGame.040" ]; then cp iGame.040 iGame-$(DRONE_TAG)/; fi
-	if [ -f "iGame.060" ]; then cp iGame.060 iGame-$(DRONE_TAG)/; fi
-	if [ -f "iGame.MOS" ]; then cp iGame.MOS iGame-$(DRONE_TAG)/; fi
-	if [ -f "iGame.OS4" ]; then cp iGame.OS4 iGame-$(DRONE_TAG)/; fi
-	lha -aq2o6 iGame-$(DRONE_TAG)-$(DATESTR).lha iGame-$(DRONE_TAG)/ iGame-$(DRONE_TAG).info
+	@cp CHANGELOG.md iGame-$(DRONE_TAG)/
+	@if [ -f "iGame.000" ]; then cp iGame.000 iGame-$(DRONE_TAG)/iGame; fi
+	@if [ -f "iGame.030" ]; then cp iGame.030 iGame-$(DRONE_TAG)/; fi
+	@if [ -f "iGame.040" ]; then cp iGame.040 iGame-$(DRONE_TAG)/; fi
+	@if [ -f "iGame.060" ]; then cp iGame.060 iGame-$(DRONE_TAG)/; fi
+	@if [ -f "iGame.MOS" ]; then cp iGame.MOS iGame-$(DRONE_TAG)/; fi
+	@if [ -f "iGame.OS4" ]; then cp iGame.OS4 iGame-$(DRONE_TAG)/; fi
+	@lha -aq2o6 iGame-$(DRONE_TAG)-$(DATESTR).lha iGame-$(DRONE_TAG)/ iGame-$(DRONE_TAG).info
 
 clean-release:
 	rm -rf iGame-$(DRONE_TAG)
