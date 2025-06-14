@@ -32,6 +32,7 @@
 /* Prototypes */
 #include <clib/alib_protos.h>
 #include <proto/muimaster.h>
+#include <string.h>
 
 #define iGame_NUMBERS
 #include "iGame_strings.h"
@@ -43,6 +44,38 @@
 #include "WinInfo.h"
 
 extern igame_settings *current_settings;
+
+HOOKPROTONH(StrObjFunc, int, Object *popObject, Object *strObject)
+{
+	char *listEntry, *currentGenre;
+	get(strObject, MUIA_String_Contents, &currentGenre);
+
+	for (int i=0;;i++)
+	{
+		DoMethod(popObject, MUIM_List_GetEntry, i, &listEntry);
+		if (!listEntry)
+		{
+			set(popObject, MUIA_List_Active, MUIV_List_Active_Off);
+			break;
+		}
+		else if (!strcmp(listEntry, currentGenre))
+		{
+			set(popObject, MUIA_List_Active, i);
+			DoMethod(popObject, MUIM_List_Jump, MUIV_List_Jump_Active);
+			break;
+		}
+	}
+	return(TRUE);
+}
+MakeStaticHook(StrObjHook, StrObjFunc);
+
+HOOKPROTONH(ObjStrFunc, int, Object *popObject, Object *strObject)
+{
+	char *selectedGenre;
+	DoMethod(popObject, MUIM_List_GetEntry, MUIV_List_GetEntry_Active, &selectedGenre);
+	set(strObject, MUIA_String_Contents, selectedGenre);
+}
+MakeStaticHook(ObjStrHook, ObjStrFunc);
 
 APTR getInformationWindow(struct ObjApp *object)
 {
@@ -83,13 +116,35 @@ APTR getInformationWindow(struct ObjApp *object)
 		MUIA_Window_ID, MAKE_ID('6', 'I', 'G', 'A'),
 		MUIA_HelpNode, "WININFO",
 		WindowContents, VGroup,
+			Child, TextObject,
+				MUIA_Weight, 30,
+				MUIA_Text_PreParse, "\0338",
+				MUIA_Text_Contents, GetMBString(MSG_STR_PropertiesGameTitleTitle),
+				MUIA_InnerLeft, 0,
+				MUIA_InnerRight, 0,
+			End,
 			Child, object->STR_WI_Information_Title = StringObject,
 				MUIA_Frame, MUIV_Frame_String,
 			End,
+			Child, TextObject,
+				MUIA_Weight, 30,
+				MUIA_Text_PreParse, "\0338",
+				MUIA_Text_Contents, GetMBString(MSG_LA_PropertiesGenre),
+				MUIA_InnerLeft, 0,
+				MUIA_InnerRight, 0,
+			End,
 			Child, GroupObject,
-				Child, object->CY_WI_Information_Genre = CycleObject,
-					MUIA_Frame, MUIV_Frame_Button,
-					MUIA_Cycle_Entries, object->CY_PropertiesGenreContent,
+				Child, object->POP_WI_Information_Genre = PopobjectObject,
+					MUIA_Popstring_String, object->STR_WI_Information_Genre = KeyString(0, MAX_GENRE_NAME_SIZE, 'n'),
+					MUIA_Popstring_Button, PopButton(MUII_PopUp),
+					MUIA_Popobject_StrObjHook, &StrObjHook,
+					MUIA_Popobject_ObjStrHook, &ObjStrHook,
+					MUIA_Popobject_Object, object->LV_WI_Information_Genre = ListviewObject,
+						MUIA_Listview_List, ListObject,
+							InputListFrame,
+							MUIA_List_AutoVisible, TRUE,
+							End,
+						End,
 				End,
 			End,
 			Child, ColGroup(2),
@@ -193,7 +248,7 @@ APTR getInformationWindow(struct ObjApp *object)
 				End,
 			End,
 			Child, object->GR_WI_Information_Links,
-			Child, MUI_MakeObject(MUIO_HBar,4),
+			Child, MUI_MakeObject(MUIO_HBar, 4),
 			Child, HGroup, MUIA_Group_SameSize, TRUE,
 				Child, object->BT_WI_Information_Save = MUI_MakeObject(MUIO_Button, GetMBString(MSG_BT_PropertiesOK)),
 				Child, object->BT_WI_Information_Cancel = MUI_MakeObject(MUIO_Button, GetMBString(MSG_BT_PropertiesCancel)),
@@ -208,9 +263,14 @@ void setInformationWindowMethods(struct ObjApp *object)
 
 	DoMethod(object->WI_Information,
 		MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
-		object->WI_Information,
-		3,
+		MUIV_Notify_Self, 3,
 		MUIM_Set, MUIA_Window_Open, FALSE
+	);
+
+	DoMethod(object->WI_Information,
+		MUIM_Notify, MUIA_Window_Open, FALSE,
+		object->POP_WI_Information_Genre, 2,
+		MUIM_Popstring_Close, TRUE
 	);
 
 	DoMethod(
@@ -232,5 +292,12 @@ void setInformationWindowMethods(struct ObjApp *object)
 		MUIM_Notify, MUIA_Pressed, FALSE,
 		object->WI_Information, 3,
 		MUIM_Set, MUIA_Window_Open, FALSE
+	);
+
+	DoMethod(
+		object->LV_WI_Information_Genre,
+		MUIM_Notify, MUIA_List_DoubleClick, TRUE,
+		object->POP_WI_Information_Genre, 2,
+		MUIM_Popstring_Close, TRUE
 	);
 }

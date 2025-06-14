@@ -86,7 +86,7 @@ void genresListPrint(void)
 	printf("END OF LIST: %d items\n", cnt);
 }
 
-genresList *genresListSearchByTitle(char *title, unsigned int titleSize)
+genresList *genresListSearchByTitle(const char *title, unsigned int titleSize)
 {
 	if (isListEmpty(genresListHead))
 	{
@@ -128,19 +128,61 @@ int genresListNodeCount(int cnt)
 	return nodeCount;
 }
 
-void addGenreInList(char *title)
+genresList *addGenreInList(const char *title)
 {
 	if (isStringEmpty(title))
-		return;
+		return NULL;
 
 	if (genresListSearchByTitle(title, sizeof(char) * MAX_GENRE_NAME_SIZE) == NULL)
 	{
 		genresList *node = malloc(sizeof(genresList));
 		if(node == NULL)
 		{
-			return;
+			return NULL;
 		}
 		strncpy(node->title, title, sizeof(char) * MAX_GENRE_NAME_SIZE);
 		genresListAddTail(node);
+		return node;
 	}
+	return NULL;
+}
+
+void sortGenresList(void)
+{
+	if (isListEmpty(genresListHead) || genresListHead->next == NULL) {
+		// Empty list or single node - already sorted
+		return;
+	}
+
+	genresList *sorted = NULL;
+	genresList *current = genresListHead;
+
+	// Remove each node from original list and insert into sorted list
+	while (current != NULL) {
+		// Save next node before we detach current
+		genresList *next = current->next;
+
+		// Insert current node into sorted list in correct position
+		if (sorted == NULL || strncmp(current->title, sorted->title, MAX_GENRE_NAME_SIZE) <= 0) {
+			// Insert at beginning of sorted list
+			current->next = sorted;
+			sorted = current;
+		} else {
+			// Find insertion point in sorted list
+			genresList *search = sorted;
+			while (search->next != NULL &&
+				   strncmp(current->title, search->next->title, MAX_GENRE_NAME_SIZE) > 0) {
+				search = search->next;
+			}
+			// Insert after search node
+			current->next = search->next;
+			search->next = current;
+		}
+
+		// Move to next node in original list
+		current = next;
+	}
+
+	// Update head pointer
+	genresListHead = sorted;
 }

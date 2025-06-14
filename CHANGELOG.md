@@ -1,5 +1,26 @@
 ## iGame VERSION_TAG - [RELEASE_DATE]
 ### Added
+- By changing the Genre select box to a PopupString, it is now possible to edit the Genre title and create new ones, which will be added to the Genre lists
+
+### Changed
+- The genres in the Information window changed to a PopupString. Now, it takes less space to choose a genre, making it possible even on small resolutions.
+- The genres lists have the titles sorted alphabetically
+- Removed some not necessary fill ups of genre cycle boxes and loops. This should make iGame start a little bit faster
+- Removed some extra change notifications in Genres lists, which should avoid not necessary refreshes of the games/demos lists
+- Added a requester to show the errors occure when iGame is started and a library is missing
+- Now the iGame icon is set back to start by Workbench
+- Revamped the About window, adding a new logo and links
+- Changed the main image in the repository
+
+### Fixed
+- The genres lists were not populated when the right sidebar was disabled (#260)
+
+## iGame 2.5.2 - [2025-05-31]
+### Fixed
+- Fixed the execution of whdload that broke on v2.5.1 for those that use an old icon library
+
+## iGame 2.5.1 - [2025-05-29]
+### Added
 - Added a file requester in the Properties window, which can be used to set a different WHDLoad slave file for an item. This is useful when a game/demo changed place on the hard disk. (#174)
 - Based on the selected file by the new field, the tooltypes text is updated, enabled/disabled, based if the selected file is a WHDLoad slave one.
 

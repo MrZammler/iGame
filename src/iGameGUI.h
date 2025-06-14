@@ -68,9 +68,6 @@ struct ObjApp
 	APTR CY_AddGameGenre;
 	APTR BT_AddGameOK;
 	APTR BT_AddGameCancel;
-	APTR WI_About;
-	APTR TX_About;
-	APTR BT_AboutOK;
 	APTR WI_Settings;
 	APTR CH_Screenshots;
 	APTR CH_NoGuiGfx;
@@ -92,7 +89,7 @@ struct ObjApp
 	CONST_STRPTR STR_TX_PropertiesSlavePath;
 	CONST_STRPTR STR_TX_PropertiesTooltypes;
 	CONST_STRPTR STR_TX_About;
-	CONST_STRPTR CY_PropertiesGenreContent[256];
+	CONST_STRPTR GenresContent[256];
 	CONST_STRPTR CY_ScreenshotSizeContent[4];
 	CONST_STRPTR RA_TitlesFromContent[3];
 	CONST_STRPTR CY_FilterListContent[6];
@@ -107,13 +104,20 @@ struct ObjApp
 	APTR TX_WI_Information_TimesPlayed;
 	APTR CH_WI_Information_Favourite;
 	APTR CH_WI_Information_Hidden;
-	APTR CY_WI_Information_Genre;
+	APTR POP_WI_Information_Genre;
+	APTR STR_WI_Information_Genre;
+	APTR LV_WI_Information_Genre;
 	APTR GR_WI_Information_Links;
 	APTR URL_WI_Information_Lemonamiga;
 	APTR URL_WI_Information_HOL;
 	APTR URL_WI_Information_Pouet;
 	APTR BT_WI_Information_Save;
 	APTR BT_WI_Information_Cancel;
+	// About Window
+	APTR WI_About;
+	APTR GR_WI_About_Links;
+	APTR TX_About;
+	APTR BT_AboutOK;
 };
 
 struct ObjApp *CreateApp(void);

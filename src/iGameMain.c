@@ -114,7 +114,7 @@ static int clean_exit(STRPTR msg)
 {
 	if (msg)
 	{
-		PutStr(msg);
+		msg_box(msg);
 		return RETURN_ERROR;
 	}
 
@@ -261,6 +261,20 @@ static void cleanupLocale(void)
 
 static int initLibraries(void)
 {
+
+	#ifndef __amigaos4__
+	if ((IntuitionBase = (struct IntuitionBase *)OpenLibrary("intuition.library", 37)))
+	#else
+	if ((IntuitionBase = OpenLibrary("intuition.library", 37)))
+	#endif
+	{
+		#ifdef __amigaos4__
+		IIntuition = (struct IntuitionIFace *)GetInterface( IntuitionBase, "main", 1, NULL );
+		if(!IIntuition) return clean_exit("Can't open intuition.library Interface\n");
+		#endif
+	}
+	else return clean_exit("Can't open intuition.library v37 or greater\n");
+
 	if ((MUIMasterBase = OpenLibrary(MUIMASTER_NAME, 19)))
 	{
 		#if defined(__amigaos4__)
@@ -293,19 +307,6 @@ static int initLibraries(void)
 		#endif
 	}
 	else return clean_exit("Can't open icon.library v37 or greater\n");
-
-	#ifndef __amigaos4__
-	if ((IntuitionBase = (struct IntuitionBase *)OpenLibrary("intuition.library", 37)))
-	#else
-	if ((IntuitionBase = OpenLibrary("intuition.library", 37)))
-	#endif
-	{
-		#ifdef __amigaos4__
-		IIntuition = (struct IntuitionIFace *)GetInterface( IntuitionBase, "main", 1, NULL );
-		if(!IIntuition) return clean_exit("Can't open intuition.library Interface\n");
-		#endif
-	}
-	else return clean_exit("Can't open intuition.library v37 or greater\n");
 
 	if ((GfxBase = OpenLibrary("graphics.library", 37)))
 	{

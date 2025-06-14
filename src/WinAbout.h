@@ -1,8 +1,8 @@
 /*
-  genresList.h
-  genres list functions header for iGame
+  iGameGUI.h
+  GUI header file for iGame
 
-  Copyright (c) 2018-2025, Emmanuel Vasilakis
+  Copyright (c) 2018, Emmanuel Vasilakis
 
   This file is part of iGame.
 
@@ -20,16 +20,10 @@
   along with iGame. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _GENRES_LIST_H
-#define _GENRES_LIST_H
+#ifndef WIN_ABOUT_H
+#define WIN_ABOUT_H
 
-void genresListAddTail(genresList *);
-void genresListPrint(void);
-genresList *genresListSearchByTitle(const char *, unsigned int);
-genresList *getGenresListHead(void);
-void emptyGenresList(void);
-int genresListNodeCount(int);
-genresList *addGenreInList(const char *);
-void sortGenresList(void);
+APTR getAboutWindow(struct ObjApp *);
+void setAboutWindowMethods(struct ObjApp *);
 
 #endif

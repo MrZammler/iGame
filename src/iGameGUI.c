@@ -68,6 +68,7 @@
 #include "iGameGUI.h"
 #include "WinInfo.h"
 #include "WinProps.h"
+#include "WinAbout.h"
 
 extern igame_settings *current_settings;
 extern blockGuiGfx;
@@ -256,7 +257,7 @@ struct ObjApp *CreateApp(void)
 	);
 
 	snprintf(about_text, sizeof(about_text),
-		"%s\n%s %s\n\nCopyright 2005-%d\n%s",
+		"\033c%s\n%s %s\n\nCopyright 2005-%d\n%s",
 		version_string, GetMBString(MSG_compiledForAboutWin), STR(CPU_VERS), COPY_END_YEAR, GetMBString(MSG_TX_About)
 	);
 
@@ -329,8 +330,8 @@ struct ObjApp *CreateApp(void)
 
 	object->STR_TX_About = about_text;
 
-	object->CY_PropertiesGenreContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_PropertiesGenre0);
-	object->CY_PropertiesGenreContent[1] = NULL;
+	object->GenresContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_PropertiesGenre0);
+	object->GenresContent[1] = NULL;
 
 	object->CY_ScreenshotSizeContent[0] = (CONST_STRPTR)GetMBString(MSG_CY_ScreenshotSize0);
 	object->CY_ScreenshotSizeContent[1] = (CONST_STRPTR)GetMBString(MSG_CY_ScreenshotSize1);
@@ -751,7 +752,6 @@ struct ObjApp *CreateApp(void)
 	object->CY_AddGameGenre = CycleObject,
 		MUIA_HelpNode, "CY_AddGameGenre",
 		MUIA_Frame, MUIV_Frame_Button,
-		MUIA_Cycle_Entries, object->CY_PropertiesGenreContent,
 		End;
 
 	GR_AddGameGenre = GroupObject,
@@ -794,25 +794,6 @@ struct ObjApp *CreateApp(void)
 		WindowContents, GROUP_ROOT_3,
 		End;
 
-	object->TX_About = TextObject,
-		MUIA_Background, MUII_TextBack,
-		MUIA_Text_Contents, object->STR_TX_About,
-		MUIA_Text_SetMin, TRUE,
-		End;
-
-	object->BT_AboutOK = SimpleButton(GetMBString(MSG_BT_AboutOK));
-
-	GROUP_ROOT_4 = GroupObject,
-		Child, object->TX_About,
-		Child, object->BT_AboutOK,
-		End;
-
-	object->WI_About = WindowObject,
-		MUIA_Window_Title, GetMBString(MSG_WI_About),
-		MUIA_Window_ID, MAKE_ID('4', 'I', 'G', 'A'),
-		MUIA_Window_SizeGadget, FALSE,
-		WindowContents, GROUP_ROOT_4,
-		End;
 
 	object->CH_Screenshots = CheckMark(FALSE);
 
@@ -1063,7 +1044,7 @@ struct ObjApp *CreateApp(void)
 		SubWindow, object->WI_Properties = getPropertiesWindow(object),
 		SubWindow, object->WI_GameRepositories,
 		SubWindow, object->WI_AddNonWHDLoad,
-		SubWindow, object->WI_About,
+		SubWindow, object->WI_About = getAboutWindow(object),
 		SubWindow, object->WI_Settings,
 		SubWindow, object->WI_Information = getInformationWindow(object),
 		End;
@@ -1076,6 +1057,7 @@ struct ObjApp *CreateApp(void)
 
 	setInformationWindowMethods(object);
 	setPropertiesWindowMethods(object);
+	setAboutWindowMethods(object);
 
 	DoMethod(object->LV_GamesList, MUIM_Notify, MUIA_NList_TitleClick, MUIV_EveryTime,
 		object->LV_GamesList, 4, MUIM_NList_Sort3, MUIV_TriggerValue, MUIV_NList_SortTypeAdd_2Values, MUIV_NList_Sort3_SortType_Both);
@@ -1158,7 +1140,6 @@ struct ObjApp *CreateApp(void)
 
 	//call whenever the string is changed
 	if (!current_settings->filter_use_enter) {
-
 		DoMethod(object->STR_Filter,
 			MUIM_Notify, MUIA_String_Contents, MUIV_EveryTime,
 			object->App,
@@ -1206,7 +1187,7 @@ struct ObjApp *CreateApp(void)
 
 	DoMethod(object->LV_GenresList,
 		MUIM_Notify, MUIA_List_Active, MUIV_EveryTime,
-		object->LV_GenresList,
+		MUIV_Notify_Self,
 		2,
 		MUIM_CallHook, &GenreClickHook
 	);
@@ -1313,24 +1294,6 @@ struct ObjApp *CreateApp(void)
 		0
 	);
 
-	DoMethod(object->WI_About,
-		MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
-		object->WI_About,
-		3,
-		MUIM_Set, MUIA_Window_Open, FALSE
-	);
-
-	DoMethod(object->BT_AboutOK,
-		MUIM_Notify, MUIA_Pressed, FALSE,
-		object->WI_About,
-		3,
-		MUIM_Set, MUIA_Window_Open, FALSE
-	);
-
-	DoMethod(object->WI_About,
-		MUIM_Window_SetCycleChain, object->BT_AboutOK,
-		0
-	);
 
 	DoMethod(object->WI_Settings,
 		MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
