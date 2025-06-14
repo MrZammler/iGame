@@ -9,6 +9,8 @@
 - Removed some extra change notifications in Genres lists, which should avoid not necessary refreshes of the games/demos lists
 - Added a requester to show the errors occure when iGame is started and a library is missing
 - Now the iGame icon is set back to start by Workbench
+- Revamped the About window, adding a new logo and links
+- Changed the main image in the repository
 
 ### Fixed
 - The genres lists were not populated when the right sidebar was disabled (#260)

@@ -68,6 +68,7 @@
 #include "iGameGUI.h"
 #include "WinInfo.h"
 #include "WinProps.h"
+#include "WinAbout.h"
 
 extern igame_settings *current_settings;
 extern blockGuiGfx;
@@ -256,7 +257,7 @@ struct ObjApp *CreateApp(void)
 	);
 
 	snprintf(about_text, sizeof(about_text),
-		"%s\n%s %s\n\nCopyright 2005-%d\n%s",
+		"\033c%s\n%s %s\n\nCopyright 2005-%d\n%s",
 		version_string, GetMBString(MSG_compiledForAboutWin), STR(CPU_VERS), COPY_END_YEAR, GetMBString(MSG_TX_About)
 	);
 
@@ -793,25 +794,6 @@ struct ObjApp *CreateApp(void)
 		WindowContents, GROUP_ROOT_3,
 		End;
 
-	object->TX_About = TextObject,
-		MUIA_Background, MUII_TextBack,
-		MUIA_Text_Contents, object->STR_TX_About,
-		MUIA_Text_SetMin, TRUE,
-		End;
-
-	object->BT_AboutOK = SimpleButton(GetMBString(MSG_BT_AboutOK));
-
-	GROUP_ROOT_4 = GroupObject,
-		Child, object->TX_About,
-		Child, object->BT_AboutOK,
-		End;
-
-	object->WI_About = WindowObject,
-		MUIA_Window_Title, GetMBString(MSG_WI_About),
-		MUIA_Window_ID, MAKE_ID('4', 'I', 'G', 'A'),
-		MUIA_Window_SizeGadget, FALSE,
-		WindowContents, GROUP_ROOT_4,
-		End;
 
 	object->CH_Screenshots = CheckMark(FALSE);
 
@@ -1062,7 +1044,7 @@ struct ObjApp *CreateApp(void)
 		SubWindow, object->WI_Properties = getPropertiesWindow(object),
 		SubWindow, object->WI_GameRepositories,
 		SubWindow, object->WI_AddNonWHDLoad,
-		SubWindow, object->WI_About,
+		SubWindow, object->WI_About = getAboutWindow(object),
 		SubWindow, object->WI_Settings,
 		SubWindow, object->WI_Information = getInformationWindow(object),
 		End;
@@ -1075,6 +1057,7 @@ struct ObjApp *CreateApp(void)
 
 	setInformationWindowMethods(object);
 	setPropertiesWindowMethods(object);
+	setAboutWindowMethods(object);
 
 	DoMethod(object->LV_GamesList, MUIM_Notify, MUIA_NList_TitleClick, MUIV_EveryTime,
 		object->LV_GamesList, 4, MUIM_NList_Sort3, MUIV_TriggerValue, MUIV_NList_SortTypeAdd_2Values, MUIV_NList_Sort3_SortType_Both);
@@ -1311,24 +1294,6 @@ struct ObjApp *CreateApp(void)
 		0
 	);
 
-	DoMethod(object->WI_About,
-		MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
-		object->WI_About,
-		3,
-		MUIM_Set, MUIA_Window_Open, FALSE
-	);
-
-	DoMethod(object->BT_AboutOK,
-		MUIM_Notify, MUIA_Pressed, FALSE,
-		object->WI_About,
-		3,
-		MUIM_Set, MUIA_Window_Open, FALSE
-	);
-
-	DoMethod(object->WI_About,
-		MUIM_Window_SetCycleChain, object->BT_AboutOK,
-		0
-	);
 
 	DoMethod(object->WI_Settings,
 		MUIM_Notify, MUIA_Window_CloseRequest, TRUE,

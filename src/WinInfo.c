@@ -248,7 +248,7 @@ APTR getInformationWindow(struct ObjApp *object)
 				End,
 			End,
 			Child, object->GR_WI_Information_Links,
-			Child, MUI_MakeObject(MUIO_HBar,4),
+			Child, MUI_MakeObject(MUIO_HBar, 4),
 			Child, HGroup, MUIA_Group_SameSize, TRUE,
 				Child, object->BT_WI_Information_Save = MUI_MakeObject(MUIO_Button, GetMBString(MSG_BT_PropertiesOK)),
 				Child, object->BT_WI_Information_Cancel = MUI_MakeObject(MUIO_Button, GetMBString(MSG_BT_PropertiesCancel)),
