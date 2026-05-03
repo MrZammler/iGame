@@ -182,57 +182,23 @@ MakeStaticHook(DestructLI_TextHook, DestructLI_TextFunc);
 
 HOOKPROTONHNO(CompareLI_TextFunc, LONG, struct NList_CompareMessage *ncm)
 {
-	struct Listentry *entry1 = (struct Listentry *) ncm->entry1;
-	struct Listentry *entry2 = (struct Listentry *) ncm->entry2;
-	LONG column = ncm->sort_type & MUIV_NList_TitleMark_ColMask;
-	LONG result = 0;
+	const struct Listentry *e1 = (const struct Listentry *)ncm->entry1;
+	const struct Listentry *e2 = (const struct Listentry *)ncm->entry2;
+	const LONG sort_type = ncm->sort_type;
+	LONG result;
 
-	if(ncm->sort_type == (LONG)MUIV_NList_SortType_None)
-	{
-		result = (LONG) strcmp(entry1->title, entry2->title);
-		return result;
-	}
+	if (sort_type == (LONG)MUIV_NList_SortType_None)
+		return (LONG)strcmp(e1->title, e2->title);
 
-	if (column == 0)
+	switch (sort_type & MUIV_NList_TitleMark_ColMask)
 	{
-		if (ncm->sort_type & MUIV_NList_TitleMark_TypeMask)
-			result = (LONG) strcmp(entry2->title, entry1->title);
-		else
-			result = (LONG) strcmp(entry1->title, entry2->title);
-	}
-	else if (column == 1)
-	{
-		if (ncm->sort_type & MUIV_NList_TitleMark_TypeMask)
-			result = (LONG) strcmp(entry2->year, entry1->year);
-		else
-			result = (LONG) strcmp(entry1->year, entry2->year);
-	}
-	else if (column == 2)
-	{
-		if (ncm->sort_type & MUIV_NList_TitleMark_TypeMask)
-			result = (LONG) strcmp(entry2->players, entry1->players);
-		else
-			result = (LONG) strcmp(entry1->players, entry2->players);
+		case 1:  result = (LONG)strcmp(e1->year,    e2->year);    break;
+		case 2:  result = (LONG)strcmp(e1->players, e2->players); break;
+		default: result = (LONG)strcmp(e1->title,   e2->title);   break;
 	}
 
-//   if      (col1 == 0)
-//   { if (ncm->sort_type & MUIV_NList_TitleMark_TypeMask)
-//       result = entry2->num - entry1->num;
-//     else
-//       result = entry1->num - entry2->num;
-//   }
-//   else if (col1 == 1)
-//   { if (ncm->sort_type & MUIV_NList_TitleMark_TypeMask)
-//       result = (LONG) stricmp(entry2->str1,entry1->str1);
-//     else
-//       result = (LONG) stricmp(entry1->str1,entry2->str1);
-//   }
-//   else if (col1 == 2)
-//   { if (ncm->sort_type & MUIV_NList_TitleMark_TypeMask)
-//       result = (LONG) stricmp(entry2->str2,entry1->str2);
-//     else
-//       result = (LONG) stricmp(entry1->str2,entry2->str2);
-//   }
+	if (sort_type & MUIV_NList_TitleMark_TypeMask)
+		result = -result;
 
 	return result;
 }
