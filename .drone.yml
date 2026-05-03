@@ -1,37 +1,5 @@
 kind: pipeline
 type: docker
-name: awsbuilders-poweron
-
-clone:
-  disable: true
-
-steps:
-- name: start-aws-instances
-  pull: always
-  image: amazon/aws-cli
-  environment:
-    AWS_ACCESS_KEY_ID:
-      from_secret: AWS_ACCESS_KEY
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: AWS_SECRET_ACCESS_KEY
-  commands:
-    - aws ec2 start-instances --region eu-north-1 --instance-ids i-07474e4fe80f14754
-
-trigger:
-  branch:
-    include:
-    - master
-    - develop
-  event:
-    include:
-    - push
-    - pull_request
-    - tag
-
----
-
-kind: pipeline
-type: docker
 name: compile-tests
 
 workspace:
@@ -106,12 +74,6 @@ trigger:
     include:
     - push
     - pull_request
-
-depends_on:
-  - awsbuilders-poweron
-
-node:
-  agents: awsbuilders
 
 ---
 
@@ -212,9 +174,3 @@ trigger:
   event:
     include:
     - tag
-
-depends_on:
-  - awsbuilders-poweron
-
-node:
-  agents: awsbuilders
