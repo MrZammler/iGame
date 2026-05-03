@@ -163,7 +163,6 @@ void slavesListCountInstancesByTitle(slavesList *node)
 		}
 		currPtr = currPtr->next;
 	}
-	free(currPtr);
 }
 
 slavesList *getSlavesListHead(void)

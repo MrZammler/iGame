@@ -61,6 +61,20 @@
 #include "chipsetList.h"
 #include "funcs.h"
 
+#ifdef BENCH
+#define BENCH_DECLARE     struct DateStamp _bench_s, _bench_e
+#define BENCH_START()     DateStamp(&_bench_s)
+#define BENCH_END(lbl) \
+    DateStamp(&_bench_e); \
+    { LONG _t = (_bench_e.ds_Minute - _bench_s.ds_Minute) * 3000L \
+              + (_bench_e.ds_Tick   - _bench_s.ds_Tick); \
+      printf("[BENCH] " lbl ": %ld ticks (%ld ms)\n", _t, _t * 20L); }
+#else
+#define BENCH_DECLARE
+#define BENCH_START()
+#define BENCH_END(lbl)
+#endif
+
 extern struct ObjApp* app;
 extern struct Library *IconBase;
 extern char* executable_name;
@@ -387,7 +401,12 @@ void app_start(void)
 	// Load the slaves list from the gameslist file
 	setStatusText(GetMBString(MSG_LoadingSavedList));
 	set(app->WI_MainWindow, MUIA_Window_Sleep, TRUE);
-	slavesListLoadFromCSV(csvFilename);
+	{
+		BENCH_DECLARE;
+		BENCH_START();
+		slavesListLoadFromCSV(csvFilename);
+		BENCH_END("CSV load");
+	}
 
 	populateGenresLists(); // This calls the filter_change()
 	if (!current_settings->hide_side_panel)
@@ -780,11 +799,15 @@ static BOOL examineFolder(char *path)
 	BOOL success = TRUE;
 	int bufSize = sizeof(char) * MAX_PATH_SIZE;
 	char *buf = malloc(bufSize);
-	if(buf == NULL)
+	if (buf == NULL)
 	{
 		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 		return FALSE;
 	}
+
+	/* Cache results that are constant for this entire call */
+	const BOOL pathIsFolder = isPathFolder(path);
+	const int currentScanBitfield = calcLastScanBitfield();
 
 	const BPTR lock = Lock(path, SHARED_LOCK);
 	if (lock) {
@@ -794,22 +817,15 @@ static BOOL examineFolder(char *path)
 		{
 			while (ExNext(lock, FIblock))
 			{
-				if(FIblock->fib_DirEntryType > 0)
+				if (FIblock->fib_DirEntryType > 0)
 				{
 					if (
 						strncmp((unsigned char *)FIblock->fib_FileName, "data\0", 5) &&
 						strncmp((unsigned char *)FIblock->fib_FileName, "Data\0", 5)
 					) {
-						strcpy(buf, FIblock->fib_FileName);
-
-						if(!isPathFolder(path))
-						{
-							sprintf(buf, "%s%s", path, FIblock->fib_FileName);
-						}
-						else
-						{
-							sprintf(buf, "%s/%s", path, FIblock->fib_FileName);
-						}
+						strlcpy(buf, path, bufSize);
+						if (pathIsFolder) strlcat(buf, "/", bufSize);
+						strlcat(buf, FIblock->fib_FileName, bufSize);
 
 						getFullPath(buf, buf);
 						setStatusText(buf);
@@ -817,14 +833,13 @@ static BOOL examineFolder(char *path)
 					}
 				}
 
-				if(FIblock->fib_DirEntryType < 0)
+				if (FIblock->fib_DirEntryType < 0)
 				{
-
-					// igame.data found
+					// igame.data found — build its path in buf (no extra allocation needed)
 					if (current_settings->useIgameDataTitle && !strcmp(FIblock->fib_FileName, DEFAULT_IGAMEDATA_FILE))
 					{
 						slavesList *node = malloc(sizeof(slavesList));
-						if(node == NULL)
+						if (node == NULL)
 						{
 							msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 							FreeVec(FIblock);
@@ -833,47 +848,22 @@ static BOOL examineFolder(char *path)
 							return FALSE;
 						}
 
-						char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
-						if(!isPathFolder(path))
-						{
-							sprintf(igameDataPath, "%s%s", path, FIblock->fib_FileName);
-						}
-						else
-						{
-							sprintf(igameDataPath, "%s/%s", path, FIblock->fib_FileName);
-						}
+						strlcpy(buf, path, bufSize);
+						if (pathIsFolder) strlcat(buf, "/", bufSize);
+						strlcat(buf, DEFAULT_IGAMEDATA_FILE, bufSize);
 
-						node->instance = 0;
-						node->title[0] = '\0';
-						node->genre[0] = '\0';
-						node->user_title[0] = '\0';
-						node->arguments[0] = '\0';
-						node->chipset[0] = '\0';
-						node->times_played = 0;
-						node->favourite = 0;
-						node->last_played = 0;
+						memset(node, 0, sizeof(slavesList));
 						node->exists = 1;
-						node->hidden = 0;
-						node->deleted = 0;
-						node->year = 0;
-						node->players = 0;
-						node->path[0] = '\0';
 
-						getIGameDataInfo(igameDataPath, node);
-						free(igameDataPath);
+						getIGameDataInfo(buf, node);
 
+						// Resolve relative path from igame.data into absolute node->path
 						strncpy(buf, node->path, bufSize);
-						if(!isPathFolder(path))
-						{
-							snprintf(node->path, sizeof(char) * MAX_PATH_SIZE, "%s%s", path, buf);
-						}
-						else
-						{
-							snprintf(node->path, sizeof(char) * MAX_PATH_SIZE, "%s/%s", path, buf);
-						}
+						strlcpy(node->path, path, sizeof(node->path));
+						if (pathIsFolder) strlcat(node->path, "/", sizeof(node->path));
+						strlcat(node->path, buf, sizeof(node->path));
 
-						// Check the node->path and skip the save if the buf is empty, it is a slave that aleady exists in the slaves list
-						// or there is no executable file defined. Free the node before move on.
+						// Skip if relative path was empty, slave missing, or already listed
 						if (
 							isStringEmpty(buf) || !check_path_exists(node->path) ||
 							(slavesListSearchByPath(node->path, sizeof(char) * MAX_PATH_SIZE) != NULL)
@@ -893,20 +883,15 @@ static BOOL examineFolder(char *path)
 					{
 						slavesList *existingNode = NULL;
 
-						if(!isPathFolder(path))
-						{
-							sprintf(buf, "%s%s", path, FIblock->fib_FileName);
-						}
-						else
-						{
-							sprintf(buf, "%s/%s", path, FIblock->fib_FileName);
-						}
+						strlcpy(buf, path, bufSize);
+						if (pathIsFolder) strlcat(buf, "/", bufSize);
+						strlcat(buf, FIblock->fib_FileName, bufSize);
 
 						// Find if already exists in the list and ignore it
 						if (!(existingNode = slavesListSearchByPath(buf, bufSize)))
 						{
 							slavesList *node = malloc(sizeof(slavesList));
-							if(node == NULL)
+							if (node == NULL)
 							{
 								msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 								FreeVec(FIblock);
@@ -915,48 +900,29 @@ static BOOL examineFolder(char *path)
 								return FALSE;
 							}
 
-							node->instance = 0;
-							node->title[0] = '\0';
-							node->genre[0] = '\0';
-							sprintf(node->genre, "Unknown");
-							node->user_title[0] = '\0';
-							node->chipset[0] = '\0';
-							node->times_played = 0;
-							node->favourite = 0;
-							node->last_played = 0;
+							memset(node, 0, sizeof(slavesList));
 							node->exists = 1;
-							node->hidden = 0;
-							node->deleted = 0;
-							node->year = 0;
-							node->players = 0;
-							node->path[0] = '\0';
+							strlcpy(node->genre, "Unknown", sizeof(node->genre));
 
 							getFullPath(buf, buf);
-							strncpy(node->path, buf, sizeof(node->path));
+							strlcpy(node->path, buf, sizeof(node->path));
 
-							// if igame.data is enabled in settings use it
+							// if igame.data is enabled in settings use it;
+							// reuse buf for its path (node->path already saved above)
 							if (current_settings->useIgameDataTitle)
 							{
-								char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
-								snprintf(igameDataPath, sizeof(char) * MAX_PATH_SIZE, "%s/%s", path, DEFAULT_IGAMEDATA_FILE);
-								if (check_path_exists(igameDataPath))
-								{
-									getIGameDataInfo(igameDataPath, node);
-								}
-								free(igameDataPath);
+								strlcpy(buf, path, bufSize);
+								strlcat(buf, "/", bufSize);
+								strlcat(buf, DEFAULT_IGAMEDATA_FILE, bufSize);
+								if (check_path_exists(buf))
+									getIGameDataInfo(buf, node);
 							}
-
-							// Generate title and add in the list
-							// Run the following if the node->title is empty
-							if (isStringEmpty(node->title))
-							{
-								generateItemName(node->path, node->title, sizeof(node->title));
-							}
-
-							// Scan how many others with same title exist and increase a number at the end of the list (alt)
-							slavesListCountInstancesByTitle(node);
 
 							// TODO: IDEA - Instead of adding at the tail insert it in sorted position
+							if (isStringEmpty(node->title))
+								generateItemName(node->path, node->title, sizeof(node->title));
+
+							slavesListCountInstancesByTitle(node);
 							slavesListAddTail(node);
 							addGenreInList(node->genre);
 							addChipsetInList(node->chipset);
@@ -965,19 +931,15 @@ static BOOL examineFolder(char *path)
 						{
 							if (current_settings->useIgameDataTitle)
 							{
-								char *igameDataPath = malloc(sizeof(char) * MAX_PATH_SIZE);
-								if(igameDataPath == NULL)
-								{
-									msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-									return FALSE;
-								}
-
-								getParentPath(existingNode->path, igameDataPath, sizeof(char) * MAX_PATH_SIZE);
-								snprintf(igameDataPath, sizeof(char) * MAX_PATH_SIZE, "%s/%s", igameDataPath, DEFAULT_IGAMEDATA_FILE); // cppcheck-suppress sprintfOverlappingData
-								if (check_path_exists(igameDataPath))
+								// Build igame.data path in buf; getParentPath writes parent,
+								// then we append the filename — no separate allocation needed
+								getParentPath(existingNode->path, buf, bufSize);
+								strlcat(buf, "/", bufSize);
+								strlcat(buf, DEFAULT_IGAMEDATA_FILE, bufSize);
+								if (check_path_exists(buf))
 								{
 									slavesList *node = malloc(sizeof(slavesList));
-									if(node == NULL)
+									if (node == NULL)
 									{
 										msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
 										FreeVec(FIblock);
@@ -986,53 +948,33 @@ static BOOL examineFolder(char *path)
 										return FALSE;
 									}
 
-									node->instance = 0;
-									node->title[0] = '\0';
-									node->genre[0] = '\0';
-									sprintf(node->genre,"Unknown");
-									node->user_title[0] = '\0';
-									node->chipset[0] = '\0';
-									node->times_played = 0;
-									node->favourite = 0;
-									node->last_played = 0;
+									memset(node, 0, sizeof(slavesList));
 									node->exists = 1;
-									node->hidden = 0;
-									node->deleted = 0;
-									node->year = 0;
-									node->players = 0;
-									node->path[0] = '\0';
+									strlcpy(node->genre, "Unknown", sizeof(node->genre));
 
-									getIGameDataInfo(igameDataPath, node);
+									getIGameDataInfo(buf, node);
 
-									strncpy(existingNode->title, node->title, MAX_SLAVE_TITLE_SIZE);
+									strlcpy(existingNode->title, node->title, MAX_SLAVE_TITLE_SIZE);
 									if (isStringEmpty(existingNode->title))
-									{
-										// Fallback generation of the title and addition in the list
 										generateItemName(existingNode->path, existingNode->title, sizeof(existingNode->title));
-									}
 
 									if (!isStringEmpty(node->genre))
 									{
-										strncpy(existingNode->genre, node->genre, MAX_GENRE_NAME_SIZE);
+										strlcpy(existingNode->genre, node->genre, MAX_GENRE_NAME_SIZE);
 										addGenreInList(node->genre);
 									}
 									if (!isStringEmpty(node->chipset))
 									{
-										strncpy(existingNode->chipset, node->chipset, MAX_CHIPSET_SIZE);
+										strlcpy(existingNode->chipset, node->chipset, MAX_CHIPSET_SIZE);
 										addChipsetInList(node->chipset);
 									}
 									free(node);
 								}
-
-								free(igameDataPath);
 							}
 
-							// If the current scan settings are different from last scan settings and
-							// the igame.data file is not used, get the title from the file
-							if (!current_settings->useIgameDataTitle && current_settings->lastScanSetup != calcLastScanBitfield())
-							{
+							// If scan settings changed and igame.data is not used, regenerate title
+							if (!current_settings->useIgameDataTitle && current_settings->lastScanSetup != currentScanBitfield)
 								generateItemName(existingNode->path, existingNode->title, sizeof(existingNode->title));
-							}
 						}
 					}
 				}
@@ -1051,6 +993,8 @@ void scan_repositories(void)
 {
 	if (repos)
 	{
+		BENCH_DECLARE;
+		BENCH_START();
 		set(app->WI_MainWindow, MUIA_Window_Sleep, TRUE);
 
 		for (item_repos = repos; item_repos != NULL; item_repos = item_repos->next)
@@ -1075,6 +1019,7 @@ void scan_repositories(void)
 		populateChipsetList();
 		setLastScanBitfield();
 		set(app->WI_MainWindow, MUIA_Window_Sleep, FALSE);
+		BENCH_END("Folder scan");
 	}
 }
 
@@ -1452,16 +1397,26 @@ void app_stop(void)
 	emptySlavesList();
 	emptyGenresList();
 
-	if (repos)
+	while (repos)
 	{
+		repos_list *next = repos->next;
 		free(repos);
-		repos = NULL;
+		repos = next;
+	}
+
+	if (current_settings)
+	{
+		free(current_settings);
+		current_settings = NULL;
 	}
 }
 
 void save_list(void)
 {
+	BENCH_DECLARE;
+	BENCH_START();
 	slavesListSaveToCSV(DEFAULT_GAMESLIST_FILE);
+	BENCH_END("CSV save");
 }
 
 // TODO: Make this work

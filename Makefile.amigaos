@@ -41,6 +41,10 @@ CFLAGS_060	= -c +aos68k -cpu=68060 -dontwarn=-1 -O2 -c99 -DCPU_VERS=68060 -DRELE
 CFLAGS_MOS	= -c +morphos -dontwarn=-1 -O2 -DCPU_VERS=MorphOS -DRELEASE_DATE=$(DATE)
 CFLAGS_OS4	= -c +aosppc -dontwarn=-1 -O2 -D__USE_INLINE__ -DCPU_VERS=AmigaOS4 -DRELEASE_DATE=$(DATE)
 
+ifeq ($(BENCH), 1)
+CFLAGS += -DBENCH
+endif
+
 ##########################################################################
 # Builder settings
 ##########################################################################

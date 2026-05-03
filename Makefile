@@ -36,6 +36,10 @@ CFLAGS_060	= -c -mcpu=68060 -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=68060 -
 CFLAGS_MOS	= -c -Os -fomit-frame-pointer -std=c99 -DCPU_VERS=MorphOS -DRELEASE_DATE=$(DATE)
 CFLAGS_OS4	= -c -Os -fomit-frame-pointer -std=c99 -D__USE_INLINE__ -DCPU_VERS=AmigaOS4 -DRELEASE_DATE=$(DATE)
 
+ifeq ($(BENCH), 1)
+CFLAGS += -DBENCH
+endif
+
 ##########################################################################
 # Builder settings
 ##########################################################################

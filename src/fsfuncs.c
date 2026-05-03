@@ -174,119 +174,119 @@ BOOL get_filename(const char *title, const char *positive_text, const BOOL save_
 	return result;
 }
 
+/* Copy a CSV field into dst, stripping surrounding quotes if present.
+   Replicates substring(src,1,-2) inline: no heap allocation needed. */
+static void parse_field(char *dst, const char *src, int dst_size)
+{
+	if (src[0] == '"')
+	{
+		int len = strlen(src);
+		strlcpy(dst, src + 1, len > 1 ? len - 1 : 1);
+	}
+	else
+		strlcpy(dst, src, dst_size);
+}
+
 void slavesListLoadFromCSV(char *filename)
 {
-	int lineBufSize = sizeof(char) * 512;
+	FILE *fpgames = fopen(filename, "r");
+	if (!fpgames)
+		return;
 
-	if (check_path_exists(filename))
+	char *lineBuf = malloc(512);
+	if (lineBuf == NULL)
 	{
-		FILE *fpgames = fopen(filename, "r");
-		if (fpgames)
-		{
-			char *lineBuf = AllocVec(lineBufSize, MEMF_CLEAR);
-			char *buf = AllocVec(sizeof(char) * MAX_PATH_SIZE, MEMF_CLEAR);
-			if((buf == NULL) || (lineBuf == NULL))
-			{
-				msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-				fclose(fpgames);
-				return;
-			}
-
-			while (fgets(lineBuf, lineBufSize, fpgames) != NULL)
-			{
-				slavesList *node = malloc(sizeof(slavesList));
-				if(node == NULL)
-				{
-					msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
-					return;
-				}
-
-				buf = strtok(lineBuf, ";");
-				node->instance = atoi(buf);
-
-				buf = strtok(NULL, ";");
-				node->title[0] = '\0';
-				sprintf(node->title, "%s", buf);
-				if (strcasestr(buf, "\""))
-				{
-					sprintf(node->title,"%s", substring(buf, 1, -2));
-				}
-
-				buf = strtok(NULL, ";");
-				node->genre[0] = '\0';
-				sprintf(node->genre, "%s", buf);
-				if (strcasestr(buf, "\""))
-				{
-					sprintf(node->genre,"%s", substring(buf, 1, -2));
-				}
-				if(isStringEmpty(node->genre))
-				{
-					sprintf(node->genre,"Unknown");
-				}
-				addGenreInList(node->genre);
-
-				buf = strtok(NULL, ";");
-				node->path[0] = '\0';
-				sprintf(node->path, "%s", buf);
-				if (strcasestr(buf, "\""))
-				{
-					sprintf(node->path, "%s", substring(buf, 1, -2));
-				}
-
-				buf = strtok(NULL, ";");
-				node->favourite = atoi(buf);
-
-				buf = strtok(NULL, ";");
-				node->times_played = atoi(buf);
-
-				buf = strtok(NULL, ";");
-				node->last_played = atoi(buf);
-
-				buf = strtok(NULL, ";");
-				node->hidden = atoi(buf);
-
-				buf = strtok(NULL, ";");
-				node->deleted = atoi(buf);
-
-				buf = strtok(NULL, ";");
-				node->user_title[0] = '\0';
-				if (buf)
-				{
-					sprintf(node->user_title, "%s", buf);
-					if (strcasestr(buf, "\""))
-					{
-						sprintf(node->user_title, "%s", substring(buf, 1, -2));
-					}
-				}
-
-				buf = strtok(NULL, ";");
-				node->year = 0;
-				if (buf)
-					node->year = atoi(buf);
-
-				buf = strtok(NULL, ";");
-				node->players = 0;
-				if (buf)
-					node->players = atoi(buf);
-
-				buf = strtok(NULL, ";");
-				node->chipset[0] = '\0';
-				if (strncmp(buf, "\n", sizeof(char)))
-				{
-					sprintf(node->chipset, "%s", buf);
-				}
-				if (strcasestr(buf, "\""))
-				{
-					sprintf(node->chipset, "%s", substring(buf, 1, -2));
-				}
-				addChipsetInList(node->chipset);
-
-				slavesListAddTail(node);
-			}
-			fclose(fpgames);
-			FreeVec(lineBuf);
-		}
+		msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+		fclose(fpgames);
+		return;
 	}
+
+	char *buf;
+	while (fgets(lineBuf, 512, fpgames) != NULL)
+	{
+		slavesList *node = malloc(sizeof(slavesList));
+		if (node == NULL)
+		{
+			msg_box((const char*)GetMBString(MSG_NotEnoughMemory));
+			free(lineBuf);
+			fclose(fpgames);
+			return;
+		}
+
+		buf = strtok(lineBuf, ";");
+		node->instance = atoi(buf);
+
+		buf = strtok(NULL, ";");
+		parse_field(node->title, buf, sizeof(node->title));
+
+		buf = strtok(NULL, ";");
+		parse_field(node->genre, buf, sizeof(node->genre));
+		if (isStringEmpty(node->genre))
+			strlcpy(node->genre, "Unknown", sizeof(node->genre));
+		addGenreInList(node->genre);
+
+		buf = strtok(NULL, ";");
+		parse_field(node->path, buf, sizeof(node->path));
+
+		buf = strtok(NULL, ";");
+		node->favourite = atoi(buf);
+
+		buf = strtok(NULL, ";");
+		node->times_played = atoi(buf);
+
+		buf = strtok(NULL, ";");
+		node->last_played = atoi(buf);
+
+		buf = strtok(NULL, ";");
+		node->hidden = atoi(buf);
+
+		buf = strtok(NULL, ";");
+		node->deleted = atoi(buf);
+
+		buf = strtok(NULL, ";");
+		node->user_title[0] = '\0';
+		if (buf)
+			parse_field(node->user_title, buf, sizeof(node->user_title));
+
+		buf = strtok(NULL, ";");
+		node->year = 0;
+		if (buf)
+			node->year = atoi(buf);
+
+		buf = strtok(NULL, ";");
+		node->players = 0;
+		if (buf)
+			node->players = atoi(buf);
+
+		buf = strtok(NULL, ";");
+		node->chipset[0] = '\0';
+		if (buf && buf[0] != '\n')
+			parse_field(node->chipset, buf, sizeof(node->chipset));
+		addChipsetInList(node->chipset);
+
+		slavesListAddTail(node);
+	}
+	fclose(fpgames);
+	free(lineBuf);
+}
+
+/* Write a decimal integer into buf without format-string parsing overhead */
+static char *csv_append_int(char *p, int val)
+{
+	char tmp[12];
+	int len = 0;
+	if (val < 0) { *p++ = '-'; val = -val; }
+	if (val == 0) { *p++ = '0'; return p; }
+	while (val > 0) { tmp[len++] = '0' + (val % 10); val /= 10; }
+	while (len > 0) *p++ = tmp[--len];
+	return p;
+}
+
+/* Copy a string into buf without format-string parsing overhead */
+static char *csv_append_str(char *p, const char *s)
+{
+	while (*s) *p++ = *s++;
+	return p;
 }
 
 void slavesListSaveToCSV(const char *filename)
@@ -294,8 +294,8 @@ void slavesListSaveToCSV(const char *filename)
 	char csvFilename[32];
 	set(app->TX_Status, MUIA_Text_Contents, (const char*)GetMBString(MSG_SavingGamelist));
 
-	strcpy(csvFilename, (CONST_STRPTR)filename);
-	strcat(csvFilename, ".csv");
+	strlcpy(csvFilename, filename, sizeof(csvFilename));
+	strlcat(csvFilename, ".csv", sizeof(csvFilename));
 
 	FILE *fpgames = fopen(csvFilename, "w");
 	if (!fpgames)
@@ -304,23 +304,39 @@ void slavesListSaveToCSV(const char *filename)
 		return;
 	}
 
-	slavesList *currPtr = getSlavesListHead();
+	/* Larger write buffer reduces AmigaDOS Write() calls (each is a message-passing round trip) */
+	char *iobuf = malloc(4096);
+	if (iobuf)
+		setvbuf(fpgames, iobuf, _IOFBF, 4096);
 
+	/* Line buffer sized for worst-case field lengths:
+	   title(128) + user_title(128) + path(256) + genre(32) + chipset(16)
+	   + 8 int fields (up to 11 digits each) + quotes/semicolons/newline */
+	char line[700];
+	slavesList *currPtr = getSlavesListHead();
 	while (currPtr != NULL)
 	{
-		fprintf(
-			fpgames,
-			"%d;\"%s\";\"%s\";\"%s\";%d;%d;%d;%d;%d;\"%s\";%d;%d;\"%s\";\n",
-			currPtr->instance, currPtr->title,
-			currPtr->genre, currPtr->path, currPtr->favourite,
-			currPtr->times_played, currPtr->last_played, currPtr->hidden,
-			currPtr->deleted, currPtr->user_title,
-			currPtr->year, currPtr->players, currPtr->chipset
-		);
+		char *p = line;
+		p = csv_append_int(p, currPtr->instance);                           *p++ = ';';
+		*p++ = '"'; p = csv_append_str(p, currPtr->title);      *p++ = '"'; *p++ = ';';
+		*p++ = '"'; p = csv_append_str(p, currPtr->genre);      *p++ = '"'; *p++ = ';';
+		*p++ = '"'; p = csv_append_str(p, currPtr->path);       *p++ = '"'; *p++ = ';';
+		p = csv_append_int(p, currPtr->favourite);                          *p++ = ';';
+		p = csv_append_int(p, currPtr->times_played);                       *p++ = ';';
+		p = csv_append_int(p, currPtr->last_played);                        *p++ = ';';
+		p = csv_append_int(p, currPtr->hidden);                             *p++ = ';';
+		p = csv_append_int(p, currPtr->deleted);                            *p++ = ';';
+		*p++ = '"'; p = csv_append_str(p, currPtr->user_title); *p++ = '"'; *p++ = ';';
+		p = csv_append_int(p, currPtr->year);                               *p++ = ';';
+		p = csv_append_int(p, currPtr->players);                            *p++ = ';';
+		*p++ = '"'; p = csv_append_str(p, currPtr->chipset);    *p++ = '"'; *p++ = ';';
+		*p++ = '\n';
+		fwrite(line, 1, p - line, fpgames);
 		currPtr = currPtr->next;
 	}
 
 	fclose(fpgames);
+	free(iobuf);
 }
 
 /*
