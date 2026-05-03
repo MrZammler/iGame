@@ -51,6 +51,7 @@
 
 /* ANSI C */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #ifndef CPU_VERS
@@ -192,8 +193,8 @@ HOOKPROTONHNO(CompareLI_TextFunc, LONG, struct NList_CompareMessage *ncm)
 
 	switch (sort_type & MUIV_NList_TitleMark_ColMask)
 	{
-		case 1:  result = (LONG)strcmp(e1->year,    e2->year);    break;
-		case 2:  result = (LONG)strcmp(e1->players, e2->players); break;
+		case 1:  result = atoi(e1->year)    - atoi(e2->year);    break;
+		case 2:  result = atoi(e1->players) - atoi(e2->players); break;
 		default: result = (LONG)strcmp(e1->title,   e2->title);   break;
 	}
 

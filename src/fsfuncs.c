@@ -181,7 +181,10 @@ static void parse_field(char *dst, const char *src, int dst_size)
 	if (src[0] == '"')
 	{
 		int len = strlen(src);
-		strlcpy(dst, src + 1, len > 1 ? len - 1 : 1);
+		int max_copy = (len > 1) ? (len - 1) : 1;
+		if (max_copy > dst_size)
+			max_copy = dst_size;
+		strlcpy(dst, src + 1, max_copy);
 	}
 	else
 		strlcpy(dst, src, dst_size);
